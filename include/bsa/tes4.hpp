@@ -1209,7 +1209,8 @@ namespace bsa::tes4
 			return _directories.insert(std::move(a_directory));
 		}
 
-		void read(std::filesystem::path a_path) noexcept
+		auto read(std::filesystem::path a_path) noexcept
+			-> version
 		{
 			clear();
 			detail::istream_t in{ std::move(a_path) };
@@ -1231,6 +1232,8 @@ namespace bsa::tes4
 			if (header.file_strings() && !header.embedded_file_names()) {
 				read_file_names(in, header);
 			}
+
+			return static_cast<version>(header.version());
 		}
 
 		void write(std::filesystem::path a_path, version a_version) const noexcept
