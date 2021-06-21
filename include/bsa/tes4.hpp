@@ -449,10 +449,6 @@ namespace bsa::tes4
 			[[nodiscard]] bool directory_strings() const noexcept { return test_flag(archive_flag::directory_strings); }
 			[[nodiscard]] bool embedded_file_names() const noexcept { return test_flag(archive_flag::embedded_file_names); }
 			[[nodiscard]] bool file_strings() const noexcept { return test_flag(archive_flag::file_strings); }
-			[[nodiscard]] bool retain_directory_names() const noexcept { return test_flag(archive_flag::retain_directory_names); }
-			[[nodiscard]] bool retain_file_name_offsets() const noexcept { return test_flag(archive_flag::retain_file_name_offsets); }
-			[[nodiscard]] bool retain_file_names() const noexcept { return test_flag(archive_flag::retain_file_names); }
-			[[nodiscard]] bool retain_strings_during_startup() const noexcept { return test_flag(archive_flag::retain_strings_during_startup); }
 			[[nodiscard]] bool xbox_archive() const noexcept { return test_flag(archive_flag::xbox_archive); }
 			[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
 
@@ -1145,6 +1141,27 @@ namespace bsa::tes4
 		[[nodiscard]] auto archive_types() const noexcept -> archive_type { return _types; }
 		void archive_types(archive_type a_types) noexcept { _types = a_types; }
 
+		[[nodiscard]] bool compressed() const noexcept { return test_flag(archive_flag::compressed); }
+		[[nodiscard]] bool directory_strings() const noexcept { return test_flag(archive_flag::directory_strings); }
+		[[nodiscard]] bool embedded_file_names() const noexcept { return test_flag(archive_flag::embedded_file_names); }
+		[[nodiscard]] bool file_strings() const noexcept { return test_flag(archive_flag::file_strings); }
+		[[nodiscard]] bool retain_directory_names() const noexcept { return test_flag(archive_flag::retain_directory_names); }
+		[[nodiscard]] bool retain_file_name_offsets() const noexcept { return test_flag(archive_flag::retain_file_name_offsets); }
+		[[nodiscard]] bool retain_file_names() const noexcept { return test_flag(archive_flag::retain_file_names); }
+		[[nodiscard]] bool retain_strings_during_startup() const noexcept { return test_flag(archive_flag::retain_strings_during_startup); }
+		[[nodiscard]] bool xbox_archive() const noexcept { return test_flag(archive_flag::xbox_archive); }
+		[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
+
+		[[nodiscard]] bool fonts() const noexcept { return test_type(archive_type::fonts); }
+		[[nodiscard]] bool menus() const noexcept { return test_type(archive_type::menus); }
+		[[nodiscard]] bool meshes() const noexcept { return test_type(archive_type::meshes); }
+		[[nodiscard]] bool misc() const noexcept { return test_type(archive_type::misc); }
+		[[nodiscard]] bool shaders() const noexcept { return test_type(archive_type::shaders); }
+		[[nodiscard]] bool sounds() const noexcept { return test_type(archive_type::sounds); }
+		[[nodiscard]] bool textures() const noexcept { return test_type(archive_type::textures); }
+		[[nodiscard]] bool trees() const noexcept { return test_type(archive_type::trees); }
+		[[nodiscard]] bool voices() const noexcept { return test_type(archive_type::voices); }
+
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _directories.begin(); }
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _directories.cbegin(); }
 
@@ -1378,6 +1395,16 @@ namespace bsa::tes4
 			}
 
 			return offset;
+		}
+
+		[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
+		{
+			return (_flags & a_flag) != archive_flag::none;
+		}
+
+		[[nodiscard]] bool test_type(archive_type a_type) const noexcept
+		{
+			return (_types & a_type) != archive_type::none;
 		}
 
 		void write_file_data(
