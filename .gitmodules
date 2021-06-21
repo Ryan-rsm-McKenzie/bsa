@@ -1,0 +1,3 @@
+[submodule "extern/CPPDebuggerVisualizers"]
+	path = extern/CPPDebuggerVisualizers
+	url = https://github.com/KindDragon/CPPDebuggerVisualizers

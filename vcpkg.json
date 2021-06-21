@@ -1,0 +1,9 @@
+{
+  "name": "bsa-tes4",
+  "version-string": "1",
+  "dependencies": [
+    "boost-iostreams",
+    "boost-predef",
+    "boost-text"
+  ]
+}

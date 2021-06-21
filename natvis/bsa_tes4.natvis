@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="bsa::tes4::archive">
+		<DisplayString>tes4 archive</DisplayString>
+		<Expand>
+			<Item Name="[directories]">_directories</Item>
+			<Item Name="[flags]">_flags,en</Item>
+			<Item Name="[types]">_types,en</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::directory::name_proxy">
+		<DisplayString>{ n }</DisplayString>
+		<Expand>
+			<Item Name="[name]">n</Item>
+			<Item Name="[proxy]">f</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::directory">
+		<DisplayString>{ _name,na }</DisplayString>
+		<Expand>
+			<Item Name="[hash]">_hash</Item>
+			<Item Name="[name]">_name,na</Item>
+			<Item Name="[files]">_files,na</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::file::name_proxy">
+		<DisplayString>{ n }</DisplayString>
+		<Expand>
+			<Item Name="[name]">n</Item>
+			<Item Name="[proxy]">f</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::file::data_proxy">
+		<DisplayString>{ d }</DisplayString>
+		<Expand>
+			<Item Name="[data]">d</Item>
+			<Item Name="[proxy]">f</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::file">
+		<DisplayString>{ _name }</DisplayString>
+		<Expand>
+			<Item Name="[hash]">_hash</Item>
+			<Item Name="[name]">_name</Item>
+			<Item Name="[decompressed size]">_decompsz</Item>
+			<Item Name="[data]">_data</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::hashing::hash">
+		<Intrinsic Name="numeric" Expression="
+			(uint64_t)last &lt;&lt; 0u * 8u |
+			(uint64_t)last2 &lt;&lt; 1u * 8u |
+			(uint64_t)length &lt;&lt; 2u * 8u |
+			(uint64_t)first &lt;&lt; 3u * 8u |
+			(uint64_t)crc &lt;&lt; 4u * 8u
+		"/>
+		<DisplayString>{ numeric(),X }</DisplayString>
+		<Expand>
+			<Item Name="[first]">first</Item>
+			<Item Name="[second to last]">last2</Item>
+			<Item Name="[last]">last</Item>
+			<Item Name="[length]">(size_t)length</Item>
+			<Item Name="[crc]">crc,X</Item>
+		</Expand>
+	</Type>
+	
+</AutoVisualizer>

@@ -1,0 +1,28 @@
+{
+  "name": "boost-text",
+  "version-string": "1",
+  "dependencies": [
+    "boost-algorithm",
+    "boost-align",
+    "boost-assert",
+    "boost-config",
+    "boost-container",
+    "boost-endian",
+    "boost-filesystem",
+    "boost-optional",
+    "boost-predef",
+    "boost-smart-ptr",
+    "boost-stl-interfaces",
+    "boost-throw-exception",
+    "boost-type-traits",
+    "boost-utility",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
