@@ -822,6 +822,27 @@ namespace bsa::tes4
 		using iterator = container_type::const_iterator;
 		using const_iterator = container_type::const_iterator;
 
+		class index_t final
+		{
+		public:
+			index_t() noexcept = default;
+
+			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
+			[[nodiscard]] auto operator*() const noexcept -> const file& { return *_proxy; }
+			[[nodiscard]] auto operator->() const noexcept -> const file* { return _proxy; }
+
+		protected:
+			friend class archive;
+			friend class directory;
+
+			explicit index_t(const file& a_value) noexcept :
+				_proxy(&a_value)
+			{}
+
+		private:
+			const file* _proxy{ nullptr };
+		};
+
 		explicit directory(hashing::hash a_hash) noexcept :
 			_hash(a_hash)
 		{}
@@ -841,6 +862,19 @@ namespace bsa::tes4
 		~directory() noexcept = default;
 		directory& operator=(const directory&) noexcept = default;
 		directory& operator=(directory&&) noexcept = default;
+
+		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept
+			-> index_t
+		{
+			const auto it = _files.find(a_hash);
+			return it != _files.end() ? index_t{ *it } : index_t{};
+		}
+
+		[[nodiscard]] auto operator[](std::filesystem::path a_filename) const noexcept
+			-> index_t
+		{
+			return (*this)[hashing::hash_file(std::move(a_filename))];
+		}
 
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _files.cbegin(); }
@@ -1036,7 +1070,52 @@ namespace bsa::tes4
 		using iterator = container_type::const_iterator;
 		using const_iterator = container_type::const_iterator;
 
+		class index_t final
+		{
+		public:
+			index_t() noexcept = default;
+
+			[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept
+				-> directory::index_t
+			{
+				return _proxy ? (*_proxy)[a_hash] : directory::index_t{};
+			}
+
+			[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
+				-> directory::index_t
+			{
+				return _proxy ? (*_proxy)[std::move(a_path)] : directory::index_t{};
+			}
+
+			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
+			[[nodiscard]] auto operator*() const noexcept -> const directory& { return *_proxy; }
+			[[nodiscard]] auto operator->() const noexcept -> const directory* { return _proxy; }
+
+		protected:
+			friend class archive;
+
+			explicit index_t(const directory& a_value) noexcept :
+				_proxy(&a_value)
+			{}
+
+		private:
+			const directory* _proxy{ nullptr };
+		};
+
 		archive() noexcept = default;
+
+		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept
+			-> index_t
+		{
+			const auto it = _directories.find(a_hash);
+			return it != _directories.end() ? index_t{ *it } : index_t{};
+		}
+
+		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
+			-> index_t
+		{
+			return (*this)[hashing::hash_directory(std::move(a_path))];
+		}
 
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
 		void archive_flags(archive_flag a_flags) noexcept { _flags = a_flags; }
