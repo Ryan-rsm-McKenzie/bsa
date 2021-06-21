@@ -567,17 +567,17 @@ namespace bsa::tes4
 		{
 			switch (_data.index()) {
 			case data_view:
-				return std::get<data_view>(_data);
+				return *std::get_if<data_view>(&_data);
 			case data_owner:
 				{
-					auto& owner = std::get<data_owner>(_data);
+					auto& owner = *std::get_if<data_owner>(&_data);
 					return {
 						owner.data(),
 						owner.size()
 					};
 				}
 			case data_proxied:
-				return std::get<data_proxied>(_data).d;
+				return std::get_if<data_proxied>(&_data)->d;
 			default:
 				detail::declare_unreachable();
 			}
@@ -588,11 +588,11 @@ namespace bsa::tes4
 		{
 			switch (_data.index()) {
 			case data_view:
-				return std::get<data_view>(_data).data();
+				return std::get_if<data_view>(&_data)->data();
 			case data_owner:
-				return std::get<data_owner>(_data).data();
+				return std::get_if<data_owner>(&_data)->data();
 			case data_proxied:
-				return std::get<data_proxied>(_data).d.data();
+				return std::get_if<data_proxied>(&_data)->d.data();
 			default:
 				detail::declare_unreachable();
 			}
@@ -607,11 +607,11 @@ namespace bsa::tes4
 			case name_null:
 				return {};
 			case name_view:
-				return std::get<name_view>(_name);
+				return *std::get_if<name_view>(&_name);
 			case name_owner:
-				return std::get<name_owner>(_name);
+				return *std::get_if<name_owner>(&_name);
 			case name_proxied:
-				return std::get<name_proxied>(_name).n;
+				return std::get_if<name_proxied>(&_name)->n;
 			default:
 				detail::declare_unreachable();
 			}
@@ -624,11 +624,11 @@ namespace bsa::tes4
 		{
 			switch (_data.index()) {
 			case data_view:
-				return std::get<data_view>(_data).size();
+				return std::get_if<data_view>(&_data)->size();
 			case data_owner:
-				return std::get<data_owner>(_data).size();
+				return std::get_if<data_owner>(&_data)->size();
 			case data_proxied:
-				return std::get<data_proxied>(_data).d.size();
+				return std::get_if<data_proxied>(&_data)->d.size();
 			default:
 				detail::declare_unreachable();
 			}
@@ -914,11 +914,11 @@ namespace bsa::tes4
 			case name_null:
 				return {};
 			case name_view:
-				return std::get<name_view>(_name);
+				return *std::get_if<name_view>(&_name);
 			case name_owner:
-				return std::get<name_owner>(_name);
+				return *std::get_if<name_owner>(&_name);
 			case name_proxied:
-				return std::get<name_proxied>(_name).n;
+				return std::get_if<name_proxied>(&_name)->n;
 			default:
 				detail::declare_unreachable();
 			}
