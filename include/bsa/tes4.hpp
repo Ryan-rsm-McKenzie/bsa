@@ -553,7 +553,7 @@ namespace bsa::tes4
 
 		file(const file&) noexcept = default;
 		file(file&&) noexcept = default;
-
+		~file() noexcept = default;
 		file& operator=(const file&) noexcept = default;
 		file& operator=(file&&) noexcept = default;
 
@@ -838,7 +838,7 @@ namespace bsa::tes4
 
 		directory(const directory&) noexcept = default;
 		directory(directory&&) noexcept = default;
-
+		~directory() noexcept = default;
 		directory& operator=(const directory&) noexcept = default;
 		directory& operator=(directory&&) noexcept = default;
 
