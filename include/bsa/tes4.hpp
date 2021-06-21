@@ -214,7 +214,7 @@ namespace bsa::tes4
 				case std::endian::big:
 					for (std::ptrdiff_t i = std::ssize(bytes) - 1; i >= 0; --i) {
 						result |=
-							static_cast<T>(bytes[static_cast<std::size_t>(i)])
+							static_cast<integral_t>(bytes[static_cast<std::size_t>(i)])
 							<< static_cast<std::size_t>(i) * 8u;
 					}
 					break;
