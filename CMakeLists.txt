@@ -88,10 +88,10 @@ source_group(
 
 set(NATVIS
 	extern/CPPDebuggerVisualizers/VS2019/Visualizers/boost_Containers.natvis
-	natvis/bsa_tes4.natvis
+	visualizers/bsa_tes4.natvis
 )
 
-source_group("natvis" FILES ${NATVIS})
+source_group("visualizers" FILES ${NATVIS})
 
 add_executable(
 	${PROJECT_NAME}
