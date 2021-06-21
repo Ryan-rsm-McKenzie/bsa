@@ -619,6 +619,22 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
+		void set_data(
+			std::span<const std::byte> a_data,
+			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+		{
+			_data.emplace<data_view>(a_data);
+			_decompsz = a_decompressedSize;
+		}
+
+		void set_data(
+			std::vector<std::byte> a_data,
+			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+		{
+			_data.emplace<data_owner>(std::move(a_data));
+			_decompsz = a_decompressedSize;
+		}
+
 		[[nodiscard]] auto size() const noexcept
 			-> std::size_t
 		{
