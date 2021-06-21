@@ -542,14 +542,20 @@ namespace bsa::tes4
 		{}
 
 		explicit file(std::u8string a_name) noexcept :
-			_name(std::in_place_index<name_owner>, std::move(a_name)),
-			_hash(hashing::hash_file(std::get<name_owner>(_name)))
+			_hash(hashing::hash_file(a_name)),
+			_name(std::in_place_index<name_owner>, std::move(a_name))
 		{}
 
 		explicit file(std::u8string_view a_name) noexcept :
-			_name(std::in_place_index<name_view>, a_name),
-			_hash(hashing::hash_file(a_name))
+			_hash(hashing::hash_file(a_name)),
+			_name(std::in_place_index<name_view>, a_name)
 		{}
+
+		file(const file&) noexcept = default;
+		file(file&&) noexcept = default;
+
+		file& operator=(const file&) noexcept = default;
+		file& operator=(file&&) noexcept = default;
 
 		[[nodiscard]] auto as_bytes() const noexcept
 			-> std::span<const std::byte>
@@ -760,6 +766,7 @@ namespace bsa::tes4
 			boost::iostreams::mapped_file_source f;
 		};
 
+		hashing::hash _hash;
 		std::variant<
 			std::monostate,
 			std::u8string_view,
@@ -772,7 +779,6 @@ namespace bsa::tes4
 			data_proxy>
 			_data;
 		std::optional<std::size_t> _decompsz;
-		hashing::hash _hash;
 	};
 
 	class directory final
@@ -813,7 +819,7 @@ namespace bsa::tes4
 	public:
 		using value_type = container_type::value_type;
 		using value_compare = container_type::value_compare;
-		using iterator = container_type::iterator;
+		using iterator = container_type::const_iterator;
 		using const_iterator = container_type::const_iterator;
 
 		explicit directory(hashing::hash a_hash) noexcept :
@@ -821,32 +827,33 @@ namespace bsa::tes4
 		{}
 
 		explicit directory(std::u8string a_filename) noexcept :
-			_name(std::in_place_index<name_owner>, std::move(a_filename)),
-			_hash(hashing::hash_directory(std::get<name_owner>(_name)))
+			_hash(hashing::hash_directory(a_filename)),
+			_name(std::in_place_index<name_owner>, std::move(a_filename))
 		{}
 
 		explicit directory(std::u8string_view a_filename) noexcept :
-			_name(std::in_place_index<name_view>, a_filename),
-			_hash(hashing::hash_directory(a_filename))
+			_hash(hashing::hash_directory(a_filename)),
+			_name(std::in_place_index<name_view>, a_filename)
 		{}
 
-		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
+		directory(const directory&) noexcept = default;
+		directory(directory&&) noexcept = default;
+
+		directory& operator=(const directory&) noexcept = default;
+		directory& operator=(directory&&) noexcept = default;
+
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _files.cbegin(); }
 
-		[[nodiscard]] auto end() noexcept -> iterator { return _files.end(); }
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
 
-		[[nodiscard]] auto find(hashing::hash a_hash) noexcept -> iterator { return _files.find(a_hash); }
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator { return _files.find(a_hash); }
-
-		[[nodiscard]] auto find(std::filesystem::path a_filename) noexcept -> iterator { return find(hashing::hash_file(std::move(a_filename))); }
 		[[nodiscard]] auto find(std::filesystem::path a_filename) const noexcept -> const_iterator { return find(hashing::hash_file(std::move(a_filename))); }
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
-		auto insert(file a_file) noexcept -> std::pair<iterator, bool> { return _files.insert(std::move(a_file)); }
+		auto insert(file a_file) noexcept -> std::pair<const_iterator, bool> { return _files.insert(std::move(a_file)); }
 
 		[[nodiscard]] auto name() const noexcept
 			-> std::u8string_view
@@ -978,6 +985,7 @@ namespace bsa::tes4
 			boost::iostreams::mapped_file_source f;
 		};
 
+		hashing::hash _hash;
 		std::variant<
 			std::monostate,
 			std::u8string_view,
@@ -985,7 +993,6 @@ namespace bsa::tes4
 			name_proxy>
 			_name;
 		container_type _files;
-		hashing::hash _hash;
 	};
 
 	class archive final
@@ -1026,7 +1033,7 @@ namespace bsa::tes4
 	public:
 		using value_type = container_type::value_type;
 		using value_compare = container_type::value_compare;
-		using iterator = container_type::iterator;
+		using iterator = container_type::const_iterator;
 		using const_iterator = container_type::const_iterator;
 
 		archive() noexcept = default;
@@ -1037,11 +1044,9 @@ namespace bsa::tes4
 		[[nodiscard]] auto archive_types() const noexcept -> archive_type { return _types; }
 		void archive_types(archive_type a_types) noexcept { _types = a_types; }
 
-		[[nodiscard]] auto begin() noexcept -> iterator { return _directories.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _directories.begin(); }
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _directories.cbegin(); }
 
-		[[nodiscard]] auto end() noexcept -> iterator { return _directories.end(); }
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _directories.end(); }
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _directories.cend(); }
 
@@ -1065,13 +1070,10 @@ namespace bsa::tes4
 
 		bool erase(std::filesystem::path a_path) noexcept { return erase(hashing::hash_directory(std::move(a_path))); }
 
-		[[nodiscard]] auto find(hashing::hash a_hash) noexcept -> iterator { return _directories.find(a_hash); }
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator { return _directories.find(a_hash); }
-
-		[[nodiscard]] auto find(std::filesystem::path a_path) noexcept -> iterator { return find(hashing::hash_directory(std::move(a_path))); }
 		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept -> const_iterator { return find(hashing::hash_directory(std::move(a_path))); }
 
-		auto insert(directory a_directory) noexcept -> std::pair<iterator, bool> { return _directories.insert(std::move(a_directory)); }
+		auto insert(directory a_directory) noexcept -> std::pair<const_iterator, bool> { return _directories.insert(std::move(a_directory)); }
 
 		void read(std::filesystem::path a_path) noexcept
 		{
