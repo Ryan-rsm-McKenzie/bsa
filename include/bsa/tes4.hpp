@@ -213,7 +213,9 @@ namespace bsa::tes4
 					break;
 				case std::endian::big:
 					for (std::ptrdiff_t i = std::ssize(bytes) - 1; i >= 0; --i) {
-						result |= static_cast<T>(bytes[static_cast<std::size_t>(i)]) << static_cast<std::size_t>(i) * 8u;
+						result |=
+							static_cast<T>(bytes[static_cast<std::size_t>(i)])
+							<< static_cast<std::size_t>(i) * 8u;
 					}
 					break;
 				default:
@@ -248,7 +250,9 @@ namespace bsa::tes4
 			}
 
 			template <std::size_t N>
-			friend istream_t& operator>>(istream_t& a_in, std::array<std::byte, N>& a_value) noexcept
+			friend istream_t& operator>>(
+				istream_t& a_in,
+				std::array<std::byte, N>& a_value) noexcept
 			{
 				const auto bytes = a_in.read_bytes(a_value.size());
 				std::copy(bytes.begin(), bytes.end(), a_value.begin());
@@ -291,7 +295,10 @@ namespace bsa::tes4
 					break;
 				case std::endian::big:
 					for (std::ptrdiff_t i = std::ssize(bytes) - 1; i >= 0; --i) {
-						bytes[static_cast<std::size_t>(i)] = static_cast<std::byte>((value >> static_cast<std::size_t>(i) * 8u) & 0xFFu);
+						bytes[static_cast<std::size_t>(i)] =
+							static_cast<std::byte>(
+								(value >> static_cast<std::size_t>(i) * 8u) &
+								0xFFu);
 					}
 					break;
 				default:
@@ -316,7 +323,9 @@ namespace bsa::tes4
 			}
 
 			template <std::size_t N>
-			friend ostream_t& operator<<(ostream_t& a_out, const std::array<std::byte, N>& a_value) noexcept
+			friend ostream_t& operator<<(
+				ostream_t& a_out,
+				const std::array<std::byte, N>& a_value) noexcept
 			{
 				a_out.write_bytes({ a_value.data(), a_value.size() });
 				return a_out;
@@ -882,12 +891,25 @@ namespace bsa::tes4
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
 
-		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator { return _files.find(a_hash); }
-		[[nodiscard]] auto find(std::filesystem::path a_filename) const noexcept -> const_iterator { return find(hashing::hash_file(std::move(a_filename))); }
+		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
+			-> const_iterator
+		{
+			return _files.find(a_hash);
+		}
+
+		[[nodiscard]] auto find(std::filesystem::path a_filename) const noexcept
+			-> const_iterator
+		{
+			return find(hashing::hash_file(std::move(a_filename)));
+		}
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
-		auto insert(file a_file) noexcept -> std::pair<const_iterator, bool> { return _files.insert(std::move(a_file)); }
+		auto insert(file a_file) noexcept
+			-> std::pair<const_iterator, bool>
+		{
+			return _files.insert(std::move(a_file));
+		}
 
 		[[nodiscard]] auto name() const noexcept
 			-> std::u8string_view
@@ -1147,12 +1169,28 @@ namespace bsa::tes4
 			}
 		}
 
-		bool erase(std::filesystem::path a_path) noexcept { return erase(hashing::hash_directory(std::move(a_path))); }
+		bool erase(std::filesystem::path a_path) noexcept
+		{
+			return erase(hashing::hash_directory(std::move(a_path)));
+		}
 
-		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator { return _directories.find(a_hash); }
-		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept -> const_iterator { return find(hashing::hash_directory(std::move(a_path))); }
+		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
+			-> const_iterator
+		{
+			return _directories.find(a_hash);
+		}
 
-		auto insert(directory a_directory) noexcept -> std::pair<const_iterator, bool> { return _directories.insert(std::move(a_directory)); }
+		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
+			-> const_iterator
+		{
+			return find(hashing::hash_directory(std::move(a_path)));
+		}
+
+		auto insert(directory a_directory) noexcept
+			-> std::pair<const_iterator, bool>
+		{
+			return _directories.insert(std::move(a_directory));
+		}
 
 		void read(std::filesystem::path a_path) noexcept
 		{
@@ -1272,7 +1310,9 @@ namespace bsa::tes4
 			std::uint32_t offset = 0;
 			offset += static_cast<std::uint32_t>(a_header.directories_offset());
 			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-			offset += static_cast<std::uint32_t>(detail::constants::file_entry_size * a_header.file_count());
+			offset += static_cast<std::uint32_t>(
+				detail::constants::file_entry_size *
+				a_header.file_count());
 			for (const auto& dir : _directories) {
 				for (const auto& file : dir) {
 					offset += static_cast<std::uint32_t>(file.filename().size() +
@@ -1319,7 +1359,12 @@ namespace bsa::tes4
 
 				match(
 					[&]() noexcept { a_out << offset; },
-					[&]() noexcept { a_out << std::uint32_t{ 0 } << offset << std::uint32_t{ 0 }; });
+					[&]() noexcept {
+						a_out
+							<< std::uint32_t{ 0 }
+							<< offset
+							<< std::uint32_t{ 0 };
+					});
 
 				if (a_header.directory_strings()) {
 					offset += static_cast<std::uint32_t>(dir.name().length() +
@@ -1327,7 +1372,9 @@ namespace bsa::tes4
 														 1u);  // null terminator
 				}
 
-				offset += static_cast<std::uint32_t>(detail::constants::file_entry_size * dir.size());
+				offset += static_cast<std::uint32_t>(
+					detail::constants::file_entry_size *
+					dir.size());
 			}
 
 			return offset;
