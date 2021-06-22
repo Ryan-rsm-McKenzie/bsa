@@ -128,13 +128,14 @@ namespace bsa::tes4::hashing
 			}
 		}();
 
-		if (!stem.empty()) {
+		if (!stem.empty() && extension.length() <= 14) {
 			auto h = [&]() noexcept {
 				std::filesystem::path temp{ stem };
 				return hash_directory(temp);
 			}();
-			h.crc += detail::crc32(
-				{ reinterpret_cast<const std::byte*>(extension.data()), extension.size() });
+			h.crc += detail::crc32({ //
+				reinterpret_cast<const std::byte*>(extension.data()),
+				extension.size() });
 
 			const auto it = std::find(
 				lut.begin(),

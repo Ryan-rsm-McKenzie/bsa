@@ -49,12 +49,13 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(h1 == h2);
 	}
 
-	SECTION("file extensions are hashed out to only 16 characters")
+	SECTION("file extensions longer than 14 characters will fail")
 	{
-		const auto h1 = hash_file(u8"test.0123456789ABCDEF_ABCDEFG"sv);
-		const auto h2 = hash_file(u8"test.0123456789ABCDEF"sv);
+		const auto good = hash_file(u8"test.123456789ABCDE"sv);
+		const auto bad = hash_file(u8"test.123456789ABCDEF"sv);
 
-		REQUIRE(h1 == h2);
+		REQUIRE(good.numeric() != 0);
+		REQUIRE(bad.numeric() == 0);
 	}
 }
 
