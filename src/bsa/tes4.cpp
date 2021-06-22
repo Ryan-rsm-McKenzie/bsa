@@ -26,6 +26,7 @@ namespace bsa::tes4::hashing
 		{
 			boost::text::text p{
 				a_path
+					.relative_path()  // remove root path
 					.lexically_normal()
 					.make_preferred()
 					.u8string()
