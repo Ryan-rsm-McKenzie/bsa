@@ -4,6 +4,7 @@
   "dependencies": [
     "boost-iostreams",
     "boost-predef",
-    "boost-text"
+    "boost-text",
+    "catch2"
   ]
 }

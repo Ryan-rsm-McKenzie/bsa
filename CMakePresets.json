@@ -1,0 +1,99 @@
+{
+  "configurePresets": [
+    {
+      "binaryDir": "build",
+      "errors": {
+        "deprecated": true
+      },
+      "hidden": true,
+      "name": "cmake-dev",
+      "warnings": {
+        "deprecated": true,
+        "dev": true
+      }
+    },
+    {
+      "environment": {
+        "CXXFLAGS": "/MP /W4 /WX /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
+      },
+      "generator": "Visual Studio 16 2019",
+      "hidden": true,
+      "name": "vs2019"
+    },
+    {
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "STRING",
+          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_OVERLAY_PORTS": {
+          "type": "STRING",
+          "value": "${sourceDir}/ports"
+        }
+      },
+      "hidden": true,
+      "name": "vcpkg"
+    },
+    {
+      "cacheVariables": {
+        "Boost_USE_STATIC_RUNTIME": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "CMAKE_MSVC_RUNTIME_LIBRARY": {
+          "type": "STRING",
+          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+        }
+      },
+      "hidden": true,
+      "name": "windows-mt"
+    },
+    {
+      "cacheVariables": {
+        "Boost_USE_STATIC_RUNTIME": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "CMAKE_MSVC_RUNTIME_LIBRARY": {
+          "type": "STRING",
+          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+        }
+      },
+      "hidden": true,
+      "name": "windows-md"
+    },
+    {
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-static-md"
+        }
+      },
+      "description": "VS2019/Dynamic CRT/VCPkg",
+      "inherits": [
+        "windows-md",
+        "vs2019",
+        "cmake-dev",
+        "vcpkg"
+      ],
+      "name": "vs2019-md-vcpkg"
+    },
+    {
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-static-mt"
+        }
+      },
+      "description": "VS2019/Static CRT/VCPkg",
+      "inherits": [
+        "windows-mt",
+        "vs2019",
+        "cmake-dev",
+        "vcpkg"
+      ],
+      "name": "vs2019-mt-vcpkg"
+    }
+  ],
+  "version": 2
+}

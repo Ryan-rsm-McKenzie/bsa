@@ -37,6 +37,12 @@ if(MSVC)
 	)
 endif()
 
+target_compile_definitions(
+	${PROJECT_NAME}
+	PUBLIC
+		BOOST_TEXT_DISABLE_CONCEPTS	# totally broken
+)
+
 target_include_directories(
 	${PROJECT_NAME}
 	PUBLIC
