@@ -48,19 +48,6 @@ namespace bsa::tes4::hashing
 			return p;
 		}
 
-		[[nodiscard]] auto normalize_file_extension(std::filesystem::path a_extension) noexcept
-			-> boost::text::text
-		{
-			boost::text::text result{
-				a_extension
-					.lexically_normal()
-					.make_preferred()
-					.u8string()
-			};
-			boost::text::in_place_to_lower(result);
-			return result;
-		}
-
 		[[nodiscard]] constexpr auto make_file_extension(std::u8string_view a_extension) noexcept
 			-> std::uint32_t
 		{
@@ -115,32 +102,47 @@ namespace bsa::tes4::hashing
 			make_file_extension(u8".adp"sv),
 		};
 
-		const auto exts =
-			a_path.has_extension() ?
-				normalize_file_extension(a_path.extension()) :
-                boost::text::text{};
-		const std::span<const char8_t> extension{
-			reinterpret_cast<const char8_t*>(exts.data()),
-			exts.storage_code_units()
+		const auto pstr = normalize_directory(a_path.filename());
+		const std::u8string_view pview{
+			reinterpret_cast<const char8_t*>(pstr.data()),
+			pstr.storage_code_units()
 		};
 
-		auto h =
-			a_path.has_stem() ?
-				hash_directory(a_path.stem()) :
-                hash{};
-		h.crc += detail::crc32(std::as_bytes(extension));
+		const auto [stem, extension] = [&]() noexcept
+			-> std::pair<std::u8string_view, std::u8string_view> {
+			const auto split = pview.find_last_of(u8'.');
+			if (split != std::u8string_view::npos) {
+				return {
+					pview.substr(0, split),
+					pview.substr(split + 1)
+				};
+			} else {
+				return {
+					pview,
+					u8""sv
+				};
+			}
+		}();
 
-		const auto it = std::find(
-			lut.begin(),
-			lut.end(),
-			make_file_extension({ extension.data(), extension.size() }));
-		if (it != lut.end()) {
-			const auto i = static_cast<std::uint8_t>(it - lut.begin());
-			h.first += 32u * (i & 0xFCu);
-			h.last += (i & 0xFEu) << 6u;
-			h.last2 += i << 7u;
+		if (!stem.empty()) {
+			auto h = hash_directory(stem);
+			h.crc += detail::crc32(
+				{ reinterpret_cast<const std::byte*>(extension.data()), extension.size() });
+
+			const auto it = std::find(
+				lut.begin(),
+				lut.end(),
+				make_file_extension(extension));
+			if (it != lut.end()) {
+				const auto i = static_cast<std::uint8_t>(it - lut.begin());
+				h.first += 32u * (i & 0xFCu);
+				h.last += (i & 0xFEu) << 6u;
+				h.last2 += i << 7u;
+			}
+
+			return h;
+		} else {
+			return {};
 		}
-
-		return h;
 	}
 }
