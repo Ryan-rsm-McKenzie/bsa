@@ -1407,9 +1407,10 @@ namespace bsa::tes4
 					});
 
 				if (a_header.directory_strings()) {
-					offset += static_cast<std::uint32_t>(dir.name().length() +
-														 1u +  // prefixed byte length
-														 1u);  // null terminator
+					offset += static_cast<std::uint32_t>(
+						dir.name().length() +
+						1u +  // prefixed byte length
+						1u);  // null terminator
 				}
 
 				offset += static_cast<std::uint32_t>(
