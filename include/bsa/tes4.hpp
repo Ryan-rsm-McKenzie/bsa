@@ -689,7 +689,7 @@ namespace bsa::tes4
 						reinterpret_cast<const char8_t*>(bytes.data()),
 						len
 					};
-					const auto pos = name.find_last_of(u8'\\');
+					const auto pos = name.find_last_of(u8"\\/"sv);
 					if (pos != std::u8string_view::npos) {
 						dirname = name.substr(0, pos);
 						name = name.substr(pos + 1);
