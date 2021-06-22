@@ -120,7 +120,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 	{
 		try {
 			bsa::tes4::archive bsa;
-			bsa.read(u8".");
+			bsa.read(u8"."sv);
 			REQUIRE(false);
 		} catch (const std::exception&) {
 			REQUIRE(true);
