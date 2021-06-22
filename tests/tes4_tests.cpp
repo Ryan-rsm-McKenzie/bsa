@@ -28,9 +28,9 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 	{
 		// archive.exe uses _splitpath_s under the hood
 		const auto gitignore =
-			hash_file(u8".gitignore"sv);  // stem == "", extension == "gitignore"
+			hash_file(u8".gitignore"sv);  // stem == "", extension == ".gitignore"
 		const auto gitmodules =
-			hash_file(u8".gitmodules"sv);  // stem == "", extension == "gitmodules"
+			hash_file(u8".gitmodules"sv);  // stem == "", extension == ".gitmodules"
 
 		REQUIRE(gitignore == gitmodules);
 		REQUIRE(gitignore.first == '\0');
