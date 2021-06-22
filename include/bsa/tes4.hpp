@@ -494,17 +494,19 @@ namespace bsa::tes4
 			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
 				-> std::strong_ordering
 			{
-				const auto numeric = [](const hash& a_hash) noexcept {
-					return std::uint64_t{
-						std::uint64_t{ a_hash.last } << 0u * 8u |
-						std::uint64_t{ a_hash.last2 } << 1u * 8u |
-						std::uint64_t{ a_hash.length } << 2u * 8u |
-						std::uint64_t{ a_hash.first } << 3u * 8u |
-						std::uint64_t{ a_hash.crc } << 4u * 8u
-					};
-				};
+				return a_lhs.numeric() <=> a_rhs.numeric();
+			}
 
-				return numeric(a_lhs) <=> numeric(a_rhs);
+			[[nodiscard]] auto numeric() const noexcept
+				-> std::uint64_t
+			{
+				return std::uint64_t{
+					std::uint64_t{ last } << 0u * 8u |
+					std::uint64_t{ last2 } << 1u * 8u |
+					std::uint64_t{ length } << 2u * 8u |
+					std::uint64_t{ first } << 3u * 8u |
+					std::uint64_t{ crc } << 4u * 8u
+				};
 			}
 
 		protected:
