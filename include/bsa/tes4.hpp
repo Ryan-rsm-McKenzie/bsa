@@ -1351,15 +1351,11 @@ namespace bsa::tes4
 			offset += static_cast<std::uint32_t>(a_header.directories_offset());
 			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
 			offset += static_cast<std::uint32_t>(
+				a_header.directory_names_length() +
+				a_header.directory_count() * 1u);  // include prefixed byte length
+			offset += static_cast<std::uint32_t>(
 				detail::constants::file_entry_size *
 				a_header.file_count());
-			for (const auto& dir : _directories) {
-				for (const auto& file : dir) {
-					offset += static_cast<std::uint32_t>(file.filename().size() +
-														 1u +  // prefixed byte length
-														 1u);  // null terminator
-				}
-			}
 
 			a_in.seek_absolute(offset);
 			for (auto& dir : _directories) {
