@@ -185,7 +185,7 @@ namespace bsa::tes4
 		public:
 			using stream_type = boost::iostreams::mapped_file_source;
 
-			istream_t(std::filesystem::path a_path) noexcept :
+			istream_t(std::filesystem::path a_path) :
 				_file(boost::filesystem::path{ a_path.native() })
 			{
 				assert(_file.is_open());
@@ -267,7 +267,7 @@ namespace bsa::tes4
 		class ostream_t final
 		{
 		public:
-			ostream_t(std::filesystem::path a_path) noexcept :
+			ostream_t(std::filesystem::path a_path) :
 				_file(a_path, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary)
 			{
 				assert(_file.is_open());
@@ -1227,7 +1227,7 @@ namespace bsa::tes4
 			return _directories.insert(std::move(a_directory));
 		}
 
-		auto read(std::filesystem::path a_path) noexcept
+		auto read(std::filesystem::path a_path)
 			-> version
 		{
 			clear();
@@ -1256,7 +1256,7 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _directories.size(); }
 
-		void write(std::filesystem::path a_path, version a_version) const noexcept
+		void write(std::filesystem::path a_path, version a_version) const
 		{
 			detail::ostream_t out{ std::move(a_path) };
 			const auto header = [&]() noexcept -> detail::header_t {
