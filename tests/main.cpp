@@ -13,6 +13,7 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
 	SECTION("archive.exe detects file extensions incorrectly")
 	{
+		// archive.exe uses _splitpath_s under the hood
 		const auto gitignore = bsa::tes4::hashing::hash_file(u8".gitignore"sv);    // stem == "", extension == "gitignore"
 		const auto gitmodules = bsa::tes4::hashing::hash_file(u8".gitmodules"sv);  // stem == "", extension == "gitmodules"
 
@@ -33,7 +34,7 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(h1 == h2);
 	}
 
-	SECTION("file extensions are hashed out to 16 characters")
+	SECTION("file extensions are hashed out to only 16 characters")
 	{
 		const auto h1 = bsa::tes4::hashing::hash_file(u8"test.0123456789ABCDEF_ABCDEFG"sv);
 		const auto h2 = bsa::tes4::hashing::hash_file(u8"test.0123456789ABCDEF"sv);
