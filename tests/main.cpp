@@ -16,9 +16,6 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		const auto gitignore = bsa::tes4::hashing::hash_file(u8".gitignore"sv);    // stem == "", extension == "gitignore"
 		const auto gitmodules = bsa::tes4::hashing::hash_file(u8".gitmodules"sv);  // stem == "", extension == "gitmodules"
 
-		bsa::tes4::archive bsa;
-		bsa.read(u8"test.bsa"sv);
-
 		REQUIRE(gitignore == gitmodules);
 		REQUIRE(gitignore.first == '\0');
 		REQUIRE(gitignore.last2 == '\0');
