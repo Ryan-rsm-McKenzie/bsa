@@ -10,26 +10,25 @@ set(SOURCE_FILES
 	${SOURCE_DIR}/bsa/tes4.cpp
 )
 
+set(NATVIS_DIR ${ROOT_DIR}/visualizers)
+set(NATVIS_FILES
+	${NATVIS_DIR}/bsa_tes4.natvis
+)
+
 source_group(
-	TREE ${ROOT_DIR}/
+	TREE ${ROOT_DIR}
 	FILES
 		${HEADER_FILES}
 		${SOURCE_FILES}
+		${NATVIS_FILES}
 )
-
-set(NATVIS
-	${ROOT_DIR}/extern/CPPDebuggerVisualizers/VS2019/Visualizers/boost_Containers.natvis
-	${ROOT_DIR}/visualizers/bsa_tes4.natvis
-)
-
-source_group("visualizers" FILES ${NATVIS})
 
 add_library(
 	bsa
 	STATIC
-	${NATVIS}
 	${HEADER_FILES}
 	${SOURCE_FILES}
+	${NATVIS_FILES}
 	${ROOT_DIR}/.clang-format
 	${ROOT_DIR}/.editorconfig
 )
