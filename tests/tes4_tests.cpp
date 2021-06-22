@@ -1,6 +1,8 @@
 #include "bsa/tes4.hpp"
 
+#include <exception>
 #include <iterator>
+#include <string_view>
 
 #pragma warning(push)
 #include <catch2/catch.hpp>
