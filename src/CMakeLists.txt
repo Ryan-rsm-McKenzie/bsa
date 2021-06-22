@@ -56,8 +56,6 @@ find_package(Boost
 )
 find_package(text REQUIRED CONFIG)
 
-include(${ROOT_DIR}/cmake/common.cmake)
-
 target_link_libraries(
 	bsa
 	PRIVATE
