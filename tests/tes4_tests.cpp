@@ -24,6 +24,14 @@ using namespace std::literals;
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
+	SECTION("the empty path \"\" is equivalent to the current path \".\"")
+	{
+		const auto empty = hash_directory(u8""sv);
+		const auto current = hash_directory(u8"."sv);
+
+		REQUIRE(empty == current);
+	}
+
 	SECTION("archive.exe detects file extensions incorrectly")
 	{
 		// archive.exe uses _splitpath_s under the hood
