@@ -16,7 +16,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
+      - name: Create vcpkg binary cache folder
+        run: mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+
       - name: Cache vcpkg archives
         uses: actions/cache@v2
         env:
