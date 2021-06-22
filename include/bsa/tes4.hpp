@@ -1191,6 +1191,8 @@ namespace bsa::tes4
 			_types = archive_type::none;
 		}
 
+		[[nodiscard]] bool empty() const noexcept { return _directories.empty(); }
+
 		bool erase(hashing::hash a_hash) noexcept
 		{
 			const auto it = _directories.find(a_hash);
@@ -1251,6 +1253,8 @@ namespace bsa::tes4
 
 			return static_cast<version>(header.version());
 		}
+
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return _directories.size(); }
 
 		void write(std::filesystem::path a_path, version a_version) const noexcept
 		{
