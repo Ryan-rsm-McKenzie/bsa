@@ -3,7 +3,6 @@
 #include <iterator>
 
 #pragma warning(push)
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #pragma warning(pop)
 
