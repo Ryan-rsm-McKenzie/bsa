@@ -16,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: Create vcpkg binary cache folder
         run: mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
