@@ -23,8 +23,9 @@ source_group(
 		${NATVIS_FILES}
 )
 
+set(TARGET_NAME bsa)
 add_library(
-	bsa
+	${TARGET_NAME}
 	STATIC
 	${HEADER_FILES}
 	${SOURCE_FILES}
@@ -32,12 +33,18 @@ add_library(
 	${ROOT_DIR}/.clang-format
 	${ROOT_DIR}/.editorconfig
 )
-add_library(bsa::bsa ALIAS bsa)
+add_library(bsa::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
 include(GNUInstallDirs)
 
+set_target_properties(
+	${TARGET_NAME}
+	PROPERTIES
+		DEBUG_POSTFIX "d"
+)
+
 target_include_directories(
-	bsa
+	${TARGET_NAME}
 	PUBLIC
 		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
@@ -56,7 +63,7 @@ find_package(Boost
 find_package(text REQUIRED CONFIG)
 
 target_link_libraries(
-	bsa
+	${TARGET_NAME}
 	PRIVATE
 		Boost::text
 	PUBLIC
@@ -64,5 +71,32 @@ target_link_libraries(
 		Boost::filesystem
 		Boost::headers
 		Boost::iostreams
-		common::common
+		bsa::common
+)
+
+install(
+	TARGETS ${TARGET_NAME}
+	EXPORT ${TARGET_NAME}-targets
+)
+
+install(
+	EXPORT ${TARGET_NAME}-targets
+	NAMESPACE bsa::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
+)
+
+configure_file(
+	${ROOT_DIR}/cmake/config.cmake.in
+	${TARGET_NAME}Config.cmake
+	@ONLY
+)
+
+install(
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}Config.cmake
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
+)
+
+install(
+	DIRECTORY ${INCLUDE_DIR}/bsa
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )

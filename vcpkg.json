@@ -2,9 +2,18 @@
   "name": "bsa-tes4",
   "version-string": "1",
   "dependencies": [
+    "boost-container",
+    "boost-filesystem",
     "boost-iostreams",
     "boost-predef",
-    "boost-text",
-    "catch2"
-  ]
+    "boost-text"
+  ],
+  "features": {
+    "tests": {
+      "description": "Build tests",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  }
 }

@@ -24,5 +24,5 @@ target_link_libraries(
 	PUBLIC
 		bsa::bsa
 		Catch2::Catch2
-		common::common
+		bsa::common
 )
