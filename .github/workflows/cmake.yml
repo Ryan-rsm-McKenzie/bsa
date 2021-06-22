@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Create vcpkg binary cache folder
+        env:
+          VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-archives
         run: mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Cache vcpkg archives
