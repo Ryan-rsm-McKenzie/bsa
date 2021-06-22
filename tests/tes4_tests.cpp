@@ -49,6 +49,17 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(h1 != h2);
 	}
 
+	SECTION("file names longer than 259 characters will fail")
+	{
+		// actually, anything longer than MAX_PATH will crash archive.exe
+
+		const auto good = hash_file(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+		const auto bad = hash_file(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+	
+		REQUIRE(good.numeric() != 0);
+		REQUIRE(bad.numeric() == 0);
+	}
+
 	SECTION("file extensions longer than 14 characters will fail")
 	{
 		const auto good = hash_file(u8"test.123456789ABCDE"sv);

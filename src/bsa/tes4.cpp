@@ -127,7 +127,9 @@ namespace bsa::tes4::hashing
 			}
 		}();
 
-		if (!stem.empty() && extension.length() <= 14) {
+		if (!stem.empty() && 
+			stem.length() < 260 &&
+			extension.length() < 16 - 1) {
 			auto h = [&]() noexcept {
 				std::filesystem::path temp{ stem };
 				return hash_directory(temp);
