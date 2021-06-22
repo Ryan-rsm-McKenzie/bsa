@@ -10,15 +10,27 @@
 
 using namespace std::literals;
 
+[[nodiscard]] auto hash_directory(std::filesystem::path a_path) noexcept
+	-> bsa::tes4::hashing::hash
+{
+	return bsa::tes4::hashing::hash_directory(a_path);
+}
+
+[[nodiscard]] auto hash_file(std::filesystem::path a_path) noexcept
+	-> bsa::tes4::hashing::hash
+{
+	return bsa::tes4::hashing::hash_file(a_path);
+}
+
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
 	SECTION("archive.exe detects file extensions incorrectly")
 	{
 		// archive.exe uses _splitpath_s under the hood
 		const auto gitignore =
-			bsa::tes4::hashing::hash_file(u8".gitignore"sv);  // stem == "", extension == "gitignore"
+			hash_file(u8".gitignore"sv);  // stem == "", extension == "gitignore"
 		const auto gitmodules =
-			bsa::tes4::hashing::hash_file(u8".gitmodules"sv);  // stem == "", extension == "gitmodules"
+			hash_file(u8".gitmodules"sv);  // stem == "", extension == "gitmodules"
 
 		REQUIRE(gitignore == gitmodules);
 		REQUIRE(gitignore.first == '\0');
@@ -31,16 +43,16 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 	SECTION("drive letters are not included in hashes")
 	{
-		const auto h1 = bsa::tes4::hashing::hash_directory(u8"C:\\foo\\bar\\baz"sv);
-		const auto h2 = bsa::tes4::hashing::hash_directory(u8"foo\\bar\\baz"sv);
+		const auto h1 = hash_directory(u8"C:\\foo\\bar\\baz"sv);
+		const auto h2 = hash_directory(u8"foo\\bar\\baz"sv);
 
 		REQUIRE(h1 == h2);
 	}
 
 	SECTION("file extensions are hashed out to only 16 characters")
 	{
-		const auto h1 = bsa::tes4::hashing::hash_file(u8"test.0123456789ABCDEF_ABCDEFG"sv);
-		const auto h2 = bsa::tes4::hashing::hash_file(u8"test.0123456789ABCDEF"sv);
+		const auto h1 = hash_file(u8"test.0123456789ABCDEF_ABCDEFG"sv);
+		const auto h2 = hash_file(u8"test.0123456789ABCDEF"sv);
 
 		REQUIRE(h1 == h2);
 	}
