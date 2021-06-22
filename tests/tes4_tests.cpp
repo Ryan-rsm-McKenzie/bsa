@@ -57,6 +57,14 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(h1 != h2);
 	}
 
+	SECTION("directory names longer than 259 characters are equivalent to the empty path")
+	{
+		const auto looong = hash_directory(u8"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+		const auto empty = hash_directory(u8""sv);
+
+		REQUIRE(looong == empty);
+	}
+
 	SECTION("file names longer than 259 characters will fail")
 	{
 		// actually, anything longer than MAX_PATH will crash archive.exe

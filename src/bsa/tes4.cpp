@@ -41,8 +41,8 @@ namespace bsa::tes4::hashing
 				p.erase(p.begin());
 			}
 
-			if (p.empty()) {
-				p.push_back(u8'.');
+			if (p.empty() || p.distance() >= 260) {
+				p.assign(u8'.');
 			}
 
 			const auto ptr = reinterpret_cast<const char8_t*>(p.data());
