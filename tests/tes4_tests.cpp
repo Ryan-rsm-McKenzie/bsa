@@ -41,12 +41,12 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(gitignore.numeric() == 0);
 	}
 
-	SECTION("drive letters are not included in hashes")
+	SECTION("drive letters are included in hashes")
 	{
 		const auto h1 = hash_directory(u8"C:\\foo\\bar\\baz"sv);
 		const auto h2 = hash_directory(u8"foo\\bar\\baz"sv);
 
-		REQUIRE(h1 == h2);
+		REQUIRE(h1 != h2);
 	}
 
 	SECTION("file extensions longer than 14 characters will fail")
@@ -61,12 +61,12 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 {
-	SECTION("drive letters are not included in directory names")
+	SECTION("drive letters are included in directory names")
 	{
 		const bsa::tes4::directory d1{ u8"C:\\foo\\bar\\baz"sv };
 		const bsa::tes4::directory d2{ u8"foo\\bar\\baz"sv };
 
-		REQUIRE(d1.name() == d2.name());
+		REQUIRE(d1.name() != d2.name());
 	}
 }
 
