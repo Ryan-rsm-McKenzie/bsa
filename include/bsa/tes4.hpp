@@ -537,8 +537,8 @@ namespace bsa::tes4
 			}
 		};
 
-		[[nodiscard]] hash hash_directory(std::filesystem::path a_path) noexcept;
-		[[nodiscard]] hash hash_file(std::filesystem::path a_path) noexcept;
+		[[nodiscard]] hash hash_directory(std::filesystem::path& a_path) noexcept;
+		[[nodiscard]] hash hash_file(std::filesystem::path& a_path) noexcept;
 	}
 
 	class file final
@@ -548,15 +548,11 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		explicit file(std::u8string a_name) noexcept :
-			_hash(hashing::hash_file(a_name)),
-			_name(std::in_place_index<name_owner>, std::move(a_name))
-		{}
-
-		explicit file(std::u8string_view a_name) noexcept :
-			_hash(hashing::hash_file(a_name)),
-			_name(std::in_place_index<name_view>, a_name)
-		{}
+		explicit file(std::filesystem::path a_path) noexcept
+		{
+			_hash = hashing::hash_file(a_path);
+			_name.emplace<name_owner>(a_path.u8string());
+		}
 
 		file(const file&) noexcept = default;
 		file(file&&) noexcept = default;
@@ -608,8 +604,6 @@ namespace bsa::tes4
 			switch (_name.index()) {
 			case name_null:
 				return {};
-			case name_view:
-				return *std::get_if<name_view>(&_name);
 			case name_owner:
 				return *std::get_if<name_owner>(&_name);
 			case name_proxied:
@@ -765,7 +759,6 @@ namespace bsa::tes4
 		enum : std::size_t
 		{
 			name_null,
-			name_view,
 			name_owner,
 			name_proxied
 		};
@@ -792,7 +785,6 @@ namespace bsa::tes4
 		hashing::hash _hash;
 		std::variant<
 			std::monostate,
-			std::u8string_view,
 			std::u8string,
 			name_proxy>
 			_name;
@@ -870,15 +862,11 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		explicit directory(std::u8string a_filename) noexcept :
-			_hash(hashing::hash_directory(a_filename)),
-			_name(std::in_place_index<name_owner>, std::move(a_filename))
-		{}
-
-		explicit directory(std::u8string_view a_filename) noexcept :
-			_hash(hashing::hash_directory(a_filename)),
-			_name(std::in_place_index<name_view>, a_filename)
-		{}
+		explicit directory(std::filesystem::path a_path) noexcept
+		{
+			_hash = hashing::hash_directory(a_path);
+			_name.emplace<name_owner>(a_path.u8string());
+		}
 
 		directory(const directory&) noexcept = default;
 		directory(directory&&) noexcept = default;
@@ -893,10 +881,10 @@ namespace bsa::tes4
 			return it != _files.end() ? index_t{ *it } : index_t{};
 		}
 
-		[[nodiscard]] auto operator[](std::filesystem::path a_filename) const noexcept
+		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
 			-> index_t
 		{
-			return (*this)[hashing::hash_file(std::move(a_filename))];
+			return (*this)[hashing::hash_file(a_path)];
 		}
 
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
@@ -911,10 +899,10 @@ namespace bsa::tes4
 			return _files.find(a_hash);
 		}
 
-		[[nodiscard]] auto find(std::filesystem::path a_filename) const noexcept
+		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
 			-> const_iterator
 		{
-			return find(hashing::hash_file(std::move(a_filename)));
+			return find(hashing::hash_file(a_path));
 		}
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
@@ -1150,7 +1138,7 @@ namespace bsa::tes4
 		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
 			-> index_t
 		{
-			return (*this)[hashing::hash_directory(std::move(a_path))];
+			return (*this)[hashing::hash_directory(a_path)];
 		}
 
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
@@ -1208,7 +1196,7 @@ namespace bsa::tes4
 
 		bool erase(std::filesystem::path a_path) noexcept
 		{
-			return erase(hashing::hash_directory(std::move(a_path)));
+			return erase(hashing::hash_directory(a_path));
 		}
 
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
@@ -1220,7 +1208,7 @@ namespace bsa::tes4
 		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
 			-> const_iterator
 		{
-			return find(hashing::hash_directory(std::move(a_path)));
+			return find(hashing::hash_directory(a_path));
 		}
 
 		auto insert(directory a_directory) noexcept

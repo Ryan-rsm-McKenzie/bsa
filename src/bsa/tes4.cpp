@@ -21,7 +21,7 @@ namespace bsa::tes4::hashing
 {
 	namespace
 	{
-		[[nodiscard]] auto normalize_directory(std::filesystem::path a_path) noexcept
+		[[nodiscard]] auto normalize_directory(std::filesystem::path& a_path) noexcept
 			-> boost::text::text
 		{
 			boost::text::text p{
@@ -45,6 +45,8 @@ namespace bsa::tes4::hashing
 				p.push_back(u8'.');
 			}
 
+			const auto ptr = reinterpret_cast<const char8_t*>(p.data());
+			a_path.assign(ptr, ptr + p.storage_code_units());
 			return p;
 		}
 
@@ -59,9 +61,9 @@ namespace bsa::tes4::hashing
 		}
 	}
 
-	hash hash_directory(std::filesystem::path a_path) noexcept
+	hash hash_directory(std::filesystem::path& a_path) noexcept
 	{
-		const auto p = normalize_directory(std::move(a_path));
+		const auto p = normalize_directory(a_path);
 		const std::span<const std::byte> view{
 			reinterpret_cast<const std::byte*>(p.data()),
 			p.storage_code_units()
@@ -91,7 +93,7 @@ namespace bsa::tes4::hashing
 		return h;
 	}
 
-	hash hash_file(std::filesystem::path a_path) noexcept
+	hash hash_file(std::filesystem::path& a_path) noexcept
 	{
 		constexpr std::array lut{
 			make_file_extension(u8""sv),
@@ -102,7 +104,8 @@ namespace bsa::tes4::hashing
 			make_file_extension(u8".adp"sv),
 		};
 
-		const auto pstr = normalize_directory(a_path.filename());
+		a_path = a_path.filename();
+		const auto pstr = normalize_directory(a_path);
 		const std::u8string_view pview{
 			reinterpret_cast<const char8_t*>(pstr.data()),
 			pstr.storage_code_units()
@@ -125,7 +128,10 @@ namespace bsa::tes4::hashing
 		}();
 
 		if (!stem.empty()) {
-			auto h = hash_directory(stem);
+			auto h = [&]() noexcept {
+				std::filesystem::path temp{ stem };
+				return hash_directory(temp);
+			}();
 			h.crc += detail::crc32(
 				{ reinterpret_cast<const std::byte*>(extension.data()), extension.size() });
 
