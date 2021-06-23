@@ -228,6 +228,8 @@ namespace bsa::tes4
 			[[nodiscard]] auto read_bytes(std::size_t a_bytes) noexcept
 				-> std::span<const std::byte>
 			{
+				assert(_pos + a_bytes <= _file.size());
+
 				const auto pos = _pos;
 				_pos += a_bytes;
 				return {
