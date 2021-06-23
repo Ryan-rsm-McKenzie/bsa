@@ -188,9 +188,9 @@ namespace bsa::tes4
 
 			istream_t(std::filesystem::path a_path) noexcept
 			{
-				if (std::filesystem::exists(a_path) && std::filesystem::is_regular_file(a_path)) {
+				try {
 					_file.open(boost::filesystem::path{ a_path.native() });
-				}
+				} catch (const std::exception&) {}
 			}
 
 			istream_t(const istream_t&) = delete;
