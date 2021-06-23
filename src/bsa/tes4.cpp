@@ -219,13 +219,13 @@ namespace bsa::tes4
 		return true;
 	}
 
-	bool file::uncompress(version a_version) noexcept
+	bool file::decompress(version a_version) noexcept
 	{
 		assert(compressed());
 
 		const auto in = as_bytes();
 		std::vector<std::byte> out;
-		out.resize(uncompressed_size());
+		out.resize(decompressed_size());
 
 		switch (detail::to_underlying(a_version)) {
 		case 103:
@@ -239,7 +239,7 @@ namespace bsa::tes4
 					reinterpret_cast<const ::Byte*>(in.data()),
 					static_cast<::uLong>(in.size_bytes()));
 				if (result == Z_OK) {
-					assert(static_cast<std::size_t>(outsz) == uncompressed_size());
+					assert(static_cast<std::size_t>(outsz) == decompressed_size());
 				} else {
 					return false;
 				}
@@ -253,7 +253,7 @@ namespace bsa::tes4
 					static_cast<int>(in.size()),
 					static_cast<int>(out.size()));
 				if (result > 0) {
-					assert(static_cast<std::size_t>(result) == uncompressed_size());
+					assert(static_cast<std::size_t>(result) == decompressed_size());
 				} else {
 					return false;
 				}

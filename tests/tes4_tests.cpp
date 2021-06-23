@@ -175,7 +175,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			const auto file = bsa[u8"."sv][name];
 			REQUIRE(file);
 			REQUIRE(file->compressed());
-			REQUIRE(file->uncompressed_size() == std::filesystem::file_size(p));
+			REQUIRE(file->decompressed_size() == std::filesystem::file_size(p));
 		}
 	}
 

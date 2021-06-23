@@ -626,6 +626,14 @@ namespace bsa::tes4
 
 		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
 
+		bool decompress(version a_version) noexcept;
+
+		[[nodiscard]] auto decompressed_size() const noexcept
+			-> std::size_t
+		{
+			return _decompsz ? *_decompsz : size();
+		}
+
 		[[nodiscard]] auto filename() const noexcept
 			-> std::u8string_view
 		{
@@ -672,14 +680,6 @@ namespace bsa::tes4
 			default:
 				detail::declare_unreachable();
 			}
-		}
-
-		bool uncompress(version a_version) noexcept;
-
-		[[nodiscard]] auto uncompressed_size() const noexcept
-			-> std::size_t
-		{
-			return _decompsz ? *_decompsz : size();
 		}
 
 	protected:
