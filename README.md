@@ -1,3 +1,5 @@
+[![Main CI](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml/badge.svg)](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml)
+
 # Important Notes
 
 - This library is a work in progress.
