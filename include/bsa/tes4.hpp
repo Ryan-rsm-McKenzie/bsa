@@ -1259,14 +1259,13 @@ namespace bsa::tes4
 					dirs.count += 1;
 					dirs.blobsz += static_cast<std::uint32_t>(
 						dir.name().length() +
-						1u +  // prefixed byte length
 						1u);  // null terminator
 
 					for (const auto& file : dir) {
 						files.count += 1;
 						files.blobsz += static_cast<std::uint32_t>(
 							file.filename().length() +
-							1u);  // prefixed byte length
+							1u);  // null terminator
 					}
 				}
 
