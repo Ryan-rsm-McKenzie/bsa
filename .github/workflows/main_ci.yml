@@ -46,4 +46,4 @@ jobs:
 
       - name: Test
         working-directory: ${{ github.workspace }}/build
-        run: ctest -C ${{ env.BUILD_TYPE }}
+        run: ctest -C ${{ env.BUILD_TYPE }} -V
