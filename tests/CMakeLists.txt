@@ -19,6 +19,12 @@ add_executable(
 )
 catch_discover_tests(tests)
 
+target_compile_definitions(
+	tests
+	PUBLIC
+		_CRT_SECURE_NO_WARNINGS
+)
+
 target_link_libraries(
 	tests
 	PUBLIC
