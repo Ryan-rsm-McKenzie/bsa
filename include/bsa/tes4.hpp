@@ -1032,10 +1032,14 @@ namespace bsa::tes4
 					a_out << static_cast<std::uint32_t>(fsize);
 				}
 				a_out << a_dataOffset;
-				a_dataOffset += static_cast<std::uint32_t>(file.filename().length() +
-														   1u);  // prefixed byte length
+
+				if (a_header.embedded_file_names()) {
+					a_dataOffset += static_cast<std::uint32_t>(
+						file.filename().length() +
+						1u);  // prefixed byte length
+				}
 				if (file.compressed()) {
-					a_dataOffset += static_cast<std::uint32_t>(file.uncompressed_size());
+					a_dataOffset += 4;
 				}
 				a_dataOffset += static_cast<std::uint32_t>(fsize);
 			}
@@ -1311,8 +1315,8 @@ namespace bsa::tes4
 			}();
 			out << header;
 
-			auto dataOffset = write_directory_entries(out, header);
-			write_file_entries(out, header, dataOffset);
+			write_directory_entries(out, header);
+			write_file_entries(out, header);
 			if (header.file_strings()) {
 				write_file_names(out);
 			}
@@ -1388,10 +1392,9 @@ namespace bsa::tes4
 			}
 		}
 
-		[[nodiscard]] auto write_directory_entries(
+		void write_directory_entries(
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header) const noexcept
-			-> std::uint32_t
 		{
 			const auto match = [&](auto&& a_x86, auto&& a_x64) noexcept {
 				switch (a_header.version()) {
@@ -1438,8 +1441,6 @@ namespace bsa::tes4
 					detail::constants::file_entry_size *
 					dir.size());
 			}
-
-			return offset;
 		}
 
 		[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
@@ -1463,11 +1464,33 @@ namespace bsa::tes4
 
 		void write_file_entries(
 			detail::ostream_t& a_out,
-			const detail::header_t& a_header,
-			std::uint32_t a_dataOffset) const noexcept
+			const detail::header_t& a_header) const noexcept
 		{
+			const auto dirsz = [&]() noexcept {
+				switch (a_header.version()) {
+				case 103:
+				case 104:
+					return detail::constants::directory_entry_size_x86;
+				case 105:
+					return detail::constants::directory_entry_size_x64;
+				default:
+					detail::declare_unreachable();
+				}
+			}();
+
+			std::uint32_t offset = 0;
+			offset += static_cast<std::uint32_t>(a_header.directories_offset());
+			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
+			offset += static_cast<std::uint32_t>(
+				a_header.directory_names_length() +
+				a_header.directory_count() * 1u);  // include prefixed byte length
+			offset += static_cast<std::uint32_t>(
+				detail::constants::file_entry_size *
+				a_header.file_count());
+			offset += static_cast<std::uint32_t>(a_header.file_names_length());
+
 			for (const auto& dir : _directories) {
-				dir.write_file_entries(a_out, a_header, a_dataOffset);
+				dir.write_file_entries(a_out, a_header, offset);
 			}
 		}
 
