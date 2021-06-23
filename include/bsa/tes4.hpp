@@ -1283,15 +1283,21 @@ namespace bsa::tes4
 
 				for (const auto& dir : _directories) {
 					dirs.count += 1;
-					dirs.blobsz += static_cast<std::uint32_t>(
-						dir.name().length() +
-						1u);  // null terminator
+
+					if (directory_strings()) {
+						dirs.blobsz += static_cast<std::uint32_t>(
+							dir.name().length() +
+							1u);  // null terminator
+					}
 
 					for (const auto& file : dir) {
 						files.count += 1;
-						files.blobsz += static_cast<std::uint32_t>(
-							file.filename().length() +
-							1u);  // null terminator
+
+						if (file_strings()) {
+							files.blobsz += static_cast<std::uint32_t>(
+								file.filename().length() +
+								1u);  // null terminator
+						}
 					}
 				}
 
