@@ -183,4 +183,28 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			REQUIRE(file->uncompressed_size() == std::filesystem::file_size(p));
 		}
 	}
+
+	SECTION("files can be compressed independently of the archive's compression")
+	{
+		const std::filesystem::path root{ u8"compression_mismatch_test"sv };
+
+		bsa::tes4::archive bsa;
+		bsa.read(root / u8"test.bsa"sv);
+		REQUIRE(bsa.compressed());
+
+		constexpr std::array files{
+			u8"License.txt"sv,
+			u8"SampleA.png"sv,
+		};
+
+		for (const auto& name : files) {
+			const auto p = root / name;
+			REQUIRE(std::filesystem::exists(p));
+
+			const auto file = bsa[u8"."sv][name];
+			REQUIRE(file);
+			REQUIRE(!file->compressed());
+			REQUIRE(file->size() == std::filesystem::file_size(p));
+		}
+	}
 }
