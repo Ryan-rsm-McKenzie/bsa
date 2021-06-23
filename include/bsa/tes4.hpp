@@ -590,12 +590,17 @@ namespace bsa::tes4
 			[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept  //
 				requires(RECURSE)
 			{
-				assert(_proxy != nullptr);
-				return (*_proxy)[std::move(a_path)];
+				return (**this)[std::move(a_path)];
 			}
 
 			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
-			[[nodiscard]] auto operator*() const noexcept -> reference { return *_proxy; }
+
+			[[nodiscard]] auto operator*() const noexcept -> reference
+			{
+				assert(*this);
+				return *_proxy;
+			}
+
 			[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
 		protected:
