@@ -59,6 +59,7 @@ find_package(Boost
 		container
 		filesystem
 		iostreams
+		nowide
 )
 find_package(text REQUIRED CONFIG)
 
@@ -71,6 +72,7 @@ target_link_libraries(
 		Boost::filesystem
 		Boost::headers
 		Boost::iostreams
+		Boost::nowide
 		bsa::common
 )
 

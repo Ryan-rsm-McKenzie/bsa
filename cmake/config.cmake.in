@@ -8,5 +8,6 @@ find_dependency(Boost
 		container
 		filesystem
 		iostreams
+		nowide
 )
 find_package(text CONFIG)

@@ -5,6 +5,7 @@
     "boost-container",
     "boost-filesystem",
     "boost-iostreams",
+    "boost-nowide",
     "boost-predef",
     "boost-text"
   ],

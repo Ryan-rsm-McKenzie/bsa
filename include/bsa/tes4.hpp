@@ -7,8 +7,8 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
-#include <fstream>
 #include <iterator>
 #include <optional>
 #include <span>
@@ -23,6 +23,7 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/nowide/cstdio.hpp>
 #include <boost/predef.h>
 #pragma warning(pop)
 
@@ -185,13 +186,18 @@ namespace bsa::tes4
 		public:
 			using stream_type = boost::iostreams::mapped_file_source;
 
-			istream_t(std::filesystem::path a_path) :
-				_file(boost::filesystem::path{ a_path.native() })
+			istream_t(std::filesystem::path a_path) noexcept
 			{
-				assert(_file.is_open());
+				if (std::filesystem::exists(a_path) && std::filesystem::is_regular_file(a_path)) {
+					_file.open(boost::filesystem::path{ a_path.native() });
+				}
 			}
 
 			istream_t(const istream_t&) = delete;
+			istream_t(istream_t&&) = delete;
+			~istream_t() noexcept = default;
+			istream_t& operator=(const istream_t&) = delete;
+			istream_t& operator=(istream_t&&) = delete;
 
 			[[nodiscard]] bool is_open() const noexcept { return _file.is_open(); }
 
@@ -269,15 +275,28 @@ namespace bsa::tes4
 		class ostream_t final
 		{
 		public:
-			ostream_t(std::filesystem::path a_path) :
-				_file(a_path, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary)
+			ostream_t(std::filesystem::path a_path) noexcept
 			{
-				assert(_file.is_open());
+				_file = boost::nowide::fopen(
+					reinterpret_cast<const char*>(a_path.u8string().data()),
+					"wb");
+			}
+
+			~ostream_t() noexcept
+			{
+				if (_file) {
+					[[maybe_unused]] const auto result = std::fclose(_file);
+					assert(result == 0);
+					_file = nullptr;
+				}
 			}
 
 			ostream_t(const ostream_t&) = delete;
+			ostream_t(ostream_t&&) = delete;
+			ostream_t& operator=(const ostream_t&) = delete;
+			ostream_t& operator=(ostream_t&&) = delete;
 
-			[[nodiscard]] bool is_open() const noexcept { return _file.is_open(); }
+			[[nodiscard]] bool is_open() const noexcept { return _file != nullptr; }
 
 			template <concepts::integral T>
 			void write(T a_value, std::endian a_endian = std::endian::little) noexcept
@@ -312,9 +331,7 @@ namespace bsa::tes4
 
 			void write_bytes(std::span<const std::byte> a_bytes) noexcept
 			{
-				_file.write(
-					reinterpret_cast<const char*>(a_bytes.data()),
-					static_cast<std::streamsize>(a_bytes.size()));
+				std::fwrite(a_bytes.data(), 1, a_bytes.size_bytes(), _file);
 			}
 
 			template <concepts::integral T>
@@ -334,7 +351,7 @@ namespace bsa::tes4
 			}
 
 		private:
-			std::ofstream _file;
+			std::FILE* _file{ nullptr };
 		};
 
 		class restore_point final
@@ -1220,11 +1237,15 @@ namespace bsa::tes4
 			return _directories.insert(std::move(a_directory));
 		}
 
-		auto read(std::filesystem::path a_path)
-			-> version
+		auto read(std::filesystem::path a_path) noexcept
+			-> std::optional<version>
 		{
-			clear();
 			detail::istream_t in{ std::move(a_path) };
+			if (!in.is_open()) {
+				return std::nullopt;
+			}
+
+			clear();
 			const auto header = [&]() noexcept {
 				detail::header_t result;
 				in >> result;
@@ -1244,14 +1265,18 @@ namespace bsa::tes4
 				read_file_names(in, header);
 			}
 
-			return static_cast<version>(header.version());
+			return { static_cast<version>(header.version()) };
 		}
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _directories.size(); }
 
-		void write(std::filesystem::path a_path, version a_version) const
+		bool write(std::filesystem::path a_path, version a_version) const noexcept
 		{
 			detail::ostream_t out{ std::move(a_path) };
+			if (!out.is_open()) {
+				return false;
+			}
+
 			const auto header = [&]() noexcept -> detail::header_t {
 				detail::header_t::info_t files;
 				detail::header_t::info_t dirs;
@@ -1286,6 +1311,8 @@ namespace bsa::tes4
 				write_file_names(out);
 			}
 			write_file_data(out, header);
+
+			return true;
 		}
 
 	private:
