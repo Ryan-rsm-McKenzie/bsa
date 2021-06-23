@@ -1,5 +1,5 @@
 # `bsa`
-[![Main CI](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml/badge.svg)](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml)
+[![Main CI](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml/badge.svg)](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml)
 
 ### Reading
 ```cpp
