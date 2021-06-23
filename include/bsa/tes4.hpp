@@ -415,14 +415,18 @@ namespace bsa::tes4
 
 				a_value.evaluate_endian();
 
-				assert(magic[0] == std::byte{ u8'B' } &&
-					   magic[1] == std::byte{ u8'S' } &&
-					   magic[2] == std::byte{ u8'A' } &&
-					   magic[3] == std::byte{ u8'\0' });
-				assert(a_value._version == 103 ||
-					   a_value._version == 104 ||
-					   a_value._version == 105);
-				assert(a_value._directoriesOffset == constants::header_size);
+				if (magic[0] != std::byte{ u8'B' } ||
+					magic[1] != std::byte{ u8'S' } ||
+					magic[2] != std::byte{ u8'A' } ||
+					magic[3] != std::byte{ u8'\0' }) {
+					a_value._good = false;
+				} else if (a_value._version != 103 &&
+						   a_value._version != 104 &&
+						   a_value._version != 105) {
+					a_value._good = false;
+				} else if (a_value._directoriesOffset != constants::header_size) {
+					a_value._good = false;
+				}
 
 				return a_in;
 			}
@@ -450,6 +454,8 @@ namespace bsa::tes4
 
 				return a_out;
 			}
+
+			[[nodiscard]] bool good() const noexcept { return _good; }
 
 			[[nodiscard]] auto directories_offset() const noexcept -> std::size_t { return _directoriesOffset; }
 			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
@@ -492,6 +498,7 @@ namespace bsa::tes4
 			info_t _file;
 			std::endian _endian{ std::endian::little };
 			std::uint16_t _archiveTypes{ 0 };
+			bool _good{ true };
 		};
 	}
 
@@ -1249,12 +1256,16 @@ namespace bsa::tes4
 				return std::nullopt;
 			}
 
-			clear();
 			const auto header = [&]() noexcept {
 				detail::header_t result;
 				in >> result;
 				return result;
 			}();
+			if (!header.good()) {
+				return std::nullopt;
+			}
+
+			clear();
 
 			_flags = header.archive_flags();
 			_types = header.archive_types();
