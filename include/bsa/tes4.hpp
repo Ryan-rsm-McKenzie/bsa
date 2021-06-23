@@ -570,7 +570,7 @@ namespace bsa::tes4
 				return *std::get_if<data_view>(&_data);
 			case data_owner:
 				{
-					auto& owner = *std::get_if<data_owner>(&_data);
+					const auto& owner = *std::get_if<data_owner>(&_data);
 					return {
 						owner.data(),
 						owner.size()
