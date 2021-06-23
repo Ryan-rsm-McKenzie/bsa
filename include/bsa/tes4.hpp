@@ -449,7 +449,7 @@ namespace bsa::tes4
 
 			[[nodiscard]] bool compressed() const noexcept { return test_flag(archive_flag::compressed); }
 			[[nodiscard]] bool directory_strings() const noexcept { return test_flag(archive_flag::directory_strings); }
-			[[nodiscard]] bool embedded_file_names() const noexcept { return test_flag(archive_flag::embedded_file_names); }
+			[[nodiscard]] bool embedded_file_names() const noexcept { return _version > 103 && test_flag(archive_flag::embedded_file_names); }
 			[[nodiscard]] bool file_strings() const noexcept { return test_flag(archive_flag::file_strings); }
 			[[nodiscard]] bool xbox_archive() const noexcept { return test_flag(archive_flag::xbox_archive); }
 			[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
