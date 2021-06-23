@@ -150,15 +150,10 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		REQUIRE(!bsa.voices());
 	}
 
-	SECTION("opening an invalid file will throw an exception")
+	SECTION("attempting to read an invalid file will fail")
 	{
-		try {
-			bsa::tes4::archive bsa;
-			bsa.read(u8"."sv);
-			REQUIRE(false);
-		} catch (const std::exception&) {
-			REQUIRE(true);
-		}
+		bsa::tes4::archive bsa;
+		REQUIRE(!bsa.read(u8"."sv));
 	}
 
 	SECTION("we can read compressed archives")
