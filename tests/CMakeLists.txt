@@ -25,12 +25,22 @@ target_compile_definitions(
 		_CRT_SECURE_NO_WARNINGS
 )
 
+find_package(Boost
+	MODULE
+	REQUIRED
+	COMPONENTS
+		iostreams
+		nowide
+)
+
 target_link_libraries(
 	tests
 	PUBLIC
+		Boost::iostreams
+		Boost::nowide
 		bsa::bsa
-		Catch2::Catch2
 		bsa::common
+		Catch2::Catch2
 )
 
 function(download_test)

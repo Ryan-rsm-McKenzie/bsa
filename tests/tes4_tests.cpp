@@ -6,9 +6,20 @@
 
 #pragma warning(push)
 #include <catch2/catch.hpp>
+
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/nowide/cstdio.hpp>
 #pragma warning(pop)
 
 using namespace std::literals;
+
+[[nodiscard]] auto fopen_path(std::filesystem::path a_path, const char* a_mode) noexcept
+	-> std::FILE*
+{
+	return boost::nowide::fopen(
+		reinterpret_cast<const char*>(a_path.u8string().data()),
+		a_mode);
+};
 
 [[nodiscard]] auto hash_directory(std::filesystem::path a_path) noexcept
 	-> bsa::tes4::hashing::hash
@@ -21,6 +32,14 @@ using namespace std::literals;
 {
 	return bsa::tes4::hashing::hash_file(a_path);
 }
+
+[[nodiscard]] auto map_file(const std::filesystem::path& a_path)
+	-> boost::iostreams::mapped_file_source
+{
+	return boost::iostreams::mapped_file_source{
+		boost::filesystem::path{ a_path.native() }
+	};
+};
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
@@ -161,7 +180,8 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		const std::filesystem::path root{ u8"compression_test"sv };
 
 		bsa::tes4::archive bsa;
-		bsa.read(root / u8"test.bsa"sv);
+		const auto version = bsa.read(root / u8"test.bsa"sv);
+		REQUIRE(version);
 
 		constexpr std::array files{
 			u8"License.txt"sv,
@@ -176,6 +196,23 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			REQUIRE(file);
 			REQUIRE(file->compressed());
 			REQUIRE(file->decompressed_size() == std::filesystem::file_size(p));
+
+			auto copy = *file;
+			REQUIRE(copy.decompress(*version));
+			REQUIRE(!copy.compressed());
+			REQUIRE(copy.size() == std::filesystem::file_size(p));
+
+			auto p2 = p;
+			p2 += u8".copy"sv;
+			const auto bytes = copy.as_bytes();
+			const auto out = fopen_path(p2, "wb");
+			std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
+			std::fclose(out);
+
+			const auto lhs = map_file(p);
+			const auto rhs = map_file(p2);
+			REQUIRE(lhs.size() == rhs.size());
+			REQUIRE(std::memcmp(lhs.data(), rhs.data(), lhs.size()));
 		}
 	}
 
