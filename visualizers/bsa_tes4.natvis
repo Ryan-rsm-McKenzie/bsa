@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+	<Type Name="bsa::tes4::archive::index_t">
+		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
+		<DisplayString Condition="empty()">none</DisplayString>
+		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
+		<Expand>
+			<Item Name="[directory]">_proxy,na</Item>
+		</Expand>
+	</Type>
+	
 	<Type Name="bsa::tes4::archive">
 		<DisplayString>tes4 archive</DisplayString>
 		<Expand>
 			<Item Name="[directories]">_directories</Item>
 			<Item Name="[flags]">_flags,en</Item>
 			<Item Name="[types]">_types,en</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::tes4::directory::index_t">
+		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
+		<DisplayString Condition="empty()">none</DisplayString>
+		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
+		<Expand>
+			<Item Name="[file]">_proxy,na</Item>
 		</Expand>
 	</Type>
 
