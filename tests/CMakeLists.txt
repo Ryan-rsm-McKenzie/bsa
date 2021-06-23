@@ -32,3 +32,50 @@ target_link_libraries(
 		Catch2::Catch2
 		bsa::common
 )
+
+function(download_test)
+	set(_PREFIX download_file)
+	set(ONE_VALUE_ARGS
+		NAME
+		SHA512
+		TAG
+	)
+
+	cmake_parse_arguments(${_PREFIX} "" "${ONE_VALUE_ARGS}" "" ${ARGN})
+
+	if(DEFINED "${_PREFIX}_KEYWORDS_MISSING_VALUES")
+		foreach(ARG "${_PREFIX}_KEYWORDS_MISSING_VALUES")
+			if(NOT DEFINED "${_PREFIX}_${ARG}")
+				message(FATAL_ERROR "missing required argument: ${ARG}")
+			endif()
+		endforeach()
+	endif()
+
+	if(DEFINED "${_PREFIX}_UNPARSED_ARGUMENTS")
+		foreach(ARG "${_PREFIX}_UNPARSED_ARGUMENTS")
+			if(NOT DEFINED "${_PREFIX}_${ARG}")
+				message(FATAL_ERROR "unused argument: ${ARG}")
+			endif()
+		endforeach()
+	endif()
+
+	set(NAME "${${_PREFIX}_NAME}")
+	set(OUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.7z")
+
+	file(DOWNLOAD
+		"https://github.com/Ryan-rsm-McKenzie/bsa/releases/download/${${_PREFIX}_TAG}/${NAME}.7z"
+		${OUT_FILE}
+		EXPECTED_HASH SHA512=${${_PREFIX}_SHA512}
+	)
+
+	file(ARCHIVE_EXTRACT
+		INPUT ${OUT_FILE}
+		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${NAME}"
+	)
+endfunction()
+
+download_test(
+	NAME "compression_test"
+	TAG "0.0.1"
+	SHA512 "4EA178D08F0EE91A375AA31077C9C23FB12CB06F1856D8A187D0CD17034D2C04001D8CDABD438C18A9D4FD51FE56E988DBE0827DE181134275B23F50B376645E"
+)
