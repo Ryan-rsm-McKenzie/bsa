@@ -1,6 +1,47 @@
+# `bsa`
 [![Main CI](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml/badge.svg)](https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/cmake.yml)
 
-# Important Notes
+### Reading
+```cpp
+#include <bsa/tes4.hpp>
+#include <cstdio>
+
+std::filesystem::path oblivion{ u8"path/to/oblivion" };
+bsa::tes4::archive bsa;
+bsa.read(oblivion / u8"Data/Oblivion - Voices2.bsa");
+const auto file = bsa[u8"sound/voice/oblivion.esm/imperial/m"][u8"testtoddquest_testtoddhappy_00027fa2_1.mp3"];
+if (file) {
+  const auto bytes = file->as_bytes();
+  const auto out = std::fopen("happy.mp3", "wb");
+  std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
+  std::fclose(out);
+}
+```
+
+### Writing
+```cpp
+#include <bsa/tes4.hpp>
+#include <string_view>
+#include <cstddef>
+#include <utility>
+
+const std::string_view payload{ "Hello world!\n" };
+bsa::tes4::file f{ "hello.txt" };
+f.set_data({ reinterpret_cast<const std::byte*>(payload.data()), payload.size() });
+
+bsa::tes4::directory d{ "misc" };
+d.insert(std::move(f));
+
+bsa::tes4::archive bsa;
+bsa.insert(std::move(d));
+bsa.archive_flags(bsa::tes4::archive_flag::file_strings | bsa::tes4::archive_flag::directory_strings);
+bsa.archive_types(bsa::tes4::archive_type::misc);
+
+bsa.write("example.bsa", bsa::tes4::version::sse);
+bsa.read("example.bsa");
+```
+
+## Important Notes
 
 - This library is a work in progress.
 - `bsa` uses copy-on-write semantics. Under the hood, it memory maps input files and stores no-copy views into that data, so that the resulting memory profile is very low. As a consequence, this means that archives you wish to read from must be stored on disk. `bsa` can not read from arbitrary input streams.
