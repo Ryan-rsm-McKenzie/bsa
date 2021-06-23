@@ -2,12 +2,14 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <span>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #pragma warning(push)
 #pragma warning(disable: 4701)  // Potentially uninitialized local variable 'name' used
@@ -15,6 +17,9 @@
 #pragma warning(disable: 4244)  // 'argument' : conversion from 'type1' to 'type2', possible loss of data
 #include <boost/text/in_place_case_mapping.hpp>
 #include <boost/text/text.hpp>
+
+#include <lz4.h>
+#include <zlib.h>
 #pragma warning(pop)
 
 namespace bsa::tes4
@@ -156,5 +161,112 @@ namespace bsa::tes4
 				return {};
 			}
 		}
+	}
+
+	bool file::compress(version a_version) noexcept
+	{
+		assert(!compressed());
+
+		const auto in = as_bytes();
+		std::vector<std::byte> out;
+
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+		case 104:
+			{
+				auto outsz = ::compressBound(static_cast<::uLong>(in.size()));
+				out.resize(outsz);
+
+				const auto result = ::compress(
+					reinterpret_cast<::Byte*>(out.data()),
+					&outsz,
+					reinterpret_cast<const ::Byte*>(in.data()),
+					static_cast<::uLong>(in.size_bytes()));
+				if (result == Z_OK) {
+					out.resize(outsz);
+					out.shrink_to_fit();
+				} else {
+					return false;
+				}
+			}
+			break;
+		case 105:
+			{
+				out.resize(static_cast<std::size_t>(
+					::LZ4_compressBound(static_cast<int>(in.size()))));
+
+				const auto result = ::LZ4_compress_default(
+					reinterpret_cast<const char*>(in.data()),
+					reinterpret_cast<char*>(out.data()),
+					static_cast<int>(in.size()),
+					static_cast<int>(out.size()));
+				if (result > 0) {
+					out.resize(static_cast<std::size_t>(result));
+					out.shrink_to_fit();
+				} else {
+					return false;
+				}
+			}
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+
+		_decompsz = in.size_bytes();
+		_data.emplace<data_owner>(std::move(out));
+
+		assert(compressed());
+		return true;
+	}
+
+	bool file::uncompress(version a_version) noexcept
+	{
+		assert(compressed());
+
+		const auto in = as_bytes();
+		std::vector<std::byte> out;
+		out.resize(uncompressed_size());
+
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+		case 104:
+			{
+				auto outsz = static_cast<::uLong>(out.size());
+
+				const auto result = ::uncompress(
+					reinterpret_cast<::Byte*>(out.data()),
+					&outsz,
+					reinterpret_cast<const ::Byte*>(in.data()),
+					static_cast<::uLong>(in.size_bytes()));
+				if (result == Z_OK) {
+					assert(static_cast<std::size_t>(outsz) == uncompressed_size());
+				} else {
+					return false;
+				}
+			}
+			break;
+		case 105:
+			{
+				const auto result = ::LZ4_decompress_safe(
+					reinterpret_cast<const char*>(in.data()),
+					reinterpret_cast<char*>(out.data()),
+					static_cast<int>(in.size()),
+					static_cast<int>(out.size()));
+				if (result > 0) {
+					assert(static_cast<std::size_t>(result) == uncompressed_size());
+				} else {
+					return false;
+				}
+			}
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+
+		_decompsz.reset();
+		_data.emplace<data_owner>(std::move(out));
+
+		assert(!compressed());
+		return true;
 	}
 }

@@ -622,6 +622,8 @@ namespace bsa::tes4
 			}
 		}
 
+		bool compress(version a_version) noexcept;
+
 		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
 
 		[[nodiscard]] auto filename() const noexcept
@@ -671,6 +673,8 @@ namespace bsa::tes4
 				detail::declare_unreachable();
 			}
 		}
+
+		bool uncompress(version a_version) noexcept;
 
 		[[nodiscard]] auto uncompressed_size() const noexcept
 			-> std::size_t

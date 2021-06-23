@@ -61,12 +61,16 @@ find_package(Boost
 		iostreams
 		nowide
 )
+find_package(lz4 REQUIRED)	# might be problematic
 find_package(text REQUIRED CONFIG)
+find_package(ZLIB MODULE REQUIRED)
 
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
 		Boost::text
+		lz4::lz4
+		ZLIB::ZLIB
 	PUBLIC
 		Boost::container
 		Boost::filesystem
