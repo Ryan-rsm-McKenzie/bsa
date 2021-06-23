@@ -705,9 +705,8 @@ namespace bsa::tes4
 				a_in >> size;
 				_decompsz = size;
 				a_size -= sizeof(size);
-				a_size &= ~icompression;
 			}
-			a_size &= ~ichecked;
+			a_size &= ~(ichecked | icompression);
 
 			_data.emplace<data_proxied>(a_in.read_bytes(a_size), a_in.rdbuf());
 			return dirname;
