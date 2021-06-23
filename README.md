@@ -38,7 +38,6 @@ bsa.archive_flags(bsa::tes4::archive_flag::file_strings | bsa::tes4::archive_fla
 bsa.archive_types(bsa::tes4::archive_type::misc);
 
 bsa.write("example.bsa", bsa::tes4::version::sse);
-bsa.read("example.bsa");
 ```
 
 ## Important Notes
