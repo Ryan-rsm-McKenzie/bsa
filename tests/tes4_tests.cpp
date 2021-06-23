@@ -174,10 +174,13 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		};
 
 		for (const auto& name : files) {
+			const auto p = root / name;
+			REQUIRE(std::filesystem::exists(p));
+
 			const auto file = bsa[u8"."sv][name];
 			REQUIRE(file);
 			REQUIRE(file->compressed());
-			REQUIRE(file->uncompressed_size() == std::filesystem::file_size(root / name));
+			REQUIRE(file->uncompressed_size() == std::filesystem::file_size(p));
 		}
 	}
 }
