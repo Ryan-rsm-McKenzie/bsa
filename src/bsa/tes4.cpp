@@ -117,7 +117,7 @@ namespace bsa::tes4::hashing
 			if (split != std::u8string_view::npos) {
 				return {
 					pview.substr(0, split),
-					pview.substr(split + 1)
+					pview.substr(split)
 				};
 			} else {
 				return {
@@ -127,9 +127,9 @@ namespace bsa::tes4::hashing
 			}
 		}();
 
-		if (!stem.empty() && 
+		if (!stem.empty() &&
 			stem.length() < 260 &&
-			extension.length() < 16 - 1) {
+			extension.length() < 16) {
 			auto h = [&]() noexcept {
 				std::filesystem::path temp{ stem };
 				return hash_directory(temp);

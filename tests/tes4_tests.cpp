@@ -24,6 +24,13 @@ using namespace std::literals;
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
+	SECTION("validate hash values")
+	{
+		const auto h = hash_file(u8"testtoddquest_testtoddhappy_00027fa2_1.mp3"sv);
+
+		REQUIRE(h.numeric() == 0xDE0301EE74265F31);
+	}
+
 	SECTION("the empty path \"\" is equivalent to the current path \".\"")
 	{
 		const auto empty = hash_directory(u8""sv);
