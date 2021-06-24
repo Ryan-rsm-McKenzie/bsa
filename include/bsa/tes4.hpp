@@ -88,10 +88,7 @@ namespace bsa::tes4
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
 			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
-				-> std::strong_ordering
-			{
-				return a_lhs.numeric() <=> a_rhs.numeric();
-			}
+				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
 
 			[[nodiscard]] auto numeric() const noexcept
 				-> std::uint64_t
@@ -199,10 +196,7 @@ namespace bsa::tes4
 		bool decompress(version a_version) noexcept;
 
 		[[nodiscard]] auto decompressed_size() const noexcept
-			-> std::size_t
-		{
-			return _decompsz ? *_decompsz : size();
-		}
+			-> std::size_t { return _decompsz ? *_decompsz : size(); }
 
 		[[nodiscard]] auto filename() const noexcept -> std::u8string_view;
 
@@ -303,26 +297,20 @@ namespace bsa::tes4
 		{
 			using is_transparent = int;
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const key_type& a_lhs,
 				const key_type& a_rhs) const noexcept
-			{
-				return a_lhs.hash() < a_rhs.hash();
-			}
+				-> bool { return a_lhs.hash() < a_rhs.hash(); }
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const key_type& a_lhs,
 				const hashing::hash& a_rhs) const noexcept
-			{
-				return a_lhs.hash() < a_rhs;
-			}
+				-> bool { return a_lhs.hash() < a_rhs; }
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const hashing::hash& a_lhs,
 				const key_type& a_rhs) const noexcept
-			{
-				return a_lhs < a_rhs.hash();
-			}
+				-> bool { return a_lhs < a_rhs.hash(); }
 		};
 
 	private:
@@ -369,16 +357,10 @@ namespace bsa::tes4
 		}
 
 		[[nodiscard]] auto operator[](std::filesystem::path a_path) noexcept
-			-> index
-		{
-			return (*this)[hashing::hash_file(a_path)];
-		}
+			-> index { return (*this)[hashing::hash_file(a_path)]; }
 
 		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
-			-> const_index
-		{
-			return (*this)[hashing::hash_file(a_path)];
-		}
+			-> const_index { return (*this)[hashing::hash_file(a_path)]; }
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
@@ -389,36 +371,21 @@ namespace bsa::tes4
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
-			-> iterator
-		{
-			return _files.find(a_hash);
-		}
+			-> iterator { return _files.find(a_hash); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
-			-> const_iterator
-		{
-			return _files.find(a_hash);
-		}
+			-> const_iterator { return _files.find(a_hash); }
 
 		[[nodiscard]] auto find(std::filesystem::path a_path) noexcept
-			-> iterator
-		{
-			return find(hashing::hash_file(a_path));
-		}
+			-> iterator { return find(hashing::hash_file(a_path)); }
 
 		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
-			-> const_iterator
-		{
-			return find(hashing::hash_file(a_path));
-		}
+			-> const_iterator { return find(hashing::hash_file(a_path)); }
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
 		auto insert(file a_file) noexcept
-			-> std::pair<iterator, bool>
-		{
-			return _files.insert(std::move(a_file));
-		}
+			-> std::pair<iterator, bool> { return _files.insert(std::move(a_file)); }
 
 		[[nodiscard]] auto name() const noexcept -> std::u8string_view;
 
@@ -481,26 +448,20 @@ namespace bsa::tes4
 		{
 			using is_transparent = int;
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const key_type& a_lhs,
 				const key_type& a_rhs) const noexcept
-			{
-				return a_lhs.hash() < a_rhs.hash();
-			}
+				-> bool { return a_lhs.hash() < a_rhs.hash(); }
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const key_type& a_lhs,
 				const hashing::hash& a_rhs) const noexcept
-			{
-				return a_lhs.hash() < a_rhs;
-			}
+				-> bool { return a_lhs.hash() < a_rhs; }
 
-			[[nodiscard]] bool operator()(
+			[[nodiscard]] auto operator()(
 				const hashing::hash& a_lhs,
 				const key_type& a_rhs) const noexcept
-			{
-				return a_lhs < a_rhs.hash();
-			}
+				-> bool { return a_lhs < a_rhs.hash(); }
 		};
 
 	private:
@@ -538,16 +499,10 @@ namespace bsa::tes4
 		}
 
 		[[nodiscard]] auto operator[](std::filesystem::path a_path) noexcept
-			-> index
-		{
-			return (*this)[hashing::hash_directory(a_path)];
-		}
+			-> index { return (*this)[hashing::hash_directory(a_path)]; }
 
 		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
-			-> const_index
-		{
-			return (*this)[hashing::hash_directory(a_path)];
-		}
+			-> const_index { return (*this)[hashing::hash_directory(a_path)]; }
 
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
 		void archive_flags(archive_flag a_flags) noexcept { _flags = a_flags; }
@@ -605,40 +560,23 @@ namespace bsa::tes4
 
 		bool erase(hashing::hash a_hash) noexcept;
 
-		bool erase(std::filesystem::path a_path) noexcept
-		{
-			return erase(hashing::hash_directory(a_path));
-		}
+		auto erase(std::filesystem::path a_path) noexcept
+			-> bool { return erase(hashing::hash_directory(a_path)); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
-			-> iterator
-		{
-			return _directories.find(a_hash);
-		}
+			-> iterator { return _directories.find(a_hash); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
-			-> const_iterator
-		{
-			return _directories.find(a_hash);
-		}
+			-> const_iterator { return _directories.find(a_hash); }
 
 		[[nodiscard]] auto find(std::filesystem::path a_path) noexcept
-			-> iterator
-		{
-			return find(hashing::hash_directory(a_path));
-		}
+			-> iterator { return find(hashing::hash_directory(a_path)); }
 
 		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
-			-> const_iterator
-		{
-			return find(hashing::hash_directory(a_path));
-		}
+			-> const_iterator { return find(hashing::hash_directory(a_path)); }
 
 		auto insert(directory a_directory) noexcept
-			-> std::pair<iterator, bool>
-		{
-			return _directories.insert(std::move(a_directory));
-		}
+			-> std::pair<iterator, bool> { return _directories.insert(std::move(a_directory)); }
 
 		auto read(std::filesystem::path a_path) noexcept -> std::optional<version>;
 
@@ -659,15 +597,11 @@ namespace bsa::tes4
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header) const noexcept;
 
-		[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
-		{
-			return (_flags & a_flag) != archive_flag::none;
-		}
+		[[nodiscard]] auto test_flag(archive_flag a_flag) const noexcept
+			-> bool { return (_flags & a_flag) != archive_flag::none; }
 
-		[[nodiscard]] bool test_type(archive_type a_type) const noexcept
-		{
-			return (_types & a_type) != archive_type::none;
-		}
+		[[nodiscard]] auto test_type(archive_type a_type) const noexcept
+			-> bool { return (_types & a_type) != archive_type::none; }
 
 		void write_file_data(
 			detail::ostream_t& a_out,
