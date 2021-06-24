@@ -195,7 +195,7 @@ namespace bsa::tes4
 		case 105:
 			{
 				::LZ4F_preferences_t pref = LZ4F_INIT_PREFERENCES;
-				pref.compressionLevel = 11;
+				pref.compressionLevel = LZ4HC_CLEVEL_DEFAULT;
 				pref.autoFlush = 1;
 				out.resize(::LZ4F_compressFrameBound(in.size(), &pref));
 
