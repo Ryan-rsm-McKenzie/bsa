@@ -30,6 +30,9 @@ namespace bsa::tes4
 	namespace detail
 	{
 		class header_t;
+
+		template <class, bool>
+		class index_t;
 	}
 
 	namespace hashing
