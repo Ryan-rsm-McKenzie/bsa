@@ -1,13 +1,10 @@
 #pragma once
 
-#include <algorithm>
-#include <array>
 #include <cassert>
 #include <compare>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <memory>
 #include <optional>
 #include <span>
 #include <string>
@@ -19,7 +16,6 @@
 
 #pragma warning(push)
 #include <boost/container/flat_set.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #pragma warning(pop)
 
@@ -104,17 +100,6 @@ namespace bsa::tes4
 			inline constexpr std::size_t header_size = 0x24;
 		}
 
-		[[nodiscard]] inline auto crc32(std::span<const std::byte> a_bytes)
-			-> std::uint32_t
-		{
-			constexpr auto constant = std::uint32_t{ 0x1003Fu };
-			std::uint32_t crc = 0;
-			for (const auto c : a_bytes) {
-				crc = static_cast<std::uint8_t>(c) + crc * constant;
-			}
-			return crc;
-		}
-
 		class header_t final
 		{
 		public:
@@ -141,63 +126,8 @@ namespace bsa::tes4
 				evaluate_endian();
 			}
 
-			friend istream_t& operator>>(istream_t& a_in, header_t& a_value) noexcept
-			{
-				std::array<std::byte, 4> magic;
-
-				a_in >>
-					magic >>
-					a_value._version >>
-					a_value._directoriesOffset >>
-					a_value._archiveFlags >>
-					a_value._directory.count >>
-					a_value._file.count >>
-					a_value._directory.blobsz >>
-					a_value._file.blobsz >>
-					a_value._archiveTypes;
-				a_in.seek_relative(2);
-
-				a_value.evaluate_endian();
-
-				if (magic[0] != std::byte{ u8'B' } ||
-					magic[1] != std::byte{ u8'S' } ||
-					magic[2] != std::byte{ u8'A' } ||
-					magic[3] != std::byte{ u8'\0' }) {
-					a_value._good = false;
-				} else if (a_value._version != 103 &&
-						   a_value._version != 104 &&
-						   a_value._version != 105) {
-					a_value._good = false;
-				} else if (a_value._directoriesOffset != constants::header_size) {
-					a_value._good = false;
-				}
-
-				return a_in;
-			}
-
-			friend ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept
-			{
-				std::array magic{
-					std::byte{ u8'B' },
-					std::byte{ u8'S' },
-					std::byte{ u8'A' },
-					std::byte{ u8'\0' }
-				};
-
-				a_out
-					<< magic
-					<< a_value._version
-					<< a_value._directoriesOffset
-					<< a_value._archiveFlags
-					<< a_value._directory.count
-					<< a_value._file.count
-					<< a_value._directory.blobsz
-					<< a_value._file.blobsz
-					<< a_value._archiveTypes
-					<< std::uint16_t{ 0 };
-
-				return a_out;
-			}
+			friend istream_t& operator>>(istream_t& a_in, header_t& a_value) noexcept;
+			friend ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept;
 
 			[[nodiscard]] bool good() const noexcept { return _good; }
 
@@ -227,13 +157,7 @@ namespace bsa::tes4
 				return (_archiveFlags & to_underlying(a_flag)) != 0;
 			}
 
-			void evaluate_endian() noexcept
-			{
-				_endian =
-					xbox_archive() ?
-						std::endian::big :
-                        std::endian::little;
-			}
+			void evaluate_endian() noexcept;
 
 			std::uint32_t _version{ 0 };
 			std::uint32_t _directoriesOffset{ constants::header_size };
@@ -285,26 +209,11 @@ namespace bsa::tes4
 
 			void read(
 				detail::istream_t& a_in,
-				std::endian a_endian) noexcept
-			{
-				a_in >>
-					last >>
-					last2 >>
-					length >>
-					first;
-				crc = a_in.read<decltype(crc)>(a_endian);
-			}
+				std::endian a_endian) noexcept;
 
 			void write(
 				detail::ostream_t& a_out,
-				std::endian a_endian) const noexcept
-			{
-				a_out << last
-					  << last2
-					  << length
-					  << first;
-				a_out.write(crc, a_endian);
-			}
+				std::endian a_endian) const noexcept;
 		};
 
 		[[nodiscard]] hash hash_directory(std::filesystem::path& a_path) noexcept;
@@ -351,7 +260,7 @@ namespace bsa::tes4
 			friend class directory;
 
 			explicit index_t(reference a_value) noexcept :
-				_proxy(std::addressof(a_value))
+				_proxy(&a_value)
 			{}
 
 		private:
@@ -378,45 +287,13 @@ namespace bsa::tes4
 		file& operator=(const file&) noexcept = default;
 		file& operator=(file&&) noexcept = default;
 
-		[[nodiscard]] auto as_bytes() const noexcept
-			-> std::span<const std::byte>
-		{
-			switch (_data.index()) {
-			case data_view:
-				return *std::get_if<data_view>(&_data);
-			case data_owner:
-				{
-					const auto& owner = *std::get_if<data_owner>(&_data);
-					return {
-						owner.data(),
-						owner.size()
-					};
-				}
-			case data_proxied:
-				return std::get_if<data_proxied>(&_data)->d;
-			default:
-				detail::declare_unreachable();
-			}
-		}
-
-		[[nodiscard]] auto data() const noexcept
-			-> const std::byte*
-		{
-			switch (_data.index()) {
-			case data_view:
-				return std::get_if<data_view>(&_data)->data();
-			case data_owner:
-				return std::get_if<data_owner>(&_data)->data();
-			case data_proxied:
-				return std::get_if<data_proxied>(&_data)->d.data();
-			default:
-				detail::declare_unreachable();
-			}
-		}
+		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
 
 		bool compress(version a_version) noexcept;
 
 		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+
+		[[nodiscard]] auto data() const noexcept -> const std::byte*;
 
 		bool decompress(version a_version) noexcept;
 
@@ -426,20 +303,7 @@ namespace bsa::tes4
 			return _decompsz ? *_decompsz : size();
 		}
 
-		[[nodiscard]] auto filename() const noexcept
-			-> std::u8string_view
-		{
-			switch (_name.index()) {
-			case name_null:
-				return {};
-			case name_owner:
-				return *std::get_if<name_owner>(&_name);
-			case name_proxied:
-				return std::get_if<name_proxied>(&_name)->n;
-			default:
-				detail::declare_unreachable();
-			}
-		}
+		[[nodiscard]] auto filename() const noexcept -> std::u8string_view;
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
@@ -459,20 +323,7 @@ namespace bsa::tes4
 			_decompsz = a_decompressedSize;
 		}
 
-		[[nodiscard]] auto size() const noexcept
-			-> std::size_t
-		{
-			switch (_data.index()) {
-			case data_view:
-				return std::get_if<data_view>(&_data)->size();
-			case data_owner:
-				return std::get_if<data_owner>(&_data)->size();
-			case data_proxied:
-				return std::get_if<data_proxied>(&_data)->d.size();
-			default:
-				detail::declare_unreachable();
-			}
-		}
+		[[nodiscard]] auto size() const noexcept -> std::size_t;
 
 	protected:
 		friend class directory;
@@ -490,95 +341,16 @@ namespace bsa::tes4
 			const detail::header_t& a_header,
 			std::size_t a_size,
 			std::size_t a_offset) noexcept
-			-> std::optional<std::u8string_view>
-		{
-			std::optional<std::u8string_view> dirname;
+			-> std::optional<std::u8string_view>;
 
-			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_offset & ~isecondary_archive);
-
-			if (a_header.embedded_file_names()) {  // bstring
-				std::uint8_t len = 0;
-				a_in >> len;
-				const auto bytes = a_in.read_bytes(len);
-
-				if (_name.index() == name_null) {
-					std::u8string_view name{
-						reinterpret_cast<const char8_t*>(bytes.data()),
-						len
-					};
-					const auto pos = name.find_last_of(u8"\\/"sv);
-					if (pos != std::u8string_view::npos) {
-						dirname = name.substr(0, pos);
-						name = name.substr(pos + 1);
-					}
-					_name.emplace<name_proxied>(name, a_in.rdbuf());
-				}
-
-				a_size -= static_cast<std::size_t>(len) + 1;
-			}
-
-			const bool compressed =
-				a_size & icompression ?
-					!a_header.compressed() :
-                    a_header.compressed();
-			if (compressed) {
-				std::uint32_t size = 0;
-				a_in >> size;
-				_decompsz = size;
-				a_size -= 4;
-			}
-			a_size &= ~(ichecked | icompression);
-
-			_data.emplace<data_proxied>(a_in.read_bytes(a_size), a_in.rdbuf());
-			return dirname;
-		}
-
-		void read_filename(detail::istream_t& a_in) noexcept
-		{
-			// zstring
-			const std::u8string_view name{
-				reinterpret_cast<const char8_t*>(a_in.read_bytes(1).data())
-			};
-			a_in.seek_relative(name.length());
-			_name.emplace<name_proxied>(name, a_in.rdbuf());
-		}
+		void read_filename(detail::istream_t& a_in) noexcept;
 
 		void write_data(
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header,
-			std::u8string_view a_dirname) const noexcept
-		{
-			if (a_header.embedded_file_names()) {
-				const auto writeStr = [&](std::u8string_view a_str) noexcept {
-					a_out.write_bytes(
-						{ reinterpret_cast<const std::byte*>(a_str.data()), a_str.length() });
-				};
+			std::u8string_view a_dirname) const noexcept;
 
-				const auto myname = filename();
-				a_out << static_cast<std::uint8_t>(
-					a_dirname.length() +
-					1u +  // directory separator
-					myname.length());
-				writeStr(a_dirname);
-				a_out << std::byte{ u8'\\' };
-				writeStr(myname);
-			}
-
-			if (compressed()) {
-				a_out << static_cast<std::uint32_t>(*_decompsz);
-			}
-
-			a_out.write_bytes(as_bytes());
-		}
-
-		void write_filename(detail::ostream_t& a_out) const noexcept
-		{
-			const auto name = filename();
-			a_out.write_bytes(
-				{ reinterpret_cast<const std::byte*>(name.data()), name.length() });
-			a_out << std::byte{ u8'\0' };
-		}
+		void write_filename(detail::ostream_t& a_out) const noexcept;
 
 	private:
 		enum : std::size_t
@@ -747,22 +519,7 @@ namespace bsa::tes4
 			return _files.insert(std::move(a_file));
 		}
 
-		[[nodiscard]] auto name() const noexcept
-			-> std::u8string_view
-		{
-			switch (_name.index()) {
-			case name_null:
-				return {};
-			case name_view:
-				return *std::get_if<name_view>(&_name);
-			case name_owner:
-				return *std::get_if<name_owner>(&_name);
-			case name_proxied:
-				return std::get_if<name_proxied>(&_name)->n;
-			default:
-				detail::declare_unreachable();
-			}
-		}
+		[[nodiscard]] auto name() const noexcept -> std::u8string_view;
 
 		void reserve(std::size_t a_count) noexcept { _files.reserve(a_count); }
 
@@ -771,100 +528,23 @@ namespace bsa::tes4
 	protected:
 		friend class archive;
 
+		void read_file_names(detail::istream_t& a_in) noexcept;
+
 		void read_files(
 			detail::istream_t& a_in,
 			const detail::header_t& a_header,
-			std::size_t a_count) noexcept
-		{
-			if (a_header.directory_strings()) {  // bzstring
-				std::uint8_t len = 0;
-				a_in >> len;
-				const std::u8string_view name{
-					reinterpret_cast<const char8_t*>(a_in.read_bytes(len).data()),
-					len - 1u  // skip null terminator
-				};
-
-				_name.emplace<name_proxied>(name, a_in.rdbuf());
-			}
-
-			_files.reserve(a_count);
-			for (std::size_t i = 0; i < a_count; ++i) {
-				hashing::hash h;
-				h.read(a_in, a_header.endian());
-
-				std::uint32_t size = 0;
-				std::uint32_t offset = 0;
-				a_in >> size >> offset;
-
-				file f{ h };
-				const auto dirname = f.read_data(a_in, a_header, size, offset);
-				if (_name.index() == name_null && dirname) {
-					_name.emplace<name_proxied>(*dirname, a_in.rdbuf());
-				}
-
-				[[maybe_unused]] const auto [it, success] = _files.insert(std::move(f));
-				assert(success);
-			}
-		}
-
-		void read_file_names(detail::istream_t& a_in) noexcept
-		{
-			for (auto& file : _files) {
-				file.read_filename(a_in);
-			}
-		}
+			std::size_t a_count) noexcept;
 
 		void write_file_data(
 			detail::ostream_t& a_out,
-			const detail::header_t& a_header) const noexcept
-		{
-			const auto myname = name();
-			for (const auto& file : _files) {
-				file.write_data(a_out, a_header, myname);
-			}
-		}
+			const detail::header_t& a_header) const noexcept;
 
 		void write_file_entries(
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header,
-			std::uint32_t& a_dataOffset) const noexcept
-		{
-			if (a_header.directory_strings()) {  // bzstring
-				const auto myname = name();
-				a_out << static_cast<std::uint8_t>(myname.length() + 1u);  // include null terminator
-				a_out.write_bytes(
-					{ reinterpret_cast<const std::byte*>(myname.data()), myname.size() });
-				a_out << std::byte{ u8'\0' };
-			}
+			std::uint32_t& a_dataOffset) const noexcept;
 
-			for (const auto& file : _files) {
-				file.hash().write(a_out, a_header.endian());
-				const auto fsize = file.size();
-				if (!!a_header.compressed() != !!file.compressed()) {
-					a_out << (static_cast<std::uint32_t>(fsize) | file::icompression);
-				} else {
-					a_out << static_cast<std::uint32_t>(fsize);
-				}
-				a_out << a_dataOffset;
-
-				if (a_header.embedded_file_names()) {
-					a_dataOffset += static_cast<std::uint32_t>(
-						file.filename().length() +
-						1u);  // prefixed byte length
-				}
-				if (file.compressed()) {
-					a_dataOffset += 4;
-				}
-				a_dataOffset += static_cast<std::uint32_t>(fsize);
-			}
-		}
-
-		void write_file_names(detail::ostream_t& a_out) const noexcept
-		{
-			for (const auto& file : _files) {
-				file.write_filename(a_out);
-			}
-		}
+		void write_file_names(detail::ostream_t& a_out) const noexcept;
 
 	private:
 		enum : std::size_t
@@ -1007,16 +687,7 @@ namespace bsa::tes4
 
 		[[nodiscard]] bool empty() const noexcept { return _directories.empty(); }
 
-		bool erase(hashing::hash a_hash) noexcept
-		{
-			const auto it = _directories.find(a_hash);
-			if (it != _directories.end()) {
-				_directories.erase(it);
-				return true;
-			} else {
-				return false;
-			}
-		}
+		bool erase(hashing::hash a_hash) noexcept;
 
 		bool erase(std::filesystem::path a_path) noexcept
 		{
@@ -1053,211 +724,24 @@ namespace bsa::tes4
 			return _directories.insert(std::move(a_directory));
 		}
 
-		auto read(std::filesystem::path a_path) noexcept
-			-> std::optional<version>
-		{
-			detail::istream_t in{ std::move(a_path) };
-			if (!in.is_open()) {
-				return std::nullopt;
-			}
-
-			const auto header = [&]() noexcept {
-				detail::header_t result;
-				in >> result;
-				return result;
-			}();
-			if (!header.good()) {
-				return std::nullopt;
-			}
-
-			clear();
-
-			_flags = header.archive_flags();
-			_types = header.archive_types();
-
-			in.seek_absolute(header.directories_offset());
-			_directories.reserve(header.directory_count());
-			for (std::size_t i = 0; i < header.directory_count(); ++i) {
-				read_directory(in, header);
-			}
-
-			if (header.file_strings() && !header.embedded_file_names()) {
-				read_file_names(in, header);
-			}
-
-			return { static_cast<version>(header.version()) };
-		}
+		auto read(std::filesystem::path a_path) noexcept -> std::optional<version>;
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _directories.size(); }
 
-		bool write(std::filesystem::path a_path, version a_version) const noexcept
-		{
-			detail::ostream_t out{ std::move(a_path) };
-			if (!out.is_open()) {
-				return false;
-			}
-
-			const auto header = [&]() noexcept -> detail::header_t {
-				detail::header_t::info_t files;
-				detail::header_t::info_t dirs;
-
-				for (const auto& dir : _directories) {
-					dirs.count += 1;
-
-					if (directory_strings()) {
-						dirs.blobsz += static_cast<std::uint32_t>(
-							dir.name().length() +
-							1u);  // null terminator
-					}
-
-					for (const auto& file : dir) {
-						files.count += 1;
-
-						if (file_strings()) {
-							files.blobsz += static_cast<std::uint32_t>(
-								file.filename().length() +
-								1u);  // null terminator
-						}
-					}
-				}
-
-				return {
-					a_version,
-					_flags,
-					_types,
-					dirs,
-					files
-				};
-			}();
-			out << header;
-
-			write_directory_entries(out, header);
-			write_file_entries(out, header);
-			if (header.file_strings()) {
-				write_file_names(out);
-			}
-			write_file_data(out, header);
-
-			return true;
-		}
+		bool write(std::filesystem::path a_path, version a_version) const noexcept;
 
 	private:
-		void read_directory(
-			detail::istream_t& a_in,
-			const detail::header_t& a_header) noexcept
-		{
-			hashing::hash hash;
-			hash.read(a_in, a_header.endian());
-			directory dir{ hash };
-
-			std::uint32_t count = 0;
-			a_in >> count;
-
-			std::uint32_t offset = 0;
-			switch (a_header.version()) {
-			case 103:
-			case 104:
-				a_in >> offset;
-				break;
-			case 105:
-				a_in.seek_relative(4);
-				a_in >> offset;
-				a_in.seek_relative(4);
-				break;
-			default:
-				detail::declare_unreachable();
-			}
-
-			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(offset - a_header.file_names_length());
-			dir.read_files(a_in, a_header, count);
-
-			[[maybe_unused]] const auto [it, success] = _directories.insert(std::move(dir));
-			assert(success);
-		}
-
 		void read_file_names(
 			detail::istream_t& a_in,
-			const detail::header_t& a_header) noexcept
-		{
-			const auto dirsz = [&]() noexcept {
-				switch (a_header.version()) {
-				case 103:
-				case 104:
-					return detail::constants::directory_entry_size_x86;
-				case 105:
-					return detail::constants::directory_entry_size_x64;
-				default:
-					detail::declare_unreachable();
-				}
-			}();
+			const detail::header_t& a_header) noexcept;
 
-			std::uint32_t offset = 0;
-			offset += static_cast<std::uint32_t>(a_header.directories_offset());
-			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-			offset += static_cast<std::uint32_t>(
-				a_header.directory_names_length() +
-				a_header.directory_count() * 1u);  // include prefixed byte length
-			offset += static_cast<std::uint32_t>(
-				detail::constants::file_entry_size *
-				a_header.file_count());
-
-			a_in.seek_absolute(offset);
-			for (auto& dir : _directories) {
-				dir.read_file_names(a_in);
-			}
-		}
+		void read_directory(
+			detail::istream_t& a_in,
+			const detail::header_t& a_header) noexcept;
 
 		void write_directory_entries(
 			detail::ostream_t& a_out,
-			const detail::header_t& a_header) const noexcept
-		{
-			const auto match = [&](auto&& a_x86, auto&& a_x64) noexcept {
-				switch (a_header.version()) {
-				case 103:
-				case 104:
-					return a_x86();
-				case 105:
-					return a_x64();
-				default:
-					detail::declare_unreachable();
-				}
-			};
-
-			const auto dirsz = match(
-				[]() noexcept { return detail::constants::directory_entry_size_x86; },
-				[]() noexcept { return detail::constants::directory_entry_size_x64; });
-
-			std::uint32_t offset = 0;
-			offset += static_cast<std::uint32_t>(a_header.directories_offset());
-			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-			offset += static_cast<std::uint32_t>(a_header.file_names_length());
-
-			for (const auto& dir : _directories) {
-				dir.hash().write(a_out, a_header.endian());
-				a_out << static_cast<std::uint32_t>(dir.size());
-
-				match(
-					[&]() noexcept { a_out << offset; },
-					[&]() noexcept {
-						a_out
-							<< std::uint32_t{ 0 }
-							<< offset
-							<< std::uint32_t{ 0 };
-					});
-
-				if (a_header.directory_strings()) {
-					offset += static_cast<std::uint32_t>(
-						dir.name().length() +
-						1u +  // prefixed byte length
-						1u);  // null terminator
-				}
-
-				offset += static_cast<std::uint32_t>(
-					detail::constants::file_entry_size *
-					dir.size());
-			}
-		}
+			const detail::header_t& a_header) const noexcept;
 
 		[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
 		{
@@ -1271,51 +755,13 @@ namespace bsa::tes4
 
 		void write_file_data(
 			detail::ostream_t& a_out,
-			const detail::header_t& a_header) const noexcept
-		{
-			for (const auto& dir : _directories) {
-				dir.write_file_data(a_out, a_header);
-			}
-		}
+			const detail::header_t& a_header) const noexcept;
 
 		void write_file_entries(
 			detail::ostream_t& a_out,
-			const detail::header_t& a_header) const noexcept
-		{
-			const auto dirsz = [&]() noexcept {
-				switch (a_header.version()) {
-				case 103:
-				case 104:
-					return detail::constants::directory_entry_size_x86;
-				case 105:
-					return detail::constants::directory_entry_size_x64;
-				default:
-					detail::declare_unreachable();
-				}
-			}();
+			const detail::header_t& a_header) const noexcept;
 
-			std::uint32_t offset = 0;
-			offset += static_cast<std::uint32_t>(a_header.directories_offset());
-			offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-			offset += static_cast<std::uint32_t>(
-				a_header.directory_names_length() +
-				a_header.directory_count() * 1u);  // include prefixed byte length
-			offset += static_cast<std::uint32_t>(
-				detail::constants::file_entry_size *
-				a_header.file_count());
-			offset += static_cast<std::uint32_t>(a_header.file_names_length());
-
-			for (const auto& dir : _directories) {
-				dir.write_file_entries(a_out, a_header, offset);
-			}
-		}
-
-		void write_file_names(detail::ostream_t& a_out) const noexcept
-		{
-			for (const auto& dir : _directories) {
-				dir.write_file_names(a_out);
-			}
-		}
+		void write_file_names(detail::ostream_t& a_out) const noexcept;
 
 		container_type _directories;
 		archive_flag _flags{ archive_flag::none };
