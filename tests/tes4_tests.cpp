@@ -1,5 +1,6 @@
 #include "bsa/tes4.hpp"
 
+#include <cstring>
 #include <exception>
 #include <iterator>
 #include <string_view>
@@ -175,13 +176,14 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		REQUIRE(!bsa.read(u8"."sv));
 	}
 
-	SECTION("we can read compressed archives")
+	SECTION("files can be compressed within an archive")
 	{
 		const std::filesystem::path root{ u8"compression_test"sv };
 
 		bsa::tes4::archive bsa;
 		const auto version = bsa.read(root / u8"test.bsa"sv);
 		REQUIRE(version);
+		REQUIRE(bsa.compressed());
 
 		constexpr std::array files{
 			u8"License.txt"sv,
@@ -192,27 +194,23 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			const auto p = root / name;
 			REQUIRE(std::filesystem::exists(p));
 
-			const auto file = bsa[u8"."sv][name];
-			REQUIRE(file);
-			REQUIRE(file->compressed());
-			REQUIRE(file->decompressed_size() == std::filesystem::file_size(p));
+			const auto read = bsa[u8"."sv][name];
+			REQUIRE(read);
+			REQUIRE(read->compressed());
+			REQUIRE(read->decompressed_size() == std::filesystem::file_size(p));
 
-			auto copy = *file;
-			REQUIRE(copy.decompress(*version));
-			REQUIRE(!copy.compressed());
-			REQUIRE(copy.size() == std::filesystem::file_size(p));
+			bsa::tes4::file original{ "" };
+			const auto origsrc = map_file(p);
+			original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
+			REQUIRE(original.compress(*version));
 
-			auto p2 = p;
-			p2 += u8".copy"sv;
-			const auto bytes = copy.as_bytes();
-			const auto out = fopen_path(p2, "wb");
-			std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
-			std::fclose(out);
+			REQUIRE(read->size() == original.size());
+			REQUIRE(read->decompressed_size() == original.decompressed_size());
+			REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
 
-			const auto lhs = map_file(p);
-			const auto rhs = map_file(p2);
-			REQUIRE(lhs.size() == rhs.size());
-			REQUIRE(std::memcmp(lhs.data(), rhs.data(), lhs.size()));
+			REQUIRE(read->decompress(*version));
+			REQUIRE(read->size() == origsrc.size());
+			REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
 		}
 	}
 
