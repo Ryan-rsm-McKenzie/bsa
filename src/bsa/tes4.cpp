@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <span>
 #include <string_view>
 #include <utility>
@@ -18,7 +19,7 @@
 #include <boost/text/in_place_case_mapping.hpp>
 #include <boost/text/text.hpp>
 
-#include <lz4.h>
+#include <lz4frame.h>
 #include <zlib.h>
 #pragma warning(pop)
 
@@ -192,16 +193,16 @@ namespace bsa::tes4
 			break;
 		case 105:
 			{
-				out.resize(static_cast<std::size_t>(
-					::LZ4_compressBound(static_cast<int>(in.size()))));
+				out.resize(::LZ4F_compressFrameBound(in.size(), nullptr));
 
-				const auto result = ::LZ4_compress_default(
-					reinterpret_cast<const char*>(in.data()),
-					reinterpret_cast<char*>(out.data()),
-					static_cast<int>(in.size()),
-					static_cast<int>(out.size()));
-				if (result > 0) {
-					out.resize(static_cast<std::size_t>(result));
+				const auto result = ::LZ4F_compressFrame(
+					out.data(),
+					out.size(),
+					in.data(),
+					in.size(),
+					nullptr);
+				if (!::LZ4F_isError(result)) {
+					out.resize(result);
 					out.shrink_to_fit();
 				} else {
 					return false;
@@ -247,13 +248,37 @@ namespace bsa::tes4
 			break;
 		case 105:
 			{
-				const auto result = ::LZ4_decompress_safe(
-					reinterpret_cast<const char*>(in.data()),
-					reinterpret_cast<char*>(out.data()),
-					static_cast<int>(in.size()),
-					static_cast<int>(out.size()));
-				if (result > 0) {
-					assert(static_cast<std::size_t>(result) == decompressed_size());
+				::LZ4F_dctx* pdctx = nullptr;
+				if (::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION) != 0) {
+					return false;
+				}
+				std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
+					pdctx,
+					LZ4F_freeDecompressionContext
+				};
+
+				std::size_t insz = 0;
+				const std::byte* inptr = in.data();
+				std::size_t outsz = 0;
+				std::byte* outptr = out.data();
+				const ::LZ4F_decompressOptions_t options{ true };
+				std::size_t result = 0;
+				do {
+					inptr += insz;
+					insz = static_cast<std::size_t>(std::to_address(in.end()) - inptr);
+					outptr += outsz;
+					outsz = static_cast<std::size_t>(std::to_address(out.end()) - outptr);
+					result = ::LZ4F_decompress(
+						dctx.get(),
+						outptr,
+						&outsz,
+						inptr,
+						&insz,
+						&options);
+				} while (result != 0 && !::LZ4F_isError(result));
+
+				if (!::LZ4F_isError(result)) {
+					assert(outptr + outsz == std::to_address(out.end()));
 				} else {
 					return false;
 				}
