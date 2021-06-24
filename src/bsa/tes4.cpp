@@ -153,7 +153,13 @@ namespace bsa::tes4
 				return (_archiveFlags & to_underlying(a_flag)) != 0;
 			}
 
-			void evaluate_endian() noexcept;
+			void evaluate_endian() noexcept
+			{
+				_endian =
+					xbox_archive() ?
+						std::endian::big :
+                        std::endian::little;
+			}
 
 			std::uint32_t _version{ 0 };
 			std::uint32_t _directoriesOffset{ constants::header_size };
@@ -164,14 +170,6 @@ namespace bsa::tes4
 			std::uint16_t _archiveTypes{ 0 };
 			bool _good{ true };
 		};
-
-		void header_t::evaluate_endian() noexcept
-		{
-			_endian =
-				xbox_archive() ?
-					std::endian::big :
-                    std::endian::little;
-		}
 	}
 
 	namespace hashing
