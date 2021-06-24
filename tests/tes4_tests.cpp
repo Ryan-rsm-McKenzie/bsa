@@ -219,7 +219,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		const std::filesystem::path root{ u8"compression_mismatch_test"sv };
 
 		bsa::tes4::archive bsa;
-		bsa.read(root / u8"test.bsa"sv);
+		REQUIRE(bsa.read(root / u8"test.bsa"sv));
 		REQUIRE(bsa.compressed());
 
 		constexpr std::array files{
