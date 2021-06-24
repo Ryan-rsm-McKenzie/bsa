@@ -2,6 +2,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set(INCLUDE_DIR ${ROOT_DIR}/include)
 set(HEADER_FILES
+	${INCLUDE_DIR}/bsa/detail/common.hpp
 	${INCLUDE_DIR}/bsa/tes4.hpp
 )
 
