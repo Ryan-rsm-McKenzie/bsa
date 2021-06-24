@@ -11,7 +11,6 @@
 #include <type_traits>
 
 #pragma warning(push)
-#include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
 #pragma warning(pop)

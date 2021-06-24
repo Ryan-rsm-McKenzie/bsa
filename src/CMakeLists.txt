@@ -71,13 +71,13 @@ find_package(ZLIB MODULE REQUIRED)
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
+		Boost::filesystem
 		Boost::nowide
 		Boost::text
 		lz4::lz4
 		ZLIB::ZLIB
 	PUBLIC
 		Boost::container
-		Boost::filesystem
 		Boost::headers
 		Boost::iostreams
 		bsa::common

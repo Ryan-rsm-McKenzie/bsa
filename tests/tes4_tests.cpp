@@ -8,6 +8,7 @@
 #pragma warning(push)
 #include <catch2/catch.hpp>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/nowide/cstdio.hpp>
 #pragma warning(pop)
