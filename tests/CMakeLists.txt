@@ -21,7 +21,7 @@ catch_discover_tests(tests)
 
 target_compile_definitions(
 	tests
-	PUBLIC
+	PRIVATE
 		_CRT_SECURE_NO_WARNINGS
 )
 
@@ -35,7 +35,7 @@ find_package(Boost
 
 target_link_libraries(
 	tests
-	PUBLIC
+	PRIVATE
 		Boost::iostreams
 		Boost::nowide
 		bsa::bsa
