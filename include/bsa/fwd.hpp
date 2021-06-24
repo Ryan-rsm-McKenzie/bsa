@@ -12,6 +12,9 @@ namespace bsa
 
 			template <class, bool>
 			class index_t;
+
+			template <class>
+			struct key_compare_t;
 		}
 
 		namespace hashing

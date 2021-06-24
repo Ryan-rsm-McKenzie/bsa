@@ -164,6 +164,27 @@ namespace bsa::tes4
 		private:
 			pointer _proxy{ nullptr };
 		};
+
+		template <class T>
+		struct key_compare_t
+		{
+			using is_transparent = int;
+
+			[[nodiscard]] auto operator()(
+				const T& a_lhs,
+				const T& a_rhs) const noexcept
+				-> bool { return a_lhs.hash() < a_rhs.hash(); }
+
+			[[nodiscard]] auto operator()(
+				const T& a_lhs,
+				const hashing::hash& a_rhs) const noexcept
+				-> bool { return a_lhs.hash() < a_rhs; }
+
+			[[nodiscard]] auto operator()(
+				const hashing::hash& a_lhs,
+				const T& a_rhs) const noexcept
+				-> bool { return a_lhs < a_rhs.hash(); }
+		};
 	}
 
 	class file final
@@ -292,26 +313,7 @@ namespace bsa::tes4
 	{
 	public:
 		using key_type = file;
-
-		struct key_compare
-		{
-			using is_transparent = int;
-
-			[[nodiscard]] auto operator()(
-				const key_type& a_lhs,
-				const key_type& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs.hash(); }
-
-			[[nodiscard]] auto operator()(
-				const key_type& a_lhs,
-				const hashing::hash& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs; }
-
-			[[nodiscard]] auto operator()(
-				const hashing::hash& a_lhs,
-				const key_type& a_rhs) const noexcept
-				-> bool { return a_lhs < a_rhs.hash(); }
-		};
+		using key_compare = detail::key_compare_t<key_type>;
 
 	private:
 		using container_type =
@@ -443,26 +445,7 @@ namespace bsa::tes4
 	{
 	public:
 		using key_type = directory;
-
-		struct key_compare
-		{
-			using is_transparent = int;
-
-			[[nodiscard]] auto operator()(
-				const key_type& a_lhs,
-				const key_type& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs.hash(); }
-
-			[[nodiscard]] auto operator()(
-				const key_type& a_lhs,
-				const hashing::hash& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs; }
-
-			[[nodiscard]] auto operator()(
-				const hashing::hash& a_lhs,
-				const key_type& a_rhs) const noexcept
-				-> bool { return a_lhs < a_rhs.hash(); }
-		};
+		using key_compare = detail::key_compare_t<key_type>;
 
 	private:
 		using container_type =
