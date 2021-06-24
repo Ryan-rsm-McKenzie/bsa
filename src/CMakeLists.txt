@@ -9,6 +9,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR ${ROOT_DIR}/src)
 set(SOURCE_FILES
+	${SOURCE_DIR}/bsa/detail/common.cpp
 	${SOURCE_DIR}/bsa/tes4.cpp
 )
 
@@ -70,6 +71,7 @@ find_package(ZLIB MODULE REQUIRED)
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
+		Boost::nowide
 		Boost::text
 		lz4::lz4
 		ZLIB::ZLIB
@@ -78,7 +80,6 @@ target_link_libraries(
 		Boost::filesystem
 		Boost::headers
 		Boost::iostreams
-		Boost::nowide
 		bsa::common
 )
 

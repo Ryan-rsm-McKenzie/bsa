@@ -13,7 +13,6 @@
 #pragma warning(push)
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
-#include <boost/nowide/cstdio.hpp>
 #include <boost/predef.h>
 #pragma warning(pop)
 
@@ -94,12 +93,7 @@ namespace bsa::detail
 	public:
 		using stream_type = boost::iostreams::mapped_file_source;
 
-		istream_t(std::filesystem::path a_path) noexcept
-		{
-			try {
-				_file.open(boost::filesystem::path{ a_path.native() });
-			} catch (const std::exception&) {}
-		}
+		istream_t(std::filesystem::path a_path) noexcept;
 
 		istream_t(const istream_t&) = delete;
 		istream_t(istream_t&&) = delete;
@@ -140,17 +134,7 @@ namespace bsa::detail
 		}
 
 		[[nodiscard]] auto read_bytes(std::size_t a_bytes) noexcept
-			-> std::span<const std::byte>
-		{
-			assert(_pos + a_bytes <= _file.size());
-
-			const auto pos = _pos;
-			_pos += a_bytes;
-			return {
-				reinterpret_cast<const std::byte*>(_file.data()) + pos,
-				a_bytes
-			};
-		}
+			-> std::span<const std::byte>;
 
 		void seek_absolute(std::size_t a_pos) noexcept { _pos = a_pos; }
 		void seek_relative(std::ptrdiff_t a_off) noexcept { _pos += a_off; }
@@ -183,24 +167,10 @@ namespace bsa::detail
 	class ostream_t final
 	{
 	public:
-		ostream_t(std::filesystem::path a_path) noexcept
-		{
-			_file = boost::nowide::fopen(
-				reinterpret_cast<const char*>(a_path.u8string().data()),
-				"wb");
-		}
-
-		~ostream_t() noexcept
-		{
-			if (_file) {
-				[[maybe_unused]] const auto result = std::fclose(_file);
-				assert(result == 0);
-				_file = nullptr;
-			}
-		}
-
+		ostream_t(std::filesystem::path a_path) noexcept;
 		ostream_t(const ostream_t&) = delete;
 		ostream_t(ostream_t&&) = delete;
+		~ostream_t() noexcept;
 		ostream_t& operator=(const ostream_t&) = delete;
 		ostream_t& operator=(ostream_t&&) = delete;
 
