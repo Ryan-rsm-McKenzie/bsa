@@ -156,7 +156,7 @@ namespace bsa::detail
 		void seek_relative(std::ptrdiff_t a_off) noexcept { _pos += a_off; }
 
 		[[nodiscard]] auto tell() const noexcept { return _pos; }
-		[[nodiscard]] auto rdbuf() const noexcept -> stream_type { return _file; }
+		[[nodiscard]] auto rdbuf() const noexcept -> const stream_type& { return _file; }
 
 		template <concepts::integral T>
 		friend istream_t& operator>>(istream_t& a_in, T& a_value) noexcept
