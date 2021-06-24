@@ -21,8 +21,8 @@ if (file) {
 ### Writing
 ```cpp
 #include <bsa/tes4.hpp>
-#include <string_view>
 #include <cstddef>
+#include <string_view>
 #include <utility>
 
 const std::string_view payload{ "Hello world!\n" };
