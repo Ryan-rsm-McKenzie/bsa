@@ -28,6 +28,17 @@ namespace bsa::tes4
 {
 	namespace detail
 	{
+		namespace
+		{
+			namespace constants
+			{
+				constexpr std::size_t directory_entry_size_x86 = 0x10;
+				constexpr std::size_t directory_entry_size_x64 = 0x18;
+				constexpr std::size_t file_entry_size = 0x10;
+				constexpr std::size_t header_size = 0x24;
+			}
+		}
+
 		class header_t final
 		{
 		public:

@@ -70,14 +70,6 @@ namespace bsa::tes4
 	namespace detail
 	{
 		using namespace bsa::detail;
-
-		namespace constants
-		{
-			inline constexpr std::size_t directory_entry_size_x86 = 0x10;
-			inline constexpr std::size_t directory_entry_size_x64 = 0x18;
-			inline constexpr std::size_t file_entry_size = 0x10;
-			inline constexpr std::size_t header_size = 0x24;
-		}
 	}
 
 	namespace hashing
