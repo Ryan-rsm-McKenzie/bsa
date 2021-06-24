@@ -170,6 +170,59 @@ namespace bsa::tes4
 			std::uint16_t _archiveTypes{ 0 };
 			bool _good{ true };
 		};
+
+		namespace
+		{
+			[[nodiscard]] auto offsetof_directory_entries(
+				const detail::header_t& a_header) noexcept
+				-> std::size_t
+			{
+				return a_header.directories_offset();
+			}
+
+			[[nodiscard]] auto offsetof_file_entries(
+				const detail::header_t& a_header) noexcept
+				-> std::size_t
+			{
+				const auto dirsz = [](std::size_t a_version) noexcept {
+					switch (a_version) {
+					case 103:
+					case 104:
+						return constants::directory_entry_size_x86;
+					case 105:
+						return constants::directory_entry_size_x64;
+					default:
+						declare_unreachable();
+					}
+				}(a_header.version());
+
+				return offsetof_directory_entries(a_header) +
+				       dirsz * a_header.directory_count();
+			}
+
+			[[nodiscard]] auto offsetof_file_strings(
+				const detail::header_t& a_header) noexcept
+				-> std::size_t
+			{
+				const auto dirStrSz =
+					a_header.directory_strings() ?
+						// include prefixed byte length
+						a_header.directory_names_length() + a_header.directory_count() :
+                        0;
+
+				return offsetof_file_entries(a_header) +
+				       dirStrSz +
+				       a_header.file_count() * constants::file_entry_size;
+			}
+
+			[[nodiscard]] auto offsetof_file_data(
+				const detail::header_t& a_header) noexcept
+				-> std::size_t
+			{
+				return offsetof_file_strings(a_header) +
+				       a_header.file_names_length();
+			}
+		}
 	}
 
 	namespace hashing
@@ -853,29 +906,7 @@ namespace bsa::tes4
 		detail::istream_t& a_in,
 		const detail::header_t& a_header) noexcept
 	{
-		const auto dirsz = [&]() noexcept {
-			switch (a_header.version()) {
-			case 103:
-			case 104:
-				return detail::constants::directory_entry_size_x86;
-			case 105:
-				return detail::constants::directory_entry_size_x64;
-			default:
-				detail::declare_unreachable();
-			}
-		}();
-
-		std::uint32_t offset = 0;
-		offset += static_cast<std::uint32_t>(a_header.directories_offset());
-		offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-		offset += static_cast<std::uint32_t>(
-			a_header.directory_names_length() +
-			a_header.directory_count() * 1u);  // include prefixed byte length
-		offset += static_cast<std::uint32_t>(
-			detail::constants::file_entry_size *
-			a_header.file_count());
-
-		a_in.seek_absolute(offset);
+		a_in.seek_absolute(detail::offsetof_file_strings(a_header));
 		for (auto& dir : _directories) {
 			dir.read_file_names(a_in);
 		}
@@ -919,39 +950,27 @@ namespace bsa::tes4
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
-		const auto match = [&](auto&& a_x86, auto&& a_x64) noexcept {
-			switch (a_header.version()) {
-			case 103:
-			case 104:
-				return a_x86();
-			case 105:
-				return a_x64();
-			default:
-				detail::declare_unreachable();
-			}
-		};
-
-		const auto dirsz = match(
-			[]() noexcept { return detail::constants::directory_entry_size_x86; },
-			[]() noexcept { return detail::constants::directory_entry_size_x64; });
-
-		std::uint32_t offset = 0;
-		offset += static_cast<std::uint32_t>(a_header.directories_offset());
-		offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
+		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_entries(a_header));
 		offset += static_cast<std::uint32_t>(a_header.file_names_length());
 
 		for (const auto& dir : _directories) {
 			dir.hash().write(a_out, a_header.endian());
 			a_out << static_cast<std::uint32_t>(dir.size());
 
-			match(
-				[&]() noexcept { a_out << offset; },
-				[&]() noexcept {
-					a_out
-						<< std::uint32_t{ 0 }
-						<< offset
-						<< std::uint32_t{ 0 };
-				});
+			switch (a_header.version()) {
+			case 103:
+			case 104:
+				a_out << offset;
+				break;
+			case 105:
+				a_out
+					<< std::uint32_t{ 0 }
+					<< offset
+					<< std::uint32_t{ 0 };
+				break;
+			default:
+				detail::declare_unreachable();
+			}
 
 			if (a_header.directory_strings()) {
 				offset += static_cast<std::uint32_t>(
@@ -979,29 +998,7 @@ namespace bsa::tes4
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
-		const auto dirsz = [&]() noexcept {
-			switch (a_header.version()) {
-			case 103:
-			case 104:
-				return detail::constants::directory_entry_size_x86;
-			case 105:
-				return detail::constants::directory_entry_size_x64;
-			default:
-				detail::declare_unreachable();
-			}
-		}();
-
-		std::uint32_t offset = 0;
-		offset += static_cast<std::uint32_t>(a_header.directories_offset());
-		offset += static_cast<std::uint32_t>(dirsz * a_header.directory_count());
-		offset += static_cast<std::uint32_t>(
-			a_header.directory_names_length() +
-			a_header.directory_count() * 1u);  // include prefixed byte length
-		offset += static_cast<std::uint32_t>(
-			detail::constants::file_entry_size *
-			a_header.file_count());
-		offset += static_cast<std::uint32_t>(a_header.file_names_length());
-
+		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_data(a_header));
 		for (const auto& dir : _directories) {
 			dir.write_file_entries(a_out, a_header, offset);
 		}
