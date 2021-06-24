@@ -110,25 +110,38 @@ namespace bsa::tes4
 
 			[[nodiscard]] bool good() const noexcept { return _good; }
 
-			[[nodiscard]] auto directories_offset() const noexcept -> std::size_t { return _directoriesOffset; }
+			[[nodiscard]] auto directories_offset() const noexcept
+				-> std::size_t { return _directoriesOffset; }
 			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
 			[[nodiscard]] auto version() const noexcept -> std::size_t { return _version; }
 
-			[[nodiscard]] auto directory_count() const noexcept -> std::size_t { return _directory.count; }
-			[[nodiscard]] auto directory_names_length() const noexcept -> std::size_t { return _directory.blobsz; }
+			[[nodiscard]] auto directory_count() const noexcept
+				-> std::size_t { return _directory.count; }
+			[[nodiscard]] auto directory_names_length() const noexcept
+				-> std::size_t { return _directory.blobsz; }
 
-			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _file.count; }
-			[[nodiscard]] auto file_names_length() const noexcept -> std::size_t { return _file.blobsz; }
+			[[nodiscard]] auto file_count() const noexcept
+				-> std::size_t { return _file.count; }
+			[[nodiscard]] auto file_names_length() const noexcept
+				-> std::size_t { return _file.blobsz; }
 
-			[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return archive_flag{ _archiveFlags }; }
-			[[nodiscard]] auto archive_types() const noexcept -> archive_type { return archive_type{ _archiveTypes }; }
+			[[nodiscard]] auto archive_flags() const noexcept
+				-> archive_flag { return archive_flag{ _archiveFlags }; }
+			[[nodiscard]] auto archive_types() const noexcept
+				-> archive_type { return archive_type{ _archiveTypes }; }
 
-			[[nodiscard]] bool compressed() const noexcept { return test_flag(archive_flag::compressed); }
-			[[nodiscard]] bool directory_strings() const noexcept { return test_flag(archive_flag::directory_strings); }
-			[[nodiscard]] bool embedded_file_names() const noexcept { return _version > 103 && test_flag(archive_flag::embedded_file_names); }
-			[[nodiscard]] bool file_strings() const noexcept { return test_flag(archive_flag::file_strings); }
-			[[nodiscard]] bool xbox_archive() const noexcept { return test_flag(archive_flag::xbox_archive); }
-			[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
+			[[nodiscard]] auto compressed() const noexcept
+				-> bool { return test_flag(archive_flag::compressed); }
+			[[nodiscard]] auto directory_strings() const noexcept
+				-> bool { return test_flag(archive_flag::directory_strings); }
+			[[nodiscard]] auto embedded_file_names() const noexcept
+				-> bool { return _version > 103 && test_flag(archive_flag::embedded_file_names); }
+			[[nodiscard]] auto file_strings() const noexcept
+				-> bool { return test_flag(archive_flag::file_strings); }
+			[[nodiscard]] auto xbox_archive() const noexcept
+				-> bool { return test_flag(archive_flag::xbox_archive); }
+			[[nodiscard]] auto xbox_compressed() const noexcept
+				-> bool { return test_flag(archive_flag::xbox_compressed); }
 
 		private:
 			[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
