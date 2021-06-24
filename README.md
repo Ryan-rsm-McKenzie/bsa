@@ -6,15 +6,15 @@
 #include <bsa/tes4.hpp>
 #include <cstdio>
 
-std::filesystem::path oblivion{ u8"path/to/oblivion" };
+std::filesystem::path oblivion{ "path/to/oblivion" };
 bsa::tes4::archive bsa;
-bsa.read(oblivion / u8"Data/Oblivion - Voices2.bsa");
-const auto file = bsa[u8"sound/voice/oblivion.esm/imperial/m"][u8"testtoddquest_testtoddhappy_00027fa2_1.mp3"];
+bsa.read(oblivion / "Data/Oblivion - Voices2.bsa");
+const auto file = bsa["sound/voice/oblivion.esm/imperial/m"]["testtoddquest_testtoddhappy_00027fa2_1.mp3"];
 if (file) {
-  const auto bytes = file->as_bytes();
-  const auto out = std::fopen("happy.mp3", "wb");
-  std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
-  std::fclose(out);
+	const auto bytes = file->as_bytes();
+	const auto out = std::fopen("happy.mp3", "wb");
+	std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
+	std::fclose(out);
 }
 ```
 
@@ -22,12 +22,11 @@ if (file) {
 ```cpp
 #include <bsa/tes4.hpp>
 #include <cstddef>
-#include <string_view>
 #include <utility>
 
-const std::string_view payload{ "Hello world!\n" };
+const char payload[] = { "Hello world!\n" };
 bsa::tes4::file f{ "hello.txt" };
-f.set_data({ reinterpret_cast<const std::byte*>(payload.data()), payload.size() });
+f.set_data({ reinterpret_cast<const std::byte*>(payload), sizeof(payload) - 1 });
 
 bsa::tes4::directory d{ "misc" };
 d.insert(std::move(f));
