@@ -20,6 +20,7 @@
 #include <boost/text/text.hpp>
 
 #include <lz4frame.h>
+#include <lz4hc.h>
 #include <zlib.h>
 #pragma warning(pop)
 
@@ -193,14 +194,17 @@ namespace bsa::tes4
 			break;
 		case 105:
 			{
-				out.resize(::LZ4F_compressFrameBound(in.size(), nullptr));
+				::LZ4F_preferences_t pref = LZ4F_INIT_PREFERENCES;
+				pref.compressionLevel = 11;
+				pref.autoFlush = 1;
+				out.resize(::LZ4F_compressFrameBound(in.size(), &pref));
 
 				const auto result = ::LZ4F_compressFrame(
 					out.data(),
 					out.size(),
 					in.data(),
 					in.size(),
-					nullptr);
+					&pref);
 				if (!::LZ4F_isError(result)) {
 					out.resize(result);
 					out.shrink_to_fit();
