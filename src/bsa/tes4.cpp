@@ -28,63 +28,142 @@ namespace bsa::tes4
 {
 	namespace detail
 	{
-		istream_t& operator>>(istream_t& a_in, header_t& a_value) noexcept
+		class header_t final
 		{
-			std::array<std::byte, 4> magic;
-
-			a_in >>
-				magic >>
-				a_value._version >>
-				a_value._directoriesOffset >>
-				a_value._archiveFlags >>
-				a_value._directory.count >>
-				a_value._file.count >>
-				a_value._directory.blobsz >>
-				a_value._file.blobsz >>
-				a_value._archiveTypes;
-			a_in.seek_relative(2);
-
-			a_value.evaluate_endian();
-
-			if (magic[0] != std::byte{ u8'B' } ||
-				magic[1] != std::byte{ u8'S' } ||
-				magic[2] != std::byte{ u8'A' } ||
-				magic[3] != std::byte{ u8'\0' }) {
-				a_value._good = false;
-			} else if (a_value._version != 103 &&
-					   a_value._version != 104 &&
-					   a_value._version != 105) {
-				a_value._good = false;
-			} else if (a_value._directoriesOffset != constants::header_size) {
-				a_value._good = false;
-			}
-
-			return a_in;
-		}
-
-		ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept
-		{
-			std::array magic{
-				std::byte{ u8'B' },
-				std::byte{ u8'S' },
-				std::byte{ u8'A' },
-				std::byte{ u8'\0' }
+		public:
+			struct info_t final
+			{
+				std::uint32_t count{ 0 };
+				std::uint32_t blobsz{ 0 };
 			};
 
-			a_out
-				<< magic
-				<< a_value._version
-				<< a_value._directoriesOffset
-				<< a_value._archiveFlags
-				<< a_value._directory.count
-				<< a_value._file.count
-				<< a_value._directory.blobsz
-				<< a_value._file.blobsz
-				<< a_value._archiveTypes
-				<< std::uint16_t{ 0 };
+			header_t() noexcept = default;
 
-			return a_out;
-		}
+			header_t(
+				version a_version,
+				archive_flag a_flags,
+				archive_type a_types,
+				info_t a_directories,
+				info_t a_files) noexcept :
+				_version(to_underlying(a_version)),
+				_archiveFlags(to_underlying(a_flags)),
+				_directory(a_directories),
+				_file(a_files),
+				_archiveTypes(to_underlying(a_types))
+			{
+				evaluate_endian();
+			}
+
+			friend istream_t& operator>>(istream_t& a_in, header_t& a_value) noexcept
+			{
+				std::array<std::byte, 4> magic;
+
+				a_in >>
+					magic >>
+					a_value._version >>
+					a_value._directoriesOffset >>
+					a_value._archiveFlags >>
+					a_value._directory.count >>
+					a_value._file.count >>
+					a_value._directory.blobsz >>
+					a_value._file.blobsz >>
+					a_value._archiveTypes;
+				a_in.seek_relative(2);
+
+				a_value.evaluate_endian();
+
+				if (magic[0] != std::byte{ u8'B' } ||
+					magic[1] != std::byte{ u8'S' } ||
+					magic[2] != std::byte{ u8'A' } ||
+					magic[3] != std::byte{ u8'\0' }) {
+					a_value._good = false;
+				} else if (a_value._version != 103 &&
+						   a_value._version != 104 &&
+						   a_value._version != 105) {
+					a_value._good = false;
+				} else if (a_value._directoriesOffset != constants::header_size) {
+					a_value._good = false;
+				}
+
+				return a_in;
+			}
+
+			friend ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept
+			{
+				std::array magic{
+					std::byte{ u8'B' },
+					std::byte{ u8'S' },
+					std::byte{ u8'A' },
+					std::byte{ u8'\0' }
+				};
+
+				a_out
+					<< magic
+					<< a_value._version
+					<< a_value._directoriesOffset
+					<< a_value._archiveFlags
+					<< a_value._directory.count
+					<< a_value._file.count
+					<< a_value._directory.blobsz
+					<< a_value._file.blobsz
+					<< a_value._archiveTypes
+					<< std::uint16_t{ 0 };
+
+				return a_out;
+			}
+
+			[[nodiscard]] bool good() const noexcept { return _good; }
+
+			[[nodiscard]] auto directories_offset() const noexcept
+				-> std::size_t { return _directoriesOffset; }
+			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
+			[[nodiscard]] auto version() const noexcept -> std::size_t { return _version; }
+
+			[[nodiscard]] auto directory_count() const noexcept
+				-> std::size_t { return _directory.count; }
+			[[nodiscard]] auto directory_names_length() const noexcept
+				-> std::size_t { return _directory.blobsz; }
+
+			[[nodiscard]] auto file_count() const noexcept
+				-> std::size_t { return _file.count; }
+			[[nodiscard]] auto file_names_length() const noexcept
+				-> std::size_t { return _file.blobsz; }
+
+			[[nodiscard]] auto archive_flags() const noexcept
+				-> archive_flag { return archive_flag{ _archiveFlags }; }
+			[[nodiscard]] auto archive_types() const noexcept
+				-> archive_type { return archive_type{ _archiveTypes }; }
+
+			[[nodiscard]] auto compressed() const noexcept
+				-> bool { return test_flag(archive_flag::compressed); }
+			[[nodiscard]] auto directory_strings() const noexcept
+				-> bool { return test_flag(archive_flag::directory_strings); }
+			[[nodiscard]] auto embedded_file_names() const noexcept
+				-> bool { return _version > 103 && test_flag(archive_flag::embedded_file_names); }
+			[[nodiscard]] auto file_strings() const noexcept
+				-> bool { return test_flag(archive_flag::file_strings); }
+			[[nodiscard]] auto xbox_archive() const noexcept
+				-> bool { return test_flag(archive_flag::xbox_archive); }
+			[[nodiscard]] auto xbox_compressed() const noexcept
+				-> bool { return test_flag(archive_flag::xbox_compressed); }
+
+		private:
+			[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
+			{
+				return (_archiveFlags & to_underlying(a_flag)) != 0;
+			}
+
+			void evaluate_endian() noexcept;
+
+			std::uint32_t _version{ 0 };
+			std::uint32_t _directoriesOffset{ constants::header_size };
+			std::uint32_t _archiveFlags{ 0 };
+			info_t _directory;
+			info_t _file;
+			std::endian _endian{ std::endian::little };
+			std::uint16_t _archiveTypes{ 0 };
+			bool _good{ true };
+		};
 
 		void header_t::evaluate_endian() noexcept
 		{
