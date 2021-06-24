@@ -783,7 +783,7 @@ namespace bsa::tes4
 				std::uint32_t size = 0;
 				a_in >> size;
 				_decompsz = size;
-				a_size -= sizeof(size);
+				a_size -= 4;
 			}
 			a_size &= ~(ichecked | icompression);
 
