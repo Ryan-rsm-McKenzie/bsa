@@ -595,6 +595,11 @@ namespace bsa::tes4
 		using const_index = detail::index_t<const value_type, true>;
 
 		archive() noexcept = default;
+		archive(const archive&) noexcept = default;
+		archive(archive&&) noexcept = default;
+		~archive() noexcept = default;
+		archive& operator=(const archive&) noexcept = default;
+		archive& operator=(archive&&) noexcept = default;
 
 		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept
 			-> index
