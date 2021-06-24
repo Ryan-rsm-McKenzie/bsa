@@ -214,8 +214,7 @@ namespace bsa::tes4
 			[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept  //
 				requires(RECURSE)
 			{
-				assert(_proxy != nullptr);
-				return (*_proxy)[a_hash];
+				return (**this)[a_hash];
 			}
 
 			[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept  //
