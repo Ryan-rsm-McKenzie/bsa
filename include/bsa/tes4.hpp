@@ -737,7 +737,9 @@ namespace bsa::tes4
 		enum : std::uint32_t
 		{
 			icompression = 1u << 30u,
-			ichecked = 1u << 31u
+			ichecked = 1u << 31u,
+
+			isecondary_archive = 1u << 31u
 		};
 
 		[[nodiscard]] auto read_data(
@@ -750,7 +752,7 @@ namespace bsa::tes4
 			std::optional<std::u8string_view> dirname;
 
 			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_offset);
+			a_in.seek_absolute(a_offset & ~isecondary_archive);
 
 			if (a_header.embedded_file_names()) {  // bstring
 				std::uint8_t len = 0;
