@@ -363,10 +363,28 @@ namespace bsa::tes4
 		}
 
 		directory(const directory&) noexcept = default;
-		directory(directory&&) noexcept = default;
+		directory(directory&& a_rhs) noexcept :
+			_hash(a_rhs._hash),
+			_name(a_rhs._name),
+			_files(std::move(a_rhs._files))
+		{
+			a_rhs.clear();
+		}
+
 		~directory() noexcept = default;
+
 		directory& operator=(const directory&) noexcept = default;
-		directory& operator=(directory&&) noexcept = default;
+		directory& operator=(directory&& a_rhs) noexcept
+		{
+			if (this != &a_rhs) {
+				_hash = a_rhs._hash;
+				_name = a_rhs._name;
+				_files = std::move(a_rhs._files);
+
+				a_rhs.clear();
+			}
+			return *this;
+		}
 
 		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept
 			-> index
