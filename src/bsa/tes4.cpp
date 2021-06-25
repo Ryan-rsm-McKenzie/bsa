@@ -271,28 +271,23 @@ namespace bsa::tes4
 				return lut[static_cast<std::size_t>(a_ch)];
 			}
 
-			[[nodiscard]] auto normalize_directory(std::filesystem::path& a_path) noexcept
-				-> std::u8string
+			[[nodiscard]] void normalize_directory(std::u8string& a_path) noexcept
 			{
-				auto p = a_path.lexically_normal().u8string();
-				for (auto& c : p) {
+				for (auto& c : a_path) {
 					c = mapchar(c);
 				}
 
-				while (!p.empty() && p.back() == u8'\\') {
-					p.pop_back();
+				while (!a_path.empty() && a_path.back() == u8'\\') {
+					a_path.pop_back();
 				}
 
-				while (!p.empty() && p.front() == u8'\\') {
-					p.erase(p.begin());
+				while (!a_path.empty() && a_path.front() == u8'\\') {
+					a_path.erase(a_path.begin());
 				}
 
-				if (p.empty() || p.size() >= 260) {
-					p = u8'.';
+				if (a_path.empty() || a_path.size() >= 260) {
+					a_path = u8'.';
 				}
-
-				a_path = p;
-				return p;
 			}
 
 			[[nodiscard]] constexpr auto make_file_extension(std::u8string_view a_extension) noexcept
@@ -329,12 +324,12 @@ namespace bsa::tes4
 			a_out.write(crc, a_endian);
 		}
 
-		hash hash_directory(std::filesystem::path& a_path) noexcept
+		hash hash_directory(std::u8string& a_path) noexcept
 		{
-			const auto p = normalize_directory(a_path);
+			normalize_directory(a_path);
 			const std::span<const std::byte> view{
-				reinterpret_cast<const std::byte*>(p.data()),
-				p.size()
+				reinterpret_cast<const std::byte*>(a_path.data()),
+				a_path.size()
 			};
 
 			hash h;
@@ -361,7 +356,7 @@ namespace bsa::tes4
 			return h;
 		}
 
-		hash hash_file(std::filesystem::path& a_path) noexcept
+		hash hash_file(std::u8string& a_path) noexcept
 		{
 			constexpr std::array lut{
 				make_file_extension(u8""sv),
@@ -372,11 +367,10 @@ namespace bsa::tes4
 				make_file_extension(u8".adp"sv),
 			};
 
-			a_path = a_path.filename();
-			const auto pstr = normalize_directory(a_path);
+			normalize_directory(a_path);
 			const std::u8string_view pview{
-				reinterpret_cast<const char8_t*>(pstr.data()),
-				pstr.size()
+				reinterpret_cast<const char8_t*>(a_path.data()),
+				a_path.size()
 			};
 
 			const auto [stem, extension] = [&]() noexcept
@@ -399,7 +393,7 @@ namespace bsa::tes4
 				stem.length() < 260 &&
 				extension.length() < 16) {
 				auto h = [&]() noexcept {
-					std::filesystem::path temp{ stem };
+					std::u8string temp{ stem };
 					return hash_directory(temp);
 				}();
 				h.crc += crc32({ //

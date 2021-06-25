@@ -115,8 +115,8 @@ namespace bsa::tes4
 				std::endian a_endian) const noexcept;
 		};
 
-		[[nodiscard]] hash hash_directory(std::filesystem::path& a_path) noexcept;
-		[[nodiscard]] hash hash_file(std::filesystem::path& a_path) noexcept;
+		[[nodiscard]] hash hash_directory(std::u8string& a_path) noexcept;
+		[[nodiscard]] hash hash_file(std::u8string& a_path) noexcept;
 	}
 
 	namespace detail
@@ -137,7 +137,7 @@ namespace bsa::tes4
 				return (**this)[a_hash];
 			}
 
-			[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept  //
+			[[nodiscard]] auto operator[](std::u8string a_path) const noexcept  //
 				requires(RECURSE)
 			{
 				return (**this)[std::move(a_path)];
@@ -194,10 +194,10 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		explicit file(std::filesystem::path a_path) noexcept
+		explicit file(std::u8string a_path) noexcept
 		{
 			_hash = hashing::hash_file(a_path);
-			_name.emplace<name_owner>(a_path.u8string());
+			_name.emplace<name_owner>(std::move(a_path));
 		}
 
 		file(const file&) noexcept = default;
@@ -356,10 +356,10 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		explicit directory(std::filesystem::path a_path) noexcept
+		explicit directory(std::u8string a_path) noexcept
 		{
 			_hash = hashing::hash_directory(a_path);
-			_name.emplace<name_owner>(a_path.u8string());
+			_name.emplace<name_owner>(std::move(a_path));
 		}
 
 		directory(const directory&) noexcept = default;
@@ -400,10 +400,10 @@ namespace bsa::tes4
 			return it != _files.end() ? const_index{ *it } : const_index{};
 		}
 
-		[[nodiscard]] auto operator[](std::filesystem::path a_path) noexcept
+		[[nodiscard]] auto operator[](std::u8string a_path) noexcept
 			-> index { return (*this)[hashing::hash_file(a_path)]; }
 
-		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
+		[[nodiscard]] auto operator[](std::u8string a_path) const noexcept
 			-> const_index { return (*this)[hashing::hash_file(a_path)]; }
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
@@ -424,10 +424,10 @@ namespace bsa::tes4
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
 			-> const_iterator { return _files.find(a_hash); }
 
-		[[nodiscard]] auto find(std::filesystem::path a_path) noexcept
+		[[nodiscard]] auto find(std::u8string a_path) noexcept
 			-> iterator { return find(hashing::hash_file(a_path)); }
 
-		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
+		[[nodiscard]] auto find(std::u8string a_path) const noexcept
 			-> const_iterator { return find(hashing::hash_file(a_path)); }
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
@@ -527,10 +527,10 @@ namespace bsa::tes4
 			return it != _directories.end() ? const_index{ *it } : const_index{};
 		}
 
-		[[nodiscard]] auto operator[](std::filesystem::path a_path) noexcept
+		[[nodiscard]] auto operator[](std::u8string a_path) noexcept
 			-> index { return (*this)[hashing::hash_directory(a_path)]; }
 
-		[[nodiscard]] auto operator[](std::filesystem::path a_path) const noexcept
+		[[nodiscard]] auto operator[](std::u8string a_path) const noexcept
 			-> const_index { return (*this)[hashing::hash_directory(a_path)]; }
 
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
@@ -589,7 +589,7 @@ namespace bsa::tes4
 
 		bool erase(hashing::hash a_hash) noexcept;
 
-		auto erase(std::filesystem::path a_path) noexcept
+		auto erase(std::u8string a_path) noexcept
 			-> bool { return erase(hashing::hash_directory(a_path)); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
@@ -598,10 +598,10 @@ namespace bsa::tes4
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
 			-> const_iterator { return _directories.find(a_hash); }
 
-		[[nodiscard]] auto find(std::filesystem::path a_path) noexcept
+		[[nodiscard]] auto find(std::u8string a_path) noexcept
 			-> iterator { return find(hashing::hash_directory(a_path)); }
 
-		[[nodiscard]] auto find(std::filesystem::path a_path) const noexcept
+		[[nodiscard]] auto find(std::u8string a_path) const noexcept
 			-> const_iterator { return find(hashing::hash_directory(a_path)); }
 
 		auto insert(directory a_directory) noexcept

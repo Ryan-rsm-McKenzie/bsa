@@ -27,16 +27,18 @@ using namespace std::literals;
 		a_mode);
 };
 
-[[nodiscard]] auto hash_directory(std::filesystem::path a_path) noexcept
+[[nodiscard]] auto hash_directory(std::u8string_view a_path) noexcept
 	-> bsa::tes4::hashing::hash
 {
-	return bsa::tes4::hashing::hash_directory(a_path);
+	std::u8string t{ a_path };
+	return bsa::tes4::hashing::hash_directory(t);
 }
 
-[[nodiscard]] auto hash_file(std::filesystem::path a_path) noexcept
+[[nodiscard]] auto hash_file(std::u8string_view a_path) noexcept
 	-> bsa::tes4::hashing::hash
 {
-	return bsa::tes4::hashing::hash_file(a_path);
+	std::u8string t{ a_path };
+	return bsa::tes4::hashing::hash_file(t);
 }
 
 [[nodiscard]] auto map_file(const std::filesystem::path& a_path)
