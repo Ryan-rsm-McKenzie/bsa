@@ -35,10 +35,10 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
 
       - name: Configure CMake
-        run: cmake --preset vs2019-md-vcpkg
+        run: cmake --preset ninja-windows-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
-        run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
+        run: cmake --build ${{ github.workspace }}/build
 
       - name: Test
         working-directory: ${{ github.workspace }}/build

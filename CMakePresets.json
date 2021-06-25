@@ -2,6 +2,12 @@
   "configurePresets": [
     {
       "binaryDir": "build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Debug"
+        }
+      },
       "errors": {
         "deprecated": true
       },
@@ -38,61 +44,40 @@
       "cacheVariables": {
         "Boost_USE_STATIC_RUNTIME": {
           "type": "BOOL",
-          "value": "ON"
-        },
-        "CMAKE_MSVC_RUNTIME_LIBRARY": {
-          "type": "STRING",
-          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-        }
-      },
-      "hidden": true,
-      "name": "windows-mt"
-    },
-    {
-      "cacheVariables": {
-        "Boost_USE_STATIC_RUNTIME": {
-          "type": "BOOL",
           "value": "OFF"
         },
         "CMAKE_MSVC_RUNTIME_LIBRARY": {
           "type": "STRING",
           "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-        }
-      },
-      "hidden": true,
-      "name": "windows-md"
-    },
-    {
-      "cacheVariables": {
+        },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
           "value": "x64-windows-static-md"
         }
       },
-      "description": "VS2019/Dynamic CRT/VCPkg",
-      "inherits": [
-        "windows-md",
-        "vs2019",
-        "cmake-dev",
-        "vcpkg"
-      ],
-      "name": "vs2019-md-vcpkg"
+      "hidden": true,
+      "name": "windows"
     },
     {
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": {
-          "type": "STRING",
-          "value": "x64-windows-static-mt"
-        }
-      },
-      "description": "VS2019/Static CRT/VCPkg",
+      "description": "VS2019/Windows/VCPkg",
       "inherits": [
-        "windows-mt",
-        "vs2019",
         "cmake-dev",
-        "vcpkg"
+        "vcpkg",
+        "vs2019",
+        "windows"
       ],
-      "name": "vs2019-mt-vcpkg"
+      "name": "vs2019-windows-vcpkg"
+    },
+    {
+      "description": "Ninja/Windows/VCPkg",
+      "generator": "Ninja",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "vs2019",
+        "windows"
+      ],
+      "name": "ninja-windows-vcpkg"
     }
   ],
   "version": 2
