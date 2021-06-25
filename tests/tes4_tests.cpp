@@ -153,7 +153,7 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 		REQUIRE(f1.filename() == f2.filename());
 	}
 
-	SECTION("you can assign and clear the contents of a file")
+	SECTION("we can assign and clear the contents of a file")
 	{
 		auto payload = std::vector<std::byte>(1u << 4);
 		bsa::tes4::file f{ u8"hello.txt"sv };
