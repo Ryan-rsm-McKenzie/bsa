@@ -728,8 +728,6 @@ namespace bsa::tes4
 		switch (_name.index()) {
 		case name_null:
 			return {};
-		case name_view:
-			return *std::get_if<name_view>(&_name);
 		case name_owner:
 			return *std::get_if<name_owner>(&_name);
 		case name_proxied:

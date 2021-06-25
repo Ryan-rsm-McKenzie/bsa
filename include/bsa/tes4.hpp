@@ -489,7 +489,6 @@ namespace bsa::tes4
 		enum : std::size_t
 		{
 			name_null,
-			name_view,
 			name_owner,
 			name_proxied
 		};
@@ -503,7 +502,6 @@ namespace bsa::tes4
 		hashing::hash _hash;
 		std::variant<
 			std::monostate,
-			std::string_view,
 			std::string,
 			name_proxy>
 			_name;
