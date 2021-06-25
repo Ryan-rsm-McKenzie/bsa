@@ -58,9 +58,9 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 			return hash_file(a_path).numeric();
 		};
 
-		REQUIRE(dhash(u8"textures\\armor\\amuletsandrings\\elder council"sv) == 0x04BC422C742C696C);
-		REQUIRE(dhash(u8"sound\\voice\\skyrim.esm\\maleuniquedbguardian"sv) == 0x594085AC732B616E);
-		REQUIRE(dhash(u8"textures\\architecture\\windhelm"sv) == 0xC1D97EBE741E6C6D);
+		REQUIRE(dhash(u8"textures/armor/amuletsandrings/elder council"sv) == 0x04BC422C742C696C);
+		REQUIRE(dhash(u8"sound/voice/skyrim.esm/maleuniquedbguardian"sv) == 0x594085AC732B616E);
+		REQUIRE(dhash(u8"textures/architecture/windhelm"sv) == 0xC1D97EBE741E6C6D);
 
 		REQUIRE(fhash(u8"darkbrotherhood__0007469a_1.fuz"sv) == 0x011F11B0641B5F31);
 		REQUIRE(fhash(u8"elder_council_amulet_n.dds"sv) == 0xDC531E2F6516DFEE);
@@ -92,10 +92,10 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(gitignore.numeric() == 0);
 	}
 
-	SECTION("drive letters are included in hashes")
+	SECTION("root paths are included in hashes")
 	{
 		const auto h1 = hash_directory(u8"C:\\foo\\bar\\baz"sv);
-		const auto h2 = hash_directory(u8"foo\\bar\\baz"sv);
+		const auto h2 = hash_directory(u8"foo/bar/baz"sv);
 
 		REQUIRE(h1 != h2);
 	}
@@ -140,7 +140,7 @@ TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 		REQUIRE(d.begin() == d.end());
 	}
 
-	SECTION("drive letters are included in directory names")
+	SECTION("root paths are included in directory names")
 	{
 		const bsa::tes4::directory d1{ u8"C:\\foo\\bar\\baz"sv };
 		const bsa::tes4::directory d2{ u8"foo\\bar\\baz"sv };
@@ -181,7 +181,7 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 
 	SECTION("parent directories are not included in file names")
 	{
-		const bsa::tes4::file f1{ u8"C:\\users\\john\\test.txt"sv };
+		const bsa::tes4::file f1{ u8"users/john/test.txt"sv };
 		const bsa::tes4::file f2{ u8"test.txt"sv };
 
 		REQUIRE(f1.filename() == f2.filename());
