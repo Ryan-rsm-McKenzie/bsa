@@ -1,9 +1,13 @@
 #include "bsa/tes4.hpp"
 
+#include <array>
 #include <cstring>
 #include <exception>
 #include <iterator>
+#include <limits>
+#include <memory>
 #include <string_view>
+#include <vector>
 
 #pragma warning(push)
 #include <catch2/catch.hpp>
@@ -319,5 +323,37 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			REQUIRE(!file->compressed());
 			REQUIRE(file->size() == std::filesystem::file_size(p));
 		}
+	}
+
+	SECTION("we can validate the offsets within an archive (<2gb)")
+	{
+		bsa::tes4::archive bsa;
+		bsa::tes4::directory tmpdir{ u8"root"sv };
+		const auto result = bsa.insert(std::move(tmpdir));
+		REQUIRE(result.second);
+		REQUIRE(result.first != bsa.end());
+		auto& dir = *result.first;
+
+		const auto add =
+			[&](bsa::tes4::hashing::hash a_hash,
+				const std::byte* a_data,
+				std::size_t a_size) {
+				bsa::tes4::file f{ a_hash };
+				f.set_data({ a_data, a_size });
+				dir.insert(std::move(f));
+			};
+
+		constexpr auto size = std::numeric_limits<std::int32_t>::max();
+		const auto large = std::make_unique<std::byte[]>(size);
+		const std::array<std::byte, 1u << 4> small{};
+
+		const auto version = bsa::tes4::version::tes4;
+		REQUIRE(bsa.verify_offsets(version));
+
+		add({ 0 }, small.data(), small.size());
+		REQUIRE(bsa.verify_offsets(version));
+
+		add({ 1 }, large.get(), size);
+		REQUIRE(!bsa.verify_offsets(version));
 	}
 }
