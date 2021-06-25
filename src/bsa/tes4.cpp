@@ -368,6 +368,9 @@ namespace bsa::tes4
 			};
 
 			normalize_directory(a_path);
+			if (const auto pos = a_path.find_last_of(u8'\\'); pos != std::u8string::npos) {
+				a_path = a_path.substr(pos + 1);
+			}
 			const std::u8string_view pview{
 				reinterpret_cast<const char8_t*>(a_path.data()),
 				a_path.size()
