@@ -17,9 +17,6 @@
 #pragma warning(disable: 4701)  // Potentially uninitialized local variable 'name' used
 #pragma warning(disable: 4702)  // unreachable code
 #pragma warning(disable: 4244)  // 'argument' : conversion from 'type1' to 'type2', possible loss of data
-#include <boost/text/in_place_case_mapping.hpp>
-#include <boost/text/text.hpp>
-
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
@@ -252,17 +249,35 @@ namespace bsa::tes4
 				return crc;
 			}
 
-			[[nodiscard]] auto normalize_directory(std::filesystem::path& a_path) noexcept
-				-> boost::text::text
+			[[nodiscard]] auto mapchar(char8_t a_ch) noexcept
+				-> char8_t
 			{
-				boost::text::text p{
-					a_path
-						.lexically_normal()
-						.make_preferred()
-						.u8string()
-				};
+				constexpr auto lut = []() noexcept {
+					std::array<char8_t, std::numeric_limits<unsigned char>::max() + 1> map{};
+					for (std::size_t i = 0; i < map.size(); ++i) {
+						map[i] = static_cast<char8_t>(i);
+					}
 
-				boost::text::in_place_to_lower(p);
+					map[static_cast<std::size_t>(u8'/')] = u8'\\';
+
+					constexpr auto offset = char8_t{ u8'a' - u8'A' };
+					for (std::size_t i = u8'A'; i <= u8'Z'; ++i) {
+						map[i] = static_cast<char8_t>(i) + offset;
+					}
+
+					return map;
+				}();
+
+				return lut[static_cast<std::size_t>(a_ch)];
+			}
+
+			[[nodiscard]] auto normalize_directory(std::filesystem::path& a_path) noexcept
+				-> std::u8string
+			{
+				auto p = a_path.lexically_normal().u8string();
+				for (auto& c : p) {
+					c = mapchar(c);
+				}
 
 				while (!p.empty() && p.back() == u8'\\') {
 					p.pop_back();
@@ -272,12 +287,11 @@ namespace bsa::tes4
 					p.erase(p.begin());
 				}
 
-				if (p.empty() || p.distance() >= 260) {
-					p.assign(u8'.');
+				if (p.empty() || p.size() >= 260) {
+					p = u8'.';
 				}
 
-				const auto ptr = reinterpret_cast<const char8_t*>(p.data());
-				a_path.assign(ptr, ptr + p.storage_code_units());
+				a_path = p;
 				return p;
 			}
 
@@ -320,7 +334,7 @@ namespace bsa::tes4
 			const auto p = normalize_directory(a_path);
 			const std::span<const std::byte> view{
 				reinterpret_cast<const std::byte*>(p.data()),
-				p.storage_code_units()
+				p.size()
 			};
 
 			hash h;
@@ -362,7 +376,7 @@ namespace bsa::tes4
 			const auto pstr = normalize_directory(a_path);
 			const std::u8string_view pview{
 				reinterpret_cast<const char8_t*>(pstr.data()),
-				pstr.storage_code_units()
+				pstr.size()
 			};
 
 			const auto [stem, extension] = [&]() noexcept

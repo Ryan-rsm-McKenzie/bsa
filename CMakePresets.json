@@ -29,10 +29,6 @@
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
           "value": "tests"
-        },
-        "VCPKG_OVERLAY_PORTS": {
-          "type": "STRING",
-          "value": "${sourceDir}/ports"
         }
       },
       "hidden": true,

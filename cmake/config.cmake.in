@@ -10,4 +10,3 @@ find_dependency(Boost
 		iostreams
 		nowide
 )
-find_package(text CONFIG)

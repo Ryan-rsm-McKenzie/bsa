@@ -7,7 +7,6 @@
     "boost-iostreams",
     "boost-nowide",
     "boost-predef",
-    "boost-text",
     "lz4",
     "zlib"
   ],

@@ -65,7 +65,6 @@ find_package(Boost
 		nowide
 )
 find_package(lz4 REQUIRED)	# might be problematic
-find_package(text REQUIRED CONFIG)
 find_package(ZLIB MODULE REQUIRED)
 
 target_link_libraries(
@@ -73,7 +72,6 @@ target_link_libraries(
 	PRIVATE
 		Boost::filesystem
 		Boost::nowide
-		Boost::text
 		lz4::lz4
 		ZLIB::ZLIB
 	PUBLIC
