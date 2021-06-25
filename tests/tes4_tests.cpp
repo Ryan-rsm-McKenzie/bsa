@@ -291,7 +291,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				REQUIRE(read->compressed());
 				REQUIRE(read->decompressed_size() == std::filesystem::file_size(p));
 
-				bsa::tes4::file original{ "" };
+				bsa::tes4::file original{ u8""sv };
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
 				REQUIRE(original.compress(*version));

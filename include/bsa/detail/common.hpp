@@ -63,6 +63,10 @@ namespace bsa::detail
 			std::same_as<T, std::uint32_t> ||
 			std::same_as<T, std::int64_t> ||
 			std::same_as<T, std::uint64_t>;
+
+		template <class T>
+		concept u8stringable =
+			std::constructible_from<std::u8string, T>;
 	}
 
 	[[noreturn]] inline void declare_unreachable()
