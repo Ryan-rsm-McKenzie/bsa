@@ -19,35 +19,38 @@
 
 using namespace std::literals;
 
-[[nodiscard]] auto fopen_path(std::filesystem::path a_path, const char* a_mode) noexcept
-	-> std::FILE*
+namespace
 {
-	return boost::nowide::fopen(
-		reinterpret_cast<const char*>(a_path.u8string().data()),
-		a_mode);
-};
-
-[[nodiscard]] auto hash_directory(std::u8string_view a_path) noexcept
-	-> bsa::tes4::hashing::hash
-{
-	std::u8string t{ a_path };
-	return bsa::tes4::hashing::hash_directory(t);
-}
-
-[[nodiscard]] auto hash_file(std::u8string_view a_path) noexcept
-	-> bsa::tes4::hashing::hash
-{
-	std::u8string t{ a_path };
-	return bsa::tes4::hashing::hash_file(t);
-}
-
-[[nodiscard]] auto map_file(const std::filesystem::path& a_path)
-	-> boost::iostreams::mapped_file_source
-{
-	return boost::iostreams::mapped_file_source{
-		boost::filesystem::path{ a_path.native() }
+	[[nodiscard]] auto fopen_path(std::filesystem::path a_path, const char* a_mode) noexcept
+		-> std::FILE*
+	{
+		return boost::nowide::fopen(
+			reinterpret_cast<const char*>(a_path.u8string().data()),
+			a_mode);
 	};
-};
+
+	[[nodiscard]] auto hash_directory(std::u8string_view a_path) noexcept
+		-> bsa::tes4::hashing::hash
+	{
+		std::u8string t{ a_path };
+		return bsa::tes4::hashing::hash_directory(t);
+	}
+
+	[[nodiscard]] auto hash_file(std::u8string_view a_path) noexcept
+		-> bsa::tes4::hashing::hash
+	{
+		std::u8string t{ a_path };
+		return bsa::tes4::hashing::hash_file(t);
+	}
+
+	[[nodiscard]] auto map_file(const std::filesystem::path& a_path)
+		-> boost::iostreams::mapped_file_source
+	{
+		return boost::iostreams::mapped_file_source{
+			boost::filesystem::path{ a_path.native() }
+		};
+	};
+}
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {
