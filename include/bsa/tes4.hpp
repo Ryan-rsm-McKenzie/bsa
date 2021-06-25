@@ -299,14 +299,18 @@ namespace bsa::tes4
 		{
 			name_null,
 			name_owner,
-			name_proxied
+			name_proxied,
+
+			name_count
 		};
 
 		enum : std::size_t
 		{
 			data_view,
 			data_owner,
-			data_proxied
+			data_proxied,
+
+			data_count
 		};
 
 		struct name_proxy final
@@ -333,6 +337,9 @@ namespace bsa::tes4
 			data_proxy>
 			_data;
 		std::optional<std::size_t> _decompsz;
+
+		static_assert(name_count == std::variant_size_v<decltype(_name)>);
+		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
 	class directory final
@@ -490,7 +497,9 @@ namespace bsa::tes4
 		{
 			name_null,
 			name_owner,
-			name_proxied
+			name_proxied,
+
+			name_count
 		};
 
 		struct name_proxy final
@@ -506,6 +515,8 @@ namespace bsa::tes4
 			name_proxy>
 			_name;
 		container_type _files;
+
+		static_assert(name_count == std::variant_size_v<decltype(_name)>);
 	};
 
 	class archive final
