@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <memory>
 #include <span>
 #include <string_view>
@@ -871,6 +872,28 @@ namespace bsa::tes4
 		return { static_cast<version>(header.version()) };
 	}
 
+	[[nodiscard]] bool archive::verify_offsets(version a_version) const noexcept
+	{
+		const auto header = make_header(a_version);
+		auto offset = detail::offsetof_file_data(header);
+
+		std::size_t last = 0;
+		for (const auto& dir : _directories) {
+			for (const auto& file : dir) {
+				last = file.filename().length() +
+				       1u;  // prefixed byte length
+				if (file.compressed()) {
+					last += 4u;
+				}
+				last += file.size();
+				offset += last;
+			}
+		}
+
+		offset -= last;
+		return offset <= std::numeric_limits<std::int32_t>::max();
+	}
+
 	bool archive::write(std::filesystem::path a_path, version a_version) const noexcept
 	{
 		detail::ostream_t out{ std::move(a_path) };
@@ -878,38 +901,7 @@ namespace bsa::tes4
 			return false;
 		}
 
-		const auto header = [&]() noexcept -> detail::header_t {
-			detail::header_t::info_t files;
-			detail::header_t::info_t dirs;
-
-			for (const auto& dir : _directories) {
-				dirs.count += 1;
-
-				if (directory_strings()) {
-					dirs.blobsz += static_cast<std::uint32_t>(
-						dir.name().length() +
-						1u);  // null terminator
-				}
-
-				for (const auto& file : dir) {
-					files.count += 1;
-
-					if (file_strings()) {
-						files.blobsz += static_cast<std::uint32_t>(
-							file.filename().length() +
-							1u);  // null terminator
-					}
-				}
-			}
-
-			return {
-				a_version,
-				_flags,
-				_types,
-				dirs,
-				files
-			};
-		}();
+		const auto header = make_header(a_version);
 		out << header;
 
 		write_directory_entries(out, header);
@@ -920,6 +912,41 @@ namespace bsa::tes4
 		write_file_data(out, header);
 
 		return true;
+	}
+
+	auto archive::make_header(version a_version) const noexcept
+		-> detail::header_t
+	{
+		detail::header_t::info_t files;
+		detail::header_t::info_t dirs;
+
+		for (const auto& dir : _directories) {
+			dirs.count += 1;
+
+			if (directory_strings()) {
+				dirs.blobsz += static_cast<std::uint32_t>(
+					dir.name().length() +
+					1u);  // null terminator
+			}
+
+			for (const auto& file : dir) {
+				files.count += 1;
+
+				if (file_strings()) {
+					files.blobsz += static_cast<std::uint32_t>(
+						file.filename().length() +
+						1u);  // null terminator
+				}
+			}
+		}
+
+		return {
+			a_version,
+			_flags,
+			_types,
+			dirs,
+			files
+		};
 	}
 
 	void archive::read_file_names(

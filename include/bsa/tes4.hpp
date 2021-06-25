@@ -611,9 +611,13 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _directories.size(); }
 
+		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
+
 		bool write(std::filesystem::path a_path, version a_version) const noexcept;
 
 	private:
+		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
+
 		void read_file_names(
 			detail::istream_t& a_in,
 			const detail::header_t& a_header) noexcept;
