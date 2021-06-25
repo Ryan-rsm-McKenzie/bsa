@@ -158,6 +158,19 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 		f.clear();
 		REQUIRE(f.empty());
 	}
+
+	SECTION("moving a file does not modify its hash or name")
+	{
+		const auto name = u8"hello.txt"sv;
+		const auto hash = hash_file(name);
+		bsa::tes4::file oldf{ name };
+		bsa::tes4::file newf{ std::move(oldf) };
+
+		REQUIRE(oldf.filename() == name);
+		REQUIRE(oldf.hash() == hash);
+		REQUIRE(newf.filename() == name);
+		REQUIRE(newf.hash() == hash);
+	}
 }
 
 TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
