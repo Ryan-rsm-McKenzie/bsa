@@ -25,7 +25,7 @@ namespace
 		-> std::FILE*
 	{
 		return boost::nowide::fopen(
-			reinterpret_cast<const char*>(a_path.string().data()),
+			reinterpret_cast<const char*>(a_path.u8string().data()),
 			a_mode);
 	};
 
