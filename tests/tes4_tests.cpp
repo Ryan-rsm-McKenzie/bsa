@@ -177,41 +177,52 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		REQUIRE(!bsa.read(u8"."sv));
 	}
 
-	SECTION("files can be compressed within an archive")
 	{
-		const std::filesystem::path root{ u8"compression_test"sv };
+		const auto testArchive = [](std::u8string_view a_name) {
+			const std::filesystem::path root{ u8"compression_test"sv };
 
-		bsa::tes4::archive bsa;
-		const auto version = bsa.read(root / u8"test.bsa"sv);
-		REQUIRE(version);
-		REQUIRE(bsa.compressed());
+			bsa::tes4::archive bsa;
+			const auto version = bsa.read(root / a_name);
+			REQUIRE(version);
+			REQUIRE(bsa.compressed());
 
-		constexpr std::array files{
-			u8"License.txt"sv,
-			u8"Preview.png"sv,
+			constexpr std::array files{
+				u8"License.txt"sv,
+				u8"Preview.png"sv,
+			};
+
+			for (const auto& name : files) {
+				const auto p = root / name;
+				REQUIRE(std::filesystem::exists(p));
+
+				const auto read = bsa[u8"."sv][name];
+				REQUIRE(read);
+				REQUIRE(read->compressed());
+				REQUIRE(read->decompressed_size() == std::filesystem::file_size(p));
+
+				bsa::tes4::file original{ "" };
+				const auto origsrc = map_file(p);
+				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
+				REQUIRE(original.compress(*version));
+
+				REQUIRE(read->size() == original.size());
+				REQUIRE(read->decompressed_size() == original.decompressed_size());
+				REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
+
+				REQUIRE(read->decompress(*version));
+				REQUIRE(read->size() == origsrc.size());
+				REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
+			}
 		};
 
-		for (const auto& name : files) {
-			const auto p = root / name;
-			REQUIRE(std::filesystem::exists(p));
+		SECTION("we can read files compressed in the v104 format")
+		{
+			testArchive(u8"test_104.bsa"sv);
+		}
 
-			const auto read = bsa[u8"."sv][name];
-			REQUIRE(read);
-			REQUIRE(read->compressed());
-			REQUIRE(read->decompressed_size() == std::filesystem::file_size(p));
-
-			bsa::tes4::file original{ "" };
-			const auto origsrc = map_file(p);
-			original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
-			REQUIRE(original.compress(*version));
-
-			REQUIRE(read->size() == original.size());
-			REQUIRE(read->decompressed_size() == original.decompressed_size());
-			REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
-
-			REQUIRE(read->decompress(*version));
-			REQUIRE(read->size() == origsrc.size());
-			REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
+		SECTION("we can read files compressed in the v105 format")
+		{
+			testArchive(u8"test_105.bsa"sv);
 		}
 	}
 
