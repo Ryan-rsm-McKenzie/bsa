@@ -116,6 +116,15 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 {
+	SECTION("directories start empty")
+	{
+		const bsa::tes4::directory d{ u8"root"sv };
+
+		REQUIRE(d.empty());
+		REQUIRE(d.size() == 0);
+		REQUIRE(d.begin() == d.end());
+	}
+
 	SECTION("drive letters are included in directory names")
 	{
 		const bsa::tes4::directory d1{ u8"C:\\foo\\bar\\baz"sv };
