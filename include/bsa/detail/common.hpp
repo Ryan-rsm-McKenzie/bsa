@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <iterator>
 #include <span>
+#include <string>
 #include <type_traits>
 
 #pragma warning(push)
@@ -65,8 +66,8 @@ namespace bsa::detail
 			std::same_as<T, std::uint64_t>;
 
 		template <class T>
-		concept u8stringable =
-			std::constructible_from<std::u8string, T>;
+		concept stringable =
+			std::constructible_from<std::string, T>;
 	}
 
 	[[noreturn]] inline void declare_unreachable()

@@ -115,8 +115,8 @@ namespace bsa::tes4
 				std::endian a_endian) const noexcept;
 		};
 
-		[[nodiscard]] hash hash_directory(std::u8string& a_path) noexcept;
-		[[nodiscard]] hash hash_file(std::u8string& a_path) noexcept;
+		[[nodiscard]] hash hash_directory(std::string& a_path) noexcept;
+		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
 	namespace detail
@@ -137,7 +137,7 @@ namespace bsa::tes4
 				return (**this)[a_hash];
 			}
 
-			template <concepts::u8stringable String>
+			template <concepts::stringable String>
 			[[nodiscard]] auto operator[](String&& a_path) const noexcept  //
 				requires(RECURSE)
 			{
@@ -195,7 +195,7 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		explicit file(String&& a_path) noexcept
 		{
 			_name.emplace<name_owner>(std::forward<String>(a_path));
@@ -245,7 +245,7 @@ namespace bsa::tes4
 
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
 
-		[[nodiscard]] auto filename() const noexcept -> std::u8string_view;
+		[[nodiscard]] auto filename() const noexcept -> std::string_view;
 
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 
@@ -283,14 +283,14 @@ namespace bsa::tes4
 			const detail::header_t& a_header,
 			std::size_t a_size,
 			std::size_t a_offset) noexcept
-			-> std::optional<std::u8string_view>;
+			-> std::optional<std::string_view>;
 
 		void read_filename(detail::istream_t& a_in) noexcept;
 
 		void write_data(
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header,
-			std::u8string_view a_dirname) const noexcept;
+			std::string_view a_dirname) const noexcept;
 
 		void write_filename(detail::ostream_t& a_out) const noexcept;
 
@@ -311,7 +311,7 @@ namespace bsa::tes4
 
 		struct name_proxy final
 		{
-			std::u8string_view n;
+			std::string_view n;
 			boost::iostreams::mapped_file_source f;
 		};
 
@@ -324,7 +324,7 @@ namespace bsa::tes4
 		hashing::hash _hash;
 		std::variant<
 			std::monostate,
-			std::u8string,
+			std::string,
 			name_proxy>
 			_name;
 		std::variant<
@@ -358,7 +358,7 @@ namespace bsa::tes4
 			_hash(a_hash)
 		{}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		explicit directory(String&& a_path) noexcept
 		{
 			_name.emplace<name_owner>(std::forward<String>(a_path));
@@ -403,19 +403,19 @@ namespace bsa::tes4
 			return it != _files.end() ? const_index{ *it } : const_index{};
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto operator[](String&& a_path) noexcept
 			-> index
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return (*this)[hashing::hash_file(path)];
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto operator[](String&& a_path) const noexcept
 			-> const_index
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return (*this)[hashing::hash_file(path)];
 		}
 
@@ -437,19 +437,19 @@ namespace bsa::tes4
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
 			-> const_iterator { return _files.find(a_hash); }
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto find(String&& a_path) noexcept
 			-> iterator
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return find(hashing::hash_file(path));
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto find(String&& a_path) const noexcept
 			-> const_iterator
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return find(hashing::hash_file(path));
 		}
 
@@ -458,7 +458,7 @@ namespace bsa::tes4
 		auto insert(file a_file) noexcept
 			-> std::pair<iterator, bool> { return _files.insert(std::move(a_file)); }
 
-		[[nodiscard]] auto name() const noexcept -> std::u8string_view;
+		[[nodiscard]] auto name() const noexcept -> std::string_view;
 
 		void reserve(std::size_t a_count) noexcept { _files.reserve(a_count); }
 
@@ -496,15 +496,15 @@ namespace bsa::tes4
 
 		struct name_proxy final
 		{
-			std::u8string_view n;
+			std::string_view n;
 			boost::iostreams::mapped_file_source f;
 		};
 
 		hashing::hash _hash;
 		std::variant<
 			std::monostate,
-			std::u8string_view,
-			std::u8string,
+			std::string_view,
+			std::string,
 			name_proxy>
 			_name;
 		container_type _files;
@@ -550,19 +550,19 @@ namespace bsa::tes4
 			return it != _directories.end() ? const_index{ *it } : const_index{};
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto operator[](String&& a_path) noexcept
 			-> index
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return (*this)[hashing::hash_directory(path)];
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto operator[](String&& a_path) const noexcept
 			-> const_index
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return (*this)[hashing::hash_directory(path)];
 		}
 
@@ -622,11 +622,11 @@ namespace bsa::tes4
 
 		bool erase(hashing::hash a_hash) noexcept;
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		auto erase(String&& a_path) noexcept
 			-> bool
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return erase(hashing::hash_directory(path));
 		}
 
@@ -636,19 +636,19 @@ namespace bsa::tes4
 		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
 			-> const_iterator { return _directories.find(a_hash); }
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto find(String&& a_path) noexcept
 			-> iterator
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return find(hashing::hash_directory(path));
 		}
 
-		template <detail::concepts::u8stringable String>
+		template <detail::concepts::stringable String>
 		[[nodiscard]] auto find(String&& a_path) const noexcept
 			-> const_iterator
 		{
-			std::u8string path(std::forward<String>(a_path));
+			std::string path(std::forward<String>(a_path));
 			return find(hashing::hash_directory(path));
 		}
 

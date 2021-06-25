@@ -81,10 +81,10 @@ namespace bsa::tes4
 
 				a_value.evaluate_endian();
 
-				if (magic[0] != std::byte{ u8'B' } ||
-					magic[1] != std::byte{ u8'S' } ||
-					magic[2] != std::byte{ u8'A' } ||
-					magic[3] != std::byte{ u8'\0' }) {
+				if (magic[0] != std::byte{ 'B' } ||
+					magic[1] != std::byte{ 'S' } ||
+					magic[2] != std::byte{ 'A' } ||
+					magic[3] != std::byte{ '\0' }) {
 					a_value._good = false;
 				} else if (a_value._version != 103 &&
 						   a_value._version != 104 &&
@@ -100,10 +100,10 @@ namespace bsa::tes4
 			friend ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept
 			{
 				std::array magic{
-					std::byte{ u8'B' },
-					std::byte{ u8'S' },
-					std::byte{ u8'A' },
-					std::byte{ u8'\0' }
+					std::byte{ 'B' },
+					std::byte{ 'S' },
+					std::byte{ 'A' },
+					std::byte{ '\0' }
 				};
 
 				a_out
@@ -258,10 +258,10 @@ namespace bsa::tes4
 						map[i] = static_cast<char8_t>(i);
 					}
 
-					map[static_cast<std::size_t>(u8'/')] = u8'\\';
+					map[static_cast<std::size_t>('/')] = '\\';
 
-					constexpr auto offset = char8_t{ u8'a' - u8'A' };
-					for (std::size_t i = u8'A'; i <= u8'Z'; ++i) {
+					constexpr auto offset = char8_t{ 'a' - 'A' };
+					for (std::size_t i = 'A'; i <= 'Z'; ++i) {
 						map[i] = static_cast<char8_t>(i) + offset;
 					}
 
@@ -271,31 +271,31 @@ namespace bsa::tes4
 				return lut[static_cast<std::size_t>(a_ch)];
 			}
 
-			[[nodiscard]] void normalize_directory(std::u8string& a_path) noexcept
+			[[nodiscard]] void normalize_directory(std::string& a_path) noexcept
 			{
 				for (auto& c : a_path) {
 					c = mapchar(c);
 				}
 
-				while (!a_path.empty() && a_path.back() == u8'\\') {
+				while (!a_path.empty() && a_path.back() == '\\') {
 					a_path.pop_back();
 				}
 
-				while (!a_path.empty() && a_path.front() == u8'\\') {
+				while (!a_path.empty() && a_path.front() == '\\') {
 					a_path.erase(a_path.begin());
 				}
 
 				if (a_path.empty() || a_path.size() >= 260) {
-					a_path = u8'.';
+					a_path = '.';
 				}
 			}
 
-			[[nodiscard]] constexpr auto make_file_extension(std::u8string_view a_extension) noexcept
+			[[nodiscard]] constexpr auto make_file_extension(std::string_view a_extension) noexcept
 				-> std::uint32_t
 			{
 				std::uint32_t ext = 0;
 				for (std::size_t i = 0; i < std::min<std::size_t>(a_extension.size(), 4u); ++i) {
-					ext |= std::uint32_t{ a_extension[i] } << i * 8;
+					ext |= std::uint32_t{ static_cast<unsigned char>(a_extension[i]) } << i * 8;
 				}
 				return ext;
 			}
@@ -324,7 +324,7 @@ namespace bsa::tes4
 			a_out.write(crc, a_endian);
 		}
 
-		hash hash_directory(std::u8string& a_path) noexcept
+		hash hash_directory(std::string& a_path) noexcept
 		{
 			normalize_directory(a_path);
 			const std::span<const std::byte> view{
@@ -356,30 +356,27 @@ namespace bsa::tes4
 			return h;
 		}
 
-		hash hash_file(std::u8string& a_path) noexcept
+		hash hash_file(std::string& a_path) noexcept
 		{
 			constexpr std::array lut{
-				make_file_extension(u8""sv),
-				make_file_extension(u8".nif"sv),
-				make_file_extension(u8".kf"sv),
-				make_file_extension(u8".dds"sv),
-				make_file_extension(u8".wav"sv),
-				make_file_extension(u8".adp"sv),
+				make_file_extension(""sv),
+				make_file_extension(".nif"sv),
+				make_file_extension(".kf"sv),
+				make_file_extension(".dds"sv),
+				make_file_extension(".wav"sv),
+				make_file_extension(".adp"sv),
 			};
 
 			normalize_directory(a_path);
-			if (const auto pos = a_path.find_last_of(u8'\\'); pos != std::u8string::npos) {
+			if (const auto pos = a_path.find_last_of('\\'); pos != std::string::npos) {
 				a_path = a_path.substr(pos + 1);
 			}
-			const std::u8string_view pview{
-				reinterpret_cast<const char8_t*>(a_path.data()),
-				a_path.size()
-			};
+			const std::string_view pview{ a_path };
 
 			const auto [stem, extension] = [&]() noexcept
-				-> std::pair<std::u8string_view, std::u8string_view> {
-				const auto split = pview.find_last_of(u8'.');
-				if (split != std::u8string_view::npos) {
+				-> std::pair<std::string_view, std::string_view> {
+				const auto split = pview.find_last_of('.');
+				if (split != std::string_view::npos) {
 					return {
 						pview.substr(0, split),
 						pview.substr(split)
@@ -387,7 +384,7 @@ namespace bsa::tes4
 				} else {
 					return {
 						pview,
-						u8""sv
+						""sv
 					};
 				}
 			}();
@@ -396,7 +393,7 @@ namespace bsa::tes4
 				stem.length() < 260 &&
 				extension.length() < 16) {
 				auto h = [&]() noexcept {
-					std::u8string temp{ stem };
+					std::string temp{ stem };
 					return hash_directory(temp);
 				}();
 				h.crc += crc32({ //
@@ -601,7 +598,7 @@ namespace bsa::tes4
 	}
 
 	auto file::filename() const noexcept
-		-> std::u8string_view
+		-> std::string_view
 	{
 		switch (_name.index()) {
 		case name_null:
@@ -635,9 +632,9 @@ namespace bsa::tes4
 		const detail::header_t& a_header,
 		std::size_t a_size,
 		std::size_t a_offset) noexcept
-		-> std::optional<std::u8string_view>
+		-> std::optional<std::string_view>
 	{
-		std::optional<std::u8string_view> dirname;
+		std::optional<std::string_view> dirname;
 
 		const detail::restore_point _{ a_in };
 		a_in.seek_absolute(a_offset & ~isecondary_archive);
@@ -648,12 +645,12 @@ namespace bsa::tes4
 			const auto bytes = a_in.read_bytes(len);
 
 			if (_name.index() == name_null) {
-				std::u8string_view name{
-					reinterpret_cast<const char8_t*>(bytes.data()),
+				std::string_view name{
+					reinterpret_cast<const char*>(bytes.data()),
 					len
 				};
-				const auto pos = name.find_last_of(u8"\\/"sv);
-				if (pos != std::u8string_view::npos) {
+				const auto pos = name.find_last_of("\\/"sv);
+				if (pos != std::string_view::npos) {
 					dirname = name.substr(0, pos);
 					name = name.substr(pos + 1);
 				}
@@ -682,8 +679,8 @@ namespace bsa::tes4
 	void file::read_filename(detail::istream_t& a_in) noexcept
 	{
 		// zstring
-		const std::u8string_view name{
-			reinterpret_cast<const char8_t*>(a_in.read_bytes(1).data())
+		const std::string_view name{
+			reinterpret_cast<const char*>(a_in.read_bytes(1).data())
 		};
 		a_in.seek_relative(name.length());
 		_name.emplace<name_proxied>(name, a_in.rdbuf());
@@ -692,10 +689,10 @@ namespace bsa::tes4
 	void file::write_data(
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header,
-		std::u8string_view a_dirname) const noexcept
+		std::string_view a_dirname) const noexcept
 	{
 		if (a_header.embedded_file_names()) {
-			const auto writeStr = [&](std::u8string_view a_str) noexcept {
+			const auto writeStr = [&](std::string_view a_str) noexcept {
 				a_out.write_bytes(
 					{ reinterpret_cast<const std::byte*>(a_str.data()), a_str.length() });
 			};
@@ -706,7 +703,7 @@ namespace bsa::tes4
 				1u +  // directory separator
 				myname.length());
 			writeStr(a_dirname);
-			a_out << std::byte{ u8'\\' };
+			a_out << std::byte{ '\\' };
 			writeStr(myname);
 		}
 
@@ -722,11 +719,11 @@ namespace bsa::tes4
 		const auto name = filename();
 		a_out.write_bytes(
 			{ reinterpret_cast<const std::byte*>(name.data()), name.length() });
-		a_out << std::byte{ u8'\0' };
+		a_out << std::byte{ '\0' };
 	}
 
 	auto directory::name() const noexcept
-		-> std::u8string_view
+		-> std::string_view
 	{
 		switch (_name.index()) {
 		case name_null:
@@ -757,8 +754,8 @@ namespace bsa::tes4
 		if (a_header.directory_strings()) {  // bzstring
 			std::uint8_t len = 0;
 			a_in >> len;
-			const std::u8string_view name{
-				reinterpret_cast<const char8_t*>(a_in.read_bytes(len).data()),
+			const std::string_view name{
+				reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
 				len - 1u  // skip null terminator
 			};
 
@@ -805,7 +802,7 @@ namespace bsa::tes4
 			a_out << static_cast<std::uint8_t>(myname.length() + 1u);  // include null terminator
 			a_out.write_bytes(
 				{ reinterpret_cast<const std::byte*>(myname.data()), myname.size() });
-			a_out << std::byte{ u8'\0' };
+			a_out << std::byte{ '\0' };
 		}
 
 		for (const auto& file : _files) {
