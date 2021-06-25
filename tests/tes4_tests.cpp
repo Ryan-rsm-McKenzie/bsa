@@ -166,10 +166,16 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 		bsa::tes4::file oldf{ name };
 		bsa::tes4::file newf{ std::move(oldf) };
 
-		REQUIRE(oldf.filename() == name);
-		REQUIRE(oldf.hash() == hash);
-		REQUIRE(newf.filename() == name);
-		REQUIRE(newf.hash() == hash);
+		const auto validate = [&]() {
+			REQUIRE(oldf.filename() == name);
+			REQUIRE(oldf.hash() == hash);
+			REQUIRE(newf.filename() == name);
+			REQUIRE(newf.hash() == hash);
+		};
+
+		validate();
+		newf = std::move(oldf);
+		validate();
 	}
 }
 
