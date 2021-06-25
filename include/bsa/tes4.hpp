@@ -201,12 +201,34 @@ namespace bsa::tes4
 		}
 
 		file(const file&) noexcept = default;
-		file(file&&) noexcept = default;
+		file(file&& a_rhs) noexcept :
+			_hash(a_rhs._hash),
+			_name(a_rhs._name),
+			_data(std::move(a_rhs._data)),
+			_decompsz(a_rhs._decompsz)
+		{
+			a_rhs.clear();
+		}
+
 		~file() noexcept = default;
+
 		file& operator=(const file&) noexcept = default;
-		file& operator=(file&&) noexcept = default;
+		file& operator=(file&& a_rhs) noexcept
+		{
+			if (this != &a_rhs) {
+				_hash = a_rhs._hash;
+				_name = a_rhs._name;
+				_data = std::move(a_rhs._data);
+				_decompsz = a_rhs._decompsz;
+
+				a_rhs.clear();
+			}
+			return *this;
+		}
 
 		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
+
+		void clear() noexcept;
 
 		bool compress(version a_version) noexcept;
 
@@ -218,6 +240,8 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto decompressed_size() const noexcept
 			-> std::size_t { return _decompsz ? *_decompsz : size(); }
+
+		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
 
 		[[nodiscard]] auto filename() const noexcept -> std::u8string_view;
 

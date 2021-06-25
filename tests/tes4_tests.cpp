@@ -127,12 +127,36 @@ TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 
 TEST_CASE("bsa::tes4::file", "[tes4.file]")
 {
+	SECTION("files start empty")
+	{
+		const bsa::tes4::file f{ u8"hello.txt"sv };
+		REQUIRE(!f.compressed());
+		REQUIRE(f.empty());
+		REQUIRE(f.size() == 0);
+		REQUIRE(f.as_bytes().size() == 0);
+	}
+
 	SECTION("parent directories are not included in file names")
 	{
 		const bsa::tes4::file f1{ u8"C:\\users\\john\\test.txt"sv };
 		const bsa::tes4::file f2{ u8"test.txt"sv };
 
 		REQUIRE(f1.filename() == f2.filename());
+	}
+
+	SECTION("you can assign and clear the contents of a file")
+	{
+		auto payload = std::vector<std::byte>(1u << 4);
+		bsa::tes4::file f{ u8"hello.txt"sv };
+
+		f.set_data({ payload.data(), payload.size() });
+		REQUIRE(f.size() == payload.size());
+		REQUIRE(f.data() == payload.data());
+		REQUIRE(f.as_bytes().size() == payload.size());
+		REQUIRE(f.as_bytes().data() == payload.data());
+
+		f.clear();
+		REQUIRE(f.empty());
 	}
 }
 

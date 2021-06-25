@@ -430,6 +430,15 @@ namespace bsa::tes4
 		}
 	}
 
+	void file::clear() noexcept
+	{
+		_data.emplace<data_view>();
+		_decompsz = std::nullopt;
+
+		assert(empty());
+		assert(!compressed());
+	}
+
 	bool file::compress(version a_version) noexcept
 	{
 		assert(!compressed());
