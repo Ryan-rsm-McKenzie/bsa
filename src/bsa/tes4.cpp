@@ -249,20 +249,20 @@ namespace bsa::tes4
 				return crc;
 			}
 
-			[[nodiscard]] auto mapchar(char8_t a_ch) noexcept
-				-> char8_t
+			[[nodiscard]] auto mapchar(char a_ch) noexcept
+				-> char
 			{
 				constexpr auto lut = []() noexcept {
-					std::array<char8_t, std::numeric_limits<unsigned char>::max() + 1> map{};
+					std::array<char, std::numeric_limits<unsigned char>::max() + 1> map{};
 					for (std::size_t i = 0; i < map.size(); ++i) {
-						map[i] = static_cast<char8_t>(i);
+						map[i] = static_cast<char>(i);
 					}
 
 					map[static_cast<std::size_t>('/')] = '\\';
 
-					constexpr auto offset = char8_t{ 'a' - 'A' };
+					constexpr auto offset = char{ 'a' - 'A' };
 					for (std::size_t i = 'A'; i <= 'Z'; ++i) {
-						map[i] = static_cast<char8_t>(i) + offset;
+						map[i] = static_cast<char>(i) + offset;
 					}
 
 					return map;
