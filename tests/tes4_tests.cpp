@@ -132,6 +132,25 @@ TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 
 		REQUIRE(d1.name() != d2.name());
 	}
+
+	SECTION("moving a directory does not modify its hash or name")
+	{
+		const auto name = u8"root"sv;
+		const auto hash = hash_directory(name);
+		bsa::tes4::directory oldd{ name };
+		bsa::tes4::directory newd{ std::move(oldd) };
+
+		const auto validate = [&]() {
+			REQUIRE(oldd.name() == name);
+			REQUIRE(oldd.hash() == hash);
+			REQUIRE(newd.name() == name);
+			REQUIRE(newd.hash() == hash);
+		};
+
+		validate();
+		newd = std::move(oldd);
+		validate();
+	}
 }
 
 TEST_CASE("bsa::tes4::file", "[tes4.file]")
