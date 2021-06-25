@@ -328,32 +328,45 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 	SECTION("we can validate the offsets within an archive (<2gb)")
 	{
 		bsa::tes4::archive bsa;
-		bsa::tes4::directory tmpdir{ u8"root"sv };
-		const auto result = bsa.insert(std::move(tmpdir));
-		REQUIRE(result.second);
-		REQUIRE(result.first != bsa.end());
-		auto& dir = *result.first;
-
 		const auto add =
 			[&](bsa::tes4::hashing::hash a_hash,
-				const std::byte* a_data,
-				std::size_t a_size) {
+				std::span<const std::byte> a_data) {
+				constexpr auto dir = u8"root"sv;
+
 				bsa::tes4::file f{ a_hash };
-				f.set_data({ a_data, a_size });
-				dir.insert(std::move(f));
+				f.set_data(a_data);
+				auto it = bsa.find(dir);
+				if (it == bsa.end()) {
+					it = bsa.insert(bsa::tes4::directory{ dir }).first;
+				}
+				REQUIRE(it != bsa.end());
+				it->insert(std::move(f));
 			};
 
-		constexpr auto size = std::numeric_limits<std::int32_t>::max();
-		const auto large = std::make_unique<std::byte[]>(size);
-		const std::array<std::byte, 1u << 4> small{};
+		constexpr auto largesz = std::numeric_limits<std::int32_t>::max();
+		const auto plarge = std::make_unique<std::byte[]>(largesz);
+		const std::span large{ plarge.get(), largesz };
 
-		const auto version = bsa::tes4::version::tes4;
-		REQUIRE(bsa.verify_offsets(version));
+		const std::array<std::byte, 1u << 4> smallbuf{};
+		const std::span small{ smallbuf.data(), smallbuf.size() };
 
-		add({ 0 }, small.data(), small.size());
-		REQUIRE(bsa.verify_offsets(version));
+		const auto verify = [&]() {
+			return bsa.verify_offsets(bsa::tes4::version::tes4);
+		};
 
-		add({ 1 }, large.get(), size);
-		REQUIRE(!bsa.verify_offsets(version));
+		REQUIRE(verify());
+
+		add({ 0 }, small);
+		REQUIRE(verify());
+
+		add({ 1 }, large);
+		REQUIRE(verify());
+
+		bsa.clear();
+		add({ 0 }, large);
+		REQUIRE(verify());
+
+		add({ 1 }, small);
+		REQUIRE(!verify());
 	}
 }
