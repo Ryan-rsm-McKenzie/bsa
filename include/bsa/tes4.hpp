@@ -396,6 +396,8 @@ namespace bsa::tes4
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
 
+		void clear() noexcept { _files.clear(); }
+
 		[[nodiscard]] bool empty() const noexcept { return _files.empty(); }
 
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
