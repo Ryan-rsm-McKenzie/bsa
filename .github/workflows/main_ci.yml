@@ -16,12 +16,27 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            cmake-generator: ninja
+            cmake-platform: linux
+            setup: bash scripts/setup.sh
+          - os: windows-latest
+            cmake-generator: vs2019
+            cmake-platform: windows
+            setup: '' # nothing right now
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'true'
+
+      - name: Run setup script
+        run: ${{ matrix.setup }}
 
       - name: Create vcpkg binary cache folder
         run: mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
@@ -35,7 +50,10 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
 
       - name: Configure CMake
-        run: cmake --preset vs2019-windows-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        env:
+          CC: gcc-10
+          CXX: g++-10
+        run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
