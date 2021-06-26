@@ -39,7 +39,7 @@ namespace
 		return boost::iostreams::mapped_file_source{
 			boost::filesystem::path{ a_path.native() }
 		};
-	};
+	}
 }
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
