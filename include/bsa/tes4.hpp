@@ -38,7 +38,7 @@ namespace bsa::tes4
 		xbox_compressed = 1u << 9u
 	};
 
-	BSA_MAKE_ALL_ENUM_OPERATORS(archive_flag);
+	BSA_MAKE_ALL_ENUM_OPERATORS(archive_flag)
 
 	enum class archive_type : std::uint16_t
 	{
@@ -55,7 +55,7 @@ namespace bsa::tes4
 		misc = 1u << 8u
 	};
 
-	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type);
+	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type)
 
 	enum class version : std::uint32_t
 	{

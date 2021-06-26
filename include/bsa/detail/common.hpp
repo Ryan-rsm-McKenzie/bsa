@@ -36,11 +36,11 @@
 			~static_cast<std::underlying_type_t<a_type>>(a_val));            \
 	}                                                                        \
                                                                              \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, ^);                                  \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, &);                                  \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, |);                                  \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<);                                 \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>);
+	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                   \
+	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                   \
+	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                   \
+	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                  \
+	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
 
 namespace bsa
 {
