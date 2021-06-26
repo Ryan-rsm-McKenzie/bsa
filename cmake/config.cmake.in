@@ -6,7 +6,5 @@ find_dependency(Boost
 	MODULE
 	COMPONENTS
 		container
-		filesystem
 		iostreams
-		nowide
 )
