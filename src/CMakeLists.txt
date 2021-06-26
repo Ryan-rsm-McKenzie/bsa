@@ -46,15 +46,6 @@ set_target_properties(
 		DEBUG_POSTFIX "d"
 )
 
-target_include_directories(
-	${TARGET_NAME}
-	PUBLIC
-		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
-		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-	PRIVATE
-		${SOURCE_DIR}
-)
-
 find_package(Boost
 	MODULE
 	REQUIRED
@@ -64,15 +55,38 @@ find_package(Boost
 		iostreams
 		nowide
 )
-find_package(lz4 REQUIRED)	# might be problematic
 find_package(ZLIB MODULE REQUIRED)
+
+find_package(PkgConfig MODULE)
+if(PkgConfig_FOUND)
+	pkg_check_modules(LZ4 liblz4)
+endif()
+if(NOT LZ4_FOUND)
+	find_package(LZ4 REQUIRED)
+endif()
+
+target_include_directories(
+	${TARGET_NAME}
+	PUBLIC
+		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+	PRIVATE
+		${LZ4_INCLUDE_DIRS}
+		${SOURCE_DIR}
+)
+
+target_link_directories(
+	${TARGET_NAME}
+	PRIVATE
+		${LZ4_LIBRARY_DIRS}
+)
 
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
+		${LZ4_LIBRARIES}
 		Boost::filesystem
 		Boost::nowide
-		lz4::lz4
 		ZLIB::ZLIB
 	PUBLIC
 		Boost::container
