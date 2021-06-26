@@ -1,4 +1,8 @@
 if(NOT TARGET bsa_common)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set(CMAKE_CXX_EXTENSIONS OFF)
+	endif()
+
 	add_library(bsa_common INTERFACE)
 	add_library(bsa::common ALIAS bsa_common)
 

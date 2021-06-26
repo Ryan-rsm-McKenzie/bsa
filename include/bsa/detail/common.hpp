@@ -11,10 +11,8 @@
 #include <string>
 #include <type_traits>
 
-#pragma warning(push)
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
-#pragma warning(pop)
 
 #define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
 	[[nodiscard]] constexpr a_type operator a_op(a_type a_lhs, a_type a_rhs) noexcept \

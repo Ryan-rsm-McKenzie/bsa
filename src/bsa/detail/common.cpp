@@ -3,10 +3,8 @@
 #include <cassert>
 #include <exception>
 
-#pragma warning(push)
 #include <boost/filesystem/path.hpp>
 #include <boost/nowide/cstdio.hpp>
-#pragma warning(pop)
 
 namespace bsa::detail
 {

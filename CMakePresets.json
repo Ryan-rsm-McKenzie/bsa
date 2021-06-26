@@ -59,6 +59,19 @@
       "name": "windows"
     },
     {
+      "environment": {
+        "CXXFLAGS": "-pedantic -pedantic-errors -Wall -Werror -Wextra $penv{CXXFLAGS}"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux"
+        }
+      },
+      "hidden": true,
+      "name": "linux"
+    },
+    {
       "description": "VS2019/Windows/VCPkg",
       "inherits": [
         "cmake-dev",
@@ -78,6 +91,16 @@
         "windows"
       ],
       "name": "ninja-windows-vcpkg"
+    },
+    {
+      "description": "Ninja/Windows/VCPkg",
+      "generator": "Ninja",
+      "inherits": [
+        "cmake-dev",
+        "linux",
+        "vcpkg"
+      ],
+      "name": "ninja-linux-vcpkg"
     }
   ],
   "version": 2

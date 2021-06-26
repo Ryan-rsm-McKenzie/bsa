@@ -13,14 +13,9 @@
 #include <utility>
 #include <vector>
 
-#pragma warning(push)
-#pragma warning(disable: 4701)  // Potentially uninitialized local variable 'name' used
-#pragma warning(disable: 4702)  // unreachable code
-#pragma warning(disable: 4244)  // 'argument' : conversion from 'type1' to 'type2', possible loss of data
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
-#pragma warning(pop)
 
 namespace bsa::tes4
 {
@@ -126,7 +121,7 @@ namespace bsa::tes4
 			[[nodiscard]] auto directories_offset() const noexcept
 				-> std::size_t { return _directoriesOffset; }
 			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
-			[[nodiscard]] auto version() const noexcept -> std::size_t { return _version; }
+			[[nodiscard]] auto archive_version() const noexcept -> std::size_t { return _version; }
 
 			[[nodiscard]] auto directory_count() const noexcept
 				-> std::size_t { return _directory.count; }
@@ -166,7 +161,7 @@ namespace bsa::tes4
 			{
 				_endian =
 					xbox_archive() ?
-						std::endian::big :
+                        std::endian::big :
                         std::endian::little;
 			}
 
@@ -203,7 +198,7 @@ namespace bsa::tes4
 					default:
 						declare_unreachable();
 					}
-				}(a_header.version());
+				}(a_header.archive_version());
 
 				return offsetof_directory_entries(a_header) +
 				       dirsz * a_header.directory_count();
@@ -215,8 +210,8 @@ namespace bsa::tes4
 			{
 				const auto dirStrSz =
 					a_header.directory_strings() ?
-						// include prefixed byte length
-						a_header.directory_names_length() + a_header.directory_count() :
+                        // include prefixed byte length
+                        a_header.directory_names_length() + a_header.directory_count() :
                         0;
 
 				return offsetof_file_entries(a_header) +
@@ -271,7 +266,7 @@ namespace bsa::tes4
 				return lut[static_cast<std::size_t>(a_ch)];
 			}
 
-			[[nodiscard]] void normalize_directory(std::string& a_path) noexcept
+			void normalize_directory(std::string& a_path) noexcept
 			{
 				for (auto& c : a_path) {
 					c = mapchar(c);
@@ -563,7 +558,11 @@ namespace bsa::tes4
 				const std::byte* inptr = in.data();
 				std::size_t outsz = 0;
 				std::byte* outptr = out.data();
-				const ::LZ4F_decompressOptions_t options{ true };
+				const auto options = []() {
+					::LZ4F_decompressOptions_t options = {};
+					options.stableDst = true;
+					return options;
+				}();
 				std::size_t result = 0;
 				do {
 					inptr += insz;
@@ -662,7 +661,7 @@ namespace bsa::tes4
 
 		const bool compressed =
 			a_size & icompression ?
-				!a_header.compressed() :
+                !a_header.compressed() :
                 a_header.compressed();
 		if (compressed) {
 			std::uint32_t size = 0;
@@ -875,7 +874,7 @@ namespace bsa::tes4
 			read_file_names(in, header);
 		}
 
-		return { static_cast<version>(header.version()) };
+		return { static_cast<version>(header.archive_version()) };
 	}
 
 	[[nodiscard]] bool archive::verify_offsets(version a_version) const noexcept
@@ -977,7 +976,7 @@ namespace bsa::tes4
 		a_in >> count;
 
 		std::uint32_t offset = 0;
-		switch (a_header.version()) {
+		switch (a_header.archive_version()) {
 		case 103:
 		case 104:
 			a_in >> offset;
@@ -1010,7 +1009,7 @@ namespace bsa::tes4
 			dir.hash().write(a_out, a_header.endian());
 			a_out << static_cast<std::uint32_t>(dir.size());
 
-			switch (a_header.version()) {
+			switch (a_header.archive_version()) {
 			case 103:
 			case 104:
 				a_out << offset;

@@ -14,10 +14,8 @@
 #include <variant>
 #include <vector>
 
-#pragma warning(push)
 #include <boost/container/flat_set.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
-#pragma warning(pop)
 
 #include "bsa/detail/common.hpp"
 #include "bsa/fwd.hpp"
@@ -103,8 +101,8 @@ namespace bsa::tes4
 			}
 
 		protected:
-			friend class archive;
-			friend class directory;
+			friend class tes4::archive;
+			friend class tes4::directory;
 
 			void read(
 				detail::istream_t& a_in,

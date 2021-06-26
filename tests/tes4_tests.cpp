@@ -9,26 +9,16 @@
 #include <string_view>
 #include <vector>
 
-#pragma warning(push)
-#include <catch2/catch.hpp>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/nowide/cstdio.hpp>
-#pragma warning(pop)
+
+#include <catch2/catch.hpp>
 
 using namespace std::literals;
 
 namespace
 {
-	[[nodiscard]] auto fopen_path(std::filesystem::path a_path, const char* a_mode) noexcept
-		-> std::FILE*
-	{
-		return boost::nowide::fopen(
-			reinterpret_cast<const char*>(a_path.u8string().data()),
-			a_mode);
-	};
-
 	[[nodiscard]] auto hash_directory(std::string_view a_path) noexcept
 		-> bsa::tes4::hashing::hash
 	{
