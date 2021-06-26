@@ -6,6 +6,8 @@ if(NOT TARGET bsa_common)
 	add_library(bsa_common INTERFACE)
 	add_library(bsa::common ALIAS bsa_common)
 
+	include(GNUInstallDirs)
+
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		target_compile_options(
 			bsa_common

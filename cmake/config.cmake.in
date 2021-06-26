@@ -2,9 +2,15 @@ include("${CMAKE_CURRENT_LIST_DIR}/bsa_common-targets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/@TARGET_NAME@-targets.cmake")
 include(CMakeFindDependencyMacro)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
 find_dependency(Boost
 	MODULE
 	COMPONENTS
 		container
+		filesystem
 		iostreams
+		nowide
 )
+find_dependency(LZ4 MODULE)
+find_dependency(ZLIB MODULE)

@@ -101,7 +101,9 @@ configure_file(
 )
 
 install(
-	FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}Config.cmake
+	FILES
+		${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}Config.cmake
+		${ROOT_DIR}/cmake/FindLZ4.cmake
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
 )
 
