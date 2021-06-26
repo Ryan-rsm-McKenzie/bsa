@@ -71,9 +71,7 @@ namespace bsa::detail
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
-#if BOOST_COMP_GNUC
-		__builtin_unreachable();
-#elif BOOST_COMP_CLANG
+#if BOOST_COMP_GNUC || BOOST_COMP_CLANG
 		__builtin_unreachable();
 #elif BOOST_COMP_MSVC || BOOST_COMP_EDG
 		__assume(false);
