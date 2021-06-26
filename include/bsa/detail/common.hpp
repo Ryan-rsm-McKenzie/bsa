@@ -94,7 +94,6 @@ namespace bsa::detail
 		using stream_type = boost::iostreams::mapped_file_source;
 
 		istream_t(std::filesystem::path a_path) noexcept;
-
 		istream_t(const istream_t&) = delete;
 		istream_t(istream_t&&) = delete;
 		~istream_t() noexcept = default;
