@@ -59,10 +59,15 @@
       "name": "windows"
     },
     {
-      "environment": {
-        "CXXFLAGS": "-pedantic -pedantic-errors -Wall -Werror -Wextra $penv{CXXFLAGS}"
-      },
       "cacheVariables": {
+        "CMAKE_CXX_FLAGS": {
+          "type": "STRING",
+          "value": "-pedantic -pedantic-errors -Wall -Werror -Wextra"
+        },
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
           "value": "x64-linux"
