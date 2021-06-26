@@ -630,8 +630,7 @@ namespace bsa::tes4
 		bool erase(hashing::hash a_hash) noexcept;
 
 		template <detail::concepts::stringable String>
-		auto erase(String&& a_path) noexcept
-			-> bool
+		bool erase(String&& a_path) noexcept
 		{
 			std::string path(std::forward<String>(a_path));
 			return erase(hashing::hash_directory(path));
