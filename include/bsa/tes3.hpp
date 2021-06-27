@@ -85,7 +85,11 @@ namespace bsa::tes3
 		{}
 
 		template <detail::concepts::stringable String>
-		explicit file(String&& a_path) noexcept;
+		explicit file(String&& a_path) noexcept
+		{
+			_name.emplace<name_owner>(std::forward<String>(a_path));
+			_hash = hashing::hash_file(*std::get_if<name_owner>(&_name));
+		}
 
 		file(const file&) noexcept = default;
 		file(file&& a_rhs) noexcept :
