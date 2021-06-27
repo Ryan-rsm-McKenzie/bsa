@@ -146,6 +146,7 @@ namespace bsa::tes3
 		file& operator=(file&&) noexcept = default;
 
 		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
+		void clear() noexcept { _data.emplace<data_view>(); }
 		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
 		[[nodiscard]] auto filename() const noexcept -> std::string_view;
