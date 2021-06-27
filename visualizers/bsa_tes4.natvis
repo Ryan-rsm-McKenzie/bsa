@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-
-	<Type Name="bsa::tes4::archive::index_t">
-		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
-		<DisplayString Condition="empty()">none</DisplayString>
-		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
-		<Expand>
-			<Item Name="[directory]">_proxy,na</Item>
-		</Expand>
-	</Type>
 	
 	<Type Name="bsa::tes4::archive">
 		<DisplayString>tes4 archive</DisplayString>
@@ -19,45 +10,12 @@
 		</Expand>
 	</Type>
 
-	<Type Name="bsa::tes4::directory::index_t">
-		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
-		<DisplayString Condition="empty()">none</DisplayString>
-		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
-		<Expand>
-			<Item Name="[file]">_proxy,na</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes4::directory::name_proxy">
-		<DisplayString>{ n }</DisplayString>
-		<Expand>
-			<Item Name="[name]">n</Item>
-			<Item Name="[proxy]">f</Item>
-		</Expand>
-	</Type>
-
 	<Type Name="bsa::tes4::directory">
 		<DisplayString>{ _name,na }</DisplayString>
 		<Expand>
 			<Item Name="[hash]">_hash</Item>
 			<Item Name="[name]">_name,na</Item>
 			<Item Name="[files]">_files,na</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes4::file::name_proxy">
-		<DisplayString>{ n }</DisplayString>
-		<Expand>
-			<Item Name="[name]">n</Item>
-			<Item Name="[proxy]">f</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes4::file::data_proxy">
-		<DisplayString>{ d }</DisplayString>
-		<Expand>
-			<Item Name="[data]">d</Item>
-			<Item Name="[proxy]">f</Item>
 		</Expand>
 	</Type>
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="bsa::detail::index_t">
+		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
+		<DisplayString Condition="empty()">none</DisplayString>
+		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
+		<Expand>
+			<Item Name="[proxy]">_proxy,na</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bsa::detail::istream_proxy">
+		<DisplayString>{ d }</DisplayString>
+		<Expand>
+			<Item Name="[data]">d</Item>
+			<Item Name="[proxy]">f</Item>
+		</Expand>
+	</Type>
+	
+</AutoVisualizer>

@@ -17,6 +17,7 @@ set(SOURCE_FILES
 
 set(NATVIS_DIR ${ROOT_DIR}/visualizers)
 set(NATVIS_FILES
+	${NATVIS_DIR}/bsa_common.natvis
 	${NATVIS_DIR}/bsa_tes3.natvis
 	${NATVIS_DIR}/bsa_tes4.natvis
 )
