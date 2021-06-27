@@ -10,6 +10,9 @@ namespace bsa
 		class ostream_t;
 		class restore_point;
 
+		template <class, bool>
+		class index_t;
+
 		template <class T>
 		struct istream_proxy;
 
@@ -22,9 +25,6 @@ namespace bsa
 		namespace detail
 		{
 			class header_t;
-
-			template <class, bool>
-			class index_t;
 		}
 
 		namespace hashing

@@ -119,51 +119,6 @@ namespace bsa::tes4
 
 	namespace detail
 	{
-		template <class T, bool RECURSE>
-		class index_t final
-		{
-		public:
-			using value_type = T;
-			using pointer = T*;
-			using reference = T&;
-
-			index_t() noexcept = default;
-
-			[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept  //
-				requires(RECURSE)
-			{
-				return (**this)[a_hash];
-			}
-
-			template <concepts::stringable String>
-			[[nodiscard]] auto operator[](String&& a_path) const noexcept  //
-				requires(RECURSE)
-			{
-				return (**this)[std::forward<String>(a_path)];
-			}
-
-			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
-
-			[[nodiscard]] auto operator*() const noexcept -> reference
-			{
-				assert(*this);
-				return *_proxy;
-			}
-
-			[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
-
-		protected:
-			friend class tes4::archive;
-			friend class tes4::directory;
-
-			explicit index_t(reference a_value) noexcept :
-				_proxy(&a_value)
-			{}
-
-		private:
-			pointer _proxy{ nullptr };
-		};
-
 		template <class T>
 		using key_compare_t = bsa::detail::key_compare_t<T, hashing::hash>;
 	}
