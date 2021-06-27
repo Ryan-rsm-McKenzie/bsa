@@ -210,8 +210,16 @@ namespace bsa::tes3
 			}
 		}
 
-		void set_data(std::span<const std::byte> a_data) noexcept;
-		void set_data(std::vector<std::byte> a_data) noexcept;
+		void set_data(std::span<const std::byte> a_data) noexcept
+		{
+			_data.emplace<data_view>(a_data);
+		}
+
+		void set_data(std::vector<std::byte> a_data) noexcept
+		{
+			_data.emplace<data_owner>(std::move(a_data));
+		}
+
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
 	protected:
