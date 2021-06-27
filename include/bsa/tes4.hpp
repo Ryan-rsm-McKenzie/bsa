@@ -365,6 +365,15 @@ namespace bsa::tes4
 
 		[[nodiscard]] bool empty() const noexcept { return _files.empty(); }
 
+		bool erase(hashing::hash a_hash) noexcept;
+
+		template <detail::concepts::stringable String>
+		bool erase(String&& a_path) noexcept
+		{
+			std::string path(std::forward<String>(a_path));
+			return erase(hashing::hash_file(path));
+		}
+
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
 			-> iterator { return _files.find(a_hash); }
 

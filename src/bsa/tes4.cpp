@@ -647,6 +647,17 @@ namespace bsa::tes4
 		a_out << std::byte{ '\0' };
 	}
 
+	bool directory::erase(hashing::hash a_hash) noexcept
+	{
+		const auto it = _files.find(a_hash);
+		if (it != _files.end()) {
+			_files.erase(it);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	auto directory::name() const noexcept
 		-> std::string_view
 	{
