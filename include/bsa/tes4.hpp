@@ -234,7 +234,7 @@ namespace bsa::tes4
 
 		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
 
-		[[nodiscard]] auto data() const noexcept -> const std::byte*;
+		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
 
 		bool decompress(version a_version) noexcept;
 
@@ -263,7 +263,7 @@ namespace bsa::tes4
 			_decompsz = a_decompressedSize;
 		}
 
-		[[nodiscard]] auto size() const noexcept -> std::size_t;
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
 	protected:
 		friend class directory;

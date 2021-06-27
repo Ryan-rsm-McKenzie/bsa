@@ -499,21 +499,6 @@ namespace bsa::tes4
 		return true;
 	}
 
-	auto file::data() const noexcept
-		-> const std::byte*
-	{
-		switch (_data.index()) {
-		case data_view:
-			return std::get_if<data_view>(&_data)->data();
-		case data_owner:
-			return std::get_if<data_owner>(&_data)->data();
-		case data_proxied:
-			return std::get_if<data_proxied>(&_data)->d.data();
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
 	bool file::decompress(version a_version) noexcept
 	{
 		assert(compressed());
@@ -603,21 +588,6 @@ namespace bsa::tes4
 			return *std::get_if<name_owner>(&_name);
 		case name_proxied:
 			return std::get_if<name_proxied>(&_name)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	auto file::size() const noexcept
-		-> std::size_t
-	{
-		switch (_data.index()) {
-		case data_view:
-			return std::get_if<data_view>(&_data)->size();
-		case data_owner:
-			return std::get_if<data_owner>(&_data)->size();
-		case data_proxied:
-			return std::get_if<data_proxied>(&_data)->d.size();
 		default:
 			detail::declare_unreachable();
 		}
