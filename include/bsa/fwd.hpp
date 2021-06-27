@@ -16,7 +16,7 @@ namespace bsa
 		template <class T>
 		struct istream_proxy;
 
-		template <class>
+		template <class, class>
 		struct key_compare_t;
 	}
 
