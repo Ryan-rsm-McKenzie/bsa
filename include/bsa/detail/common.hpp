@@ -90,7 +90,7 @@ namespace bsa::detail
 		return static_cast<std::underlying_type_t<Enum>>(a_val);
 	}
 
-	template <class T, bool RECURSE>
+	template <class T, bool RECURSE, class Hash>
 	class index_t final
 	{
 	public:
@@ -100,7 +100,7 @@ namespace bsa::detail
 
 		index_t() noexcept = default;
 
-		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept  //
+		[[nodiscard]] auto operator[](Hash a_hash) const noexcept  //
 			requires(RECURSE)
 		{
 			return (**this)[a_hash];

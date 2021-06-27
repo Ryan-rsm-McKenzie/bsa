@@ -10,7 +10,7 @@ namespace bsa
 		class ostream_t;
 		class restore_point;
 
-		template <class, bool>
+		template <class, bool, class>
 		class index_t;
 
 		template <class T>

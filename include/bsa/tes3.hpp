@@ -123,6 +123,12 @@ namespace bsa::tes3
 		};
 	}
 
+	namespace detail
+	{
+		template <class T>
+		using index_t = bsa::detail::index_t<T, false, hashing::hash>;
+	}
+
 	class file final
 	{
 	public:
@@ -262,8 +268,8 @@ namespace bsa::tes3
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
 
-		using index = detail::index_t<value_type, false>;
-		using const_index = detail::index_t<const value_type, false>;
+		using index = detail::index_t<value_type>;
+		using const_index = detail::index_t<const value_type>;
 
 		archive() noexcept = default;
 		archive(const archive&) noexcept = default;

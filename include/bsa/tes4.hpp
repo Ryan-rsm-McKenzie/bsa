@@ -117,6 +117,9 @@ namespace bsa::tes4
 
 	namespace detail
 	{
+		template <class T, bool RECURSE>
+		using index_t = bsa::detail::index_t<T, RECURSE, hashing::hash>;
+
 		template <class T>
 		using key_compare_t = bsa::detail::key_compare_t<T, hashing::hash>;
 	}
