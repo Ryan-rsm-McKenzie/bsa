@@ -14,7 +14,6 @@
 #include <boost/container/flat_set.hpp>
 
 #include "bsa/detail/common.hpp"
-#include "bsa/fwd.hpp"
 
 namespace bsa::tes3
 {
