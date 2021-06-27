@@ -411,7 +411,7 @@ namespace bsa::tes3
 			-> iterator
 		{
 			std::string path(std::forward<String>(a_path));
-			return find(hashing::hash_file(path);
+			return find(hashing::hash_file(path));
 		}
 
 		template <detail::concepts::stringable String>
@@ -419,7 +419,7 @@ namespace bsa::tes3
 			-> const_iterator
 		{
 			std::string path(std::forward<String>(a_path));
-			return find(hashing::hash_file(path);
+			return find(hashing::hash_file(path));
 		}
 
 		auto insert(file a_file) noexcept
