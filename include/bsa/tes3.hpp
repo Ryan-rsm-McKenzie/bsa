@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstddef>
 #include <cstdint>
 #include <variant>
@@ -74,6 +75,40 @@ namespace bsa::tes3
 		public:
 			std::uint32_t lo{ 0 };
 			std::uint32_t hi{ 0 };
+
+			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
+
+			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
+				-> std::strong_ordering
+			{
+				return a_lhs.lo != a_rhs.lo ?
+                           a_lhs.lo <=> a_rhs.lo :
+                           a_lhs.hi <=> a_rhs.hi;
+			}
+
+		protected:
+			friend tes3::archive;
+			friend tes3::file;
+
+			friend detail::istream_t& operator>>(
+				detail::istream_t& a_in,
+				hash& a_hash) noexcept
+			{
+				a_in >>
+					a_hash.lo >>
+					a_hash.hi;
+				return a_in;
+			}
+
+			friend detail::ostream_t& operator<<(
+				detail::ostream_t& a_out,
+				const hash& a_hash) noexcept
+			{
+				a_out
+					<< a_hash.lo
+					<< a_hash.hi;
+				return a_out;
+			}
 		};
 	}
 
