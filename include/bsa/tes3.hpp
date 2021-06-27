@@ -352,10 +352,23 @@ namespace bsa::tes3
 
 		[[nodiscard]] bool empty() const noexcept { return _files.empty(); }
 
-		bool erase(hashing::hash a_hash) noexcept;
+		bool erase(hashing::hash a_hash) noexcept
+		{
+			const auto it = _files.find(a_hash);
+			if (it != _files.end()) {
+				_files.erase(it);
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 		template <detail::concepts::stringable String>
-		bool erase(String&& a_path) noexcept;
+		bool erase(String&& a_path) noexcept
+		{
+			std::string path(std::forward<String>(a_path));
+			return erase(hashing::hash_file(path));
+		}
 
 		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
 			-> iterator { return _files.find(a_hash); }
