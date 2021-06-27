@@ -199,6 +199,7 @@ namespace bsa::tes3
 
 		void read(
 			detail::istream_t& a_in,
+			std::size_t a_nameOffset,
 			std::size_t a_dataOffset) noexcept
 		{
 			std::uint32_t size = 0;
@@ -206,22 +207,14 @@ namespace bsa::tes3
 			a_in >> size >> offset;
 
 			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_dataOffset + offset);
-			_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
-		}
 
-		void read_name(
-			detail::istream_t& a_in,
-			std::size_t a_namesOffset) noexcept
-		{
-			std::uint32_t offset = 0;
-			a_in >> offset;
-
-			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_namesOffset + offset);
+			a_in.seek_absolute(a_nameOffset);
 			_name.emplace<name_proxied>(
 				reinterpret_cast<const char*>(a_in.read_bytes(1).data()),  // zstring
 				a_in.rdbuf());
+
+			a_in.seek_absolute(a_dataOffset + offset);
+			_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
 		}
 
 	private:
@@ -282,7 +275,7 @@ namespace bsa::tes3
 		}
 
 		[[nodiscard]] inline auto offsetof_hashes(const detail::header_t& a_header) noexcept
-			-> std::size_t { return a_header.hash_offset() - constants::header_size; }
+			-> std::size_t { return a_header.hash_offset() + constants::header_size; }
 
 		[[nodiscard]] inline auto offsetof_file_data(const detail::header_t& a_header) noexcept
 			-> std::size_t
@@ -373,15 +366,16 @@ namespace bsa::tes3
 
 			clear();
 
-			const auto dataOffset = detail::offsetof_file_data(header);
+			const offsets_t offsets{
+				detail::offsetof_hashes(header),
+				detail::offsetof_name_offsets(header),
+				detail::offsetof_names(header),
+				detail::offsetof_file_data(header)
+			};
+
 			_files.reserve(header.file_count());
 			for (std::size_t i = 0; i < header.file_count(); ++i) {
-				read_file(in, header, i, dataOffset);
-			}
-
-			const auto nameOffset = detail::offsetof_names(header);
-			for (auto& file : _files) {
-				file.read_name(in, nameOffset);
+				read_file(in, offsets, i);
 			}
 
 			return true;
@@ -394,25 +388,43 @@ namespace bsa::tes3
 		bool write(std::filesystem::path a_path) const noexcept;
 
 	private:
+		struct offsets_t final
+		{
+			std::size_t hashes{ 0 };
+			std::size_t nameOffsets{ 0 };
+			std::size_t names{ 0 };
+			std::size_t fileData{ 0 };
+		};
+
 		void read_file(
 			detail::istream_t& a_in,
-			const detail::header_t& a_header,
-			std::size_t a_idx,
-			std::size_t a_dataOffset) noexcept
+			const offsets_t& a_offsets,
+			std::size_t a_idx) noexcept
 		{
 			const auto hash = [&]() noexcept {
 				const detail::restore_point _{ a_in };
-				a_in.seek_absolute(detail::offsetof_hashes(a_header));
+				a_in.seek_absolute(a_offsets.hashes);
 				a_in.seek_relative(detail::constants::hash_size * a_idx);
 				hashing::hash h;
 				a_in >> h;
 				return h;
 			}();
+			const auto nameOffset = [&]() noexcept {
+				const detail::restore_point _{ a_in };
+				a_in.seek_absolute(a_offsets.nameOffsets);
+				a_in.seek_relative(4u * a_idx);
+				std::uint32_t result = 0;
+				a_in >> result;
+				return result;
+			}();
 
 			[[maybe_unused]] const auto [it, success] = _files.emplace(hash);
 			assert(success);
 
-			it->read(a_in, a_dataOffset);
+			it->read(
+				a_in,
+				nameOffset + a_offsets.names,
+				a_offsets.fileData);
 		}
 
 		container_type _files;
