@@ -260,7 +260,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 	{
 		const auto testArchive = [](std::string_view a_name) {
-			const std::filesystem::path root{ "compression_test"sv };
+			const std::filesystem::path root{ "tes4_compression_test"sv };
 
 			bsa::tes4::archive bsa;
 			const auto version = bsa.read(root / a_name);
@@ -309,7 +309,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 	SECTION("files can be compressed independently of the archive's compression")
 	{
-		const std::filesystem::path root{ "compression_mismatch_test"sv };
+		const std::filesystem::path root{ "tes4_compression_mismatch_test"sv };
 
 		bsa::tes4::archive bsa;
 		REQUIRE(bsa.read(root / "test.bsa"sv));
