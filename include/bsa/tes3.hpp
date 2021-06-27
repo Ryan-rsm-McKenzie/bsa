@@ -169,7 +169,27 @@ namespace bsa::tes3
 			return *this;
 		}
 
-		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
+		[[nodiscard]] auto as_bytes() const noexcept
+			-> std::span<const std::byte>
+		{
+			switch (_data.index()) {
+			case data_view:
+				return *std::get_if<data_view>(&_data);
+			case data_owner:
+				{
+					const auto& owner = *std::get_if<data_owner>(&_data);
+					return {
+						owner.data(),
+						owner.size()
+					};
+				}
+			case data_proxied:
+				return std::get_if<data_proxied>(&_data)->d;
+			default:
+				detail::declare_unreachable();
+			}
+		}
+
 		void clear() noexcept { _data.emplace<data_view>(); }
 		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
