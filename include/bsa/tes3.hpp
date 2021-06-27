@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <compare>
 #include <cstddef>
 #include <cstdint>
@@ -23,6 +24,8 @@ namespace bsa::tes3
 
 		namespace constants
 		{
+			inline constexpr std::size_t file_entry_size = 0x8;
+			inline constexpr std::size_t hash_size = 0x8;
 			inline constexpr std::size_t header_size = 0xC;
 		}
 
@@ -97,7 +100,6 @@ namespace bsa::tes3
 
 		protected:
 			friend tes3::archive;
-			friend tes3::file;
 
 			friend detail::istream_t& operator>>(
 				detail::istream_t& a_in,
@@ -146,6 +148,36 @@ namespace bsa::tes3
 		void set_data(std::vector<std::byte> a_data) noexcept;
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
+	protected:
+		friend archive;
+
+		void read(
+			detail::istream_t& a_in,
+			std::size_t a_dataOffset) noexcept
+		{
+			std::uint32_t size = 0;
+			std::uint32_t offset = 0;
+			a_in >> size >> offset;
+
+			const detail::restore_point _{ a_in };
+			a_in.seek_absolute(a_dataOffset + offset);
+			_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
+		}
+
+		void read_filename(
+			detail::istream_t& a_in,
+			std::size_t a_namesOffset) noexcept
+		{
+			std::uint32_t offset = 0;
+			a_in >> offset;
+
+			const detail::restore_point _{ a_in };
+			a_in.seek_absolute(a_namesOffset + offset);
+			_name.emplace<name_proxied>(
+				reinterpret_cast<const char*>(a_in.read_bytes(1).data()),  // zstring
+				a_in.rdbuf());
+		}
+
 	private:
 		enum : std::size_t
 		{
@@ -183,6 +215,36 @@ namespace bsa::tes3
 		static_assert(name_count == std::variant_size_v<decltype(_name)>);
 		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
+
+	namespace detail
+	{
+		[[nodiscard]] auto offsetof_file_entries(const detail::header_t&) noexcept
+			-> std::size_t { return constants::header_size; }
+
+		[[nodiscard]] auto offsetof_name_offsets(const detail::header_t& a_header) noexcept
+			-> std::size_t
+		{
+			return offsetof_file_entries(a_header) +
+			       a_header.file_count() * constants::file_entry_size;
+		}
+
+		[[nodiscard]] auto offsetof_names(const detail::header_t& a_header) noexcept
+			-> std::size_t
+		{
+			return offsetof_name_offsets(a_header) +
+			       a_header.file_count() * 4u;
+		}
+
+		[[nodiscard]] auto offsetof_hashes(const detail::header_t& a_header) noexcept
+			-> std::size_t { return a_header.hash_offset() - constants::header_size; }
+
+		[[nodiscard]] auto offsetof_file_data(const detail::header_t& a_header) noexcept
+			-> std::size_t
+		{
+			return offsetof_hashes(a_header) +
+			       a_header.file_count() * constants::hash_size;
+		}
+	}
 
 	class archive final
 	{
@@ -247,7 +309,35 @@ namespace bsa::tes3
 
 		auto insert(file a_file) noexcept -> std::pair<iterator, bool>;
 
-		bool read(std::filesystem::path a_path) noexcept;
+		bool read(std::filesystem::path a_path) noexcept
+		{
+			detail::istream_t in{ std::move(a_path) };
+			if (!in.is_open()) {
+				return false;
+			}
+
+			const auto header = [&]() noexcept {
+				detail::header_t header;
+				in >> header;
+				return header;
+			}();
+			if (!header.good()) {
+				return false;
+			}
+
+			clear();
+
+			const auto dataOffset = detail::offsetof_file_data(header);
+			_files.reserve(header.file_count());
+			for (std::size_t i = 0; i < header.file_count(); ++i) {
+				read_file(in, header, i, dataOffset);
+			}
+
+			const auto nameOffset = detail::offsetof_names(header);
+			for (auto& file : _files) {
+				file.read_filename(in, nameOffset);
+			}
+		}
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
 
@@ -256,6 +346,27 @@ namespace bsa::tes3
 		bool write(std::filesystem::path a_path) const noexcept;
 
 	private:
+		void read_file(
+			detail::istream_t& a_in,
+			const detail::header_t& a_header,
+			std::size_t a_idx,
+			std::size_t a_dataOffset) noexcept
+		{
+			const auto hash = [&]() noexcept {
+				const detail::restore_point _{ a_in };
+				a_in.seek_absolute(detail::offsetof_hashes(a_header));
+				a_in.seek_relative(detail::constants::hash_size * a_idx);
+				hashing::hash h;
+				a_in >> h;
+				return h;
+			}();
+
+			[[maybe_unused]] const auto [it, success] = _files.emplace(hash);
+			assert(success);
+
+			it->read(a_in, a_dataOffset);
+		}
+
 		container_type _files;
 	};
 }
