@@ -468,20 +468,7 @@ namespace bsa::tes3
 				return false;
 			}
 
-			[&]() noexcept {
-				std::size_t offset =
-					(detail::constants::file_entry_size + 4u) * _files.size();
-				for (const auto& file : _files) {
-					offset += file.name().length() +
-					          1u;  // include null terminator
-				}
-
-				const detail::header_t header{
-					static_cast<std::uint32_t>(offset),
-					static_cast<std::uint32_t>(_files.size())
-				};
-				out << header;
-			}();
+			out << make_header();
 
 			write_file_entries(out);
 			write_file_name_offsets(out);
@@ -500,6 +487,22 @@ namespace bsa::tes3
 			std::size_t names{ 0 };
 			std::size_t fileData{ 0 };
 		};
+
+		[[nodiscard]] auto make_header() const noexcept
+			-> detail::header_t
+		{
+			std::size_t offset =
+				(detail::constants::file_entry_size + 4u) * _files.size();
+			for (const auto& file : _files) {
+				offset += file.name().length() +
+				          1u;  // include null terminator
+			}
+
+			return {
+				static_cast<std::uint32_t>(offset),
+				static_cast<std::uint32_t>(_files.size())
+			};
+		}
 
 		void read_file(
 			detail::istream_t& a_in,
