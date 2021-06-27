@@ -173,8 +173,23 @@ namespace bsa::tes3
 		void clear() noexcept { _data.emplace<data_view>(); }
 		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
-		[[nodiscard]] auto filename() const noexcept -> std::string_view;
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
+
+		[[nodiscard]] auto name() const noexcept
+			-> std::string_view
+		{
+			switch (_name.index()) {
+			case name_null:
+				return {};
+			case name_owner:
+				return *std::get_if<name_owner>(&_name);
+			case name_proxied:
+				return std::get_if<name_proxied>(&_name)->d;
+			default:
+				detail::declare_unreachable();
+			}
+		}
+
 		void set_data(std::span<const std::byte> a_data) noexcept;
 		void set_data(std::vector<std::byte> a_data) noexcept;
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
@@ -195,7 +210,7 @@ namespace bsa::tes3
 			_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
 		}
 
-		void read_filename(
+		void read_name(
 			detail::istream_t& a_in,
 			std::size_t a_namesOffset) noexcept
 		{
@@ -366,7 +381,7 @@ namespace bsa::tes3
 
 			const auto nameOffset = detail::offsetof_names(header);
 			for (auto& file : _files) {
-				file.read_filename(in, nameOffset);
+				file.read_name(in, nameOffset);
 			}
 
 			return true;
