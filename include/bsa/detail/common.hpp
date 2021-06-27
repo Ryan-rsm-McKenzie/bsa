@@ -163,6 +163,13 @@ namespace bsa::detail
 		std::size_t _pos{ 0 };
 	};
 
+	template <class T>
+	struct istream_proxy
+	{
+		T d;
+		boost::iostreams::mapped_file_source f;
+	};
+
 	class ostream_t final
 	{
 	public:

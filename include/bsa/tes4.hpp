@@ -311,17 +311,8 @@ namespace bsa::tes4
 			data_count
 		};
 
-		struct name_proxy final
-		{
-			std::string_view n;
-			boost::iostreams::mapped_file_source f;
-		};
-
-		struct data_proxy final
-		{
-			std::span<const std::byte> d;
-			boost::iostreams::mapped_file_source f;
-		};
+		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
+		using name_proxy = detail::istream_proxy<std::string_view>;
 
 		hashing::hash _hash;
 		std::variant<
@@ -500,11 +491,7 @@ namespace bsa::tes4
 			name_count
 		};
 
-		struct name_proxy final
-		{
-			std::string_view n;
-			boost::iostreams::mapped_file_source f;
-		};
+		using name_proxy = detail::istream_proxy<std::string_view>;
 
 		hashing::hash _hash;
 		std::variant<

@@ -602,7 +602,7 @@ namespace bsa::tes4
 		case name_owner:
 			return *std::get_if<name_owner>(&_name);
 		case name_proxied:
-			return std::get_if<name_proxied>(&_name)->n;
+			return std::get_if<name_proxied>(&_name)->d;
 		default:
 			detail::declare_unreachable();
 		}
@@ -727,7 +727,7 @@ namespace bsa::tes4
 		case name_owner:
 			return *std::get_if<name_owner>(&_name);
 		case name_proxied:
-			return std::get_if<name_proxied>(&_name)->n;
+			return std::get_if<name_proxied>(&_name)->d;
 		default:
 			detail::declare_unreachable();
 		}
