@@ -9,6 +9,9 @@ namespace bsa
 		class istream_t;
 		class ostream_t;
 		class restore_point;
+
+		template <class T>
+		struct istream_proxy;
 	}
 
 	namespace tes4
