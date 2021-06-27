@@ -30,6 +30,8 @@ namespace bsa::tes3
 		class header_t final
 		{
 		public:
+			header_t() noexcept = default;
+
 			header_t(
 				std::uint32_t a_hashOffset,
 				std::uint32_t a_fileCount) noexcept :
