@@ -165,25 +165,7 @@ namespace bsa::tes4
 		};
 
 		template <class T>
-		struct key_compare_t
-		{
-			using is_transparent = int;
-
-			[[nodiscard]] auto operator()(
-				const T& a_lhs,
-				const T& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs.hash(); }
-
-			[[nodiscard]] auto operator()(
-				const T& a_lhs,
-				const hashing::hash& a_rhs) const noexcept
-				-> bool { return a_lhs.hash() < a_rhs; }
-
-			[[nodiscard]] auto operator()(
-				const hashing::hash& a_lhs,
-				const T& a_rhs) const noexcept
-				-> bool { return a_lhs < a_rhs.hash(); }
-		};
+		using key_compare_t = bsa::detail::key_compare_t<T, hashing::hash>;
 	}
 
 	class file final

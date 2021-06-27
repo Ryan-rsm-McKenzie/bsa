@@ -170,6 +170,27 @@ namespace bsa::detail
 		boost::iostreams::mapped_file_source f;
 	};
 
+	template <class Key, class Hash>
+	struct key_compare_t
+	{
+		using is_transparent = int;
+
+		[[nodiscard]] auto operator()(
+			const Key& a_lhs,
+			const Key& a_rhs) const noexcept
+			-> bool { return a_lhs.hash() < a_rhs.hash(); }
+
+		[[nodiscard]] auto operator()(
+			const Key& a_lhs,
+			const Hash& a_rhs) const noexcept
+			-> bool { return a_lhs.hash() < a_rhs; }
+
+		[[nodiscard]] auto operator()(
+			const Hash& a_lhs,
+			const Key& a_rhs) const noexcept
+			-> bool { return a_lhs < a_rhs.hash(); }
+	};
+
 	class ostream_t final
 	{
 	public:

@@ -12,6 +12,9 @@ namespace bsa
 
 		template <class T>
 		struct istream_proxy;
+
+		template <class>
+		struct key_compare_t;
 	}
 
 	namespace tes4
@@ -22,9 +25,6 @@ namespace bsa
 
 			template <class, bool>
 			class index_t;
-
-			template <class>
-			struct key_compare_t;
 		}
 
 		namespace hashing
