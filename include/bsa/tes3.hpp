@@ -132,12 +132,12 @@ namespace bsa::tes3
 	class file final
 	{
 	public:
-		file(hashing::hash a_hash) noexcept :
+		explicit file(hashing::hash a_hash) noexcept :
 			_hash(a_hash)
 		{}
 
 		template <detail::concepts::stringable String>
-		file(String&& a_path) noexcept;
+		explicit file(String&& a_path) noexcept;
 
 		file(const file&) noexcept = default;
 		file(file&& a_rhs) noexcept :
