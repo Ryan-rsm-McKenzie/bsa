@@ -19,7 +19,7 @@ namespace bsa::tes3
 			inline constexpr std::size_t header_size = 0xC;
 		}
 
-		class header_t
+		class header_t final
 		{
 		public:
 			header_t(
@@ -70,7 +70,7 @@ namespace bsa::tes3
 
 	namespace hashing
 	{
-		struct hash
+		struct hash final
 		{
 		public:
 			std::uint32_t lo{ 0 };
@@ -112,7 +112,7 @@ namespace bsa::tes3
 		};
 	}
 
-	class file
+	class file final
 	{
 	public:
 	private:
@@ -153,7 +153,7 @@ namespace bsa::tes3
 		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
-	class archive
+	class archive final
 	{
 	public:
 	private:

@@ -164,7 +164,7 @@ namespace bsa::detail
 	};
 
 	template <class T>
-	struct istream_proxy
+	struct istream_proxy final
 	{
 		T d;
 		boost::iostreams::mapped_file_source f;
