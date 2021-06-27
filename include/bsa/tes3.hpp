@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
@@ -459,7 +460,37 @@ namespace bsa::tes3
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
 
-		[[nodiscard]] bool verify_offsets() const noexcept;
+		[[nodiscard]] bool verify_offsets() const noexcept
+		{
+			offsets_t total;
+			offsets_t last;
+
+			for (const auto& file : _files) {
+				last.nameOffsets += file.name().length() +
+				                    1u;  // include null terminator
+				last.fileData += file.size();
+
+				total += last;
+			}
+
+			total.hashes =
+				detail::constants::header_size +
+				(detail::constants::file_entry_size + 4u) * _files.size() +
+				total.nameOffsets;
+			total -= last;
+
+			const std::array offsets{
+				total.nameOffsets,
+				total.hashes,
+				total.fileData
+			};
+			for (const auto offset : offsets) {
+				if (offset > std::numeric_limits<std::uint32_t>::max()) {
+					return false;
+				}
+			}
+			return true;
+		}
 
 		bool write(std::filesystem::path a_path) const noexcept
 		{
@@ -486,6 +517,28 @@ namespace bsa::tes3
 			std::size_t nameOffsets{ 0 };
 			std::size_t names{ 0 };
 			std::size_t fileData{ 0 };
+
+			friend offsets_t& operator+=(
+				offsets_t& a_lhs,
+				const offsets_t& a_rhs) noexcept
+			{
+				a_lhs.hashes += a_rhs.hashes;
+				a_lhs.nameOffsets += a_rhs.nameOffsets;
+				a_lhs.names += a_rhs.names;
+				a_lhs.fileData += a_rhs.fileData;
+				return a_lhs;
+			}
+
+			friend offsets_t& operator-=(
+				offsets_t& a_lhs,
+				const offsets_t& a_rhs) noexcept
+			{
+				a_lhs.hashes -= a_rhs.hashes;
+				a_lhs.nameOffsets -= a_rhs.nameOffsets;
+				a_lhs.names -= a_rhs.names;
+				a_lhs.fileData -= a_rhs.fileData;
+				return a_lhs;
+			}
 		};
 
 		[[nodiscard]] auto make_header() const noexcept
