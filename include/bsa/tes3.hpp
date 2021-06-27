@@ -264,27 +264,27 @@ namespace bsa::tes3
 
 	namespace detail
 	{
-		[[nodiscard]] auto offsetof_file_entries(const detail::header_t&) noexcept
+		[[nodiscard]] inline auto offsetof_file_entries(const detail::header_t&) noexcept
 			-> std::size_t { return constants::header_size; }
 
-		[[nodiscard]] auto offsetof_name_offsets(const detail::header_t& a_header) noexcept
+		[[nodiscard]] inline auto offsetof_name_offsets(const detail::header_t& a_header) noexcept
 			-> std::size_t
 		{
 			return offsetof_file_entries(a_header) +
 			       a_header.file_count() * constants::file_entry_size;
 		}
 
-		[[nodiscard]] auto offsetof_names(const detail::header_t& a_header) noexcept
+		[[nodiscard]] inline auto offsetof_names(const detail::header_t& a_header) noexcept
 			-> std::size_t
 		{
 			return offsetof_name_offsets(a_header) +
 			       a_header.file_count() * 4u;
 		}
 
-		[[nodiscard]] auto offsetof_hashes(const detail::header_t& a_header) noexcept
+		[[nodiscard]] inline auto offsetof_hashes(const detail::header_t& a_header) noexcept
 			-> std::size_t { return a_header.hash_offset() - constants::header_size; }
 
-		[[nodiscard]] auto offsetof_file_data(const detail::header_t& a_header) noexcept
+		[[nodiscard]] inline auto offsetof_file_data(const detail::header_t& a_header) noexcept
 			-> std::size_t
 		{
 			return offsetof_hashes(a_header) +
