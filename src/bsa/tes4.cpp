@@ -244,47 +244,6 @@ namespace bsa::tes4
 				return crc;
 			}
 
-			[[nodiscard]] auto mapchar(char a_ch) noexcept
-				-> char
-			{
-				constexpr auto lut = []() noexcept {
-					std::array<char, std::numeric_limits<unsigned char>::max() + 1> map{};
-					for (std::size_t i = 0; i < map.size(); ++i) {
-						map[i] = static_cast<char>(i);
-					}
-
-					map[static_cast<std::size_t>('/')] = '\\';
-
-					constexpr auto offset = char{ 'a' - 'A' };
-					for (std::size_t i = 'A'; i <= 'Z'; ++i) {
-						map[i] = static_cast<char>(i) + offset;
-					}
-
-					return map;
-				}();
-
-				return lut[static_cast<std::size_t>(a_ch)];
-			}
-
-			void normalize_directory(std::string& a_path) noexcept
-			{
-				for (auto& c : a_path) {
-					c = mapchar(c);
-				}
-
-				while (!a_path.empty() && a_path.back() == '\\') {
-					a_path.pop_back();
-				}
-
-				while (!a_path.empty() && a_path.front() == '\\') {
-					a_path.erase(a_path.begin());
-				}
-
-				if (a_path.empty() || a_path.size() >= 260) {
-					a_path = '.';
-				}
-			}
-
 			[[nodiscard]] constexpr auto make_file_extension(std::string_view a_extension) noexcept
 				-> std::uint32_t
 			{

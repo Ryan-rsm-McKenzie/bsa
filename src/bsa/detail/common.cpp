@@ -1,13 +1,60 @@
 #include "bsa/detail/common.hpp"
 
+#include <array>
 #include <cassert>
+#include <cstddef>
 #include <exception>
+#include <limits>
+#include <string>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/nowide/cstdio.hpp>
 
 namespace bsa::detail
 {
+	namespace
+	{
+		[[nodiscard]] char mapchar(char a_ch) noexcept
+		{
+			constexpr auto lut = []() noexcept {
+				std::array<char, std::numeric_limits<unsigned char>::max() + 1> map{};
+				for (std::size_t i = 0; i < map.size(); ++i) {
+					map[i] = static_cast<char>(i);
+				}
+
+				map[static_cast<std::size_t>('/')] = '\\';
+
+				constexpr auto offset = char{ 'a' - 'A' };
+				for (std::size_t i = 'A'; i <= 'Z'; ++i) {
+					map[i] = static_cast<char>(i) + offset;
+				}
+
+				return map;
+			}();
+
+			return lut[static_cast<std::size_t>(a_ch)];
+		}
+	}
+
+	void normalize_directory(std::string& a_path) noexcept
+	{
+		for (auto& c : a_path) {
+			c = mapchar(c);
+		}
+
+		while (!a_path.empty() && a_path.back() == '\\') {
+			a_path.pop_back();
+		}
+
+		while (!a_path.empty() && a_path.front() == '\\') {
+			a_path.erase(a_path.begin());
+		}
+
+		if (a_path.empty() || a_path.size() >= 260) {
+			a_path = '.';
+		}
+	}
+
 	istream_t::istream_t(std::filesystem::path a_path) noexcept
 	{
 		try {
