@@ -138,12 +138,28 @@ namespace bsa::tes3
 		file(String&& a_path) noexcept;
 
 		file(const file&) noexcept = default;
-		file(file&& a_rhs) noexcept;
+		file(file&& a_rhs) noexcept :
+			_hash(a_rhs._hash),
+			_name(a_rhs._name),
+			_data(std::move(a_rhs._data))
+		{
+			a_rhs.clear();
+		}
 
 		~file() noexcept = default;
 
 		file& operator=(const file&) noexcept = default;
-		file& operator=(file&&) noexcept = default;
+		file& operator=(file&& a_rhs) noexcept
+		{
+			if (this != &a_rhs) {
+				_hash = a_rhs._hash;
+				_name = a_rhs._name;
+				_data = std::move(a_rhs._data);
+
+				a_rhs.clear();
+			}
+			return *this;
+		}
 
 		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
 		void clear() noexcept { _data.emplace<data_view>(); }
