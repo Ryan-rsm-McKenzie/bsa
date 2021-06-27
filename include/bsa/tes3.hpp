@@ -421,7 +421,7 @@ namespace bsa::tes3
 			return find(hashing::hash_file(path);
 		}
 
-		auto insert(file a_file) noexcept 
+		auto insert(file a_file) noexcept
 			-> std::pair<iterator, bool> { return _files.insert(std::move(a_file)); }
 
 		bool read(std::filesystem::path a_path) noexcept
