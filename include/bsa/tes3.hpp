@@ -405,7 +405,36 @@ namespace bsa::tes3
 
 		[[nodiscard]] bool verify_offsets() const noexcept;
 
-		bool write(std::filesystem::path a_path) const noexcept;
+		bool write(std::filesystem::path a_path) const noexcept
+		{
+			detail::ostream_t out{ std::move(a_path) };
+			if (!out.is_open()) {
+				return false;
+			}
+
+			[&]() noexcept {
+				std::size_t offset =
+					(detail::constants::file_entry_size + 4u) * _files.size();
+				for (const auto& file : _files) {
+					offset += file.name().length() +
+					          1u;  // include null terminator
+				}
+
+				const detail::header_t header{
+					static_cast<std::uint32_t>(offset),
+					static_cast<std::uint32_t>(_files.size())
+				};
+				out << header;
+			}();
+
+			write_file_entries(out);
+			write_file_name_offsets(out);
+			write_file_names(out);
+			write_file_hashes(out);
+			write_file_data(out);
+
+			return true;
+		}
 
 	private:
 		struct offsets_t final
@@ -445,6 +474,53 @@ namespace bsa::tes3
 				a_in,
 				nameOffset + a_offsets.names,
 				a_offsets.fileData);
+		}
+
+		void write_file_entries(detail::ostream_t& a_out) const noexcept
+		{
+			std::uint32_t offset = 0;
+			for (const auto& file : _files) {
+				const auto size = static_cast<std::uint32_t>(file.size());
+				a_out
+					<< size
+					<< offset;
+				offset += size;
+			}
+		}
+
+		void write_file_name_offsets(detail::ostream_t& a_out) const noexcept
+		{
+			std::uint32_t offset = 0;
+			for (const auto& file : _files) {
+				a_out << offset;
+				offset += file.name().length() +
+				          1u;  // include null terminator
+			}
+		}
+
+		void write_file_names(detail::ostream_t& a_out) const noexcept
+		{
+			for (const auto& file : _files) {
+				const auto name = file.name();
+				a_out.write_bytes({ //
+					reinterpret_cast<const std::byte*>(name.data()),
+					name.size() });
+				a_out << std::byte{ '\0' };
+			}
+		}
+
+		void write_file_hashes(detail::ostream_t& a_out) const noexcept
+		{
+			for (const auto& file : _files) {
+				a_out << file.hash();
+			}
+		}
+
+		void write_file_data(detail::ostream_t& a_out) const noexcept
+		{
+			for (const auto& file : _files) {
+				a_out.write_bytes(file.as_bytes());
+			}
 		}
 
 		container_type _files;
