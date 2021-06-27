@@ -22,14 +22,14 @@ namespace
 	[[nodiscard]] auto hash_directory(std::string_view a_path) noexcept
 		-> bsa::tes4::hashing::hash
 	{
-		std::string t{ a_path };
+		std::string t(a_path);
 		return bsa::tes4::hashing::hash_directory(t);
 	}
 
 	[[nodiscard]] auto hash_file(std::string_view a_path) noexcept
 		-> bsa::tes4::hashing::hash
 	{
-		std::string t{ a_path };
+		std::string t(a_path);
 		return bsa::tes4::hashing::hash_file(t);
 	}
 
