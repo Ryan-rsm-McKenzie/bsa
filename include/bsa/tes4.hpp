@@ -15,7 +15,6 @@
 #include <vector>
 
 #include <boost/container/flat_set.hpp>
-#include <boost/iostreams/device/mapped_file.hpp>
 
 #include "bsa/detail/common.hpp"
 #include "bsa/fwd.hpp"
