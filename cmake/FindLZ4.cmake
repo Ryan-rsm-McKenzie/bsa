@@ -1,6 +1,6 @@
 set(TARGET LZ4)
 
-find_package(PkgConfig MODULE)
+find_package(PkgConfig QUIET MODULE)
 if(PkgConfig_FOUND)
 	pkg_check_modules(PC_${TARGET} QUIET liblz4)
 endif()
@@ -16,11 +16,11 @@ find_path(${TARGET}_INCLUDE_DIR
 
 find_library(${TARGET}_LIBRARY_RELEASE
 	NAMES "lz4"
-	PATHS ${PC_${TARGET}_LIBRARY_DIRS}/Release
+	PATHS ${PC_${TARGET}_LIBRARY_DIRS}
 )
 find_library(${TARGET}_LIBRARY_DEBUG
-	NAMES "lz4"
-	PATHS ${PC_${TARGET}_LIBRARY_DIRS}/Debug
+	NAMES "lz4d"
+	PATHS ${PC_${TARGET}_LIBRARY_DIRS}
 )
 
 include(SelectLibraryConfigurations)
@@ -41,9 +41,7 @@ if(${TARGET}_FOUND)
 	set(${TARGET}_LIBRARIES ${${TARGET}_LIBRARY})
 	set(${TARGET}_INCLUDE_DIRS ${${TARGET}_INCLUDE_DIR})
 	set(${TARGET}_DEFINITIONS ${PC_${TARGET}_CFLAGS_OTHER})
-endif()
 
-if(${TARGET}_FOUND)
 	if(NOT TARGET ${TARGET}::${TARGET})
 		add_library(${TARGET}::${TARGET} UNKNOWN IMPORTED)
 	endif()
@@ -74,10 +72,18 @@ if(${TARGET}_FOUND)
 		)
 	endif()
 
+	if(NOT ${TARGET}_LIBRARY_RELEASE AND NOT ${TARGET}_LIBRARY_DEBUG)
+		set_property(
+			TARGET ${TARGET}::${TARGET}
+			APPEND
+			PROPERTY IMPORTED_LOCATION "${${TARGET}_LIBRARY}"
+		)
+	endif()
+
 	set_target_properties(
 		${TARGET}::${TARGET}
 		PROPERTIES
-			INTERFACE_COMPILE_OPTIONS "${PC_${TARGET}_CFLAGS_OTHER}"
-			INTERFACE_INCLUDE_DIRECTORIES "${${TARGET}_INCLUDE_DIR}"
+			INTERFACE_COMPILE_OPTIONS "${${TARGET}_DEFINITIONS}"
+			INTERFACE_INCLUDE_DIRECTORIES "${${TARGET}_INCLUDE_DIRS}"
 	)
 endif()
