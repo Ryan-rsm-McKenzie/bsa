@@ -124,6 +124,7 @@ namespace bsa::detail
 		[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
 	protected:
+		friend class tes3::archive;
 		friend class tes4::archive;
 		friend class tes4::directory;
 
