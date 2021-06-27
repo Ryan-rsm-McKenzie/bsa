@@ -81,7 +81,41 @@ namespace bsa::tes3
 	{
 	public:
 	private:
-		hash _hash;
+		enum : std::size_t
+		{
+			name_null,
+			name_owner,
+			name_proxied,
+
+			name_count
+		};
+
+		enum : std::size_t
+		{
+			data_view,
+			data_owner,
+			data_proxied,
+
+			data_count
+		};
+
+		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
+		using name_proxy = detail::istream_proxy<std::string_view>;
+
+		hashing::hash _hash;
+		std::variant<
+			std::monostate,
+			std::string,
+			name_proxy>
+			_name;
+		std::variant<
+			std::span<const std::byte>,
+			std::vector<std::byte>,
+			data_proxy>
+			_data;
+
+		static_assert(name_count == std::variant_size_v<decltype(_name)>);
+		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
 	class archive
