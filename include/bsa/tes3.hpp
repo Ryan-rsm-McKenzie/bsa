@@ -331,14 +331,35 @@ namespace bsa::tes3
 		archive& operator=(const archive&) noexcept = default;
 		archive& operator=(archive&&) noexcept = default;
 
-		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept -> index;
-		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept -> const_index;
+		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept
+			-> index
+		{
+			const auto it = _files.find(a_hash);
+			return it != _files.end() ? index{ *it } : index{};
+		}
+
+		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept
+			-> const_index
+		{
+			const auto it = _files.find(a_hash);
+			return it != _files.end() ? const_index{ *it } : const_index{};
+		}
 
 		template <detail::concepts::stringable String>
-		[[nodiscard]] auto operator[](String&& a_path) noexcept -> index;
+		[[nodiscard]] auto operator[](String&& a_path) noexcept
+			-> index
+		{
+			std::string path(std::forward<String>(a_path));
+			return (*this)[hashing::hash_file(path)];
+		}
 
 		template <detail::concepts::stringable String>
-		[[nodiscard]] auto operator[](String&& a_path) const noexcept -> const_index;
+		[[nodiscard]] auto operator[](String&& a_path) const noexcept
+			-> const_index
+		{
+			std::string path(std::forward<String>(a_path));
+			return (*this)[hashing::hash_file(path)];
+		}
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
