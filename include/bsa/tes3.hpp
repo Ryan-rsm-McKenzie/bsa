@@ -343,6 +343,8 @@ namespace bsa::tes3
 			for (auto& file : _files) {
 				file.read_filename(in, nameOffset);
 			}
+
+			return true;
 		}
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
