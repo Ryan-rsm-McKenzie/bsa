@@ -3,11 +3,15 @@
 #include <compare>
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 #include <vector>
+
+#include <boost/container/flat_set.hpp>
 
 #include "bsa/detail/common.hpp"
 #include "bsa/fwd.hpp"
@@ -182,6 +186,75 @@ namespace bsa::tes3
 	class archive final
 	{
 	public:
+		using key_type = file;
+		using key_compare = detail::key_compare_t<key_type, hashing::hash>;
+
 	private:
+		using container_type =
+			boost::container::flat_set<key_type, key_compare>;
+
+	public:
+		using value_type = container_type::value_type;
+		using value_compare = container_type::value_compare;
+		using iterator = container_type::iterator;
+		using const_iterator = container_type::const_iterator;
+
+		using index = detail::index_t<value_type, false>;
+		using const_index = detail::index_t<const value_type, false>;
+
+		archive() noexcept = default;
+		archive(const archive&) noexcept = default;
+		archive(archive&&) noexcept = default;
+		~archive() noexcept = default;
+		archive& operator=(const archive&) noexcept = default;
+		archive& operator=(archive&&) noexcept = default;
+
+		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept -> index;
+		[[nodiscard]] auto operator[](hashing::hash a_hash) const noexcept -> const_index;
+
+		template <detail::concepts::stringable String>
+		[[nodiscard]] auto operator[](String&& a_path) noexcept -> index;
+
+		template <detail::concepts::stringable String>
+		[[nodiscard]] auto operator[](String&& a_path) const noexcept -> const_index;
+
+		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
+		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
+		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _files.cbegin(); }
+
+		[[nodiscard]] auto end() noexcept -> iterator { return _files.end(); }
+		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
+		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
+
+		void clear() noexcept { _files.clear(); }
+
+		[[nodiscard]] bool empty() const noexcept { return _files.empty(); }
+
+		bool erase(hashing::hash a_hash) noexcept;
+
+		template <detail::concepts::stringable String>
+		bool erase(String&& a_path) noexcept;
+
+		[[nodiscard]] auto find(hashing::hash a_hash) noexcept -> iterator;
+		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator;
+
+		template <detail::concepts::stringable String>
+		[[nodiscard]] auto find(String&& a_path) noexcept -> iterator;
+
+		template <detail::concepts::stringable String>
+		[[nodiscard]] auto find(String&& a_path) const noexcept -> const_iterator;
+
+		auto insert(file a_file) noexcept -> std::pair<iterator, bool>;
+
+		bool read(std::filesystem::path a_path) noexcept;
+
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
+
+		[[nodiscard]] bool verify_offsets() const noexcept;
+
+		bool write(std::filesystem::path a_path) const noexcept;
+
+	private:
+		container_type _files;
 	};
 }
