@@ -125,6 +125,8 @@ namespace bsa::tes3
 				return a_out;
 			}
 		};
+
+		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
 	namespace detail
