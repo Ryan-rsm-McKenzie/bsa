@@ -20,6 +20,22 @@ namespace bsa
 		struct key_compare_t;
 	}
 
+	namespace tes3
+	{
+		namespace detail
+		{
+			class header_t;
+		}
+
+		namespace hashing
+		{
+			struct hash;
+		}
+
+		class archive;
+		class file;
+	}
+
 	namespace tes4
 	{
 		namespace detail
