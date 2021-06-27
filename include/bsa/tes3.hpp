@@ -3,7 +3,11 @@
 #include <compare>
 #include <cstddef>
 #include <cstdint>
+#include <span>
+#include <string>
+#include <string_view>
 #include <variant>
+#include <vector>
 
 #include "bsa/detail/common.hpp"
 #include "bsa/fwd.hpp"
@@ -115,6 +119,28 @@ namespace bsa::tes3
 	class file final
 	{
 	public:
+		file(hashing::hash a_hash) noexcept;
+
+		template <detail::concepts::stringable String>
+		file(String&& a_path) noexcept;
+
+		file(const file&) noexcept = default;
+		file(file&& a_rhs) noexcept;
+
+		~file() noexcept = default;
+
+		file& operator=(const file&) noexcept = default;
+		file& operator=(file&&) noexcept = default;
+
+		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
+		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
+		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
+		[[nodiscard]] auto filename() const noexcept -> std::string_view;
+		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
+		void set_data(std::span<const std::byte> a_data) noexcept;
+		void set_data(std::vector<std::byte> a_data) noexcept;
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
+
 	private:
 		enum : std::size_t
 		{
