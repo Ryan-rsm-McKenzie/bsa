@@ -91,11 +91,15 @@ namespace bsa::tes3
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
 			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
-				-> std::strong_ordering
+				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
+
+			[[nodiscard]] auto numeric() const noexcept
+				-> std::uint64_t
 			{
-				return a_lhs.lo != a_rhs.lo ?
-                           a_lhs.lo <=> a_rhs.lo :
-                           a_lhs.hi <=> a_rhs.hi;
+				return std::uint64_t{
+					std::uint64_t{ hi } << 0u * 8u |
+					std::uint64_t{ lo } << 4u * 8u
+				};
 			}
 
 		protected:
