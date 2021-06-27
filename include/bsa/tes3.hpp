@@ -357,14 +357,27 @@ namespace bsa::tes3
 		template <detail::concepts::stringable String>
 		bool erase(String&& a_path) noexcept;
 
-		[[nodiscard]] auto find(hashing::hash a_hash) noexcept -> iterator;
-		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept -> const_iterator;
+		[[nodiscard]] auto find(hashing::hash a_hash) noexcept
+			-> iterator { return _files.find(a_hash); }
+
+		[[nodiscard]] auto find(hashing::hash a_hash) const noexcept
+			-> const_iterator { return _files.find(a_hash); }
 
 		template <detail::concepts::stringable String>
-		[[nodiscard]] auto find(String&& a_path) noexcept -> iterator;
+		[[nodiscard]] auto find(String&& a_path) noexcept
+			-> iterator
+		{
+			std::string path(std::forward<String>(a_path));
+			return find(hashing::hash_file(path);
+		}
 
 		template <detail::concepts::stringable String>
-		[[nodiscard]] auto find(String&& a_path) const noexcept -> const_iterator;
+		[[nodiscard]] auto find(String&& a_path) const noexcept
+			-> const_iterator
+		{
+			std::string path(std::forward<String>(a_path));
+			return find(hashing::hash_file(path);
+		}
 
 		auto insert(file a_file) noexcept -> std::pair<iterator, bool>;
 
