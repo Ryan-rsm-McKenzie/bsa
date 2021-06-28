@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <boost/container/flat_set.hpp>
+#include <boost/container/small_vector.hpp>
 
 #include "bsa/detail/common.hpp"
 
@@ -229,7 +230,7 @@ namespace bsa::fo4
 	class file final
 	{
 	private:
-		using container_type = std::vector<chunk>;
+		using container_type = boost::container::small_vector<chunk, 1>;
 
 	public:
 		using value_type = container_type::value_type;
@@ -357,7 +358,7 @@ namespace bsa::fo4
 			std::string,
 			name_proxy>
 			_name;
-		std::vector<chunk> _chunks;
+		container_type _chunks;
 		std::optional<dx10_t> _dx10;
 
 		static_assert(name_count == std::variant_size_v<decltype(_name)>);
