@@ -379,6 +379,13 @@ namespace bsa::fo4
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
 
+		archive() noexcept = default;
+		archive(const archive&) noexcept = default;
+		archive(archive&&) noexcept = default;
+		~archive() noexcept = default;
+		archive& operator=(const archive&) noexcept = default;
+		archive& operator=(archive&&) noexcept = default;
+
 		void clear() noexcept { _files.clear(); }
 
 		[[nodiscard]] auto read(std::filesystem::path a_path) noexcept
