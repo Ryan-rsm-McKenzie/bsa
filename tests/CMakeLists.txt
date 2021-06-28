@@ -2,6 +2,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set(SOURCE_DIR ${ROOT_DIR}/tests)
 set(SOURCE_FILES
+	${SOURCE_DIR}/fo4_tests.cpp
 	${SOURCE_DIR}/main.cpp
 	${SOURCE_DIR}/tes3_tests.cpp
 	${SOURCE_DIR}/tes4_tests.cpp
