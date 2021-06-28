@@ -386,6 +386,14 @@ namespace bsa::fo4
 		archive& operator=(const archive&) noexcept = default;
 		archive& operator=(archive&&) noexcept = default;
 
+		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
+		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
+		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _files.cbegin(); }
+
+		[[nodiscard]] auto end() noexcept -> iterator { return _files.end(); }
+		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
+		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
+
 		void clear() noexcept { _files.clear(); }
 
 		[[nodiscard]] auto read(std::filesystem::path a_path) noexcept
