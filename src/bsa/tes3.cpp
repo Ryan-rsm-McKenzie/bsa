@@ -33,9 +33,10 @@ namespace bsa::tes3
 			[[nodiscard]] bool good() const noexcept { return _good; }
 			[[nodiscard]] auto hash_offset() const noexcept -> std::size_t { return _hashOffset; }
 
-			friend istream_t& operator>>(
+			friend auto operator>>(
 				istream_t& a_in,
 				header_t& a_header) noexcept
+				-> istream_t&
 			{
 				std::uint32_t magic = 0;
 				a_in >>
@@ -50,15 +51,15 @@ namespace bsa::tes3
 				return a_in;
 			}
 
-			friend ostream_t& operator<<(
+			friend auto operator<<(
 				ostream_t& a_out,
 				const header_t& a_header) noexcept
+				-> ostream_t&
 			{
-				a_out
-					<< std::uint32_t{ 0x100 }
-					<< a_header._hashOffset
-					<< a_header._fileCount;
-				return a_out;
+				return a_out
+				       << std::uint32_t{ 0x100 }
+				       << a_header._hashOffset
+				       << a_header._fileCount;
 			}
 
 		private:

@@ -47,24 +47,24 @@ namespace bsa::tes3
 		protected:
 			friend tes3::archive;
 
-			friend detail::istream_t& operator>>(
+			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash) noexcept
+				-> detail::istream_t&
 			{
-				a_in >>
-					a_hash.lo >>
-					a_hash.hi;
-				return a_in;
+				return a_in >>
+				       a_hash.lo >>
+				       a_hash.hi;
 			}
 
-			friend detail::ostream_t& operator<<(
+			friend auto operator<<(
 				detail::ostream_t& a_out,
 				const hash& a_hash) noexcept
+				-> detail::ostream_t&
 			{
-				a_out
-					<< a_hash.lo
-					<< a_hash.hi;
-				return a_out;
+				return a_out
+				       << a_hash.lo
+				       << a_hash.hi;
 			}
 		};
 

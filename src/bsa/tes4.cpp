@@ -58,41 +58,47 @@ namespace bsa::tes4
 				evaluate_endian();
 			}
 
-			friend istream_t& operator>>(istream_t& a_in, header_t& a_value) noexcept
+			friend auto operator>>(
+				istream_t& a_in,
+				header_t& a_header) noexcept
+				-> istream_t&
 			{
 				std::array<std::byte, 4> magic;
 
 				a_in >>
 					magic >>
-					a_value._version >>
-					a_value._directoriesOffset >>
-					a_value._archiveFlags >>
-					a_value._directory.count >>
-					a_value._file.count >>
-					a_value._directory.blobsz >>
-					a_value._file.blobsz >>
-					a_value._archiveTypes;
+					a_header._version >>
+					a_header._directoriesOffset >>
+					a_header._archiveFlags >>
+					a_header._directory.count >>
+					a_header._file.count >>
+					a_header._directory.blobsz >>
+					a_header._file.blobsz >>
+					a_header._archiveTypes;
 				a_in.seek_relative(2);
 
-				a_value.evaluate_endian();
+				a_header.evaluate_endian();
 
 				if (magic[0] != std::byte{ 'B' } ||
 					magic[1] != std::byte{ 'S' } ||
 					magic[2] != std::byte{ 'A' } ||
 					magic[3] != std::byte{ '\0' }) {
-					a_value._good = false;
-				} else if (a_value._version != 103 &&
-						   a_value._version != 104 &&
-						   a_value._version != 105) {
-					a_value._good = false;
-				} else if (a_value._directoriesOffset != constants::header_size) {
-					a_value._good = false;
+					a_header._good = false;
+				} else if (a_header._version != 103 &&
+						   a_header._version != 104 &&
+						   a_header._version != 105) {
+					a_header._good = false;
+				} else if (a_header._directoriesOffset != constants::header_size) {
+					a_header._good = false;
 				}
 
 				return a_in;
 			}
 
-			friend ostream_t& operator<<(ostream_t& a_out, const header_t& a_value) noexcept
+			friend auto operator<<(
+				ostream_t& a_out,
+				const header_t& a_header) noexcept
+				-> ostream_t&
 			{
 				std::array magic{
 					std::byte{ 'B' },
@@ -101,19 +107,17 @@ namespace bsa::tes4
 					std::byte{ '\0' }
 				};
 
-				a_out
-					<< magic
-					<< a_value._version
-					<< a_value._directoriesOffset
-					<< a_value._archiveFlags
-					<< a_value._directory.count
-					<< a_value._file.count
-					<< a_value._directory.blobsz
-					<< a_value._file.blobsz
-					<< a_value._archiveTypes
-					<< std::uint16_t{ 0 };
-
-				return a_out;
+				return a_out
+				       << magic
+				       << a_header._version
+				       << a_header._directoriesOffset
+				       << a_header._archiveFlags
+				       << a_header._directory.count
+				       << a_header._file.count
+				       << a_header._directory.blobsz
+				       << a_header._file.blobsz
+				       << a_header._archiveTypes
+				       << std::uint16_t{ 0 };
 			}
 
 			[[nodiscard]] bool good() const noexcept { return _good; }
