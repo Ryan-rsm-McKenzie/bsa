@@ -20,6 +20,25 @@ namespace bsa
 		struct key_compare_t;
 	}
 
+	namespace fo4
+	{
+		namespace detail
+		{
+			class header_t;
+		}
+
+		namespace hashing
+		{
+			struct hash;
+		}
+
+		enum class format : std::uint32_t;
+
+		class archive;
+		class chunk;
+		class file;
+	}
+
 	namespace tes3
 	{
 		namespace detail
