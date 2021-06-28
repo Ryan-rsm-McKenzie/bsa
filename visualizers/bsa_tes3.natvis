@@ -2,7 +2,7 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
 	<Type Name="bsa::tes3::archive">
-		<DisplayString>tes4 archive</DisplayString>
+		<DisplayString>tes3 archive</DisplayString>
 		<Expand>
 			<Item Name="[files]">_files</Item>
 		</Expand>
