@@ -184,7 +184,6 @@ namespace bsa::fo4
 				a_in >>
 					mip.first >>
 					mip.last;
-				a_in.seek_relative(4u);  // padding
 			}
 
 			std::uint32_t sentinel = 0;
