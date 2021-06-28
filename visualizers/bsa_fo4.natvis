@@ -1,4 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+	<Type Name="bsa::fo4::archive">
+		<DisplayString>fo4 archive</DisplayString>
+		<Expand>
+			<Item Name="[files]">_files</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="bsa::fo4::chunk">
+		<DisplayString>{ _data }</DisplayString>
+		<Expand>
+			<Item Name="[data]">_data</Item>
+			<Item Name="[decompressed size]">_decompsz</Item>
+			<Item Name="[mips]">_mip</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="bsa::fo4::file">
+		<DisplayString>{ _hash }</DisplayString>
+		<Expand>
+			<Item Name="[hash]">_hash</Item>
+			<Item Name="[name]">_name</Item>
+			<Item Name="[chunks]">_chunks</Item>
+			<Item Name="[DX10 header]">_dx10</Item>
+		</Expand>
+	</Type>
+		
+	<Type Name="bsa::fo4::hashing::hash">
+		<DisplayString>{ file,X } { ext,X } { dir,X }</DisplayString>
+		<Expand>
+			<Item Name="[file]">file,X</Item>
+			<Item Name="[extension]">ext,X</Item>
+			<Item Name="[directory]">dir,X</Item>
+		</Expand>
+	</Type>
+	
 </AutoVisualizer>
