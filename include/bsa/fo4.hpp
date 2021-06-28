@@ -283,7 +283,9 @@ namespace bsa::fo4
 			_dx10 = dx10_t{};
 		}
 
+		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
 		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
 	protected:
 		friend class archive;
