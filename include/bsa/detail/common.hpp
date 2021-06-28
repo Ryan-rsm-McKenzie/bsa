@@ -55,19 +55,34 @@ namespace bsa::detail
 	{
 		template <class T>
 		concept integral =
-			std::same_as<T, std::byte> ||
-			std::same_as<T, std::int8_t> ||
-			std::same_as<T, std::uint8_t> ||
-			std::same_as<T, std::int16_t> ||
-			std::same_as<T, std::uint16_t> ||
-			std::same_as<T, std::int32_t> ||
-			std::same_as<T, std::uint32_t> ||
-			std::same_as<T, std::int64_t> ||
-			std::same_as<T, std::uint64_t>;
+			std::is_enum_v<T> ||
+
+			std::same_as<T, char> ||
+
+			std::same_as<T, signed char> ||
+			std::same_as<T, signed short int> ||
+			std::same_as<T, signed int> ||
+			std::same_as<T, signed long int> ||
+			std::same_as<T, signed long long int> ||
+
+			std::same_as<T, unsigned char> ||
+			std::same_as<T, unsigned short int> ||
+			std::same_as<T, unsigned int> ||
+			std::same_as<T, unsigned long int> ||
+			std::same_as<T, unsigned long long int>;
 
 		template <class T>
 		concept stringable =
 			std::constructible_from<std::string, T>;
+	}
+
+	namespace type_traits
+	{
+		template <class T>
+		using integral_type_t = typename std::conditional_t<
+			std::is_enum_v<T>,
+			std::underlying_type<T>,
+			std::type_identity<T>>::type;
 	}
 
 	[[noreturn]] inline void declare_unreachable()
@@ -155,17 +170,14 @@ namespace bsa::detail
 		template <concepts::integral T>
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little) noexcept
 		{
-			using integral_t = typename std::conditional_t<
-				std::is_enum_v<T>,
-				std::underlying_type<T>,
-				std::type_identity<T>>::type;
+			using integral_t = type_traits::integral_type_t<T>;
 			auto result = integral_t{ 0 };
-			const auto bytes = read_bytes(sizeof(T));
+			const auto bytes = read_bytes(sizeof(integral_t));
 
 			switch (a_endian) {
 			case std::endian::little:
 				for (std::size_t i = 0; i < bytes.size(); ++i) {
-					result |= static_cast<T>(bytes[i]) << i * 8u;
+					result |= static_cast<integral_t>(bytes[i]) << i * 8u;
 				}
 				break;
 			case std::endian::big:
@@ -198,17 +210,21 @@ namespace bsa::detail
 			return a_in;
 		}
 
-		template <std::size_t N>
+		template <class T, std::size_t N>
 		friend istream_t& operator>>(
 			istream_t& a_in,
-			std::array<std::byte, N>& a_value) noexcept
+			std::array<T, N>& a_value) noexcept  //
+			requires(sizeof(T) == 1)
 		{
 			const auto bytes = a_in.read_bytes(a_value.size());
-			std::copy(bytes.begin(), bytes.end(), a_value.begin());
+			std::copy(
+				bytes.begin(),
+				bytes.end(),
+				reinterpret_cast<std::byte*>(a_value.data()));
 			return a_in;
 		}
 
-	private:
+	private :
 		stream_type _file;
 		std::size_t _pos{ 0 };
 	};
@@ -256,12 +272,9 @@ namespace bsa::detail
 		template <concepts::integral T>
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
 		{
-			using integral_t = typename std::conditional_t<
-				std::is_enum_v<T>,
-				std::underlying_type<T>,
-				std::type_identity<T>>::type;
+			using integral_t = type_traits::integral_type_t<T>;
 			const auto value = static_cast<integral_t>(a_value);
-			std::array<std::byte, sizeof(T)> bytes;
+			std::array<std::byte, sizeof(integral_t)> bytes;
 
 			switch (a_endian) {
 			case std::endian::little:
@@ -296,16 +309,19 @@ namespace bsa::detail
 			return a_out;
 		}
 
-		template <std::size_t N>
+		template <class T, std::size_t N>
 		friend ostream_t& operator<<(
 			ostream_t& a_out,
-			const std::array<std::byte, N>& a_value) noexcept
+			const std::array<T, N>& a_value) noexcept  //
+			requires(sizeof(T) == 1)
 		{
-			a_out.write_bytes({ a_value.data(), a_value.size() });
+			a_out.write_bytes({ //
+				reinterpret_cast<const std::byte*>(a_value.data()),
+				a_value.size() * sizeof(T) });
 			return a_out;
 		}
 
-	private:
+	private :
 		std::FILE* _file{ nullptr };
 	};
 
