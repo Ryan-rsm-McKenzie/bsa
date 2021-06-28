@@ -180,7 +180,7 @@ namespace bsa::fo4
 			}
 
 			if (a_format == format::directx) {
-				auto& mip = _mip.emplace();
+				auto& mip = _mip.emplace(mip_t{});
 				a_in >>
 					mip.first >>
 					mip.last;
@@ -301,7 +301,7 @@ namespace bsa::fo4
 			a_in.seek_relative(2u);  // skip unknown
 
 			if (a_format == format::directx) {
-				auto& dx = _dx10.emplace();
+				auto& dx = _dx10.emplace(dx10_t{});
 				a_in >>
 					dx.height >>
 					dx.width >>
