@@ -269,6 +269,14 @@ namespace bsa::fo4
 			return *this;
 		}
 
+		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
+		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
+		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _chunks.cbegin(); }
+
+		[[nodiscard]] auto end() noexcept -> iterator { return _chunks.end(); }
+		[[nodiscard]] auto end() const noexcept -> const_iterator { return _chunks.end(); }
+		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _chunks.cend(); }
+
 		void clear() noexcept
 		{
 			_chunks.clear();
