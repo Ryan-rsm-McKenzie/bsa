@@ -32,7 +32,7 @@ namespace bsa::detail
 				return map;
 			}();
 
-			return lut[static_cast<std::size_t>(a_ch)];
+			return lut[static_cast<unsigned char>(a_ch)];
 		}
 	}
 
