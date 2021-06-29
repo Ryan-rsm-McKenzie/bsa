@@ -43,7 +43,7 @@ namespace bsa::fo4
 			inline constexpr auto dx10 = detail::make_file_type({ 'D', 'X', '1', '0' });
 		}
 
-		class header_t
+		class header_t final
 		{
 		public:
 			header_t() noexcept = default;
@@ -141,7 +141,7 @@ namespace bsa::fo4
 		};
 	}
 
-	class chunk
+	class chunk final
 	{
 	public:
 		chunk() noexcept = default;
