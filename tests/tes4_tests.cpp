@@ -60,6 +60,7 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(fhash("darkbrotherhood__0007469a_1.fuz"sv) == 0x011F11B0641B5F31);
 		REQUIRE(fhash("elder_council_amulet_n.dds"sv) == 0xDC531E2F6516DFEE);
 		REQUIRE(fhash("testtoddquest_testtoddhappy_00027fa2_1.mp3"sv) == 0xDE0301EE74265F31);
+		REQUIRE(fhash("María_F.fuz"sv) == 0x6434BBA36D085F66);
 	}
 
 	SECTION("the empty path \"\" is equivalent to the current path \".\"")
