@@ -14,7 +14,6 @@
 #include <variant>
 #include <vector>
 
-#include <boost/container/flat_set.hpp>
 #include <boost/container/set.hpp>
 
 #include "bsa/detail/common.hpp"
@@ -278,7 +277,7 @@ namespace bsa::tes4
 
 	private:
 		using container_type =
-			boost::container::flat_set<key_type, key_compare>;
+			boost::container::set<key_type, key_compare>;
 
 	public:
 		using value_type = container_type::value_type;
@@ -403,8 +402,6 @@ namespace bsa::tes4
 			-> std::pair<iterator, bool> { return _files.insert(std::move(a_file)); }
 
 		[[nodiscard]] auto name() const noexcept -> std::string_view;
-
-		void reserve(std::size_t a_count) noexcept { _files.reserve(a_count); }
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
 

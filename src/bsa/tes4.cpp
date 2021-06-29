@@ -700,7 +700,6 @@ namespace bsa::tes4
 			_name.emplace<name_proxied>(name, a_in.rdbuf());
 		}
 
-		_files.reserve(a_count);
 		for (std::size_t i = 0; i < a_count; ++i) {
 			hashing::hash h;
 			h.read(a_in, a_header.endian());
