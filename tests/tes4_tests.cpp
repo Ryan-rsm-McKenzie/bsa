@@ -13,6 +13,8 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/nowide/cstdio.hpp>
 
+#include "common.hpp"
+
 #include <catch2/catch.hpp>
 
 using namespace std::literals;
@@ -32,15 +34,12 @@ namespace
 		std::string t(a_path);
 		return bsa::tes4::hashing::hash_file(t);
 	}
-
-	[[nodiscard]] auto map_file(const std::filesystem::path& a_path)
-		-> boost::iostreams::mapped_file_source
-	{
-		return boost::iostreams::mapped_file_source{
-			boost::filesystem::path{ a_path.native() }
-		};
-	}
 }
+
+static_assert(assert_nothrowable<bsa::tes4::hashing::hash>());
+static_assert(assert_nothrowable<bsa::tes4::file>());
+static_assert(assert_nothrowable<bsa::tes4::directory>());
+static_assert(assert_nothrowable<bsa::tes4::archive>());
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 {

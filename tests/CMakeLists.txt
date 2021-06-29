@@ -1,5 +1,11 @@
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+set(INCLUDE_DIR ${ROOT_DIR}/tests)
+set(HEADER_FILES
+	${INCLUDE_DIR}/common.hpp
+)
+source_group("include" FILES ${HEADER_FILES})
+
 set(SOURCE_DIR ${ROOT_DIR}/tests)
 set(SOURCE_FILES
 	${SOURCE_DIR}/fo4_tests.cpp
@@ -16,6 +22,7 @@ source_group("visualizers" FILES ${NATVIS_FILES})
 
 add_executable(
 	tests
+	${HEADER_FILES}
 	${SOURCE_FILES}
 	${NATVIS_FILES}
 )
