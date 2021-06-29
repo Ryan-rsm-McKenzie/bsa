@@ -11,7 +11,7 @@
 #include <variant>
 #include <vector>
 
-#include <boost/container/flat_set.hpp>
+#include <boost/container/set.hpp>
 
 #include "bsa/detail/common.hpp"
 
@@ -188,7 +188,7 @@ namespace bsa::tes3
 
 	private:
 		using container_type =
-			boost::container::flat_set<key_type, key_compare>;
+			boost::container::set<key_type, key_compare>;
 
 	public:
 		using value_type = container_type::value_type;

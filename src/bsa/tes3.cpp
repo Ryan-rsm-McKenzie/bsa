@@ -254,7 +254,6 @@ namespace bsa::tes3
 			detail::offsetof_file_data(header)
 		};
 
-		_files.reserve(header.file_count());
 		for (std::size_t i = 0; i < header.file_count(); ++i) {
 			read_file(in, offsets, i);
 		}

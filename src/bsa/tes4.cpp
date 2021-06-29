@@ -806,7 +806,6 @@ namespace bsa::tes4
 		_types = header.archive_types();
 
 		in.seek_absolute(header.directories_offset());
-		_directories.reserve(header.directory_count());
 		for (std::size_t i = 0; i < header.directory_count(); ++i) {
 			read_directory(in, header);
 		}

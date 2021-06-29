@@ -13,7 +13,7 @@
 #include <variant>
 #include <vector>
 
-#include <boost/container/flat_set.hpp>
+#include <boost/container/set.hpp>
 #include <boost/container/small_vector.hpp>
 
 #include "bsa/detail/common.hpp"
@@ -371,7 +371,7 @@ namespace bsa::fo4
 
 	private:
 		using container_type =
-			boost::container::flat_set<key_type, key_compare>;
+			boost::container::set<key_type, key_compare>;
 
 	public:
 		using value_type = container_type::value_type;
@@ -416,7 +416,6 @@ namespace bsa::fo4
 			clear();
 			const auto fmt = static_cast<format>(header.archive_format());
 
-			_files.reserve(header.file_count());
 			for (std::size_t i = 0; i < header.file_count(); ++i) {
 				hashing::hash h;
 				in >> h;
