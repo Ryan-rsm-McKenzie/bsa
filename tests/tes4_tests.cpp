@@ -151,16 +151,10 @@ TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 		bsa::tes4::directory oldd{ name };
 		bsa::tes4::directory newd{ std::move(oldd) };
 
-		const auto validate = [&]() {
-			REQUIRE(oldd.name() == name);
-			REQUIRE(oldd.hash() == hash);
-			REQUIRE(newd.name() == name);
-			REQUIRE(newd.hash() == hash);
-		};
-
-		validate();
-		newd = std::move(oldd);
-		validate();
+		REQUIRE(oldd.name() == name);
+		REQUIRE(oldd.hash() == hash);
+		REQUIRE(newd.name() == name);
+		REQUIRE(newd.hash() == hash);
 	}
 }
 
@@ -205,16 +199,10 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 		bsa::tes4::file oldf{ name };
 		bsa::tes4::file newf{ std::move(oldf) };
 
-		const auto validate = [&]() {
-			REQUIRE(oldf.filename() == name);
-			REQUIRE(oldf.hash() == hash);
-			REQUIRE(newf.filename() == name);
-			REQUIRE(newf.hash() == hash);
-		};
-
-		validate();
-		newf = std::move(oldf);
-		validate();
+		REQUIRE(oldf.filename() == name);
+		REQUIRE(oldf.hash() == hash);
+		REQUIRE(newf.filename() == name);
+		REQUIRE(newf.hash() == hash);
 	}
 }
 

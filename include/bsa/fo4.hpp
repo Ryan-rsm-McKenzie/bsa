@@ -244,30 +244,10 @@ namespace bsa::fo4
 		explicit file(String&& a_path) noexcept;
 
 		file(const file&) noexcept = default;
-		file(file&& a_rhs) noexcept :
-			_hash(a_rhs._hash),
-			_name(a_rhs._name),
-			_chunks(std::move(a_rhs._chunks)),
-			_dx10(a_rhs._dx10)
-		{
-			a_rhs.clear();
-		}
-
+		file(file&&) noexcept = default;
 		~file() noexcept = default;
-
-		file& operator=(const file&) noexcept = default;
-		file& operator=(file&& a_rhs) noexcept
-		{
-			if (this != &a_rhs) {
-				_hash = a_rhs._hash;
-				_name = a_rhs._name;
-				_chunks = std::move(a_rhs._chunks);
-				_dx10 = a_rhs._dx10;
-
-				a_rhs.clear();
-			}
-			return *this;
-		}
+		file& operator=(const file&) = delete;
+		file& operator=(file&&) = delete;
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
@@ -326,7 +306,7 @@ namespace bsa::fo4
 				reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
 				len
 			};
-			_name.emplace<name_proxied>(name, a_in.rdbuf());
+			const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
 		}
 
 	private:
@@ -351,12 +331,13 @@ namespace bsa::fo4
 
 		using name_proxy = detail::istream_proxy<std::string_view>;
 
-		hashing::hash _hash;
-		std::variant<
+		using name_t = std::variant<
 			std::monostate,
 			std::string,
-			name_proxy>
-			_name;
+			name_proxy>;
+
+		const hashing::hash _hash;
+		const name_t _name;
 		container_type _chunks;
 		std::optional<dx10_t> _dx10;
 

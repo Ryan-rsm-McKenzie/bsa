@@ -132,37 +132,17 @@ namespace bsa::tes4
 		{}
 
 		template <detail::concepts::stringable String>
-		explicit file(String&& a_path) noexcept
-		{
-			_name.emplace<name_owner>(std::forward<String>(a_path));
-			_hash = hashing::hash_file(*std::get_if<name_owner>(&_name));
-		}
+		explicit file(String&& a_path) noexcept :
+			_name(std::in_place_index<name_owner>, std::forward<String>(a_path)),
+			_hash(hashing::hash_file(
+				const_cast<std::string&>(*std::get_if<name_owner>(&_name))))
+		{}
 
 		file(const file&) noexcept = default;
-		file(file&& a_rhs) noexcept :
-			_hash(a_rhs._hash),
-			_name(a_rhs._name),
-			_data(std::move(a_rhs._data)),
-			_decompsz(a_rhs._decompsz)
-		{
-			a_rhs.clear();
-		}
-
+		file(file&&) noexcept = default;
 		~file() noexcept = default;
-
-		file& operator=(const file&) noexcept = default;
-		file& operator=(file&& a_rhs) noexcept
-		{
-			if (this != &a_rhs) {
-				_hash = a_rhs._hash;
-				_name = a_rhs._name;
-				_data = std::move(a_rhs._data);
-				_decompsz = a_rhs._decompsz;
-
-				a_rhs.clear();
-			}
-			return *this;
-		}
+		file& operator=(const file&) = delete;
+		file& operator=(file&&) = delete;
 
 		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
 
@@ -252,12 +232,13 @@ namespace bsa::tes4
 		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 		using name_proxy = detail::istream_proxy<std::string_view>;
 
-		hashing::hash _hash;
-		std::variant<
+		using name_t = std::variant<
 			std::monostate,
 			std::string,
-			name_proxy>
-			_name;
+			name_proxy>;
+
+		const name_t _name;
+		const hashing::hash _hash;
 		std::variant<
 			std::span<const std::byte>,
 			std::vector<std::byte>,
@@ -293,35 +274,17 @@ namespace bsa::tes4
 		{}
 
 		template <detail::concepts::stringable String>
-		explicit directory(String&& a_path) noexcept
-		{
-			_name.emplace<name_owner>(std::forward<String>(a_path));
-			_hash = hashing::hash_directory(*std::get_if<name_owner>(&_name));
-		}
+		explicit directory(String&& a_path) noexcept :
+			_name(std::in_place_index<name_owner>, std::forward<String>(a_path)),
+			_hash(hashing::hash_directory(
+				const_cast<std::string&>(*std::get_if<name_owner>(&_name))))
+		{}
 
 		directory(const directory&) noexcept = default;
-		directory(directory&& a_rhs) noexcept :
-			_hash(a_rhs._hash),
-			_name(a_rhs._name),
-			_files(std::move(a_rhs._files))
-		{
-			a_rhs.clear();
-		}
-
+		directory(directory&&) noexcept = default;
 		~directory() noexcept = default;
-
 		directory& operator=(const directory&) noexcept = default;
-		directory& operator=(directory&& a_rhs) noexcept
-		{
-			if (this != &a_rhs) {
-				_hash = a_rhs._hash;
-				_name = a_rhs._name;
-				_files = std::move(a_rhs._files);
-
-				a_rhs.clear();
-			}
-			return *this;
-		}
+		directory& operator=(directory&&) noexcept = default;
 
 		[[nodiscard]] auto operator[](hashing::hash a_hash) noexcept
 			-> index
@@ -438,12 +401,13 @@ namespace bsa::tes4
 
 		using name_proxy = detail::istream_proxy<std::string_view>;
 
-		hashing::hash _hash;
-		std::variant<
+		using name_t = std::variant<
 			std::monostate,
 			std::string,
-			name_proxy>
-			_name;
+			name_proxy>;
+
+		const name_t _name;
+		const hashing::hash _hash;
 		container_type _files;
 
 		static_assert(name_count == std::variant_size_v<decltype(_name)>);

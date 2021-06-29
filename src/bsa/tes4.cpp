@@ -583,7 +583,7 @@ namespace bsa::tes4
 					dirname = name.substr(0, pos);
 					name = name.substr(pos + 1);
 				}
-				_name.emplace<name_proxied>(name, a_in.rdbuf());
+				const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
 			}
 
 			a_size -= static_cast<std::size_t>(len) + 1;
@@ -612,7 +612,7 @@ namespace bsa::tes4
 			reinterpret_cast<const char*>(a_in.read_bytes(1).data())
 		};
 		a_in.seek_relative(name.length());
-		_name.emplace<name_proxied>(name, a_in.rdbuf());
+		const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
 	}
 
 	void file::write_data(
@@ -697,7 +697,7 @@ namespace bsa::tes4
 				len - 1u  // skip null terminator
 			};
 
-			_name.emplace<name_proxied>(name, a_in.rdbuf());
+			const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
 		}
 
 		for (std::size_t i = 0; i < a_count; ++i) {
@@ -711,7 +711,7 @@ namespace bsa::tes4
 			file f{ h };
 			const auto dirname = f.read_data(a_in, a_header, size, offset);
 			if (_name.index() == name_null && dirname) {
-				_name.emplace<name_proxied>(*dirname, a_in.rdbuf());
+				const_cast<name_t&>(_name).emplace<name_proxied>(*dirname, a_in.rdbuf());
 			}
 
 			[[maybe_unused]] const auto [it, success] = _files.insert(std::move(f));

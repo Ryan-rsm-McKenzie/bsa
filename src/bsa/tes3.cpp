@@ -180,7 +180,7 @@ namespace bsa::tes3
 		const detail::restore_point _{ a_in };
 
 		a_in.seek_absolute(a_nameOffset);
-		_name.emplace<name_proxied>(
+		const_cast<name_t&>(_name).emplace<name_proxied>(
 			reinterpret_cast<const char*>(a_in.read_bytes(1).data()),  // zstring
 			a_in.rdbuf());
 
