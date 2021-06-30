@@ -37,6 +37,14 @@ namespace bsa::fo4
 			inline constexpr auto btdx = make_file_type({ 'B', 'T', 'D', 'X' });
 			inline constexpr auto gnrl = detail::make_file_type({ 'G', 'N', 'R', 'L' });
 			inline constexpr auto dx10 = detail::make_file_type({ 'D', 'X', '1', '0' });
+
+			inline constexpr std::size_t header_size = 0x18;
+
+			inline constexpr std::size_t chunk_header_size_gnrl = 0x10;
+			inline constexpr std::size_t chunk_header_size_dx10 = 0x18;
+
+			inline constexpr std::size_t chunk_size_gnrl = 0x14;
+			inline constexpr std::size_t chunk_size_dx10 = 0x18;
 		}
 
 		class header_t final
