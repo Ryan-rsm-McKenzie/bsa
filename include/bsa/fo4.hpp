@@ -144,14 +144,13 @@ namespace bsa::fo4
 		public detail::components::compressed_container
 	{
 	public:
-		struct mip final
+		struct mips_t final
 		{
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 		};
 
-		[[nodiscard]] mip get_mip() const noexcept { return _mip; }
-		void set_mip(mip a_mip) noexcept { _mip = a_mip; }
+		mips_t mips;
 
 	private:
 		friend file;
@@ -179,8 +178,8 @@ namespace bsa::fo4
 
 			if (a_format == format::directx) {
 				a_in >>
-					_mip.first >>
-					_mip.last;
+					mips.first >>
+					mips.last;
 			}
 
 			std::uint32_t sentinel = 0;
@@ -194,8 +193,6 @@ namespace bsa::fo4
 				a_in,
 				decompsz);
 		}
-
-		mip _mip;
 	};
 
 	class file final
@@ -204,7 +201,7 @@ namespace bsa::fo4
 		using container_type = boost::container::small_vector<chunk, 1>;
 
 	public:
-		struct directx_header final
+		struct header_t final
 		{
 			std::uint16_t height{ 0 };
 			std::uint16_t width{ 0 };
@@ -238,13 +235,13 @@ namespace bsa::fo4
 		void clear() noexcept
 		{
 			_chunks.clear();
-			_header = directx_header{};
+			header = header_t{};
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
-		[[nodiscard]] auto get_header() const noexcept -> directx_header { return _header; }
-		void set_header(directx_header a_header) noexcept { _header = a_header; }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
+
+		header_t header;
 
 	private:
 		friend archive;
@@ -261,12 +258,12 @@ namespace bsa::fo4
 
 			if (a_format == format::directx) {
 				a_in >>
-					_header.height >>
-					_header.width >>
-					_header.mipCount >>
-					_header.format >>
-					_header.flags >>
-					_header.tileMode;
+					header.height >>
+					header.width >>
+					header.mipCount >>
+					header.format >>
+					header.flags >>
+					header.tileMode;
 			}
 
 			_chunks.reserve(count);
@@ -277,7 +274,6 @@ namespace bsa::fo4
 		}
 
 		container_type _chunks;
-		directx_header _header;
 	};
 
 	class archive final
