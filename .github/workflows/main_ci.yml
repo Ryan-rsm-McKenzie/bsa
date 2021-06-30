@@ -25,10 +25,12 @@ jobs:
             cmake-generator: ninja
             cmake-platform: linux
             setup: bash scripts/setup.sh
+            shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
             setup: '' # nothing right now
+            shell-extension: bat
 
     steps:
       - uses: actions/checkout@v2
@@ -41,7 +43,8 @@ jobs:
       - name: Setup vcpkg
         run: |
           mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          vcpkg --version > vcpkg-version
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/bootstrap-vcpkg.${{ runner.shell-extension }}
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/vcpkg --version > ${{ github.workspace }}/vcpkg-version
 
       - name: Cache vcpkg archives
         uses: actions/cache@v2
@@ -49,7 +52,7 @@ jobs:
           cache-name: vcpkg-cache
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json', '/vcpkg-version') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json', 'vcpkg-version') }}
 
       - name: Configure CMake
         env:
