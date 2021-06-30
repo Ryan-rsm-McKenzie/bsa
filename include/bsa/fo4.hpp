@@ -370,20 +370,25 @@ namespace bsa::fo4
 			this->clear();
 			const auto fmt = static_cast<format>(header.archive_format());
 
-			for (std::size_t i = 0; i < header.file_count(); ++i) {
+			for (std::size_t i = 0, strpos = header.string_table_offset();
+				 i < header.file_count();
+				 ++i) {
 				hashing::hash hash;
 				in >> hash;
 
 				const auto name = [&]() {
 					const detail::restore_point _{ in };
-					in.seek_absolute(header.string_table_offset());
+					in.seek_absolute(strpos);
 
 					std::uint16_t len = 0;
 					in >> len;
-					return std::string_view{
+					std::string_view name{
 						reinterpret_cast<const char*>(in.read_bytes(len).data()),
 						len
 					};
+
+					strpos = in.tell();
+					return name;
 				}();
 
 				[[maybe_unused]] const auto [it, success] =
