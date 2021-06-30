@@ -114,43 +114,6 @@ namespace bsa::detail
 		return static_cast<std::underlying_type_t<Enum>>(a_val);
 	}
 
-	template <class T, bool RECURSE>
-	class index_t final
-	{
-	public:
-		using value_type = T;
-		using pointer = value_type*;
-		using reference = value_type&;
-
-		index_t() noexcept = default;
-
-		template <class K>
-		[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
-			requires(RECURSE)
-		{
-			return (**this)[std::forward<K>(a_key)];
-		}
-
-		[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
-
-		[[nodiscard]] auto operator*() const noexcept -> reference
-		{
-			assert(*this);
-			return *_proxy;
-		}
-
-		[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
-
-	private:
-		friend components::hashmap;
-
-		explicit index_t(T& a_value) noexcept :
-			_proxy(&a_value)
-		{}
-
-		T* _proxy{ nullptr };
-	};
-
 	class istream_t final
 	{
 	public:
@@ -556,8 +519,47 @@ namespace bsa::detail
 			using iterator = typename container_type::iterator;
 			using const_iterator = typename container_type::const_iterator;
 
-			using index = index_t<mapped_type, RECURSE>;
-			using const_index = index_t<const mapped_type, RECURSE>;
+		private:
+			template <class U>
+			class index_t final
+			{
+			public:
+				using value_type = U;
+				using pointer = value_type*;
+				using reference = value_type&;
+
+				index_t() noexcept = default;
+
+				template <class K>
+				[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
+					requires(RECURSE)
+				{
+					return (**this)[std::forward<K>(a_key)];
+				}
+
+				[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
+
+				[[nodiscard]] auto operator*() const noexcept -> reference
+				{
+					assert(*this);
+					return *_proxy;
+				}
+
+				[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
+
+			private:
+				friend hashmap;
+
+				explicit index_t(value_type& a_value) noexcept :
+					_proxy(&a_value)
+				{}
+
+				value_type* _proxy{ nullptr };
+			};
+
+		public:
+			using index = index_t<mapped_type>;
+			using const_index = index_t<const mapped_type>;
 
 			hashmap() noexcept = default;
 			hashmap(const hashmap&) noexcept = default;
