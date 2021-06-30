@@ -216,6 +216,34 @@ namespace bsa::fo4
 			std::uint8_t format{ 0 };
 			std::uint8_t flags{ 0 };
 			std::uint8_t tileMode{ 0 };
+
+			friend auto operator>>(
+				detail::istream_t& a_in,
+				header_t& a_header) noexcept
+				-> detail::istream_t&
+			{
+				return a_in >>
+				       a_header.height >>
+				       a_header.width >>
+				       a_header.mipCount >>
+				       a_header.format >>
+				       a_header.flags >>
+				       a_header.tileMode;
+			}
+
+			friend auto operator<<(
+				detail::ostream_t& a_out,
+				const header_t& a_header) noexcept
+				-> detail::ostream_t&
+			{
+				return a_out
+				       << a_header.height
+				       << a_header.width
+				       << a_header.mipCount
+				       << a_header.format
+				       << a_header.flags
+				       << a_header.tileMode;
+			}
 		};
 
 		using value_type = container_type::value_type;
@@ -270,19 +298,10 @@ namespace bsa::fo4
 				break;
 			case format::directx:
 				assert(hdrsz == detail::constants::chunk_header_size_dx10);
+				a_in >> header;
 				break;
 			default:
 				detail::declare_unreachable();
-			}
-
-			if (a_format == format::directx) {
-				a_in >>
-					header.height >>
-					header.width >>
-					header.mipCount >>
-					header.format >>
-					header.flags >>
-					header.tileMode;
 			}
 
 			_chunks.reserve(count);
