@@ -144,14 +144,17 @@ namespace bsa::fo4
 		public detail::components::compressed_container
 	{
 	public:
-	private:
-		friend file;
-
-		struct mip_t final
+		struct mip final
 		{
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 		};
+
+		[[nodiscard]] mip get_mip() const noexcept { return _mip; }
+		void set_mip(mip a_mip) noexcept { _mip = a_mip; }
+
+	private:
+		friend file;
 
 		void read(
 			detail::istream_t& a_in,
@@ -175,10 +178,9 @@ namespace bsa::fo4
 			}
 
 			if (a_format == format::directx) {
-				auto& mip = _mip.emplace(mip_t{});
 				a_in >>
-					mip.first >>
-					mip.last;
+					_mip.first >>
+					_mip.last;
 			}
 
 			std::uint32_t sentinel = 0;
@@ -193,7 +195,7 @@ namespace bsa::fo4
 				decompsz);
 		}
 
-		std::optional<mip_t> _mip;
+		mip _mip;
 	};
 
 	class file final
