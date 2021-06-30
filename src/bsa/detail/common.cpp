@@ -36,7 +36,7 @@ namespace bsa::detail
 		}
 	}
 
-	void normalize_directory(std::string& a_path) noexcept
+	void normalize_path(std::string& a_path) noexcept
 	{
 		for (auto& c : a_path) {
 			c = mapchar(c);

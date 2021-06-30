@@ -103,7 +103,7 @@ namespace bsa::detail
 #endif
 	}
 
-	void normalize_directory(std::string& a_path) noexcept;
+	void normalize_path(std::string& a_path) noexcept;
 
 	template <class Enum>
 	[[nodiscard]] constexpr auto to_underlying(Enum a_val) noexcept

@@ -111,7 +111,7 @@ namespace bsa::tes3
 	{
 		hash hash_file(std::string& a_path) noexcept
 		{
-			detail::normalize_directory(a_path);
+			detail::normalize_path(a_path);
 			hash h;
 
 			const std::size_t midpoint = a_path.length() / 2u;

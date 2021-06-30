@@ -285,7 +285,7 @@ namespace bsa::tes4
 
 		hash hash_directory(std::string& a_path) noexcept
 		{
-			detail::normalize_directory(a_path);
+			detail::normalize_path(a_path);
 			const std::span<const std::byte> view{
 				reinterpret_cast<const std::byte*>(a_path.data()),
 				a_path.size()
@@ -326,7 +326,7 @@ namespace bsa::tes4
 				make_file_extension(".adp"sv),
 			};
 
-			detail::normalize_directory(a_path);
+			detail::normalize_path(a_path);
 			if (const auto pos = a_path.find_last_of('\\'); pos != std::string::npos) {
 				a_path = a_path.substr(pos + 1);
 			}
