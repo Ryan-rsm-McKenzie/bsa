@@ -64,8 +64,13 @@ namespace bsa::tes3
 	class file final :
 		public detail::components::byte_container
 	{
+	private:
+		using super = detail::components::byte_container;
+
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
+
+		using super::clear;
 
 	private:
 		friend archive;

@@ -159,6 +159,9 @@ namespace bsa::fo4
 	class chunk final :
 		public detail::components::compressed_byte_container
 	{
+	private:
+		using super = detail::components::compressed_byte_container;
+
 	public:
 		struct mips_t final
 		{
@@ -185,6 +188,12 @@ namespace bsa::fo4
 				       << a_mips.last;
 			}
 		};
+
+		void clear() noexcept
+		{
+			super::clear();
+			mips = mips_t{};
+		}
 
 		mips_t mips;
 

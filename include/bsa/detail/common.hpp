@@ -434,8 +434,6 @@ namespace bsa::detail
 			public detail::basic_byte_container
 		{
 		public:
-			void clear() noexcept { _data.emplace<data_view>(); }
-
 			void set_data(std::span<const std::byte> a_data) noexcept
 			{
 				_data.emplace<data_view>(a_data);
@@ -447,6 +445,8 @@ namespace bsa::detail
 			}
 
 		protected:
+			void clear() noexcept { _data.emplace<data_view>(); }
+
 			void set_data(
 				std::span<const std::byte> a_data,
 				const istream_t& a_in) noexcept
@@ -459,12 +459,6 @@ namespace bsa::detail
 			public detail::basic_byte_container
 		{
 		public:
-			void clear() noexcept
-			{
-				_data.emplace<data_view>();
-				_decompsz.reset();
-			}
-
 			[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
 
 			[[nodiscard]] auto decompressed_size() const noexcept
@@ -491,6 +485,12 @@ namespace bsa::detail
 			}
 
 		protected:
+			void clear() noexcept
+			{
+				_data.emplace<data_view>();
+				_decompsz.reset();
+			}
+
 			void set_data(
 				std::span<const std::byte> a_data,
 				const istream_t& a_in,
