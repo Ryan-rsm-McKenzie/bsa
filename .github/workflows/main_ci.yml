@@ -38,8 +38,10 @@ jobs:
       - name: Run setup script
         run: ${{ matrix.setup }}
 
-      - name: Create vcpkg binary cache folder
-        run: mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+      - name: Setup vcpkg
+        run: |
+          mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          vcpkg --version > vcpkg-version
 
       - name: Cache vcpkg archives
         uses: actions/cache@v2
@@ -47,7 +49,7 @@ jobs:
           cache-name: vcpkg-cache
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json', '/vcpkg-version') }}
 
       - name: Configure CMake
         env:
