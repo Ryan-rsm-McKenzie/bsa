@@ -24,13 +24,13 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
-            env-access: '$env:'
+            env-access: '$'
             setup: bash scripts/setup.sh
             shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
-            env-access: '$'
+            env-access: '$env:'
             setup: '' # nothing right now
             shell-extension: bat
 
