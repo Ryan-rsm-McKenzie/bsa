@@ -17,7 +17,7 @@ namespace bsa
 		struct istream_proxy;
 
 		template <class Hash>
-		using hasher_t = Hash(*)(std::string&) noexcept;
+		using hasher_t = Hash (*)(std::string&) noexcept;
 
 		template <class Hash, hasher_t<Hash>>
 		class key_t;
