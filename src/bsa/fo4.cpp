@@ -10,7 +10,7 @@
 
 namespace bsa::fo4
 {
-	namespace detail
+	namespace hashing
 	{
 		namespace
 		{
@@ -97,18 +97,15 @@ namespace bsa::fo4
 				return result;
 			}
 		}
-	}
 
-	namespace hashing
-	{
 		hash hash_file(std::string& a_path) noexcept
 		{
 			detail::normalize_path(a_path);
-			const auto pieces = detail::split_path(a_path);
+			const auto pieces = split_path(a_path);
 
 			hash h;
-			h.dir = detail::crc32(pieces.parent);
-			h.file = detail::crc32(pieces.stem);
+			h.dir = crc32(pieces.parent);
+			h.file = crc32(pieces.stem);
 
 			const auto len = std::min<std::size_t>(pieces.extension.length(), 4u);
 			for (std::size_t i = 0; i < len; ++i) {
