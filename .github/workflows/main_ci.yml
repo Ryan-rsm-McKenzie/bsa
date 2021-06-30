@@ -45,7 +45,7 @@ jobs:
       - name: Setup vcpkg
         run: |
           mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          cd ${{ matrix.env-access }}
+          cd ${{ matrix.env-access }}VCPKG_INSTALLATION_ROOT
           ./bootstrap-vcpkg.${{ matrix.shell-extension }}
           ./vcpkg --version > ${{ github.workspace }}/vcpkg-version
 
