@@ -121,11 +121,11 @@ namespace bsa::detail
 
 		index_t() noexcept = default;
 
-		template <class T>
-		[[nodiscard]] auto operator[](T&& a_key) const noexcept  //
+		template <class K>
+		[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
 			requires(RECURSE)
 		{
-			return (**this)[std::forward<T>(a_key)];
+			return (**this)[std::forward<K>(a_key)];
 		}
 
 		[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
