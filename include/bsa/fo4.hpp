@@ -233,6 +233,16 @@ namespace bsa::fo4
 		using container_type = boost::container::small_vector<chunk, 1>;
 
 	public:
+		struct directx_header final
+		{
+			std::uint16_t height{ 0 };
+			std::uint16_t width{ 0 };
+			std::uint8_t mipCount{ 0 };
+			std::uint8_t format{ 0 };
+			std::uint8_t flags{ 0 };
+			std::uint8_t tileMode{ 0 };
+		};
+
 		using value_type = container_type::value_type;
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
@@ -257,24 +267,16 @@ namespace bsa::fo4
 		void clear() noexcept
 		{
 			_chunks.clear();
-			_dx10 = dx10_t{};
+			_header = directx_header{};
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
+		[[nodiscard]] auto get_header() const noexcept -> directx_header { return _header; }
+		void set_header(directx_header a_header) noexcept { _header = a_header; }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
 	private:
 		friend archive;
-
-		struct dx10_t final
-		{
-			std::uint16_t height{ 0 };
-			std::uint16_t width{ 0 };
-			std::uint8_t mipCount{ 0 };
-			std::uint8_t format{ 0 };
-			std::uint8_t flags{ 0 };
-			std::uint8_t tileMode{ 0 };
-		};
 
 		void read_chunk(
 			detail::istream_t& a_in,
@@ -287,14 +289,13 @@ namespace bsa::fo4
 			a_in.seek_relative(2u);  // skip unknown
 
 			if (a_format == format::directx) {
-				auto& dx = _dx10.emplace(dx10_t{});
 				a_in >>
-					dx.height >>
-					dx.width >>
-					dx.mipCount >>
-					dx.format >>
-					dx.flags >>
-					dx.tileMode;
+					_header.height >>
+					_header.width >>
+					_header.mipCount >>
+					_header.format >>
+					_header.flags >>
+					_header.tileMode;
 			}
 
 			_chunks.reserve(count);
@@ -305,7 +306,7 @@ namespace bsa::fo4
 		}
 
 		container_type _chunks;
-		std::optional<dx10_t> _dx10;
+		directx_header _header;
 	};
 
 	class archive final
