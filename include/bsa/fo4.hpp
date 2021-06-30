@@ -187,7 +187,7 @@ namespace bsa::fo4
 
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(dataFileOffset);
-			set_data(
+			this->set_data(
 				a_in.read_bytes(size),
 				a_in,
 				decompsz);
@@ -301,7 +301,7 @@ namespace bsa::fo4
 				return std::nullopt;
 			}
 
-			clear();
+			this->clear();
 			const auto fmt = static_cast<format>(header.archive_format());
 
 			for (std::size_t i = 0; i < header.file_count(); ++i) {

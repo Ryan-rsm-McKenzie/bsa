@@ -142,7 +142,7 @@ namespace bsa::tes3
 		const detail::restore_point _{ a_in };
 
 		a_in.seek_absolute(a_dataOffset + offset);
-		set_data(a_in.read_bytes(size), a_in);
+		this->set_data(a_in.read_bytes(size), a_in);
 	}
 
 	struct archive::offsets_t final
@@ -191,7 +191,7 @@ namespace bsa::tes3
 			return false;
 		}
 
-		clear();
+		this->clear();
 
 		const offsets_t offsets{
 			detail::offsetof_hashes(header),
@@ -201,7 +201,7 @@ namespace bsa::tes3
 		};
 
 		for (std::size_t i = 0; i < header.file_count(); ++i) {
-			read_file(in, offsets, i);
+			this->read_file(in, offsets, i);
 		}
 
 		return true;
@@ -246,13 +246,13 @@ namespace bsa::tes3
 			return false;
 		}
 
-		out << make_header();
+		out << this->make_header();
 
-		write_file_entries(out);
-		write_file_name_offsets(out);
-		write_file_names(out);
-		write_file_hashes(out);
-		write_file_data(out);
+		this->write_file_entries(out);
+		this->write_file_name_offsets(out);
+		this->write_file_names(out);
+		this->write_file_hashes(out);
+		this->write_file_data(out);
 
 		return true;
 	}

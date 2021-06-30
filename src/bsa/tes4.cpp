@@ -56,7 +56,7 @@ namespace bsa::tes4
 				_file(a_files),
 				_archiveTypes(to_underlying(a_types))
 			{
-				evaluate_endian();
+				this->evaluate_endian();
 			}
 
 			friend auto operator>>(
@@ -165,7 +165,7 @@ namespace bsa::tes4
 			void evaluate_endian() noexcept
 			{
 				_endian =
-					xbox_archive() ?
+					this->xbox_archive() ?
                         std::endian::big :
                         std::endian::little;
 			}
@@ -379,9 +379,9 @@ namespace bsa::tes4
 
 	bool file::compress(version a_version) noexcept
 	{
-		assert(!compressed());
+		assert(!this->compressed());
 
-		const auto in = as_bytes();
+		const auto in = this->as_bytes();
 		std::vector<std::byte> out;
 
 		switch (detail::to_underlying(a_version)) {
@@ -429,19 +429,19 @@ namespace bsa::tes4
 			detail::declare_unreachable();
 		}
 
-		set_data(std::move(out), in.size_bytes());
+		this->set_data(std::move(out), in.size_bytes());
 
-		assert(compressed());
+		assert(this->compressed());
 		return true;
 	}
 
 	bool file::decompress(version a_version) noexcept
 	{
-		assert(compressed());
+		assert(this->compressed());
 
-		const auto in = as_bytes();
+		const auto in = this->as_bytes();
 		std::vector<std::byte> out;
-		out.resize(decompressed_size());
+		out.resize(this->decompressed_size());
 
 		switch (detail::to_underlying(a_version)) {
 		case 103:
@@ -455,7 +455,7 @@ namespace bsa::tes4
 					reinterpret_cast<const ::Byte*>(in.data()),
 					static_cast<::uLong>(in.size_bytes()));
 				if (result == Z_OK) {
-					assert(static_cast<std::size_t>(outsz) == decompressed_size());
+					assert(static_cast<std::size_t>(outsz) == this->decompressed_size());
 				} else {
 					return false;
 				}
@@ -469,7 +469,7 @@ namespace bsa::tes4
 				}
 				std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
 					pdctx,
-					LZ4F_freeDecompressionContext
+					::LZ4F_freeDecompressionContext
 				};
 
 				std::size_t insz = 0;
@@ -507,9 +507,9 @@ namespace bsa::tes4
 			detail::declare_unreachable();
 		}
 
-		set_data(std::move(out));
+		this->set_data(std::move(out));
 
-		assert(!compressed());
+		assert(!this->compressed());
 		return true;
 	}
 
@@ -531,13 +531,13 @@ namespace bsa::tes4
 		}
 		a_size &= ~(ichecked | icompression);
 
-		set_data(a_in.read_bytes(a_size), a_in, decompsz);
+		this->set_data(a_in.read_bytes(a_size), a_in, decompsz);
 	}
 
 	void file::write_data(detail::ostream_t& a_out) const noexcept
 	{
-		if (compressed()) {
-			a_out << static_cast<std::uint32_t>(decompressed_size());
+		if (this->compressed()) {
+			a_out << static_cast<std::uint32_t>(this->decompressed_size());
 		}
 
 		a_out.write_bytes(as_bytes());
@@ -547,7 +547,7 @@ namespace bsa::tes4
 	{
 		for ([[maybe_unused]] auto& [key, file] : *this) {
 			const std::string_view name{
-				reinterpret_cast<const char*>(a_in.read_bytes(1).data())
+				reinterpret_cast<const char*>(a_in.read_bytes(1).data())  // zstring
 			};
 			a_in.seek_relative(name.length());
 			const_cast<file::key&>(key).set_name(name, a_in);
@@ -694,18 +694,18 @@ namespace bsa::tes4
 			return std::nullopt;
 		}
 
-		clear();
+		this->clear();
 
 		_flags = header.archive_flags();
 		_types = header.archive_types();
 
 		in.seek_absolute(header.directories_offset());
 		for (std::size_t i = 0; i < header.directory_count(); ++i) {
-			read_directory(in, header);
+			this->read_directory(in, header);
 		}
 
 		if (header.file_strings() && !header.embedded_file_names()) {
-			read_file_names(in, header);
+			this->read_file_names(in, header);
 		}
 
 		return { static_cast<version>(header.archive_version()) };
@@ -713,7 +713,7 @@ namespace bsa::tes4
 
 	[[nodiscard]] bool archive::verify_offsets(version a_version) const noexcept
 	{
-		const auto header = make_header(a_version);
+		const auto header = this->make_header(a_version);
 		auto offset = detail::offsetof_file_data(header);
 
 		std::size_t last = 0;
@@ -740,15 +740,15 @@ namespace bsa::tes4
 			return false;
 		}
 
-		const auto header = make_header(a_version);
+		const auto header = this->make_header(a_version);
 		out << header;
 
-		write_directory_entries(out, header);
-		write_file_entries(out, header);
+		this->write_directory_entries(out, header);
+		this->write_file_entries(out, header);
 		if (header.file_strings()) {
-			write_file_names(out);
+			this->write_file_names(out);
 		}
-		write_file_data(out, header);
+		this->write_file_data(out, header);
 
 		return true;
 	}
@@ -762,7 +762,7 @@ namespace bsa::tes4
 		for (const auto& dir : *this) {
 			dirs.count += 1;
 
-			if (directory_strings()) {
+			if (this->directory_strings()) {
 				dirs.blobsz += static_cast<std::uint32_t>(
 					dir.first.name().length() +
 					1u);  // null terminator
@@ -771,7 +771,7 @@ namespace bsa::tes4
 			for (const auto& file : dir.second) {
 				files.count += 1;
 
-				if (file_strings()) {
+				if (this->file_strings()) {
 					files.blobsz += static_cast<std::uint32_t>(
 						file.first.name().length() +
 						1u);  // null terminator
