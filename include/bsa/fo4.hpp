@@ -213,7 +213,7 @@ namespace bsa::fo4
 			}
 
 			if (a_format == format::directx) {
-				a_in >> mips;
+				a_in >> this->mips;
 			}
 
 			std::uint32_t sentinel = 0;
@@ -297,7 +297,7 @@ namespace bsa::fo4
 		void clear() noexcept
 		{
 			_chunks.clear();
-			header = header_t{};
+			this->header = header_t{};
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
@@ -325,7 +325,7 @@ namespace bsa::fo4
 				break;
 			case format::directx:
 				assert(hdrsz == detail::constants::chunk_header_size_dx10);
-				a_in >> header;
+				a_in >> this->header;
 				break;
 			default:
 				detail::declare_unreachable();
