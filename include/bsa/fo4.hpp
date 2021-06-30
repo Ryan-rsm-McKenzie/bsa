@@ -10,7 +10,6 @@
 #include <string>
 #include <string_view>
 
-#include <boost/container/map.hpp>
 #include <boost/container/small_vector.hpp>
 
 #include "bsa/detail/common.hpp"
@@ -276,36 +275,14 @@ namespace bsa::fo4
 		container_type _chunks;
 	};
 
-	class archive final
+	class archive final :
+		public detail::components::hashmap<file>
 	{
 	private:
-		using container_type =
-			boost::container::map<file::key, file>;
+		using super = detail::components::hashmap<file>;
 
 	public:
-		using key_type = container_type::key_type;
-		using mapped_type = container_type::mapped_type;
-		using value_type = container_type::value_type;
-		using key_compare = container_type::key_compare;
-		using iterator = container_type::iterator;
-		using const_iterator = container_type::const_iterator;
-
-		archive() noexcept = default;
-		archive(const archive&) noexcept = default;
-		archive(archive&&) noexcept = default;
-		~archive() noexcept = default;
-		archive& operator=(const archive&) noexcept = default;
-		archive& operator=(archive&&) noexcept = default;
-
-		[[nodiscard]] auto begin() noexcept -> iterator { return _files.begin(); }
-		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _files.begin(); }
-		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _files.cbegin(); }
-
-		[[nodiscard]] auto end() noexcept -> iterator { return _files.end(); }
-		[[nodiscard]] auto end() const noexcept -> const_iterator { return _files.end(); }
-		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _files.cend(); }
-
-		void clear() noexcept { _files.clear(); }
+		using super::clear;
 
 		[[nodiscard]] auto read(std::filesystem::path a_path) noexcept
 			-> std::optional<format>
@@ -344,7 +321,7 @@ namespace bsa::fo4
 				}();
 
 				[[maybe_unused]] const auto [it, success] =
-					_files.emplace(
+					this->emplace(
 						std::piecewise_construct,
 						std::forward_as_tuple(hash, name, in),
 						std::forward_as_tuple());
@@ -359,8 +336,5 @@ namespace bsa::fo4
 		[[nodiscard]] bool write(
 			std::filesystem::path a_path,
 			format a_format) noexcept;
-
-	private:
-		container_type _files;
 	};
 }

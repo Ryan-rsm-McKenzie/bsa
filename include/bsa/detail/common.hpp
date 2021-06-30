@@ -17,6 +17,7 @@
 #include <variant>
 #include <vector>
 
+#include <boost/container/map.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
 
@@ -141,9 +142,7 @@ namespace bsa::detail
 		[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
 	private:
-		friend tes3::archive;
-		friend tes4::archive;
-		friend tes4::directory;
+		friend components::hashmap;
 
 		explicit index_t(T& a_value) noexcept :
 			_proxy(&a_value)
@@ -540,6 +539,94 @@ namespace bsa::detail
 			{
 				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
 			}
+		};
+
+		template <class T, bool RECURSE>
+		class hashmap
+		{
+		private:
+			using container_type =
+				boost::container::map<typename T::key, T>;
+
+		public:
+			using key_type = typename container_type::key_type;
+			using mapped_type = typename container_type::mapped_type;
+			using value_type = typename container_type::value_type;
+			using key_compare = typename container_type::key_compare;
+			using iterator = typename container_type::iterator;
+			using const_iterator = typename container_type::const_iterator;
+
+			using index = index_t<mapped_type, RECURSE>;
+			using const_index = index_t<const mapped_type, RECURSE>;
+
+			hashmap() noexcept = default;
+			hashmap(const hashmap&) noexcept = default;
+			hashmap(hashmap&&) noexcept = default;
+			~hashmap() noexcept = default;
+			hashmap& operator=(const hashmap&) noexcept = default;
+			hashmap& operator=(hashmap&&) noexcept = default;
+
+			[[nodiscard]] auto operator[](const key_type& a_key) noexcept
+				-> index
+			{
+				const auto it = _map.find(a_key);
+				return it != _map.end() ? index{ it->second } : index{};
+			}
+
+			[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
+				-> const_index
+			{
+				const auto it = _map.find(a_key);
+				return it != _map.end() ? const_index{ it->second } : const_index{};
+			}
+
+			[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
+			[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
+			[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
+
+			[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
+			[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
+			[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
+
+			[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
+
+			bool erase(const key_type& a_key) noexcept
+			{
+				const auto it = _map.find(a_key);
+				if (it != _map.end()) {
+					_map.erase(it);
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			[[nodiscard]] auto find(const key_type& a_key) noexcept
+				-> iterator { return _map.find(a_key); }
+
+			[[nodiscard]] auto find(const key_type& a_key) const noexcept
+				-> const_iterator { return _map.find(a_key); }
+
+			auto insert(key_type a_key, mapped_type a_value) noexcept
+				-> std::pair<iterator, bool>
+			{
+				return _map.emplace(std::move(a_key), std::move(a_value));
+			}
+
+			[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
+
+		protected:
+			void clear() { _map.clear(); }
+
+			template <class... Args>
+			auto emplace(Args&&... a_args) noexcept
+				-> std::pair<iterator, bool>
+			{
+				return _map.emplace(std::forward<Args>(a_args)...);
+			}
+
+		private:
+			container_type _map;
 		};
 	}
 }

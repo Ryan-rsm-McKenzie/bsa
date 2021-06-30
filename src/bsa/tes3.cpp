@@ -7,12 +7,10 @@
 #include <cstdint>
 #include <filesystem>
 #include <limits>
-#include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <utility>
-#include <variant>
 
 namespace bsa::tes3
 {
@@ -177,17 +175,6 @@ namespace bsa::tes3
 		}
 	};
 
-	bool archive::erase(const key_type& a_key) noexcept
-	{
-		const auto it = _files.find(a_key);
-		if (it != _files.end()) {
-			_files.erase(it);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	bool archive::read(std::filesystem::path a_path) noexcept
 	{
 		detail::istream_t in{ std::move(a_path) };
@@ -225,7 +212,7 @@ namespace bsa::tes3
 		offsets_t total;
 		offsets_t last;
 
-		for (const auto& [key, file] : _files) {
+		for (const auto& [key, file] : *this) {
 			last.nameOffsets += key.name().length() +
 			                    1u;  // include null terminator
 			last.fileData += file.size();
@@ -235,7 +222,7 @@ namespace bsa::tes3
 
 		total.hashes =
 			detail::constants::header_size +
-			(detail::constants::file_entry_size + 4u) * _files.size() +
+			(detail::constants::file_entry_size + 4u) * this->size() +
 			total.nameOffsets;
 		total -= last;
 
@@ -274,15 +261,15 @@ namespace bsa::tes3
 		-> detail::header_t
 	{
 		std::size_t offset =
-			(detail::constants::file_entry_size + 4u) * _files.size();
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+			(detail::constants::file_entry_size + 4u) * this->size();
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			offset += key.name().length() +
 			          1u;  // include null terminator
 		}
 
 		return {
 			static_cast<std::uint32_t>(offset),
-			static_cast<std::uint32_t>(_files.size())
+			static_cast<std::uint32_t>(this->size())
 		};
 	}
 
@@ -311,7 +298,7 @@ namespace bsa::tes3
 		}();
 
 		[[maybe_unused]] const auto [it, success] =
-			_files.emplace(
+			this->emplace(
 				std::piecewise_construct,
 				std::forward_as_tuple(hash, name, a_in),
 				std::forward_as_tuple());
@@ -325,7 +312,7 @@ namespace bsa::tes3
 	void archive::write_file_entries(detail::ostream_t& a_out) const noexcept
 	{
 		std::uint32_t offset = 0;
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			const auto size = static_cast<std::uint32_t>(file.size());
 			a_out
 				<< size
@@ -337,7 +324,7 @@ namespace bsa::tes3
 	void archive::write_file_name_offsets(detail::ostream_t& a_out) const noexcept
 	{
 		std::uint32_t offset = 0;
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			a_out << offset;
 			offset += key.name().length() +
 			          1u;  // include null terminator
@@ -346,7 +333,7 @@ namespace bsa::tes3
 
 	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			const auto name = key.name();
 			a_out.write_bytes({ //
 				reinterpret_cast<const std::byte*>(name.data()),
@@ -357,14 +344,14 @@ namespace bsa::tes3
 
 	void archive::write_file_hashes(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			a_out << key.hash();
 		}
 	}
 
 	void archive::write_file_data(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, file] : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			a_out.write_bytes(file.as_bytes());
 		}
 	}

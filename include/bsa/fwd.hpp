@@ -15,6 +15,9 @@ namespace bsa
 
 			class compressed_byte_container;
 			class byte_container;
+
+			template <class, bool = false>
+			class hashmap;
 		}
 
 		class istream_t;

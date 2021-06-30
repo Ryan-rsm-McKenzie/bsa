@@ -543,20 +543,9 @@ namespace bsa::tes4
 		a_out.write_bytes(as_bytes());
 	}
 
-	bool directory::erase(const key_type& a_key) noexcept
-	{
-		const auto it = _files.find(a_key);
-		if (it != _files.end()) {
-			_files.erase(it);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	void directory::read_file_names(detail::istream_t& a_in) noexcept
 	{
-		for ([[maybe_unused]] auto& [key, file] : _files) {
+		for ([[maybe_unused]] auto& [key, file] : *this) {
 			const std::string_view name{
 				reinterpret_cast<const char*>(a_in.read_bytes(1).data())
 			};
@@ -610,7 +599,7 @@ namespace bsa::tes4
 			}();
 
 			[[maybe_unused]] const auto [it, success] =
-				_files.emplace(
+				this->emplace(
 					std::piecewise_construct,
 					std::forward_as_tuple(hash, fname, a_in),
 					std::forward_as_tuple());
@@ -632,7 +621,7 @@ namespace bsa::tes4
 			a_dirname.size()
 		};
 
-		for (const auto& [key, file] : _files) {
+		for (const auto& [key, file] : *this) {
 			if (a_header.embedded_file_names()) {
 				const auto fname = key.name();
 				const auto len = dirbytes.size() +
@@ -655,7 +644,7 @@ namespace bsa::tes4
 		const detail::header_t& a_header,
 		std::uint32_t& a_dataOffset) const noexcept
 	{
-		for (const auto& [key, file] : _files) {
+		for (const auto& [key, file] : *this) {
 			key.hash().write(a_out, a_header.endian());
 			const auto fsize = file.size();
 			if (!!a_header.compressed() != !!file.compressed()) {
@@ -679,23 +668,12 @@ namespace bsa::tes4
 
 	void directory::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, file] : _files) {  // zstring
+		for ([[maybe_unused]] const auto& [key, file] : *this) {  // zstring
 			const auto fname = key.name();
 			a_out.write_bytes({ //
 				reinterpret_cast<const std::byte*>(fname.data()),
 				fname.length() });
 			a_out << std::byte{ '\0' };
-		}
-	}
-
-	bool archive::erase(const key_type& a_key) noexcept
-	{
-		const auto it = _directories.find(a_key);
-		if (it != _directories.end()) {
-			_directories.erase(it);
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -739,7 +717,7 @@ namespace bsa::tes4
 		auto offset = detail::offsetof_file_data(header);
 
 		std::size_t last = 0;
-		for (const auto& dir : _directories) {
+		for (const auto& dir : *this) {
 			for (const auto& [key, file] : dir.second) {
 				last = key.name().length() +
 				       1u;  // prefixed byte length
@@ -781,7 +759,7 @@ namespace bsa::tes4
 		detail::header_t::info_t files;
 		detail::header_t::info_t dirs;
 
-		for (const auto& dir : _directories) {
+		for (const auto& dir : *this) {
 			dirs.count += 1;
 
 			if (directory_strings()) {
@@ -815,7 +793,7 @@ namespace bsa::tes4
 		const detail::header_t& a_header) noexcept
 	{
 		a_in.seek_absolute(detail::offsetof_file_strings(a_header));
-		for ([[maybe_unused]] auto& [key, dir] : _directories) {
+		for ([[maybe_unused]] auto& [key, dir] : *this) {
 			dir.read_file_names(a_in);
 		}
 	}
@@ -862,7 +840,7 @@ namespace bsa::tes4
 		}();
 
 		[[maybe_unused]] const auto [it, success] =
-			_directories.emplace(
+			this->emplace(
 				std::piecewise_construct,
 				std::forward_as_tuple(hash, name, a_in),
 				std::forward_as_tuple());
@@ -881,7 +859,7 @@ namespace bsa::tes4
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_entries(a_header));
 		offset += static_cast<std::uint32_t>(a_header.file_names_length());
 
-		for (const auto& [key, dir] : _directories) {
+		for (const auto& [key, dir] : *this) {
 			key.hash().write(a_out, a_header.endian());
 			a_out << static_cast<std::uint32_t>(dir.size());
 
@@ -917,7 +895,7 @@ namespace bsa::tes4
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
-		for (const auto& [key, dir] : _directories) {
+		for (const auto& [key, dir] : *this) {
 			dir.write_file_data(a_out, a_header, key.name());
 		}
 	}
@@ -927,7 +905,7 @@ namespace bsa::tes4
 		const detail::header_t& a_header) const noexcept
 	{
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_data(a_header));
-		for ([[maybe_unused]] const auto& [key, dir] : _directories) {
+		for ([[maybe_unused]] const auto& [key, dir] : *this) {
 			if (a_header.directory_strings()) {  // bzstring
 				const auto dirname = key.name();
 				a_out << static_cast<std::uint8_t>(
@@ -945,7 +923,7 @@ namespace bsa::tes4
 
 	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, dir] : _directories) {
+		for ([[maybe_unused]] const auto& [key, dir] : *this) {
 			dir.write_file_names(a_out);
 		}
 	}
