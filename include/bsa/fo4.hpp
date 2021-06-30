@@ -283,8 +283,8 @@ namespace bsa::fo4
 		file(const file&) noexcept = default;
 		file(file&&) noexcept = default;
 		~file() noexcept = default;
-		file& operator=(const file&) noexcept = delete;
-		file& operator=(file&&) noexcept = delete;
+		file& operator=(const file&) noexcept = default;
+		file& operator=(file&&) noexcept = default;
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
