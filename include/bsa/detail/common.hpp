@@ -470,7 +470,7 @@ namespace bsa::detail
 			[[nodiscard]] auto decompressed_size() const noexcept
 				-> std::size_t
 			{
-				assert(compressed());
+				assert(this->compressed());
 				return *_decompsz;
 			}
 
