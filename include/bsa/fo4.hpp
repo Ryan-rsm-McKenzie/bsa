@@ -261,7 +261,19 @@ namespace bsa::fo4
 
 			a_in.seek_relative(1u);  // skip mod index
 			a_in >> count;
-			a_in.seek_relative(2u);  // skip unknown
+
+			std::uint16_t hdrsz = 0;
+			a_in >> hdrsz;
+			switch (a_format) {
+			case format::general:
+				assert(hdrsz == detail::constants::chunk_header_size_gnrl);
+				break;
+			case format::directx:
+				assert(hdrsz == detail::constants::chunk_header_size_dx10);
+				break;
+			default:
+				detail::declare_unreachable();
+			}
 
 			if (a_format == format::directx) {
 				a_in >>
