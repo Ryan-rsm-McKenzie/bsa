@@ -426,15 +426,15 @@ namespace bsa::detail
 	{
 		namespace detail
 		{
-			class raw_container
+			class basic_byte_container
 			{
 			public:
-				raw_container() noexcept = default;
-				raw_container(const raw_container&) noexcept = default;
-				raw_container(raw_container&&) noexcept = default;
-				~raw_container() noexcept = default;
-				raw_container& operator=(const raw_container&) noexcept = default;
-				raw_container& operator=(raw_container&&) noexcept = default;
+				basic_byte_container() noexcept = default;
+				basic_byte_container(const basic_byte_container&) noexcept = default;
+				basic_byte_container(basic_byte_container&&) noexcept = default;
+				~basic_byte_container() noexcept = default;
+				basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
+				basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
 
 				auto as_bytes() const noexcept -> std::span<const std::byte>;
 				[[nodiscard]] auto data() const noexcept
@@ -444,8 +444,8 @@ namespace bsa::detail
 					-> std::size_t { return as_bytes().size(); }
 
 			private:
-				friend components::compressed_container;
-				friend components::container;
+				friend components::compressed_byte_container;
+				friend components::byte_container;
 
 				enum : std::size_t
 				{
@@ -468,8 +468,8 @@ namespace bsa::detail
 			};
 		}
 
-		class compressed_container :
-			public detail::raw_container
+		class compressed_byte_container :
+			public detail::basic_byte_container
 		{
 		public:
 			void clear() noexcept
@@ -517,8 +517,8 @@ namespace bsa::detail
 			std::optional<std::size_t> _decompsz;
 		};
 
-		class container :
-			public detail::raw_container
+		class byte_container :
+			public detail::basic_byte_container
 		{
 		public:
 			void clear() noexcept { _data.emplace<data_view>(); }

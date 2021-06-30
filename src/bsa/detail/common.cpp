@@ -93,7 +93,7 @@ namespace bsa::detail
 
 	namespace components::detail
 	{
-		auto raw_container::as_bytes() const noexcept
+		auto basic_byte_container::as_bytes() const noexcept
 			-> std::span<const std::byte>
 		{
 			switch (_data.index()) {

@@ -113,7 +113,7 @@ namespace bsa::tes4
 	}
 
 	class file final :
-		public detail::components::compressed_container
+		public detail::components::compressed_byte_container
 	{
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;

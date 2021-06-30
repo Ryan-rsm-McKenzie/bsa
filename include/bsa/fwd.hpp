@@ -10,11 +10,11 @@ namespace bsa
 		{
 			namespace detail
 			{
-				class raw_container;
+				class basic_byte_container;
 			}
 
-			class compressed_container;
-			class container;
+			class compressed_byte_container;
+			class byte_container;
 		}
 
 		class istream_t;

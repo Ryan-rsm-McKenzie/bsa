@@ -141,7 +141,7 @@ namespace bsa::fo4
 	}
 
 	class chunk final :
-		public detail::components::compressed_container
+		public detail::components::compressed_byte_container
 	{
 	public:
 		struct mips_t final

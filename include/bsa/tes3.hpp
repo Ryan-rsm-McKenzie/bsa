@@ -65,7 +65,7 @@ namespace bsa::tes3
 	}
 
 	class file final :
-		public detail::components::container
+		public detail::components::byte_container
 	{
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
