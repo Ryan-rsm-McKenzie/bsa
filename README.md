@@ -25,14 +25,14 @@ if (file) {
 #include <utility>
 
 const char payload[] = { "Hello world!\n" };
-bsa::tes4::file f{ "hello.txt" };
+bsa::tes4::file f;
 f.set_data({ reinterpret_cast<const std::byte*>(payload), sizeof(payload) - 1 });
 
-bsa::tes4::directory d{ "misc" };
-d.insert(std::move(f));
+bsa::tes4::directory d;
+d.insert("hello.txt", std::move(f));
 
 bsa::tes4::archive bsa;
-bsa.insert(std::move(d));
+bsa.insert("misc", std::move(d));
 bsa.archive_flags(bsa::tes4::archive_flag::file_strings | bsa::tes4::archive_flag::directory_strings);
 bsa.archive_types(bsa::tes4::archive_type::misc);
 
