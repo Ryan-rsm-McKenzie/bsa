@@ -13,7 +13,7 @@
 #include <variant>
 #include <vector>
 
-#include <boost/container/set.hpp>
+#include <boost/container/map.hpp>
 #include <boost/container/small_vector.hpp>
 
 #include "bsa/detail/common.hpp"
@@ -139,6 +139,8 @@ namespace bsa::fo4
 				       << a_hash.dir;
 			}
 		};
+
+		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
 	class chunk final
@@ -236,18 +238,14 @@ namespace bsa::fo4
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
 
-		explicit file(hashing::hash a_hash) noexcept :
-			_hash(a_hash)
-		{}
+		using key = detail::key_t<hashing::hash, hashing::hash_file>;
 
-		template <detail::concepts::stringable String>
-		explicit file(String&& a_path) noexcept;
-
+		file() noexcept = default;
 		file(const file&) noexcept = default;
 		file(file&&) noexcept = default;
 		~file() noexcept = default;
-		file& operator=(const file&) = delete;
-		file& operator=(file&&) = delete;
+		file& operator=(const file&) noexcept = delete;
+		file& operator=(file&&) noexcept = delete;
 
 		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
@@ -264,7 +262,6 @@ namespace bsa::fo4
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
-		[[nodiscard]] auto hash() const noexcept -> const hashing::hash& { return _hash; }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
 	protected:
@@ -298,17 +295,6 @@ namespace bsa::fo4
 			}
 		}
 
-		void read_name(detail::istream_t& a_in) noexcept
-		{
-			std::uint16_t len = 0;
-			a_in >> len;
-			std::string_view name{
-				reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
-				len
-			};
-			const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
-		}
-
 	private:
 		struct dx10_t final
 		{
@@ -320,43 +306,21 @@ namespace bsa::fo4
 			std::uint8_t tileMode{ 0 };
 		};
 
-		enum : std::size_t
-		{
-			name_null,
-			name_owner,
-			name_proxied,
-
-			name_count
-		};
-
-		using name_proxy = detail::istream_proxy<std::string_view>;
-
-		using name_t = std::variant<
-			std::monostate,
-			std::string,
-			name_proxy>;
-
-		const hashing::hash _hash;
-		const name_t _name;
 		container_type _chunks;
 		std::optional<dx10_t> _dx10;
-
-		static_assert(name_count == std::variant_size_v<decltype(_name)>);
 	};
 
 	class archive final
 	{
-	public:
-		using key_type = file;
-		using key_compare = detail::key_compare_t<key_type, hashing::hash>;
-
 	private:
 		using container_type =
-			boost::container::set<key_type, key_compare>;
+			boost::container::map<file::key, file>;
 
 	public:
+		using key_type = container_type::key_type;
+		using mapped_type = container_type::mapped_type;
 		using value_type = container_type::value_type;
-		using value_compare = container_type::value_compare;
+		using key_compare = container_type::key_compare;
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
 
@@ -398,17 +362,29 @@ namespace bsa::fo4
 			const auto fmt = static_cast<format>(header.archive_format());
 
 			for (std::size_t i = 0; i < header.file_count(); ++i) {
-				hashing::hash h;
-				in >> h;
-				[[maybe_unused]] const auto [it, success] = _files.emplace(h);
+				hashing::hash hash;
+				in >> hash;
+
+				const auto name = [&]() {
+					const detail::restore_point _{ in };
+					in.seek_absolute(header.string_table_offset());
+
+					std::uint16_t len = 0;
+					in >> len;
+					return std::string_view{
+						reinterpret_cast<const char*>(in.read_bytes(len).data()),
+						len
+					};
+				}();
+
+				[[maybe_unused]] const auto [it, success] =
+					_files.emplace(
+						std::piecewise_construct,
+						std::forward_as_tuple(hash, name, in),
+						std::forward_as_tuple());
 				assert(success);
 
-				it->read_chunk(in, fmt);
-			}
-
-			in.seek_absolute(header.string_table_offset());
-			for (auto& file : _files) {
-				file.read_name(in);
+				it->second.read_chunk(in, fmt);
 			}
 
 			return { fmt };

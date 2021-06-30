@@ -10,14 +10,17 @@ namespace bsa
 		class ostream_t;
 		class restore_point;
 
-		template <class, bool, class>
+		template <class, bool>
 		class index_t;
 
 		template <class T>
 		struct istream_proxy;
 
-		template <class, class>
-		struct key_compare_t;
+		template <class Hash>
+		using hasher_t = Hash(*)(std::string&) noexcept;
+
+		template <class Hash, hasher_t<Hash>>
+		class key_t;
 	}
 
 	namespace fo4

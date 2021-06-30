@@ -78,7 +78,7 @@ TEST_CASE("bsa::tes3::file", "[tes3.file]")
 {
 	SECTION("files start empty")
 	{
-		bsa::tes3::file f{ "example.txt" };
+		bsa::tes3::file f;
 		REQUIRE(f.empty());
 		REQUIRE(f.size() == 0);
 		REQUIRE(f.as_bytes().empty());

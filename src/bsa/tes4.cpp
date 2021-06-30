@@ -541,54 +541,11 @@ namespace bsa::tes4
 		return true;
 	}
 
-	auto file::filename() const noexcept
-		-> std::string_view
-	{
-		switch (_name.index()) {
-		case name_null:
-			return {};
-		case name_owner:
-			return *std::get_if<name_owner>(&_name);
-		case name_proxied:
-			return std::get_if<name_proxied>(&_name)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	auto file::read_data(
+	void file::read_data(
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
-		std::size_t a_size,
-		std::size_t a_offset) noexcept
-		-> std::optional<std::string_view>
+		std::size_t a_size) noexcept
 	{
-		std::optional<std::string_view> dirname;
-
-		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(a_offset & ~isecondary_archive);
-
-		if (a_header.embedded_file_names()) {  // bstring
-			std::uint8_t len = 0;
-			a_in >> len;
-			const auto bytes = a_in.read_bytes(len);
-
-			if (_name.index() == name_null) {
-				std::string_view name{
-					reinterpret_cast<const char*>(bytes.data()),
-					len
-				};
-				const auto pos = name.find_last_of("\\/"sv);
-				if (pos != std::string_view::npos) {
-					dirname = name.substr(0, pos);
-					name = name.substr(pos + 1);
-				}
-				const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
-			}
-
-			a_size -= static_cast<std::size_t>(len) + 1;
-		}
-
 		const bool compressed =
 			a_size & icompression ?
                 !a_header.compressed() :
@@ -602,40 +559,10 @@ namespace bsa::tes4
 		a_size &= ~(ichecked | icompression);
 
 		_data.emplace<data_proxied>(a_in.read_bytes(a_size), a_in.rdbuf());
-		return dirname;
 	}
 
-	void file::read_filename(detail::istream_t& a_in) noexcept
+	void file::write_data(detail::ostream_t& a_out) const noexcept
 	{
-		// zstring
-		const std::string_view name{
-			reinterpret_cast<const char*>(a_in.read_bytes(1).data())
-		};
-		a_in.seek_relative(name.length());
-		const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
-	}
-
-	void file::write_data(
-		detail::ostream_t& a_out,
-		const detail::header_t& a_header,
-		std::string_view a_dirname) const noexcept
-	{
-		if (a_header.embedded_file_names()) {
-			const auto writeStr = [&](std::string_view a_str) noexcept {
-				a_out.write_bytes(
-					{ reinterpret_cast<const std::byte*>(a_str.data()), a_str.length() });
-			};
-
-			const auto myname = filename();
-			a_out << static_cast<std::uint8_t>(
-				a_dirname.length() +
-				1u +  // directory separator
-				myname.length());
-			writeStr(a_dirname);
-			a_out << std::byte{ '\\' };
-			writeStr(myname);
-		}
-
 		if (compressed()) {
 			a_out << static_cast<std::uint32_t>(*_decompsz);
 		}
@@ -643,17 +570,9 @@ namespace bsa::tes4
 		a_out.write_bytes(as_bytes());
 	}
 
-	void file::write_filename(detail::ostream_t& a_out) const noexcept
+	bool directory::erase(const key_type& a_key) noexcept
 	{
-		const auto name = filename();
-		a_out.write_bytes(
-			{ reinterpret_cast<const std::byte*>(name.data()), name.length() });
-		a_out << std::byte{ '\0' };
-	}
-
-	bool directory::erase(hashing::hash a_hash) noexcept
-	{
-		const auto it = _files.find(a_hash);
+		const auto it = _files.find(a_key);
 		if (it != _files.end()) {
 			_files.erase(it);
 			return true;
@@ -662,70 +581,99 @@ namespace bsa::tes4
 		}
 	}
 
-	auto directory::name() const noexcept
-		-> std::string_view
-	{
-		switch (_name.index()) {
-		case name_null:
-			return {};
-		case name_owner:
-			return *std::get_if<name_owner>(&_name);
-		case name_proxied:
-			return std::get_if<name_proxied>(&_name)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
 	void directory::read_file_names(detail::istream_t& a_in) noexcept
 	{
-		for (auto& file : _files) {
-			file.read_filename(a_in);
+		for ([[maybe_unused]] auto& [key, file] : _files) {
+			const std::string_view name{
+				reinterpret_cast<const char*>(a_in.read_bytes(1).data())
+			};
+			a_in.seek_relative(name.length());
+			const_cast<file::key&>(key).set_name(name, a_in);
 		}
 	}
 
-	void directory::read_files(
+	auto directory::read_files(
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
 		std::size_t a_count) noexcept
+		-> std::optional<std::string_view>
 	{
-		if (a_header.directory_strings()) {  // bzstring
-			std::uint8_t len = 0;
-			a_in >> len;
-			const std::string_view name{
-				reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
-				len - 1u  // skip null terminator
-			};
-
-			const_cast<name_t&>(_name).emplace<name_proxied>(name, a_in.rdbuf());
-		}
+		std::optional<std::string_view> dirname;
 
 		for (std::size_t i = 0; i < a_count; ++i) {
-			hashing::hash h;
-			h.read(a_in, a_header.endian());
+			hashing::hash hash;
+			hash.read(a_in, a_header.endian());
 
 			std::uint32_t size = 0;
 			std::uint32_t offset = 0;
 			a_in >> size >> offset;
 
-			file f{ h };
-			const auto dirname = f.read_data(a_in, a_header, size, offset);
-			if (_name.index() == name_null && dirname) {
-				const_cast<name_t&>(_name).emplace<name_proxied>(*dirname, a_in.rdbuf());
-			}
+			const detail::restore_point _{ a_in };
+			a_in.seek_absolute(offset & ~file::isecondary_archive);
 
-			[[maybe_unused]] const auto [it, success] = _files.insert(std::move(f));
+			const auto fname = [&]() noexcept -> std::string_view {
+				if (a_header.embedded_file_names()) {  // bstring
+					std::uint8_t len = 0;
+					a_in >> len;
+					const auto bytes = a_in.read_bytes(len);
+
+					std::string_view name{
+						reinterpret_cast<const char*>(bytes.data()),
+						len
+					};
+					const auto pos = name.find_last_of("\\/"sv);
+					if (pos != std::string_view::npos) {
+						if (!dirname) {
+							dirname = name.substr(0, pos);
+						}
+						name = name.substr(pos + 1);
+					}
+
+					size -= static_cast<std::size_t>(len) + 1;
+					return name;
+				} else {
+					return {};
+				}
+			}();
+
+			[[maybe_unused]] const auto [it, success] =
+				_files.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(hash, fname, a_in),
+					std::forward_as_tuple());
 			assert(success);
+
+			it->second.read_data(a_in, a_header, size);
 		}
+
+		return dirname;
 	}
 
 	void directory::write_file_data(
 		detail::ostream_t& a_out,
-		const detail::header_t& a_header) const noexcept
+		const detail::header_t& a_header,
+		std::string_view a_dirname) const noexcept
 	{
-		const auto myname = name();
-		for (const auto& file : _files) {
-			file.write_data(a_out, a_header, myname);
+		std::span dirbytes{
+			reinterpret_cast<const std::byte*>(a_dirname.data()),
+			a_dirname.size()
+		};
+
+		for (const auto& [key, file] : _files) {
+			if (a_header.embedded_file_names()) {
+				const auto fname = key.name();
+				const auto len = dirbytes.size() +
+				                 1u +  // directory separator
+				                 fname.size();
+				a_out << static_cast<std::uint8_t>(len);
+				a_out.write_bytes(dirbytes);
+				a_out << std::byte{ '\\' };
+				a_out.write_bytes({ //
+					reinterpret_cast<const std::byte*>(fname.data()),
+					fname.size() });
+			}
+
+			file.write_data(a_out);
 		}
 	}
 
@@ -734,16 +682,8 @@ namespace bsa::tes4
 		const detail::header_t& a_header,
 		std::uint32_t& a_dataOffset) const noexcept
 	{
-		if (a_header.directory_strings()) {  // bzstring
-			const auto myname = name();
-			a_out << static_cast<std::uint8_t>(myname.length() + 1u);  // include null terminator
-			a_out.write_bytes(
-				{ reinterpret_cast<const std::byte*>(myname.data()), myname.size() });
-			a_out << std::byte{ '\0' };
-		}
-
-		for (const auto& file : _files) {
-			file.hash().write(a_out, a_header.endian());
+		for (const auto& [key, file] : _files) {
+			key.hash().write(a_out, a_header.endian());
 			const auto fsize = file.size();
 			if (!!a_header.compressed() != !!file.compressed()) {
 				a_out << (static_cast<std::uint32_t>(fsize) | file::icompression);
@@ -754,7 +694,7 @@ namespace bsa::tes4
 
 			if (a_header.embedded_file_names()) {
 				a_dataOffset += static_cast<std::uint32_t>(
-					file.filename().length() +
+					key.name().length() +
 					1u);  // prefixed byte length
 			}
 			if (file.compressed()) {
@@ -766,14 +706,18 @@ namespace bsa::tes4
 
 	void directory::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& file : _files) {
-			file.write_filename(a_out);
+		for ([[maybe_unused]] const auto& [key, file] : _files) {  // zstring
+			const auto fname = key.name();
+			a_out.write_bytes({ //
+				reinterpret_cast<const std::byte*>(fname.data()),
+				fname.length() });
+			a_out << std::byte{ '\0' };
 		}
 	}
 
-	bool archive::erase(hashing::hash a_hash) noexcept
+	bool archive::erase(const key_type& a_key) noexcept
 	{
-		const auto it = _directories.find(a_hash);
+		const auto it = _directories.find(a_key);
 		if (it != _directories.end()) {
 			_directories.erase(it);
 			return true;
@@ -823,8 +767,8 @@ namespace bsa::tes4
 
 		std::size_t last = 0;
 		for (const auto& dir : _directories) {
-			for (const auto& file : dir) {
-				last = file.filename().length() +
+			for (const auto& [key, file] : dir.second) {
+				last = key.name().length() +
 				       1u;  // prefixed byte length
 				if (file.compressed()) {
 					last += 4u;
@@ -869,16 +813,16 @@ namespace bsa::tes4
 
 			if (directory_strings()) {
 				dirs.blobsz += static_cast<std::uint32_t>(
-					dir.name().length() +
+					dir.first.name().length() +
 					1u);  // null terminator
 			}
 
-			for (const auto& file : dir) {
+			for (const auto& file : dir.second) {
 				files.count += 1;
 
 				if (file_strings()) {
 					files.blobsz += static_cast<std::uint32_t>(
-						file.filename().length() +
+						file.first.name().length() +
 						1u);  // null terminator
 				}
 			}
@@ -898,7 +842,7 @@ namespace bsa::tes4
 		const detail::header_t& a_header) noexcept
 	{
 		a_in.seek_absolute(detail::offsetof_file_strings(a_header));
-		for (auto& dir : _directories) {
+		for ([[maybe_unused]] auto& [key, dir] : _directories) {
 			dir.read_file_names(a_in);
 		}
 	}
@@ -909,7 +853,6 @@ namespace bsa::tes4
 	{
 		hashing::hash hash;
 		hash.read(a_in, a_header.endian());
-		directory dir{ hash };
 
 		std::uint32_t count = 0;
 		a_in >> count;
@@ -931,10 +874,31 @@ namespace bsa::tes4
 
 		const detail::restore_point _{ a_in };
 		a_in.seek_absolute(offset - a_header.file_names_length());
-		dir.read_files(a_in, a_header, count);
 
-		[[maybe_unused]] const auto [it, success] = _directories.insert(std::move(dir));
+		const auto name = [&]() noexcept -> std::string_view {
+			if (a_header.directory_strings()) {  // bzstring
+				std::uint8_t len = 0;
+				a_in >> len;
+				return {
+					reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+					len - 1u  // skip null terminator
+				};
+			} else {
+				return {};
+			}
+		}();
+
+		[[maybe_unused]] const auto [it, success] =
+			_directories.emplace(
+				std::piecewise_construct,
+				std::forward_as_tuple(hash, name, a_in),
+				std::forward_as_tuple());
 		assert(success);
+
+		const auto backup = it->second.read_files(a_in, a_header, count);
+		if (backup) {
+			const_cast<directory::key&>(it->first).set_name(*backup, a_in);
+		}
 	}
 
 	void archive::write_directory_entries(
@@ -944,8 +908,8 @@ namespace bsa::tes4
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_entries(a_header));
 		offset += static_cast<std::uint32_t>(a_header.file_names_length());
 
-		for (const auto& dir : _directories) {
-			dir.hash().write(a_out, a_header.endian());
+		for (const auto& [key, dir] : _directories) {
+			key.hash().write(a_out, a_header.endian());
 			a_out << static_cast<std::uint32_t>(dir.size());
 
 			switch (a_header.archive_version()) {
@@ -965,7 +929,7 @@ namespace bsa::tes4
 
 			if (a_header.directory_strings()) {
 				offset += static_cast<std::uint32_t>(
-					dir.name().length() +
+					key.name().length() +
 					1u +  // prefixed byte length
 					1u);  // null terminator
 			}
@@ -980,8 +944,8 @@ namespace bsa::tes4
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
-		for (const auto& dir : _directories) {
-			dir.write_file_data(a_out, a_header);
+		for (const auto& [key, dir] : _directories) {
+			dir.write_file_data(a_out, a_header, key.name());
 		}
 	}
 
@@ -990,14 +954,25 @@ namespace bsa::tes4
 		const detail::header_t& a_header) const noexcept
 	{
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_data(a_header));
-		for (const auto& dir : _directories) {
+		for ([[maybe_unused]] const auto& [key, dir] : _directories) {
+			if (a_header.directory_strings()) {  // bzstring
+				const auto dirname = key.name();
+				a_out << static_cast<std::uint8_t>(
+					dirname.length() +
+					1u);            // include null terminator
+				a_out.write_bytes({ //
+					reinterpret_cast<const std::byte*>(dirname.data()),
+					dirname.size() });
+				a_out << std::byte{ '\0' };
+			}
+
 			dir.write_file_entries(a_out, a_header, offset);
 		}
 	}
 
 	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& dir : _directories) {
+		for ([[maybe_unused]] const auto& [key, dir] : _directories) {
 			dir.write_file_names(a_out);
 		}
 	}

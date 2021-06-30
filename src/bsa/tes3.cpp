@@ -10,6 +10,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <variant>
 
@@ -153,24 +154,8 @@ namespace bsa::tes3
 		}
 	}
 
-	auto file::name() const noexcept
-		-> std::string_view
-	{
-		switch (_name.index()) {
-		case name_null:
-			return {};
-		case name_owner:
-			return *std::get_if<name_owner>(&_name);
-		case name_proxied:
-			return std::get_if<name_proxied>(&_name)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
 	void file::read(
 		detail::istream_t& a_in,
-		std::size_t a_nameOffset,
 		std::size_t a_dataOffset) noexcept
 	{
 		std::uint32_t size = 0;
@@ -178,11 +163,6 @@ namespace bsa::tes3
 		a_in >> size >> offset;
 
 		const detail::restore_point _{ a_in };
-
-		a_in.seek_absolute(a_nameOffset);
-		const_cast<name_t&>(_name).emplace<name_proxied>(
-			reinterpret_cast<const char*>(a_in.read_bytes(1).data()),  // zstring
-			a_in.rdbuf());
 
 		a_in.seek_absolute(a_dataOffset + offset);
 		_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
@@ -218,9 +198,9 @@ namespace bsa::tes3
 		}
 	};
 
-	bool archive::erase(hashing::hash a_hash) noexcept
+	bool archive::erase(const key_type& a_key) noexcept
 	{
-		const auto it = _files.find(a_hash);
+		const auto it = _files.find(a_key);
 		if (it != _files.end()) {
 			_files.erase(it);
 			return true;
@@ -266,8 +246,8 @@ namespace bsa::tes3
 		offsets_t total;
 		offsets_t last;
 
-		for (const auto& file : _files) {
-			last.nameOffsets += file.name().length() +
+		for (const auto& [key, file] : _files) {
+			last.nameOffsets += key.name().length() +
 			                    1u;  // include null terminator
 			last.fileData += file.size();
 
@@ -316,8 +296,8 @@ namespace bsa::tes3
 	{
 		std::size_t offset =
 			(detail::constants::file_entry_size + 4u) * _files.size();
-		for (const auto& file : _files) {
-			offset += file.name().length() +
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
+			offset += key.name().length() +
 			          1u;  // include null terminator
 		}
 
@@ -340,28 +320,33 @@ namespace bsa::tes3
 			a_in >> h;
 			return h;
 		}();
-		const auto nameOffset = [&]() noexcept {
+		const auto name = [&]() noexcept {
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(a_offsets.nameOffsets);
 			a_in.seek_relative(4u * a_idx);
-			std::uint32_t result = 0;
-			a_in >> result;
-			return result;
+			std::uint32_t offset = 0;
+			a_in >> offset;
+			return std::string_view{
+				reinterpret_cast<const char*>(a_in.read_bytes(1).data())  // zstring
+			};
 		}();
 
-		[[maybe_unused]] const auto [it, success] = _files.emplace(hash);
+		[[maybe_unused]] const auto [it, success] =
+			_files.emplace(
+				std::piecewise_construct,
+				std::forward_as_tuple(hash, name, a_in),
+				std::forward_as_tuple());
 		assert(success);
 
-		it->read(
+		it->second.read(
 			a_in,
-			nameOffset + a_offsets.names,
 			a_offsets.fileData);
 	}
 
 	void archive::write_file_entries(detail::ostream_t& a_out) const noexcept
 	{
 		std::uint32_t offset = 0;
-		for (const auto& file : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
 			const auto size = static_cast<std::uint32_t>(file.size());
 			a_out
 				<< size
@@ -373,17 +358,17 @@ namespace bsa::tes3
 	void archive::write_file_name_offsets(detail::ostream_t& a_out) const noexcept
 	{
 		std::uint32_t offset = 0;
-		for (const auto& file : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
 			a_out << offset;
-			offset += file.name().length() +
+			offset += key.name().length() +
 			          1u;  // include null terminator
 		}
 	}
 
 	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& file : _files) {
-			const auto name = file.name();
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
+			const auto name = key.name();
 			a_out.write_bytes({ //
 				reinterpret_cast<const std::byte*>(name.data()),
 				name.size() });
@@ -393,14 +378,14 @@ namespace bsa::tes3
 
 	void archive::write_file_hashes(detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& file : _files) {
-			a_out << file.hash();
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
+			a_out << key.hash();
 		}
 	}
 
 	void archive::write_file_data(detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& file : _files) {
+		for ([[maybe_unused]] const auto& [key, file] : _files) {
 			a_out.write_bytes(file.as_bytes());
 		}
 	}

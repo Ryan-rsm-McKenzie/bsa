@@ -122,38 +122,33 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 		REQUIRE(good.numeric() != 0);
 		REQUIRE(bad.numeric() == 0);
 	}
+
+	SECTION("root paths are included in directory names")
+	{
+		const auto h1 = hash_directory("C:\\foo\\bar\\baz"sv);
+		const auto h2 = hash_directory("foo\\bar\\baz"sv);
+
+		REQUIRE(h1 != h2);
+	}
+
+	SECTION("parent directories are not included in file names")
+	{
+		const auto h1 = hash_file("users/john/test.txt"sv);
+		const auto h2 = hash_file("test.txt"sv);
+
+		REQUIRE(h1 == h2);
+	}
 }
 
 TEST_CASE("bsa::tes4::directory", "[tes4.directory]")
 {
 	SECTION("directories start empty")
 	{
-		const bsa::tes4::directory d{ "root"sv };
+		const bsa::tes4::directory d;
 
 		REQUIRE(d.empty());
 		REQUIRE(d.size() == 0);
 		REQUIRE(d.begin() == d.end());
-	}
-
-	SECTION("root paths are included in directory names")
-	{
-		const bsa::tes4::directory d1{ "C:\\foo\\bar\\baz"sv };
-		const bsa::tes4::directory d2{ "foo\\bar\\baz"sv };
-
-		REQUIRE(d1.name() != d2.name());
-	}
-
-	SECTION("moving a directory does not modify its hash or name")
-	{
-		const auto name = "root"sv;
-		const auto hash = hash_directory(name);
-		bsa::tes4::directory oldd{ name };
-		bsa::tes4::directory newd{ std::move(oldd) };
-
-		REQUIRE(oldd.name() == name);
-		REQUIRE(oldd.hash() == hash);
-		REQUIRE(newd.name() == name);
-		REQUIRE(newd.hash() == hash);
 	}
 }
 
@@ -161,25 +156,17 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 {
 	SECTION("files start empty")
 	{
-		const bsa::tes4::file f{ "hello.txt"sv };
+		const bsa::tes4::file f;
 		REQUIRE(!f.compressed());
 		REQUIRE(f.empty());
 		REQUIRE(f.size() == 0);
 		REQUIRE(f.as_bytes().size() == 0);
 	}
 
-	SECTION("parent directories are not included in file names")
-	{
-		const bsa::tes4::file f1{ "users/john/test.txt"sv };
-		const bsa::tes4::file f2{ "test.txt"sv };
-
-		REQUIRE(f1.filename() == f2.filename());
-	}
-
 	SECTION("we can assign and clear the contents of a file")
 	{
 		auto payload = std::vector<std::byte>(1u << 4);
-		bsa::tes4::file f{ "hello.txt"sv };
+		bsa::tes4::file f;
 
 		f.set_data({ payload.data(), payload.size() });
 		REQUIRE(f.size() == payload.size());
@@ -189,19 +176,6 @@ TEST_CASE("bsa::tes4::file", "[tes4.file]")
 
 		f.clear();
 		REQUIRE(f.empty());
-	}
-
-	SECTION("moving a file does not modify its hash or name")
-	{
-		const auto name = "hello.txt"sv;
-		const auto hash = hash_file(name);
-		bsa::tes4::file oldf{ name };
-		bsa::tes4::file newf{ std::move(oldf) };
-
-		REQUIRE(oldf.filename() == name);
-		REQUIRE(oldf.hash() == hash);
-		REQUIRE(newf.filename() == name);
-		REQUIRE(newf.hash() == hash);
 	}
 }
 
@@ -269,7 +243,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				REQUIRE(read->compressed());
 				REQUIRE(read->decompressed_size() == std::filesystem::file_size(p));
 
-				bsa::tes4::file original{ ""sv };
+				bsa::tes4::file original;
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
 				REQUIRE(original.compress(*version));
@@ -327,14 +301,14 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				std::span<const std::byte> a_data) {
 				constexpr auto dir = "root"sv;
 
-				bsa::tes4::file f{ a_hash };
+				bsa::tes4::file f;
 				f.set_data(a_data);
 				auto it = bsa.find(dir);
 				if (it == bsa.end()) {
-					it = bsa.insert(bsa::tes4::directory{ dir }).first;
+					it = bsa.insert(dir, bsa::tes4::directory{}).first;
 				}
 				REQUIRE(it != bsa.end());
-				it->insert(std::move(f));
+				it->second.insert(a_hash, std::move(f));
 			};
 
 		constexpr auto largesz = std::numeric_limits<std::int32_t>::max();
