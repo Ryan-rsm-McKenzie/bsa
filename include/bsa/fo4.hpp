@@ -164,6 +164,26 @@ namespace bsa::fo4
 		{
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
+
+			friend auto operator>>(
+				detail::istream_t& a_in,
+				mips_t& a_mips) noexcept
+				-> detail::istream_t&
+			{
+				return a_in >>
+				       a_mips.first >>
+				       a_mips.last;
+			}
+
+			friend auto operator<<(
+				detail::ostream_t& a_out,
+				const mips_t& a_mips) noexcept
+				-> detail::ostream_t&
+			{
+				return a_out
+				       << a_mips.first
+				       << a_mips.last;
+			}
 		};
 
 		mips_t mips;
@@ -193,9 +213,7 @@ namespace bsa::fo4
 			}
 
 			if (a_format == format::directx) {
-				a_in >>
-					mips.first >>
-					mips.last;
+				a_in >> mips;
 			}
 
 			std::uint32_t sentinel = 0;
