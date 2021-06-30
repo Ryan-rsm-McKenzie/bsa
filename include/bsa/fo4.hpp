@@ -52,6 +52,15 @@ namespace bsa::fo4
 		public:
 			header_t() noexcept = default;
 
+			header_t(
+				format a_format,
+				std::size_t a_fileCount,
+				std::uint64_t a_stringTableOffset) noexcept :
+				_format(to_underlying(a_format)),
+				_fileCount(static_cast<std::uint32_t>(a_fileCount)),
+				_stringTableOffset(a_stringTableOffset)
+			{}
+
 			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
 			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
 			[[nodiscard]] bool good() const noexcept { return _good; }
