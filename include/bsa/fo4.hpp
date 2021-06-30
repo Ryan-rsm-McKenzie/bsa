@@ -158,8 +158,25 @@ namespace bsa::fo4
 		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
-	protected:
-		friend class file;
+	private:
+		friend file;
+
+		struct mip_t final
+		{
+			std::uint16_t first{ 0 };
+			std::uint16_t last{ 0 };
+		};
+
+		enum : std::size_t
+		{
+			data_view,
+			data_owner,
+			data_proxied,
+
+			data_count
+		};
+
+		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 
 		void read(
 			detail::istream_t& a_in,
@@ -198,24 +215,6 @@ namespace bsa::fo4
 				a_in.read_bytes(size),
 				a_in.rdbuf());
 		}
-
-	private:
-		struct mip_t final
-		{
-			std::uint16_t first{ 0 };
-			std::uint16_t last{ 0 };
-		};
-
-		enum : std::size_t
-		{
-			data_view,
-			data_owner,
-			data_proxied,
-
-			data_count
-		};
-
-		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 
 		std::variant<
 			std::span<const std::byte>,
@@ -264,8 +263,18 @@ namespace bsa::fo4
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
-	protected:
-		friend class archive;
+	private:
+		friend archive;
+
+		struct dx10_t final
+		{
+			std::uint16_t height{ 0 };
+			std::uint16_t width{ 0 };
+			std::uint8_t mipCount{ 0 };
+			std::uint8_t format{ 0 };
+			std::uint8_t flags{ 0 };
+			std::uint8_t tileMode{ 0 };
+		};
 
 		void read_chunk(
 			detail::istream_t& a_in,
@@ -294,17 +303,6 @@ namespace bsa::fo4
 				chunk.read(a_in, a_format);
 			}
 		}
-
-	private:
-		struct dx10_t final
-		{
-			std::uint16_t height{ 0 };
-			std::uint16_t width{ 0 };
-			std::uint8_t mipCount{ 0 };
-			std::uint8_t format{ 0 };
-			std::uint8_t flags{ 0 };
-			std::uint8_t tileMode{ 0 };
-		};
 
 		container_type _chunks;
 		std::optional<dx10_t> _dx10;

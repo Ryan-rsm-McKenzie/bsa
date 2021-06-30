@@ -98,9 +98,9 @@ namespace bsa::tes4
 				};
 			}
 
-		protected:
-			friend class tes4::archive;
-			friend class tes4::directory;
+		private:
+			friend tes4::archive;
+			friend tes4::directory;
 
 			void read(
 				detail::istream_t& a_in,
@@ -162,8 +162,8 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
-	protected:
-		friend class directory;
+	private:
+		friend directory;
 
 		enum : std::uint32_t
 		{
@@ -173,14 +173,6 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
-		void read_data(
-			detail::istream_t& a_in,
-			const detail::header_t& a_header,
-			std::size_t a_size) noexcept;
-
-		void write_data(detail::ostream_t& a_out) const noexcept;
-
-	private:
 		enum : std::size_t
 		{
 			data_view,
@@ -191,6 +183,13 @@ namespace bsa::tes4
 		};
 
 		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
+
+		void read_data(
+			detail::istream_t& a_in,
+			const detail::header_t& a_header,
+			std::size_t a_size) noexcept;
+
+		void write_data(detail::ostream_t& a_out) const noexcept;
 
 		std::variant<
 			std::span<const std::byte>,
@@ -270,8 +269,8 @@ namespace bsa::tes4
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _files.size(); }
 
-	protected:
-		friend class archive;
+	private:
+		friend archive;
 
 		void read_file_names(detail::istream_t& a_in) noexcept;
 
@@ -292,7 +291,6 @@ namespace bsa::tes4
 
 		void write_file_names(detail::ostream_t& a_out) const noexcept;
 
-	private:
 		container_type _files;
 	};
 

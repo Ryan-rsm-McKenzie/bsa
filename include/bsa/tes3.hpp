@@ -44,9 +44,6 @@ namespace bsa::tes3
 				};
 			}
 
-		protected:
-			friend tes3::archive;
-
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash) noexcept
@@ -100,14 +97,9 @@ namespace bsa::tes3
 
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
-	protected:
+	private:
 		friend archive;
 
-		void read(
-			detail::istream_t& a_in,
-			std::size_t a_dataOffset) noexcept;
-
-	private:
 		enum : std::size_t
 		{
 			data_view,
@@ -118,6 +110,10 @@ namespace bsa::tes3
 		};
 
 		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
+
+		void read(
+			detail::istream_t& a_in,
+			std::size_t a_dataOffset) noexcept;
 
 		std::variant<
 			std::span<const std::byte>,

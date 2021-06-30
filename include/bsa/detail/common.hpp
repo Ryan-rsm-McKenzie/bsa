@@ -138,16 +138,15 @@ namespace bsa::detail
 
 		[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
-	protected:
-		friend class tes3::archive;
-		friend class tes4::archive;
-		friend class tes4::directory;
+	private:
+		friend tes3::archive;
+		friend tes4::archive;
+		friend tes4::directory;
 
 		explicit index_t(T& a_value) noexcept :
 			_proxy(&a_value)
 		{}
 
-	private:
 		T* _proxy{ nullptr };
 	};
 
@@ -304,18 +303,10 @@ namespace bsa::detail
 			const hash_type& a_rhs) noexcept
 			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
 
-	protected:
-		friend class tes4::archive;
-		friend class tes4::directory;
-
-		void set_name(
-			std::string_view a_name,
-			const istream_t& a_in) noexcept
-		{
-			_name.emplace<name_proxied>(a_name, a_in.rdbuf());
-		}
-
 	private:
+		friend tes4::archive;
+		friend tes4::directory;
+
 		enum : std::size_t
 		{
 			name_null,
@@ -326,6 +317,13 @@ namespace bsa::detail
 		};
 
 		using name_proxy = detail::istream_proxy<std::string_view>;
+
+		void set_name(
+			std::string_view a_name,
+			const istream_t& a_in) noexcept
+		{
+			_name.emplace<name_proxied>(a_name, a_in.rdbuf());
+		}
 
 		hash_type _hash;
 		std::variant<
