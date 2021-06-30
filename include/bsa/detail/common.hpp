@@ -234,7 +234,7 @@ namespace bsa::detail
 	};
 
 	template <class Hash, hasher_t<Hash> Hasher>
-	class key_t
+	class key_t final
 	{
 	public:
 		using hash_type = Hash;
