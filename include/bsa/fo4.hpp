@@ -236,6 +236,25 @@ namespace bsa::fo4
 				a_in,
 				decompsz);
 		}
+
+		void write(
+			detail::ostream_t& a_out,
+			format a_format,
+			std::uint64_t& a_dataOffset) const noexcept
+		{
+			const auto size = this->size();
+			a_out << a_dataOffset
+				  << static_cast<std::uint32_t>(
+						 this->compressed() ? this->decompressed_size() : 0)
+				  << static_cast<std::uint32_t>(size);
+			a_dataOffset += size;
+
+			if (a_format == format::directx) {
+				a_out << this->mips;
+			}
+
+			a_out << static_cast<std::uint32_t>(0xBAADF00D);
+		}
 	};
 
 	class file final
@@ -347,6 +366,29 @@ namespace bsa::fo4
 			}
 		}
 
+		void write_chunk(
+			detail::ostream_t& a_out,
+			format a_format,
+			std::uint64_t& a_dataOffset) const noexcept
+		{
+			a_out << std::byte{ 0 }  // skip mod index
+				  << static_cast<std::uint8_t>(this->size());
+			switch (a_format) {
+			case format::general:
+				a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_gnrl);
+				break;
+			case format::directx:
+				a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_dx10)
+					  << this->header;
+			default:
+				detail::declare_unreachable();
+			}
+
+			for (const auto& chunk : *this) {
+				chunk.write(a_out, a_format, a_dataOffset);
+			}
+		}
+
 		container_type _chunks;
 	};
 
@@ -415,6 +457,76 @@ namespace bsa::fo4
 
 		[[nodiscard]] bool write(
 			std::filesystem::path a_path,
-			format a_format) noexcept;
+			format a_format) noexcept
+		{
+			detail::ostream_t out{ std::move(a_path) };
+			if (!out.is_open()) {
+				return false;
+			}
+
+			auto [header, dataOffset] = make_header(a_format);
+			out << header;
+
+			for (const auto& [key, file] : *this) {
+				out << key.hash();
+				file.write_chunk(out, a_format, dataOffset);
+			}
+
+			for (const auto& file : *this) {
+				for (const auto& chunk : file.second) {
+					out.write_bytes(chunk.as_bytes());
+				}
+			}
+
+			for ([[maybe_unused]] const auto& [key, file] : *this) {
+				const auto name = key.name();
+				out << static_cast<std::uint16_t>(name.length());
+				out.write_bytes({ //
+					reinterpret_cast<const std::byte*>(name.data()),
+					name.length() });
+			}
+		}
+
+	private:
+		[[nodiscard]] auto make_header(format a_format) const noexcept
+			-> std::pair<detail::header_t, std::uint64_t>
+		{
+			const auto inspect = [&](auto a_gnrl, auto a_dx10) noexcept {
+				switch (a_format) {
+				case format::general:
+					return a_gnrl();
+				case format::directx:
+					return a_dx10();
+				default:
+					detail::declare_unreachable();
+				}
+			};
+
+			std::uint64_t dataOffset =
+				detail::constants::header_size +
+				inspect(
+					[]() noexcept { return detail::constants::chunk_header_size_gnrl; },
+					[]() noexcept { return detail::constants::chunk_header_size_dx10; }) *
+					this->size();
+			std::uint64_t dataSize = 0;
+			for ([[maybe_unused]] const auto& [key, file] : *this) {
+				dataOffset +=
+					inspect(
+						[]() noexcept { return detail::constants::chunk_size_gnrl; },
+						[]() noexcept { return detail::constants::chunk_size_dx10; }) *
+					file.size();
+				for (const auto& chunk : file) {
+					dataSize += chunk.size();
+				}
+			}
+
+			return {
+				detail::header_t{
+					a_format,
+					this->size(),
+					dataOffset + dataSize },
+				dataOffset
+			};
+		}
 	};
 }
