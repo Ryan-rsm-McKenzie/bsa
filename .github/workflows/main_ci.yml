@@ -24,11 +24,13 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
+            env-access: '$env:'
             setup: bash scripts/setup.sh
             shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
+            env-access: '$'
             setup: '' # nothing right now
             shell-extension: bat
 
@@ -43,8 +45,8 @@ jobs:
       - name: Setup vcpkg
         run: |
           mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/vcpkg --version > ${{ github.workspace }}/vcpkg-version
+          ${{ matrix.env-access }}VCPKG_INSTALLATION_ROOT/bootstrap-vcpkg.${{ matrix.shell-extension }}
+          ${{ matrix.env-access }}VCPKG_INSTALLATION_ROOT/vcpkg --version > ${{ github.workspace }}/vcpkg-version
 
       - name: Cache vcpkg archives
         uses: actions/cache@v2
