@@ -467,6 +467,31 @@ namespace bsa::detail
 			};
 		}
 
+		class byte_container :
+			public detail::basic_byte_container
+		{
+		public:
+			void clear() noexcept { _data.emplace<data_view>(); }
+
+			void set_data(std::span<const std::byte> a_data) noexcept
+			{
+				_data.emplace<data_view>(a_data);
+			}
+
+			void set_data(std::vector<std::byte> a_data) noexcept
+			{
+				_data.emplace<data_owner>(std::move(a_data));
+			}
+
+		protected:
+			void set_data(
+				std::span<const std::byte> a_data,
+				const istream_t& a_in) noexcept
+			{
+				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+			}
+		};
+
 		class compressed_byte_container :
 			public detail::basic_byte_container
 		{
@@ -514,31 +539,6 @@ namespace bsa::detail
 
 		private:
 			std::optional<std::size_t> _decompsz;
-		};
-
-		class byte_container :
-			public detail::basic_byte_container
-		{
-		public:
-			void clear() noexcept { _data.emplace<data_view>(); }
-
-			void set_data(std::span<const std::byte> a_data) noexcept
-			{
-				_data.emplace<data_view>(a_data);
-			}
-
-			void set_data(std::vector<std::byte> a_data) noexcept
-			{
-				_data.emplace<data_owner>(std::move(a_data));
-			}
-
-		protected:
-			void set_data(
-				std::span<const std::byte> a_data,
-				const istream_t& a_in) noexcept
-			{
-				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
-			}
 		};
 
 		template <class T, bool RECURSE>

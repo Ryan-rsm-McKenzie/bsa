@@ -13,8 +13,8 @@ namespace bsa
 				class basic_byte_container;
 			}
 
-			class compressed_byte_container;
 			class byte_container;
+			class compressed_byte_container;
 
 			template <class, bool = false>
 			class hashmap;
