@@ -90,4 +90,28 @@ namespace bsa::detail
 			_file = nullptr;
 		}
 	}
+
+	namespace components::detail
+	{
+		auto raw_container::as_bytes() const noexcept
+			-> std::span<const std::byte>
+		{
+			switch (_data.index()) {
+			case data_view:
+				return *std::get_if<data_view>(&_data);
+			case data_owner:
+				{
+					const auto& owner = *std::get_if<data_owner>(&_data);
+					return {
+						owner.data(),
+						owner.size()
+					};
+				}
+			case data_proxied:
+				return std::get_if<data_proxied>(&_data)->d;
+			default:
+				declare_unreachable();
+			}
+		}
+	}
 }

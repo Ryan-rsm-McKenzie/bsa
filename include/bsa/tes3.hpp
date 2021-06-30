@@ -4,12 +4,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <span>
 #include <string>
-#include <string_view>
 #include <utility>
-#include <variant>
-#include <vector>
 
 #include <boost/container/map.hpp>
 
@@ -68,60 +64,18 @@ namespace bsa::tes3
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
-	class file final
+	class file final :
+		public detail::components::container
 	{
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
 
-		file() noexcept = default;
-		file(const file&) noexcept = default;
-		file(file&&) noexcept = default;
-		~file() noexcept = default;
-		file& operator=(const file&) noexcept = default;
-		file& operator=(file&&) noexcept = default;
-
-		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
-		void clear() noexcept { _data.emplace<data_view>(); }
-		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
-		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
-
-		void set_data(std::span<const std::byte> a_data) noexcept
-		{
-			_data.emplace<data_view>(a_data);
-		}
-
-		void set_data(std::vector<std::byte> a_data) noexcept
-		{
-			_data.emplace<data_owner>(std::move(a_data));
-		}
-
-		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
-
 	private:
 		friend archive;
-
-		enum : std::size_t
-		{
-			data_view,
-			data_owner,
-			data_proxied,
-
-			data_count
-		};
-
-		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 
 		void read(
 			detail::istream_t& a_in,
 			std::size_t a_dataOffset) noexcept;
-
-		std::variant<
-			std::span<const std::byte>,
-			std::vector<std::byte>,
-			data_proxy>
-			_data;
-
-		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
 	class archive final

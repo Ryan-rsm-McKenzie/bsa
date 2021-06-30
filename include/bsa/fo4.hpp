@@ -7,11 +7,8 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
-#include <span>
 #include <string>
 #include <string_view>
-#include <variant>
-#include <vector>
 
 #include <boost/container/map.hpp>
 #include <boost/container/small_vector.hpp>
@@ -143,21 +140,10 @@ namespace bsa::fo4
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
-	class chunk final
+	class chunk final :
+		public detail::components::compressed_container
 	{
 	public:
-		chunk() noexcept = default;
-		chunk(const chunk&) noexcept = default;
-		chunk(chunk&&) noexcept = default;
-		~chunk() noexcept = default;
-		chunk& operator=(const chunk&) noexcept = default;
-		chunk& operator=(chunk&&) noexcept = default;
-
-		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
-		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
-		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
-		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
-
 	private:
 		friend file;
 
@@ -166,17 +152,6 @@ namespace bsa::fo4
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 		};
-
-		enum : std::size_t
-		{
-			data_view,
-			data_owner,
-			data_proxied,
-
-			data_count
-		};
-
-		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 
 		void read(
 			detail::istream_t& a_in,
@@ -191,8 +166,9 @@ namespace bsa::fo4
 				decompressedSize;
 
 			std::size_t size = 0;
+			std::optional<std::size_t> decompsz;
 			if (compressedSize != 0) {
-				_decompsz = decompressedSize;
+				decompsz = decompressedSize;
 				size = compressedSize;
 			} else {
 				size = decompressedSize;
@@ -211,20 +187,13 @@ namespace bsa::fo4
 
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(dataFileOffset);
-			_data.emplace<data_proxied>(
+			set_data(
 				a_in.read_bytes(size),
-				a_in.rdbuf());
+				a_in,
+				decompsz);
 		}
 
-		std::variant<
-			std::span<const std::byte>,
-			std::vector<std::byte>,
-			data_proxy>
-			_data;
-		std::optional<std::size_t> _decompsz;
 		std::optional<mip_t> _mip;
-
-		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
 	class file final

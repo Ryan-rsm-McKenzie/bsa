@@ -8,12 +8,14 @@
 #include <cstdio>
 #include <filesystem>
 #include <iterator>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
 #include <variant>
+#include <vector>
 
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
@@ -419,4 +421,125 @@ namespace bsa::detail
 		istream_t& _proxy;
 		std::size_t _pos;
 	};
+
+	namespace components
+	{
+		namespace detail
+		{
+			class raw_container
+			{
+			public:
+				raw_container() noexcept = default;
+				raw_container(const raw_container&) noexcept = default;
+				raw_container(raw_container&&) noexcept = default;
+				~raw_container() noexcept = default;
+				raw_container& operator=(const raw_container&) noexcept = default;
+				raw_container& operator=(raw_container&&) noexcept = default;
+
+				auto as_bytes() const noexcept -> std::span<const std::byte>;
+				[[nodiscard]] auto data() const noexcept
+					-> const std::byte* { return as_bytes().data(); }
+				[[nodiscard]] bool empty() const noexcept { return size() == 0; }
+				[[nodiscard]] auto size() const noexcept
+					-> std::size_t { return as_bytes().size(); }
+
+			private:
+				friend components::compressed_container;
+				friend components::container;
+
+				enum : std::size_t
+				{
+					data_view,
+					data_owner,
+					data_proxied,
+
+					data_count
+				};
+
+				using data_proxy = istream_proxy<std::span<const std::byte>>;
+
+				std::variant<
+					std::span<const std::byte>,
+					std::vector<std::byte>,
+					data_proxy>
+					_data;
+
+				static_assert(data_count == std::variant_size_v<decltype(_data)>);
+			};
+		}
+
+		class compressed_container :
+			public detail::raw_container
+		{
+		public:
+			void clear() noexcept
+			{
+				_data.emplace<data_view>();
+				_decompsz.reset();
+			}
+
+			[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+
+			[[nodiscard]] auto decompressed_size() const noexcept
+				-> std::size_t
+			{
+				assert(compressed());
+				return *_decompsz;
+			}
+
+			void set_data(
+				std::span<const std::byte> a_data,
+				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+			{
+				_data.emplace<data_view>(a_data);
+				_decompsz = a_decompressedSize;
+			}
+
+			void set_data(
+				std::vector<std::byte> a_data,
+				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+			{
+				_data.emplace<data_owner>(std::move(a_data));
+				_decompsz = a_decompressedSize;
+			}
+
+		protected:
+			void set_data(
+				std::span<const std::byte> a_data,
+				const istream_t& a_in,
+				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+			{
+				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+				_decompsz = a_decompressedSize;
+			}
+
+		private:
+			std::optional<std::size_t> _decompsz;
+		};
+
+		class container :
+			public detail::raw_container
+		{
+		public:
+			void clear() noexcept { _data.emplace<data_view>(); }
+
+			void set_data(std::span<const std::byte> a_data) noexcept
+			{
+				_data.emplace<data_view>(a_data);
+			}
+
+			void set_data(std::vector<std::byte> a_data) noexcept
+			{
+				_data.emplace<data_owner>(std::move(a_data));
+			}
+
+		protected:
+			void set_data(
+				std::span<const std::byte> a_data,
+				const istream_t& a_in) noexcept
+			{
+				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+			}
+		};
+	}
 }

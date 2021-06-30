@@ -6,6 +6,17 @@ namespace bsa
 {
 	namespace detail
 	{
+		namespace components
+		{
+			namespace detail
+			{
+				class raw_container;
+			}
+
+			class compressed_container;
+			class container;
+		}
+
 		class istream_t;
 		class ostream_t;
 		class restore_point;

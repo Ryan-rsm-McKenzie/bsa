@@ -133,27 +133,6 @@ namespace bsa::tes3
 		}
 	}
 
-	auto file::as_bytes() const noexcept
-		-> std::span<const std::byte>
-	{
-		switch (_data.index()) {
-		case data_view:
-			return *std::get_if<data_view>(&_data);
-		case data_owner:
-			{
-				const auto& owner = *std::get_if<data_owner>(&_data);
-				return {
-					owner.data(),
-					owner.size()
-				};
-			}
-		case data_proxied:
-			return std::get_if<data_proxied>(&_data)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
 	void file::read(
 		detail::istream_t& a_in,
 		std::size_t a_dataOffset) noexcept
@@ -165,7 +144,7 @@ namespace bsa::tes3
 		const detail::restore_point _{ a_in };
 
 		a_in.seek_absolute(a_dataOffset + offset);
-		_data.emplace<data_proxied>(a_in.read_bytes(size), a_in.rdbuf());
+		set_data(a_in.read_bytes(size), a_in);
 	}
 
 	struct archive::offsets_t final

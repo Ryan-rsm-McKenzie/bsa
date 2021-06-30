@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <utility>
@@ -376,33 +377,6 @@ namespace bsa::tes4
 		}
 	}
 
-	auto file::as_bytes() const noexcept
-		-> std::span<const std::byte>
-	{
-		switch (_data.index()) {
-		case data_view:
-			return *std::get_if<data_view>(&_data);
-		case data_owner:
-			{
-				const auto& owner = *std::get_if<data_owner>(&_data);
-				return {
-					owner.data(),
-					owner.size()
-				};
-			}
-		case data_proxied:
-			return std::get_if<data_proxied>(&_data)->d;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	void file::clear() noexcept
-	{
-		_data.emplace<data_view>();
-		_decompsz = std::nullopt;
-	}
-
 	bool file::compress(version a_version) noexcept
 	{
 		assert(!compressed());
@@ -455,8 +429,7 @@ namespace bsa::tes4
 			detail::declare_unreachable();
 		}
 
-		_decompsz = in.size_bytes();
-		_data.emplace<data_owner>(std::move(out));
+		set_data(std::move(out), in.size_bytes());
 
 		assert(compressed());
 		return true;
@@ -534,8 +507,7 @@ namespace bsa::tes4
 			detail::declare_unreachable();
 		}
 
-		_decompsz.reset();
-		_data.emplace<data_owner>(std::move(out));
+		set_data(std::move(out));
 
 		assert(!compressed());
 		return true;
@@ -546,6 +518,7 @@ namespace bsa::tes4
 		const detail::header_t& a_header,
 		std::size_t a_size) noexcept
 	{
+		std::optional<std::size_t> decompsz;
 		const bool compressed =
 			a_size & icompression ?
                 !a_header.compressed() :
@@ -553,18 +526,18 @@ namespace bsa::tes4
 		if (compressed) {
 			std::uint32_t size = 0;
 			a_in >> size;
-			_decompsz = size;
+			decompsz = size;
 			a_size -= 4;
 		}
 		a_size &= ~(ichecked | icompression);
 
-		_data.emplace<data_proxied>(a_in.read_bytes(a_size), a_in.rdbuf());
+		set_data(a_in.read_bytes(a_size), a_in, decompsz);
 	}
 
 	void file::write_data(detail::ostream_t& a_out) const noexcept
 	{
 		if (compressed()) {
-			a_out << static_cast<std::uint32_t>(*_decompsz);
+			a_out << static_cast<std::uint32_t>(decompressed_size());
 		}
 
 		a_out.write_bytes(as_bytes());

@@ -6,13 +6,10 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
-#include <span>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
-#include <variant>
-#include <vector>
 
 #include <boost/container/map.hpp>
 
@@ -115,52 +112,14 @@ namespace bsa::tes4
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
-	class file final
+	class file final :
+		public detail::components::compressed_container
 	{
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
 
-		file() noexcept = default;
-		file(const file&) noexcept = default;
-		file(file&&) noexcept = default;
-		~file() noexcept = default;
-		file& operator=(const file&) noexcept = default;
-		file& operator=(file&&) noexcept = default;
-
-		[[nodiscard]] auto as_bytes() const noexcept -> std::span<const std::byte>;
-
-		void clear() noexcept;
-
 		bool compress(version a_version) noexcept;
-
-		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
-
-		[[nodiscard]] auto data() const noexcept -> const std::byte* { return as_bytes().data(); }
-
 		bool decompress(version a_version) noexcept;
-
-		[[nodiscard]] auto decompressed_size() const noexcept
-			-> std::size_t { return _decompsz ? *_decompsz : size(); }
-
-		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
-
-		void set_data(
-			std::span<const std::byte> a_data,
-			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
-		{
-			_data.emplace<data_view>(a_data);
-			_decompsz = a_decompressedSize;
-		}
-
-		void set_data(
-			std::vector<std::byte> a_data,
-			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
-		{
-			_data.emplace<data_owner>(std::move(a_data));
-			_decompsz = a_decompressedSize;
-		}
-
-		[[nodiscard]] auto size() const noexcept -> std::size_t { return as_bytes().size(); }
 
 	private:
 		friend directory;
@@ -173,32 +132,12 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
-		enum : std::size_t
-		{
-			data_view,
-			data_owner,
-			data_proxied,
-
-			data_count
-		};
-
-		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
-
 		void read_data(
 			detail::istream_t& a_in,
 			const detail::header_t& a_header,
 			std::size_t a_size) noexcept;
 
 		void write_data(detail::ostream_t& a_out) const noexcept;
-
-		std::variant<
-			std::span<const std::byte>,
-			std::vector<std::byte>,
-			data_proxy>
-			_data;
-		std::optional<std::size_t> _decompsz;
-
-		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
 	class directory final
