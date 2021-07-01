@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <boost/container/small_vector.hpp>
 
@@ -174,6 +175,12 @@ namespace bsa::fo4
 		{
 			_chunks.clear();
 			this->header = header_t{};
+		}
+
+		template <class... Args>
+		value_type& emplace_back(Args&&... a_args) noexcept
+		{
+			return _chunks.emplace_back(std::forward<Args>(a_args)...);
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
