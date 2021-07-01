@@ -312,8 +312,9 @@ namespace bsa::tes3
 		std::uint32_t offset = 0;
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			a_out << offset;
-			offset += key.name().length() +
-			          1u;  // include null terminator
+			offset += static_cast<std::uint32_t>(
+				key.name().length() +
+				1u);  // include null terminator
 		}
 	}
 

@@ -582,7 +582,7 @@ namespace bsa::tes4
 						name = name.substr(pos + 1);
 					}
 
-					size -= name.length() + 1u;
+					size -= static_cast<std::uint32_t>(name.length() + 1u);
 					return name;
 				} else {
 					return {};
