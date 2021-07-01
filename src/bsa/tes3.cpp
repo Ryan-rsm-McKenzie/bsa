@@ -304,9 +304,13 @@ namespace bsa::tes3
 				std::forward_as_tuple());
 		assert(success);
 
-		it->second.read(
-			a_in,
-			a_offsets.fileData);
+		std::uint32_t size = 0;
+		std::uint32_t offset = 0;
+		a_in >> size >> offset;
+
+		const detail::restore_point _{ a_in };
+		a_in.seek_absolute(a_offsets.fileData + offset);
+		it->second.set_data(a_in.read_bytes(size), a_in);
 	}
 
 	void archive::write_file_entries(detail::ostream_t& a_out) const noexcept

@@ -445,6 +445,8 @@ namespace bsa::detail
 			}
 
 		protected:
+			friend tes3::archive;
+
 			void clear() noexcept { _data.emplace<data_view>(); }
 
 			void set_data(

@@ -69,15 +69,7 @@ namespace bsa::tes3
 
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
-
 		using super::clear;
-
-	private:
-		friend archive;
-
-		void read(
-			detail::istream_t& a_in,
-			std::size_t a_dataOffset) noexcept;
 	};
 
 	class archive final :
