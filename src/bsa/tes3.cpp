@@ -131,20 +131,6 @@ namespace bsa::tes3
 		}
 	}
 
-	void file::read(
-		detail::istream_t& a_in,
-		std::size_t a_dataOffset) noexcept
-	{
-		std::uint32_t size = 0;
-		std::uint32_t offset = 0;
-		a_in >> size >> offset;
-
-		const detail::restore_point _{ a_in };
-
-		a_in.seek_absolute(a_dataOffset + offset);
-		this->set_data(a_in.read_bytes(size), a_in);
-	}
-
 	struct archive::offsets_t final
 	{
 		std::size_t hashes{ 0 };
