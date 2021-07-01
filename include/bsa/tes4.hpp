@@ -111,17 +111,8 @@ namespace bsa::tes4
 		public detail::components::compressed_byte_container
 	{
 	private:
+		friend archive;
 		using super = detail::components::compressed_byte_container;
-
-	public:
-		using key = detail::key_t<hashing::hash, hashing::hash_file>;
-		using super::clear;
-
-		bool compress(version a_version) noexcept;
-		bool decompress(version a_version) noexcept;
-
-	private:
-		friend directory;
 
 		enum : std::uint32_t
 		{
@@ -131,45 +122,24 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
-		void read_data(
-			detail::istream_t& a_in,
-			const detail::header_t& a_header,
-			std::size_t a_size) noexcept;
+	public:
+		using key = detail::key_t<hashing::hash, hashing::hash_file>;
+		using super::clear;
 
-		void write_data(detail::ostream_t& a_out) const noexcept;
+		bool compress(version a_version) noexcept;
+		bool decompress(version a_version) noexcept;
 	};
 
 	class directory final :
 		public detail::components::hashmap<file>
 	{
 	private:
+		friend archive;
 		using super = detail::components::hashmap<file>;
 
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_directory>;
 		using super::clear;
-
-	private:
-		friend archive;
-
-		void read_file_names(detail::istream_t& a_in) noexcept;
-
-		[[nodiscard]] auto read_files(
-			detail::istream_t& a_in,
-			const detail::header_t& a_header,
-			std::size_t a_count) noexcept -> std::optional<std::string_view>;
-
-		void write_file_data(
-			detail::ostream_t& a_out,
-			const detail::header_t& a_header,
-			std::string_view a_dirname) const noexcept;
-
-		void write_file_entries(
-			detail::ostream_t& a_out,
-			const detail::header_t& a_header,
-			std::uint32_t& a_dataOffset) const noexcept;
-
-		void write_file_names(detail::ostream_t& a_out) const noexcept;
 	};
 
 	class archive final :
@@ -229,6 +199,18 @@ namespace bsa::tes4
 
 	private:
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
+
+		[[nodiscard]] auto read_file_entries(
+			directory& a_dir,
+			detail::istream_t& a_in,
+			const detail::header_t& a_header,
+			std::size_t a_count) noexcept -> std::optional<std::string_view>;
+
+		void read_file_data(
+			file& a_file,
+			detail::istream_t& a_in,
+			const detail::header_t& a_header,
+			std::size_t a_size) noexcept;
 
 		void read_file_names(
 			detail::istream_t& a_in,
