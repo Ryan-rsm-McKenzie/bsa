@@ -24,6 +24,7 @@
 		<Expand>
 			<Item Name="[flags]">_flags,en</Item>
 			<Item Name="[types]">_types,en</Item>
+			<ExpandedItem>(bsa::detail::components::hashmap&lt;bsa::tes4::directory,1&gt;*)this,nd</ExpandedItem>
 		</Expand>
 	</Type>
 

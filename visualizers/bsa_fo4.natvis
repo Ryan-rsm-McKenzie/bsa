@@ -24,6 +24,9 @@
 
 	<Type Name="bsa::fo4::archive">
 		<DisplayString>fo4 archive</DisplayString>
+		<Expand>
+			<ExpandedItem>(bsa::detail::components::hashmap&lt;bsa::fo4::file,0&gt;*)this,nd</ExpandedItem>
+		</Expand>
 	</Type>
 
 </AutoVisualizer>

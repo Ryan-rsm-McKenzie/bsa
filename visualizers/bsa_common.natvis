@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
 	<Type Name="bsa::detail::istream_proxy">
 		<DisplayString>{ d }</DisplayString>
 		<Expand>
@@ -19,16 +20,16 @@
 			<Item Name="[decompressed size]">_decompsz</Item>
 		</Expand>
 	</Type>
-	
+
 	<Type Name="bsa::detail::components::hashmap&lt;*&gt;::index_t&lt;*&gt;">
 		<Intrinsic Name="empty" Expression="_proxy == nullptr"/>
 		<DisplayString Condition="empty()">none</DisplayString>
 		<DisplayString Condition="!empty()">{ *_proxy }</DisplayString>
 		<Expand>
-			<Item Name="[proxy]">_proxy,na</Item>
+			<ExpandedItem>_proxy</ExpandedItem>
 		</Expand>
 	</Type>
-	
+
 	<Type Name="bsa::detail::components::hashmap&lt;*&gt;">
 		<Expand>
 			<Item Name="[map]">_map</Item>
