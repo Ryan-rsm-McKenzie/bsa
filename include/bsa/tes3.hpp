@@ -90,9 +90,7 @@ namespace bsa::tes3
 		using super::clear;
 
 		bool read(std::filesystem::path a_path) noexcept;
-
 		[[nodiscard]] bool verify_offsets() const noexcept;
-
 		bool write(std::filesystem::path a_path) const noexcept;
 
 	private:

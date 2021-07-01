@@ -314,9 +314,7 @@ namespace bsa::tes3
 		std::uint32_t offset = 0;
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			const auto size = static_cast<std::uint32_t>(file.size());
-			a_out
-				<< size
-				<< offset;
+			a_out << size << offset;
 			offset += size;
 		}
 	}
