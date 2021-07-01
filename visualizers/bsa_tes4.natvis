@@ -1,33 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?> 
+<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	
-	<Type Name="bsa::tes4::archive">
-		<DisplayString>tes4 archive</DisplayString>
-		<Expand>
-			<Item Name="[directories]">_directories</Item>
-			<Item Name="[flags]">_flags,en</Item>
-			<Item Name="[types]">_types,en</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes4::directory">
-		<DisplayString>{ _name,na }</DisplayString>
-		<Expand>
-			<Item Name="[hash]">_hash</Item>
-			<Item Name="[name]">_name,na</Item>
-			<Item Name="[files]">_files,na</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes4::file">
-		<DisplayString>{ _name }</DisplayString>
-		<Expand>
-			<Item Name="[hash]">_hash</Item>
-			<Item Name="[name]">_name</Item>
-			<Item Name="[decompressed size]">_decompsz</Item>
-			<Item Name="[data]">_data</Item>
-		</Expand>
-	</Type>
 
 	<Type Name="bsa::tes4::hashing::hash">
 		<Intrinsic Name="numeric" Expression="
@@ -46,5 +18,13 @@
 			<Item Name="[crc]">crc,X</Item>
 		</Expand>
 	</Type>
-	
+
+	<Type Name="bsa::tes4::archive">
+		<DisplayString>tes4 archive</DisplayString>
+		<Expand>
+			<Item Name="[flags]">_flags,en</Item>
+			<Item Name="[types]">_types,en</Item>
+		</Expand>
+	</Type>
+
 </AutoVisualizer>

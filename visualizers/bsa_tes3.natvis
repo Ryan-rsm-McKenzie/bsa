@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-	<Type Name="bsa::tes3::archive">
-		<DisplayString>tes3 archive</DisplayString>
-		<Expand>
-			<Item Name="[files]">_files</Item>
-		</Expand>
-	</Type>
-
-	<Type Name="bsa::tes3::file">
-		<DisplayString>{ _name }</DisplayString>
-		<Expand>
-			<Item Name="[hash]">_hash</Item>
-			<Item Name="[name]">_name</Item>
-			<Item Name="[data]">_data</Item>
-		</Expand>
-	</Type>
-
 	<Type Name="bsa::tes3::hashing::hash">
 		<Intrinsic Name="numeric" Expression="
 			(uint64_t)hi &lt;&lt; 0u * 8u |
@@ -28,5 +12,9 @@
 			<Item Name="[hi]">hi,X</Item>
 		</Expand>
 	</Type>
-	
+
+	<Type Name="bsa::tes3::archive">
+		<DisplayString>tes3 archive</DisplayString>
+	</Type>
+
 </AutoVisualizer>
