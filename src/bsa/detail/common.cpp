@@ -55,6 +55,71 @@ namespace bsa::detail
 		}
 	}
 
+	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) noexcept
+		-> std::string_view
+	{
+		std::uint8_t len = 0;
+		a_in >> len;
+		return {
+			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			len
+		};
+	}
+
+	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in) noexcept
+		-> std::string_view
+	{
+		std::uint8_t len = 0;
+		a_in >> len;
+		return {
+			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			len - 1u  // skip null terminator
+		};
+	}
+
+	[[nodiscard]] auto read_wstring(detail::istream_t& a_in) noexcept
+		-> std::string_view
+	{
+		std::uint16_t len = 0;
+		a_in >> len;
+		return {
+			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			len
+		};
+	}
+
+	[[nodiscard]] auto read_zstring(detail::istream_t& a_in) noexcept
+		-> std::string_view
+	{
+		const std::string_view result{
+			reinterpret_cast<const char*>(a_in.read_bytes(1u).data())
+		};
+		a_in.seek_relative(result.length());  // include null terminator
+		return result;
+	}
+
+	void write_bzstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
+	{
+		a_out << static_cast<std::uint8_t>(a_string.length() + 1u);  // include null terminator
+		write_zstring(a_out, a_string);
+	}
+
+	void write_wstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
+	{
+		a_out << static_cast<std::uint16_t>(a_string.length());
+		a_out.write_bytes({ //
+			reinterpret_cast<const std::byte*>(a_string.data()),
+			a_string.length() });
+	}
+
+	void write_zstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
+	{
+		a_out.write_bytes({ //
+			reinterpret_cast<const std::byte*>(a_string.data()),
+			a_string.length() });
+		a_out << std::byte{ '\0' };
+	}
+
 	istream_t::istream_t(std::filesystem::path a_path) noexcept
 	{
 		try {

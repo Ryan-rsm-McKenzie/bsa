@@ -446,14 +446,7 @@ namespace bsa::fo4
 				const auto name = [&]() {
 					const detail::restore_point _{ in };
 					in.seek_absolute(strpos);
-
-					std::uint16_t len = 0;
-					in >> len;
-					std::string_view name{
-						reinterpret_cast<const char*>(in.read_bytes(len).data()),
-						len
-					};
-
+					const auto name = detail::read_wstring(in);
 					strpos = in.tell();
 					return name;
 				}();
@@ -495,11 +488,7 @@ namespace bsa::fo4
 			}
 
 			for ([[maybe_unused]] const auto& [key, file] : *this) {
-				const auto name = key.name();
-				out << static_cast<std::uint16_t>(name.length());
-				out.write_bytes({ //
-					reinterpret_cast<const std::byte*>(name.data()),
-					name.length() });
+				detail::write_wstring(out, key.name());
 			}
 
 			return true;

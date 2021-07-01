@@ -278,9 +278,7 @@ namespace bsa::tes3
 			a_in.seek_relative(4u * a_idx);
 			std::uint32_t offset = 0;
 			a_in >> offset;
-			return std::string_view{
-				reinterpret_cast<const char*>(a_in.read_bytes(1).data())  // zstring
-			};
+			return detail::read_zstring(a_in);
 		}();
 
 		[[maybe_unused]] const auto [it, success] =
@@ -322,11 +320,7 @@ namespace bsa::tes3
 	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
-			const auto name = key.name();
-			a_out.write_bytes({ //
-				reinterpret_cast<const std::byte*>(name.data()),
-				name.size() });
-			a_out << std::byte{ '\0' };
+			detail::write_zstring(a_out, key.name());
 		}
 	}
 

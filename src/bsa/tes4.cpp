@@ -546,11 +546,9 @@ namespace bsa::tes4
 	void directory::read_file_names(detail::istream_t& a_in) noexcept
 	{
 		for ([[maybe_unused]] auto& [key, file] : *this) {
-			const std::string_view name{
-				reinterpret_cast<const char*>(a_in.read_bytes(1).data())  // zstring
-			};
-			a_in.seek_relative(name.length());
-			const_cast<file::key&>(key).set_name(name, a_in);
+			const_cast<file::key&>(key).set_name(
+				detail::read_zstring(a_in),
+				a_in);
 		}
 	}
 
@@ -574,15 +572,8 @@ namespace bsa::tes4
 			a_in.seek_absolute(offset & ~file::isecondary_archive);
 
 			const auto fname = [&]() noexcept -> std::string_view {
-				if (a_header.embedded_file_names()) {  // bstring
-					std::uint8_t len = 0;
-					a_in >> len;
-					const auto bytes = a_in.read_bytes(len);
-
-					std::string_view name{
-						reinterpret_cast<const char*>(bytes.data()),
-						len
-					};
+				if (a_header.embedded_file_names()) {
+					auto name = detail::read_bstring(a_in);
 					const auto pos = name.find_last_of("\\/"sv);
 					if (pos != std::string_view::npos) {
 						if (!dirname) {
@@ -591,7 +582,7 @@ namespace bsa::tes4
 						name = name.substr(pos + 1);
 					}
 
-					size -= static_cast<std::size_t>(len) + 1;
+					size -= name.length() + 1u;
 					return name;
 				} else {
 					return {};
@@ -668,12 +659,8 @@ namespace bsa::tes4
 
 	void directory::write_file_names(detail::ostream_t& a_out) const noexcept
 	{
-		for ([[maybe_unused]] const auto& [key, file] : *this) {  // zstring
-			const auto fname = key.name();
-			a_out.write_bytes({ //
-				reinterpret_cast<const std::byte*>(fname.data()),
-				fname.length() });
-			a_out << std::byte{ '\0' };
+		for ([[maybe_unused]] const auto& [key, file] : *this) {
+			detail::write_zstring(a_out, key.name());
 		}
 	}
 
@@ -826,18 +813,8 @@ namespace bsa::tes4
 		const detail::restore_point _{ a_in };
 		a_in.seek_absolute(offset - a_header.file_names_length());
 
-		const auto name = [&]() noexcept -> std::string_view {
-			if (a_header.directory_strings()) {  // bzstring
-				std::uint8_t len = 0;
-				a_in >> len;
-				return {
-					reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
-					len - 1u  // skip null terminator
-				};
-			} else {
-				return {};
-			}
-		}();
+		const auto name =
+			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
 
 		[[maybe_unused]] const auto [it, success] =
 			this->emplace(
@@ -906,15 +883,8 @@ namespace bsa::tes4
 	{
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_data(a_header));
 		for ([[maybe_unused]] const auto& [key, dir] : *this) {
-			if (a_header.directory_strings()) {  // bzstring
-				const auto dirname = key.name();
-				a_out << static_cast<std::uint8_t>(
-					dirname.length() +
-					1u);            // include null terminator
-				a_out.write_bytes({ //
-					reinterpret_cast<const std::byte*>(dirname.data()),
-					dirname.size() });
-				a_out << std::byte{ '\0' };
+			if (a_header.directory_strings()) {
+				detail::write_bzstring(a_out, key.name());
 			}
 
 			dir.write_file_entries(a_out, a_header, offset);

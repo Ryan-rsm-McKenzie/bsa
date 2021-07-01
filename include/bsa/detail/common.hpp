@@ -106,6 +106,11 @@ namespace bsa::detail
 
 	void normalize_path(std::string& a_path) noexcept;
 
+	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) noexcept -> std::string_view;
+	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in) noexcept -> std::string_view;
+	[[nodiscard]] auto read_wstring(detail::istream_t& a_in) noexcept -> std::string_view;
+	[[nodiscard]] auto read_zstring(detail::istream_t& a_in) noexcept -> std::string_view;
+
 	template <class Enum>
 	[[nodiscard]] constexpr auto to_underlying(Enum a_val) noexcept
 		-> std::underlying_type_t<Enum>
@@ -113,6 +118,10 @@ namespace bsa::detail
 		static_assert(std::is_enum_v<Enum>, "Input type is not an enumeration");
 		return static_cast<std::underlying_type_t<Enum>>(a_val);
 	}
+
+	void write_bzstring(detail::ostream_t& a_out, std::string_view a_string) noexcept;
+	void write_wstring(detail::ostream_t& a_out, std::string_view a_string) noexcept;
+	void write_zstring(detail::ostream_t& a_out, std::string_view a_string) noexcept;
 
 	class istream_t final
 	{
