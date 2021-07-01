@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <iterator>
+#include <map>
 #include <optional>
 #include <span>
 #include <string>
@@ -17,7 +18,6 @@
 #include <variant>
 #include <vector>
 
-#include <boost/container/map.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
 
@@ -520,7 +520,7 @@ namespace bsa::detail
 		{
 		private:
 			using container_type =
-				boost::container::map<typename T::key, T>;
+				std::map<typename T::key, T>;
 
 		public:
 			using key_type = typename container_type::key_type;
