@@ -97,7 +97,7 @@ namespace bsa::fo4
 		void clear() noexcept
 		{
 			super::clear();
-			mips = mips_t{};
+			this->mips = mips_t{};
 		}
 
 		mips_t mips;
