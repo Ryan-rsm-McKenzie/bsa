@@ -815,9 +815,9 @@ namespace bsa::tes4
 			a_in >> offset;
 			break;
 		case 105:
-			a_in.seek_relative(4);
+			a_in.seek_relative(4u);
 			a_in >> offset;
-			a_in.seek_relative(4);
+			a_in.seek_relative(4u);
 			break;
 		default:
 			detail::declare_unreachable();
