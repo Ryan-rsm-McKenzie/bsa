@@ -115,7 +115,6 @@ namespace bsa::tes4
 
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
-
 		using super::clear;
 
 		bool compress(version a_version) noexcept;
@@ -148,7 +147,6 @@ namespace bsa::tes4
 
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_directory>;
-
 		using super::clear;
 
 	private:
@@ -226,9 +224,7 @@ namespace bsa::tes4
 		}
 
 		auto read(std::filesystem::path a_path) noexcept -> std::optional<version>;
-
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
-
 		bool write(std::filesystem::path a_path, version a_version) const noexcept;
 
 	private:
