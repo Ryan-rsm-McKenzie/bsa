@@ -40,22 +40,12 @@ namespace bsa::tes3
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash) noexcept
-				-> detail::istream_t&
-			{
-				return a_in >>
-				       a_hash.lo >>
-				       a_hash.hi;
-			}
+				-> detail::istream_t&;
 
 			friend auto operator<<(
 				detail::ostream_t& a_out,
 				const hash& a_hash) noexcept
-				-> detail::ostream_t&
-			{
-				return a_out
-				       << a_hash.lo
-				       << a_hash.hi;
-			}
+				-> detail::ostream_t&;
 		};
 
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;

@@ -107,6 +107,26 @@ namespace bsa::tes3
 
 	namespace hashing
 	{
+		auto operator>>(
+			detail::istream_t& a_in,
+			hash& a_hash) noexcept
+			-> detail::istream_t&
+		{
+			return a_in >>
+			       a_hash.lo >>
+			       a_hash.hi;
+		}
+
+		auto operator<<(
+			detail::ostream_t& a_out,
+			const hash& a_hash) noexcept
+			-> detail::ostream_t&
+		{
+			return a_out
+			       << a_hash.lo
+			       << a_hash.hi;
+		}
+
 		hash hash_file(std::string& a_path) noexcept
 		{
 			detail::normalize_path(a_path);
