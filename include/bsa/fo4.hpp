@@ -92,15 +92,13 @@ namespace bsa::fo4
 				detail::ostream_t& a_out,
 				const mips_t& a_mips) noexcept
 				-> detail::ostream_t&;
-		};
+		} mips;
 
 		void clear() noexcept
 		{
 			super::clear();
 			this->mips = mips_t{};
 		}
-
-		mips_t mips;
 
 	private:
 		friend file;
@@ -139,7 +137,7 @@ namespace bsa::fo4
 				detail::ostream_t& a_out,
 				const header_t& a_header) noexcept
 				-> detail::ostream_t&;
-		};
+		} header;
 
 		using value_type = container_type::value_type;
 		using iterator = container_type::iterator;
@@ -186,8 +184,6 @@ namespace bsa::fo4
 		void reserve(std::size_t a_count) noexcept { _chunks.reserve(a_count); }
 		void shrink_to_fit() noexcept { _chunks.shrink_to_fit(); }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
-
-		header_t header;
 
 	private:
 		friend archive;
