@@ -485,6 +485,8 @@ namespace bsa::fo4
 					reinterpret_cast<const std::byte*>(name.data()),
 					name.length() });
 			}
+
+			return true;
 		}
 
 	private:
