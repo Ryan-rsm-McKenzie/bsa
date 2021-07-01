@@ -16,7 +16,7 @@ using namespace std::literals;
 
 namespace
 {
-	[[nodiscard]] auto hash_file(std::string_view a_path)
+	[[nodiscard]] auto hash_file(std::string_view a_path) noexcept
 		-> bsa::tes3::hashing::hash
 	{
 		std::string t(a_path);
