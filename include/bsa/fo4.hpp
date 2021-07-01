@@ -314,6 +314,11 @@ namespace bsa::fo4
 		file& operator=(const file&) noexcept = default;
 		file& operator=(file&&) noexcept = default;
 
+		[[nodiscard]] auto operator[](std::size_t a_pos) noexcept
+			-> value_type& { return _chunks[a_pos]; }
+		[[nodiscard]] auto operator[](std::size_t a_pos) const noexcept
+			-> const value_type& { return _chunks[a_pos]; }
+
 		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _chunks.cbegin(); }
@@ -322,6 +327,11 @@ namespace bsa::fo4
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _chunks.end(); }
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _chunks.cend(); }
 
+		[[nodiscard]] auto back() noexcept -> value_type& { return _chunks.back(); }
+		[[nodiscard]] auto back() const noexcept -> const value_type& { return _chunks.back(); }
+
+		[[nodiscard]] auto capacity() const noexcept -> std::size_t { return _chunks.capacity(); }
+
 		void clear() noexcept
 		{
 			_chunks.clear();
@@ -329,6 +339,12 @@ namespace bsa::fo4
 		}
 
 		[[nodiscard]] bool empty() const noexcept { return _chunks.empty(); }
+		[[nodiscard]] auto front() noexcept -> value_type& { return _chunks.front(); }
+		[[nodiscard]] auto front() const noexcept -> const value_type& { return _chunks.front(); }
+		void pop_back() noexcept { _chunks.pop_back(); }
+		void push_back(value_type a_value) noexcept { _chunks.push_back(std::move(a_value)); }
+		void reserve(std::size_t a_count) noexcept { _chunks.reserve(a_count); }
+		void shrink_to_fit() noexcept { _chunks.shrink_to_fit(); }
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
 		header_t header;
