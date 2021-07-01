@@ -455,7 +455,7 @@ namespace bsa::fo4
 			return { fmt };
 		}
 
-		[[nodiscard]] bool write(
+		bool write(
 			std::filesystem::path a_path,
 			format a_format) noexcept
 		{
