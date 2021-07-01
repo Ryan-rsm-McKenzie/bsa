@@ -816,17 +816,14 @@ namespace bsa::tes4
 		const auto name =
 			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
 
+		directory d;
+		const auto backup = d.read_files(a_in, a_header, count);
 		[[maybe_unused]] const auto [it, success] =
 			this->emplace(
 				std::piecewise_construct,
-				std::forward_as_tuple(hash, name, a_in),
-				std::forward_as_tuple());
+				std::forward_as_tuple(hash, backup.value_or(name), a_in),
+				std::forward_as_tuple(std::move(d)));
 		assert(success);
-
-		const auto backup = it->second.read_files(a_in, a_header, count);
-		if (backup) {
-			const_cast<directory::key&>(it->first).set_name(*backup, a_in);
-		}
 	}
 
 	void archive::write_directory_entries(
