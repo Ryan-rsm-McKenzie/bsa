@@ -242,62 +242,6 @@ namespace bsa::fo4
 		       << a_mips.last;
 	}
 
-	void chunk::read(
-		detail::istream_t& a_in,
-		format a_format) noexcept
-	{
-		std::uint64_t dataFileOffset = 0;
-		std::uint32_t compressedSize = 0;
-		std::uint32_t decompressedSize = 0;
-		a_in >>
-			dataFileOffset >>
-			compressedSize >>
-			decompressedSize;
-
-		std::size_t size = 0;
-		std::optional<std::size_t> decompsz;
-		if (compressedSize != 0) {
-			decompsz = decompressedSize;
-			size = compressedSize;
-		} else {
-			size = decompressedSize;
-		}
-
-		if (a_format == format::directx) {
-			a_in >> this->mips;
-		}
-
-		std::uint32_t sentinel = 0;
-		a_in >> sentinel;
-		assert(sentinel == 0xBAADF00D);
-
-		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(dataFileOffset);
-		this->set_data(
-			a_in.read_bytes(size),
-			a_in,
-			decompsz);
-	}
-
-	void chunk::write(
-		detail::ostream_t& a_out,
-		format a_format,
-		std::uint64_t& a_dataOffset) const noexcept
-	{
-		const auto size = this->size();
-		a_out << a_dataOffset
-			  << static_cast<std::uint32_t>(
-					 this->compressed() ? this->decompressed_size() : 0)
-			  << static_cast<std::uint32_t>(size);
-		a_dataOffset += size;
-
-		if (a_format == format::directx) {
-			a_out << this->mips;
-		}
-
-		a_out << static_cast<std::uint32_t>(0xBAADF00D);
-	}
-
 	auto operator>>(
 		detail::istream_t& a_in,
 		file::header_t& a_header) noexcept
@@ -324,59 +268,6 @@ namespace bsa::fo4
 		       << a_header.format
 		       << a_header.flags
 		       << a_header.tileMode;
-	}
-
-	void file::read_chunk(
-		detail::istream_t& a_in,
-		format a_format) noexcept
-	{
-		std::uint8_t count = 0;
-
-		a_in.seek_relative(1u);  // skip mod index
-		a_in >> count;
-
-		std::uint16_t hdrsz = 0;
-		a_in >> hdrsz;
-		switch (a_format) {
-		case format::general:
-			assert(hdrsz == detail::constants::chunk_header_size_gnrl);
-			break;
-		case format::directx:
-			assert(hdrsz == detail::constants::chunk_header_size_dx10);
-			a_in >> this->header;
-			break;
-		default:
-			detail::declare_unreachable();
-		}
-
-		_chunks.reserve(count);
-		for (std::size_t i = 0; i < count; ++i) {
-			auto& chunk = _chunks.emplace_back();
-			chunk.read(a_in, a_format);
-		}
-	}
-
-	void file::write_chunk(
-		detail::ostream_t& a_out,
-		format a_format,
-		std::uint64_t& a_dataOffset) const noexcept
-	{
-		a_out << std::byte{ 0 }  // skip mod index
-			  << static_cast<std::uint8_t>(this->size());
-		switch (a_format) {
-		case format::general:
-			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_gnrl);
-			break;
-		case format::directx:
-			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_dx10)
-				  << this->header;
-		default:
-			detail::declare_unreachable();
-		}
-
-		for (const auto& chunk : *this) {
-			chunk.write(a_out, a_format, a_dataOffset);
-		}
 	}
 
 	auto archive::read(std::filesystem::path a_path) noexcept
@@ -420,7 +311,7 @@ namespace bsa::fo4
 					std::forward_as_tuple());
 			assert(success);
 
-			it->second.read_chunk(in, fmt);
+			this->read_file(it->second, in, fmt);
 		}
 
 		return { fmt };
@@ -440,7 +331,7 @@ namespace bsa::fo4
 
 		for (const auto& [key, file] : *this) {
 			out << key.hash();
-			file.write_chunk(out, a_format, dataOffset);
+			this->write_file(file, out, a_format, dataOffset);
 		}
 
 		for (const auto& file : *this) {
@@ -495,5 +386,120 @@ namespace bsa::fo4
 				dataOffset + dataSize },
 			dataOffset
 		};
+	}
+
+	void archive::read_chunk(
+		chunk& a_chunk,
+		detail::istream_t& a_in,
+		format a_format) noexcept
+	{
+		std::uint64_t dataFileOffset = 0;
+		std::uint32_t compressedSize = 0;
+		std::uint32_t decompressedSize = 0;
+		a_in >>
+			dataFileOffset >>
+			compressedSize >>
+			decompressedSize;
+
+		std::size_t size = 0;
+		std::optional<std::size_t> decompsz;
+		if (compressedSize != 0) {
+			decompsz = decompressedSize;
+			size = compressedSize;
+		} else {
+			size = decompressedSize;
+		}
+
+		if (a_format == format::directx) {
+			a_in >> a_chunk.mips;
+		}
+
+		std::uint32_t sentinel = 0;
+		a_in >> sentinel;
+		assert(sentinel == 0xBAADF00D);
+
+		const detail::restore_point _{ a_in };
+		a_in.seek_absolute(dataFileOffset);
+		a_chunk.set_data(
+			a_in.read_bytes(size),
+			a_in,
+			decompsz);
+	}
+
+	void archive::read_file(
+		file& a_file,
+		detail::istream_t& a_in,
+		format a_format) noexcept
+	{
+		std::uint8_t count = 0;
+
+		a_in.seek_relative(1u);  // skip mod index
+		a_in >> count;
+
+		std::uint16_t hdrsz = 0;
+		a_in >> hdrsz;
+		switch (a_format) {
+		case format::general:
+			assert(hdrsz == detail::constants::chunk_header_size_gnrl);
+			break;
+		case format::directx:
+			assert(hdrsz == detail::constants::chunk_header_size_dx10);
+			a_in >> a_file.header;
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+
+		a_file.reserve(count);
+		for (std::size_t i = 0; i < count; ++i) {
+			this->read_chunk(
+				a_file.emplace_back(),
+				a_in,
+				a_format);
+		}
+	}
+
+	void archive::write_chunk(
+		const chunk& a_chunk,
+		detail::ostream_t& a_out,
+		format a_format,
+		std::uint64_t& a_dataOffset) noexcept
+	{
+		const auto size = a_chunk.size();
+		a_out << a_dataOffset
+			  << static_cast<std::uint32_t>(
+					 a_chunk.compressed() ? a_chunk.decompressed_size() : 0u)
+			  << static_cast<std::uint32_t>(size);
+		a_dataOffset += size;
+
+		if (a_format == format::directx) {
+			a_out << a_chunk.mips;
+		}
+
+		a_out << static_cast<std::uint32_t>(0xBAADF00D);
+	}
+
+	void archive::write_file(
+		const file& a_file,
+		detail::ostream_t& a_out,
+		format a_format,
+		std::uint64_t& a_dataOffset) noexcept
+	{
+		a_out << std::byte{ 0 }  // skip mod index
+			  << static_cast<std::uint8_t>(a_file.size());
+		switch (a_format) {
+		case format::general:
+			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_gnrl);
+			break;
+		case format::directx:
+			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_dx10)
+				  << a_file.header;
+		default:
+			detail::declare_unreachable();
+		}
+
+		for (const auto& chunk : a_file) {
+			this->write_chunk(chunk, a_out, a_format, a_dataOffset);
+		}
 	}
 }

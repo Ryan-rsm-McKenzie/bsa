@@ -76,6 +76,7 @@ namespace bsa::fo4
 		public detail::components::compressed_byte_container
 	{
 	private:
+		friend archive;
 		using super = detail::components::compressed_byte_container;
 
 	public:
@@ -100,18 +101,6 @@ namespace bsa::fo4
 			super::clear();
 			this->mips = mips_t{};
 		}
-
-	private:
-		friend file;
-
-		void read(
-			detail::istream_t& a_in,
-			format a_format) noexcept;
-
-		void write(
-			detail::ostream_t& a_out,
-			format a_format,
-			std::uint64_t& a_dataOffset) const noexcept;
 	};
 
 	class file final
@@ -193,17 +182,6 @@ namespace bsa::fo4
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
 
 	private:
-		friend archive;
-
-		void read_chunk(
-			detail::istream_t& a_in,
-			format a_format) noexcept;
-
-		void write_chunk(
-			detail::ostream_t& a_out,
-			format a_format,
-			std::uint64_t& a_dataOffset) const noexcept;
-
 		container_type _chunks;
 	};
 
@@ -222,5 +200,27 @@ namespace bsa::fo4
 	private:
 		[[nodiscard]] auto make_header(format a_format) const noexcept
 			-> std::pair<detail::header_t, std::uint64_t>;
+
+		void read_chunk(
+			chunk& a_chunk,
+			detail::istream_t& a_in,
+			format a_format) noexcept;
+
+		void read_file(
+			file& a_file,
+			detail::istream_t& a_in,
+			format a_format) noexcept;
+
+		void write_chunk(
+			const chunk& a_chunk,
+			detail::ostream_t& a_out,
+			format a_format,
+			std::uint64_t& a_dataOffset) noexcept;
+
+		void write_file(
+			const file& a_file,
+			detail::ostream_t& a_out,
+			format a_format,
+			std::uint64_t& a_dataOffset) noexcept;
 	};
 }
