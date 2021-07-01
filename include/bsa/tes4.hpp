@@ -238,15 +238,15 @@ namespace bsa::tes4
 			detail::istream_t& a_in,
 			const detail::header_t& a_header) noexcept;
 
-		void write_directory_entries(
-			detail::ostream_t& a_out,
-			const detail::header_t& a_header) const noexcept;
-
 		[[nodiscard]] auto test_flag(archive_flag a_flag) const noexcept
 			-> bool { return (_flags & a_flag) != archive_flag::none; }
 
 		[[nodiscard]] auto test_type(archive_type a_type) const noexcept
 			-> bool { return (_types & a_type) != archive_type::none; }
+
+		void write_directory_entries(
+			detail::ostream_t& a_out,
+			const detail::header_t& a_header) const noexcept;
 
 		void write_file_data(
 			detail::ostream_t& a_out,
