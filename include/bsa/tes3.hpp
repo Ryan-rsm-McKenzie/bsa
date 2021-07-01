@@ -65,7 +65,7 @@ namespace bsa::tes3
 		public detail::components::byte_container
 	{
 	private:
-		friend tes3::archive;
+		friend archive;
 		using super = detail::components::byte_container;
 
 	public:
