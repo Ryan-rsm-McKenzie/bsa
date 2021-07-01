@@ -28,6 +28,7 @@ TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 			return hash_file(a_path);
 		};
 
+		REQUIRE(h(R"(Sound\Voice\Fallout4.esm\RobotMrHandy\María_M.fuz)"sv) == hash_t{ 0x7644F04B, 0x007A7566, 0x8A9C014E });
 		REQUIRE(h(R"(Strings\ccBGSFO4001-PipBoy(Black)_en.DLSTRINGS)"sv) == hash_t{ 0x1985075C, 0x74736C64, 0x29F6B58B });
 		REQUIRE(h(R"(Textures\CreationClub\BGSFO4001\AnimObjects\PipBoy\PipBoy02(Black)_d.DDS)"sv) == hash_t{ 0x69E1E82C, 0x00736464, 0x23157A84 });
 		REQUIRE(h(R"(Materials\CreationClub\BGSFO4003\AnimObjects\PipBoy\PipBoyLabels01(Camo01).BGSM)"sv) == hash_t{ 0x0785843B, 0x6D736762, 0x818374CC });
