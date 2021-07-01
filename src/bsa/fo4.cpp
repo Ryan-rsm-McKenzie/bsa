@@ -43,9 +43,9 @@ namespace bsa::fo4
 					result.extension = a_path.substr(*pextension + 1);  // don't include '.'
 				}
 
-				const auto first = pstem.value_or(0);
-				const auto last = pstem && pextension ?
-                                      *pextension - *pstem :
+				const auto first = pstem ? *pstem + 1 : 0;
+				const auto last = pextension ?
+                                      *pextension - first :
                                       pextension.value_or(std::string_view::npos);
 				result.stem = a_path.substr(first, last);
 
