@@ -366,12 +366,12 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		};
 
 		constexpr std::array index{
-			info_t{ 0x006819F973057265, "share"sv, 0xDC415D456C077365, "license.txt"sv },
-			info_t{ 0x00691A4374056573, "tiles"sv, 0xDDE285B874093030, "tile_0000.png"sv },
-			info_t{ 0x0E09AFBA620A6E64, "background"sv, 0xC41A947762116F6D, "background_bottom.png"sv },
-			info_t{ 0x4ADF420B74076170, "tilemap"sv, 0x0D9BA627630A7273, "characters.png"sv },
-			info_t{ 0x6A326CD4630B2033, "construct 3"sv, 0xC7EDDCEA72066D65, "readme.txt"sv },
-			info_t{ 0x79CD3FEC630A7273, "characters"sv, 0xD0E4FC14630E3030, "character_0000.png"sv },
+			info_t{ 0x006819F973057265, "Share"sv, 0xDC415D456C077365, "License.txt"sv },
+			info_t{ 0x00691A4374056573, "Tiles"sv, 0xDDE285B874093030, "tile_0000.png"sv },
+			info_t{ 0x0E09AFBA620A6E64, "Background"sv, 0xC41A947762116F6D, "background_bottom.png"sv },
+			info_t{ 0x4ADF420B74076170, "Tilemap"sv, 0x0D9BA627630A7273, "characters.png"sv },
+			info_t{ 0x6A326CD4630B2033, "Construct 3"sv, 0xC7EDDCEA72066D65, "Readme.txt"sv },
+			info_t{ 0x79CD3FEC630A7273, "Characters"sv, 0xD0E4FC14630E3030, "character_0000.png"sv },
 		};
 
 		std::vector<boost::iostreams::mapped_file_source> mmapped;
