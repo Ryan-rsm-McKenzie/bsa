@@ -647,6 +647,7 @@ namespace bsa::tes4
 			const auto fname = [&]() noexcept -> std::string_view {
 				if (a_header.embedded_file_names()) {
 					auto name = detail::read_bstring(a_in);
+					size -= static_cast<std::uint32_t>(name.length() + 1u);
 					const auto pos = name.find_last_of("\\/"sv);
 					if (pos != std::string_view::npos) {
 						if (!dirname) {
@@ -655,7 +656,6 @@ namespace bsa::tes4
 						name = name.substr(pos + 1);
 					}
 
-					size -= static_cast<std::uint32_t>(name.length() + 1u);
 					return name;
 				} else {
 					return {};
