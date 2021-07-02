@@ -19,6 +19,11 @@ namespace
 	}
 }
 
+static_assert(assert_nothrowable<bsa::fo4::hashing::hash>());
+static_assert(assert_nothrowable<bsa::fo4::chunk>());
+static_assert(assert_nothrowable<bsa::fo4::file>());
+static_assert(assert_nothrowable<bsa::fo4::archive>());
+
 TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 {
 	SECTION("validate hash values")
