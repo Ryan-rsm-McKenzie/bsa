@@ -734,8 +734,12 @@ namespace bsa::tes4
 			detail::declare_unreachable();
 		}
 
+		if (a_header.file_strings()) {
+			offset -= a_header.file_names_length();
+		}
+
 		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(offset - a_header.file_names_length());
+		a_in.seek_absolute(offset);
 
 		const auto name =
 			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
