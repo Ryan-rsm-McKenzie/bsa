@@ -494,6 +494,7 @@ namespace bsa::fo4
 		case format::directx:
 			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_dx10)
 				  << a_file.header;
+			break;
 		default:
 			detail::declare_unreachable();
 		}
