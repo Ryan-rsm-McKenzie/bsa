@@ -48,3 +48,4 @@ bsa.write("example.bsa", bsa::tes4::version::sse);
 - The game engine normalizes paths to use the `\` character instead of the standard `/`. As such, users should be aware that file paths retrieved from the virtual file system may not constitute valid paths on their native file system.
 - Avoid writing file paths which are close to the limit of `MAX_PATH`. Bethesda uses fixed buffers everywhere with no input validation, so they will most likely crash the game.
 - Make sure to lexically normalize your paths before you pass them. Bethesda uses *really* basic file extension detection methods, and `bsa` replicates those methods.
+- Files can not be split into more than 4 chunks inside a ba2. Bethesda uses a fixed buffer to store the chunks, and exceeding that limit will likely crash the game.
