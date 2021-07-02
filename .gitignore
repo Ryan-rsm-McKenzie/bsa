@@ -1,6 +1,5 @@
 /.cache
 /.vscode
 /build
-/scripts/bin
 compile_commands.json
 CMakeUserPresets.json
