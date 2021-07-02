@@ -839,25 +839,27 @@ namespace bsa::tes4
 
 			for (const auto& file : dir.second) {
 				file.first.hash().write(a_out, a_header.endian());
-				const auto fsize = file.second.size();
+				auto fsize = file.second.size();
+
 				if (!!a_header.compressed() != !!file.second.compressed()) {
-					a_out << (static_cast<std::uint32_t>(fsize) | file::icompression);
-				} else {
-					a_out << static_cast<std::uint32_t>(fsize);
+					fsize |= file::icompression;
 				}
-				a_out << offset;
 
 				if (a_header.embedded_file_names()) {
-					offset += static_cast<std::uint32_t>(
+					fsize += static_cast<std::uint32_t>(
 						1u +  // prefixed byte length
 						dir.first.name().length() +
 						1u +  // directory separator
 						file.first.name().length());
 				}
+
 				if (file.second.compressed()) {
-					offset += 4u;
+					fsize += 4u;
 				}
-				offset += static_cast<std::uint32_t>(fsize);
+
+				a_out << static_cast<std::uint32_t>(fsize);
+				a_out << offset;
+				offset += static_cast<std::uint32_t>(fsize & ~file::icompression);
 			}
 		}
 	}
