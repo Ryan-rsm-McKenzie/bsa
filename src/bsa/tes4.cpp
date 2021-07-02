@@ -853,7 +853,7 @@ namespace bsa::tes4
 						1u);  // prefixed byte length
 				}
 				if (file.compressed()) {
-					offset += 4;
+					offset += 4u;
 				}
 				offset += static_cast<std::uint32_t>(fsize);
 			}
