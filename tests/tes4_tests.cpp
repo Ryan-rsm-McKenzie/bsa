@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <exception>
+#include <filesystem>
 #include <iterator>
 #include <limits>
 #include <memory>
@@ -336,5 +337,107 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 		add({ 1 }, small);
 		REQUIRE(!verify());
+	}
+
+	SECTION("we can write archives with a variety of flags")
+	{
+		const std::filesystem::path root{ "tes4_flags_test"sv };
+		const std::filesystem::path outPath = root / "out.bsa"sv;
+
+		struct info_t
+		{
+			struct pair_t
+			{
+				std::uint64_t hash;
+				std::string_view name;
+			};
+
+			consteval info_t(
+				std::uint64_t a_dhash,
+				std::string_view a_dname,
+				std::uint64_t a_fhash,
+				std::string_view a_fname) noexcept :
+				directory{ a_dhash, a_dname },
+				file{ a_fhash, a_fname }
+			{}
+
+			pair_t directory;
+			pair_t file;
+		};
+
+		constexpr std::array index{
+			info_t{ 0x006819F973057265, "share"sv, 0xDC415D456C077365, "license.txt"sv },
+			info_t{ 0x00691A4374056573, "tiles"sv, 0xDDE285B874093030, "tile_0000.png"sv },
+			info_t{ 0x0E09AFBA620A6E64, "background"sv, 0xC41A947762116F6D, "background_bottom.png"sv },
+			info_t{ 0x4ADF420B74076170, "tilemap"sv, 0x0D9BA627630A7273, "characters.png"sv },
+			info_t{ 0x6A326CD4630B2033, "construct 3"sv, 0xC7EDDCEA72066D65, "readme.txt"sv },
+			info_t{ 0x79CD3FEC630A7273, "characters"sv, 0xD0E4FC14630E3030, "character_0000.png"sv },
+		};
+
+		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		bsa::tes4::archive in;
+		for (const auto& [dir, file] : index) {
+			const auto data = map_file(root / "data"sv / dir.name / file.name);
+			REQUIRE(data.is_open());
+			bsa::tes4::file f;
+			f.set_data({ //
+				reinterpret_cast<const std::byte*>(data.data()),
+				data.size() });
+			mmapped.push_back(std::move(data));
+
+			bsa::tes4::directory d;
+			REQUIRE(d.insert(file.name, std::move(f)).second);
+
+			REQUIRE(in.insert(dir.name, std::move(d)).second);
+		}
+
+		constexpr std::array versions{
+			bsa::tes4::version::tes4,
+			bsa::tes4::version::tes5,
+			bsa::tes4::version::sse,
+		};
+		constexpr std::array flags{
+			bsa::tes4::archive_flag::directory_strings,
+			bsa::tes4::archive_flag::file_strings,
+			bsa::tes4::archive_flag::compressed,
+			bsa::tes4::archive_flag::embedded_file_names,
+		};
+
+		for (const auto version : versions) {
+			for (std::size_t i = 0; i < flags.size(); ++i) {
+				auto af = flags[i];
+				for (std::size_t j = i; j < flags.size(); ++j) {
+					af |= flags[j];
+					in.archive_flags(af);
+					REQUIRE(in.write(outPath, version));
+
+					bsa::tes4::archive out;
+					const auto verOut = out.read(outPath);
+					REQUIRE(verOut);
+					REQUIRE(*verOut == version);
+					REQUIRE(out.size() == index.size());
+					for (std::size_t idx = 0; idx < index.size(); ++idx) {
+						const auto& [dir, file] = index[idx];
+						const auto& mapped = mmapped[idx];
+
+						REQUIRE(out[dir.name][file.name]);
+
+						const auto d = out.find(dir.name);
+						REQUIRE(d != out.end());
+						REQUIRE(d->first.hash().numeric() == dir.hash);
+						REQUIRE(d->second.size() == 1);
+
+						const auto f = d->second.find(file.name);
+						REQUIRE(f != d->second.end());
+						REQUIRE(f->first.hash().numeric() == file.hash);
+						if (f->second.compressed()) {
+							REQUIRE(f->second.decompress(version));
+						}
+						REQUIRE(f->second.size() == mapped.size());
+						REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+					}
+				}
+			}
+		}
 	}
 }
