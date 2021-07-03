@@ -456,7 +456,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		}
 	}
 
-	SECTION("archives will bail on malformed input")
+	SECTION("archives will bail on malformed inputs")
 	{
 		const std::filesystem::path root{ "tes4_invalid_test"sv };
 		constexpr std::array types{
