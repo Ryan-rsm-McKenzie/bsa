@@ -123,10 +123,10 @@ namespace bsa::tes4
 
 			[[nodiscard]] bool good() const noexcept { return _good; }
 
+			[[nodiscard]] auto archive_version() const noexcept -> std::size_t { return _version; }
 			[[nodiscard]] auto directories_offset() const noexcept
 				-> std::size_t { return _directoriesOffset; }
 			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
-			[[nodiscard]] auto archive_version() const noexcept -> std::size_t { return _version; }
 
 			[[nodiscard]] auto directory_count() const noexcept
 				-> std::size_t { return _directory.count; }
