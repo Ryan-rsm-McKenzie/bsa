@@ -40,6 +40,7 @@ find_package(Boost
 	COMPONENTS
 		iostreams
 		nowide
+		regex
 )
 
 target_link_libraries(
@@ -47,6 +48,7 @@ target_link_libraries(
 	PRIVATE
 		Boost::iostreams
 		Boost::nowide
+		Boost::regex
 		bsa::bsa
 		bsa::common
 		Catch2::Catch2
@@ -115,4 +117,10 @@ download_test(
 	NAME "tes4_flags_test"
 	TAG "0.0.3"
 	SHA512 "5323B6846AB8481DDFE2C6CC8E7CAB52DCCD087B9375F7D799C5DA7755300771693169F9D9D68E2881AFC5A56BAB72D20B15F34F959BA6C50BF3A673534DEFE1"
+)
+
+download_test(
+	NAME "tes4_invalid_test"
+	TAG "0.0.3"
+	SHA512 "3F835E3180D10226AB2307C9AABC680DB246BA452BA9F0602FF1A0B16A3D9A1C93251B926ADA91974EA0970DA1B1266D58B073B6A563A06B1187E13DDECB8470"
 )

@@ -14,6 +14,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/nowide/cstdio.hpp>
+#include <boost/regex.hpp>
 
 #include "common.hpp"
 
@@ -439,6 +440,43 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 						REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
 					}
 				}
+			}
+		}
+	}
+
+	SECTION("archives will bail on malformed input")
+	{
+		const std::filesystem::path root{ "tes4_invalid_test"sv };
+		constexpr std::array types{
+			"magic"sv,
+			"version"sv,
+			"size"sv,
+			"range"sv,
+		};
+
+		for (const auto& type : types) {
+			try {
+				std::string filename;
+				filename += "invalid_"sv;
+				filename += type;
+				filename += ".bsa"sv;
+
+				bsa::tes4::archive bsa;
+				bsa.read(root / filename);
+
+				REQUIRE(false);
+			} catch (bsa::exception& a_err) {
+				std::string fmt;
+				fmt += "\\b"sv;
+				fmt += type;
+				fmt += "\\b"sv;
+
+				boost::regex pattern{
+					fmt.c_str(),
+					boost::regex_constants::ECMAScript | boost::regex_constants::icase
+				};
+
+				REQUIRE(boost::regex_search(a_err.what(), pattern));
 			}
 		}
 	}

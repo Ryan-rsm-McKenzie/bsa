@@ -14,6 +14,7 @@
     "tests": {
       "description": "Build tests",
       "dependencies": [
+        "boost-regex",
         "catch2"
       ]
     }
