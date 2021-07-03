@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(
-	bsa
-	LANGUAGES CXX
-)
+project(bsa LANGUAGES CXX)
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 	message(FATAL_ERROR "in-source builds are not allowed")
