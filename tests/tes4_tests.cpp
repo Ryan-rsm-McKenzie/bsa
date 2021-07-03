@@ -224,6 +224,18 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			bsa.read("."sv);
 			REQUIRE(false);
 		} catch (const std::system_error&) {
+			REQUIRE(true);
+		}
+	}
+
+	SECTION("attempting to write to an invalid location will fail")
+	{
+		try {
+			bsa::tes4::archive bsa;
+			bsa.write("."sv, bsa::tes4::version::tes5);
+			REQUIRE(false);
+		} catch (const std::system_error&) {
+			REQUIRE(true);
 		}
 	}
 
