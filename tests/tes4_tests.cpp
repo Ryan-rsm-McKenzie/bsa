@@ -440,13 +440,19 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 						const auto d = out.find(dir.name);
 						REQUIRE(d != out.end());
 						REQUIRE(d->first.hash().numeric() == dir.hash);
-						REQUIRE(d->first.name() == simple_normalize(dir.name));
+						if (out.directory_strings() ||
+							(version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
+							REQUIRE(d->first.name() == simple_normalize(dir.name));
+						}
 						REQUIRE(d->second.size() == 1);
 
 						const auto f = d->second.find(file.name);
 						REQUIRE(f != d->second.end());
 						REQUIRE(f->first.hash().numeric() == file.hash);
-						REQUIRE(f->first.name() == simple_normalize(file.name));
+						if (out.file_strings() ||
+							(version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
+							REQUIRE(f->first.name() == simple_normalize(file.name));
+						}
 						if (f->second.compressed()) {
 							REQUIRE(f->second.decompress(version));
 						}
