@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cctype>
 #include <filesystem>
+#include <string>
+#include <string_view>
 #include <type_traits>
 
 #include <boost/filesystem/path.hpp>
