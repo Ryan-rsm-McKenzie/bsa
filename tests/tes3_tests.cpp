@@ -123,4 +123,66 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 			REQUIRE(std::memcmp(archived->data(), disk.data(), archived->size()) == 0);
 		}
 	}
+
+	SECTION("we can write archives")
+	{
+		const std::filesystem::path root{ "tes3_write_test"sv };
+		const std::filesystem::path outPath = root / "out.bsa"sv;
+
+		struct info_t
+		{
+			consteval info_t(
+				std::uint32_t a_lo,
+				std::uint32_t a_hi,
+				std::string_view a_path) noexcept :
+				hash{ a_lo, a_hi },
+				path(a_path)
+			{}
+
+			bsa::tes3::hashing::hash hash;
+			std::string_view path;
+		};
+
+		constexpr std::array index{
+			info_t{ 0x0C18356B, 0xA578DB74, "Tiles/tile_0001.png"sv },
+			info_t{ 0x1B0D3416, 0xF5D5F30E, "Share/License.txt"sv },
+			info_t{ 0x1B3B140A, 0x07B36E53, "Background/background_middle.png"sv },
+			info_t{ 0x29505413, 0x1EB4CED7, "Construct 3/Pixel Platformer.c3p"sv },
+			info_t{ 0x4B7D031B, 0xD4701AD4, "Tilemap/characters_packed.png"sv },
+			info_t{ 0x74491918, 0x2BEBCD0A, "Characters/character_0001.png"sv },
+		};
+
+		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		bsa::tes3::archive in;
+		for (const auto& file : index) {
+			auto& data = mmapped.emplace_back(
+				map_file(root / "data"sv / file.path));
+			REQUIRE(data.is_open());
+			bsa::tes3::file f;
+			f.set_data({ //
+				reinterpret_cast<const std::byte*>(data.data()),
+				data.size() });
+
+			REQUIRE(in.insert(file.path, std::move(f)).second);
+		}
+
+		in.write(outPath);
+
+		bsa::tes3::archive out;
+		out.read(outPath);
+		REQUIRE(out.size() == index.size());
+		for (std::size_t idx = 0; idx < index.size(); ++idx) {
+			const auto& file = index[idx];
+			const auto& mapped = mmapped[idx];
+
+			REQUIRE(out[file.path]);
+
+			const auto f = out.find(file.path);
+			REQUIRE(f != out.end());
+			REQUIRE(f->first.hash() == file.hash);
+			REQUIRE(f->first.name() == simple_normalize(file.path));
+			REQUIRE(f->second.size() == mapped.size());
+			REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+		}
+	}
 }
