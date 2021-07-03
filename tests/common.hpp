@@ -26,3 +26,13 @@ consteval bool assert_nothrowable() noexcept
 		boost::filesystem::path{ a_path.native() }
 	};
 }
+
+inline auto simple_normalize(std::string_view a_path) noexcept
+	-> std::string
+{
+	std::string result(a_path);
+	for (auto& c : result) {
+		c = c == '/' ? '\\' : static_cast<char>(std::tolower(c));
+	}
+	return result;
+};
