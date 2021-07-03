@@ -39,7 +39,7 @@ namespace bsa::tes3
 
 			friend auto operator>>(
 				detail::istream_t& a_in,
-				hash& a_hash) noexcept
+				hash& a_hash)
 				-> detail::istream_t&;
 
 			friend auto operator<<(
@@ -84,7 +84,7 @@ namespace bsa::tes3
 		void read_file(
 			detail::istream_t& a_in,
 			const offsets_t& a_offsets,
-			std::size_t a_idx) noexcept;
+			std::size_t a_idx);
 
 		void write_file_entries(detail::ostream_t& a_out) const noexcept;
 		void write_file_name_offsets(detail::ostream_t& a_out) const noexcept;

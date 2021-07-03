@@ -121,10 +121,10 @@ namespace bsa::detail
 
 	void normalize_path(std::string& a_path) noexcept;
 
-	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) noexcept -> std::string_view;
-	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in) noexcept -> std::string_view;
-	[[nodiscard]] auto read_wstring(detail::istream_t& a_in) noexcept -> std::string_view;
-	[[nodiscard]] auto read_zstring(detail::istream_t& a_in) noexcept -> std::string_view;
+	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) -> std::string_view;
+	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in) -> std::string_view;
+	[[nodiscard]] auto read_wstring(detail::istream_t& a_in) -> std::string_view;
+	[[nodiscard]] auto read_zstring(detail::istream_t& a_in) -> std::string_view;
 
 	template <class Enum>
 	[[nodiscard]] constexpr auto to_underlying(Enum a_val) noexcept
@@ -151,7 +151,7 @@ namespace bsa::detail
 		istream_t& operator=(istream_t&&) = delete;
 
 		template <concepts::integral T>
-		[[nodiscard]] T read(std::endian a_endian = std::endian::little) noexcept
+		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
 		{
 			using integral_t = type_traits::integral_type_t<T>;
 			auto result = integral_t{ 0 };
@@ -177,7 +177,7 @@ namespace bsa::detail
 			return static_cast<T>(result);
 		}
 
-		[[nodiscard]] auto read_bytes(std::size_t a_bytes) noexcept
+		[[nodiscard]] auto read_bytes(std::size_t a_bytes)
 			-> std::span<const std::byte>;
 
 		void seek_absolute(std::size_t a_pos) noexcept { _pos = a_pos; }
@@ -187,7 +187,7 @@ namespace bsa::detail
 		[[nodiscard]] auto rdbuf() const noexcept -> const stream_type& { return _file; }
 
 		template <concepts::integral T>
-		friend istream_t& operator>>(istream_t& a_in, T& a_value) noexcept
+		friend istream_t& operator>>(istream_t& a_in, T& a_value)
 		{
 			a_value = a_in.read<T>();
 			return a_in;
@@ -196,7 +196,7 @@ namespace bsa::detail
 		template <class T, std::size_t N>
 		friend istream_t& operator>>(
 			istream_t& a_in,
-			std::array<T, N>& a_value) noexcept  //
+			std::array<T, N>& a_value)  //
 			requires(sizeof(T) == 1)
 		{
 			const auto bytes = a_in.read_bytes(a_value.size());

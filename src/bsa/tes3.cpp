@@ -107,7 +107,7 @@ namespace bsa::tes3
 	{
 		auto operator>>(
 			detail::istream_t& a_in,
-			hash& a_hash) noexcept
+			hash& a_hash)
 			-> detail::istream_t&
 		{
 			return a_in >>
@@ -265,7 +265,7 @@ namespace bsa::tes3
 	void archive::read_file(
 		detail::istream_t& a_in,
 		const offsets_t& a_offsets,
-		std::size_t a_idx) noexcept
+		std::size_t a_idx)
 	{
 		const auto hash = [&]() noexcept {
 			const detail::restore_point _{ a_in };

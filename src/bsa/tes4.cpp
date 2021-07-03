@@ -259,7 +259,7 @@ namespace bsa::tes4
 
 		void hash::read(
 			detail::istream_t& a_in,
-			std::endian a_endian) noexcept
+			std::endian a_endian)
 		{
 			a_in >>
 				last >>
@@ -612,7 +612,7 @@ namespace bsa::tes4
 		directory& a_dir,
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
-		std::size_t a_count) noexcept
+		std::size_t a_count)
 		-> std::optional<std::string_view>
 	{
 		std::optional<std::string_view> dirname;
@@ -663,7 +663,7 @@ namespace bsa::tes4
 		file& a_file,
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
-		std::size_t a_size) noexcept
+		std::size_t a_size)
 	{
 		std::optional<std::size_t> decompsz;
 		const bool compressed =
@@ -683,7 +683,7 @@ namespace bsa::tes4
 
 	void archive::read_file_names(
 		detail::istream_t& a_in,
-		const detail::header_t& a_header) noexcept
+		const detail::header_t& a_header)
 	{
 		a_in.seek_absolute(detail::offsetof_file_strings(a_header));
 		for (auto& dir : *this) {
@@ -695,7 +695,7 @@ namespace bsa::tes4
 
 	void archive::read_directory(
 		detail::istream_t& a_in,
-		const detail::header_t& a_header) noexcept
+		const detail::header_t& a_header)
 	{
 		hashing::hash hash;
 		hash.read(a_in, a_header.endian());

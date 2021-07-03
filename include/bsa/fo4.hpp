@@ -59,7 +59,7 @@ namespace bsa::fo4
 
 			friend auto operator>>(
 				detail::istream_t& a_in,
-				hash& a_hash) noexcept
+				hash& a_hash)
 				-> detail::istream_t&;
 
 			friend auto operator<<(
@@ -86,7 +86,7 @@ namespace bsa::fo4
 
 			friend auto operator>>(
 				detail::istream_t& a_in,
-				mips_t& a_mips) noexcept
+				mips_t& a_mips)
 				-> detail::istream_t&;
 
 			friend auto operator<<(
@@ -119,7 +119,7 @@ namespace bsa::fo4
 
 			friend auto operator>>(
 				detail::istream_t& a_in,
-				header_t& a_header) noexcept
+				header_t& a_header)
 				-> detail::istream_t&;
 
 			friend auto operator<<(
@@ -203,12 +203,12 @@ namespace bsa::fo4
 		void read_chunk(
 			chunk& a_chunk,
 			detail::istream_t& a_in,
-			format a_format) noexcept;
+			format a_format);
 
 		void read_file(
 			file& a_file,
 			detail::istream_t& a_in,
-			format a_format) noexcept;
+			format a_format);
 
 		void write_chunk(
 			const chunk& a_chunk,

@@ -57,7 +57,7 @@ namespace bsa::detail
 		}
 	}
 
-	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) noexcept
+	[[nodiscard]] auto read_bstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
 		std::uint8_t len = 0;
@@ -68,7 +68,7 @@ namespace bsa::detail
 		};
 	}
 
-	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in) noexcept
+	[[nodiscard]] auto read_bzstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
 		std::uint8_t len = 0;
@@ -79,7 +79,7 @@ namespace bsa::detail
 		};
 	}
 
-	[[nodiscard]] auto read_wstring(detail::istream_t& a_in) noexcept
+	[[nodiscard]] auto read_wstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
 		std::uint16_t len = 0;
@@ -90,7 +90,7 @@ namespace bsa::detail
 		};
 	}
 
-	[[nodiscard]] auto read_zstring(detail::istream_t& a_in) noexcept
+	[[nodiscard]] auto read_zstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
 		const std::string_view result{
@@ -133,10 +133,12 @@ namespace bsa::detail
 		}
 	}
 
-	auto istream_t::read_bytes(std::size_t a_bytes) noexcept
+	auto istream_t::read_bytes(std::size_t a_bytes)
 		-> std::span<const std::byte>
 	{
-		assert(_pos + a_bytes <= _file.size());
+		if (_pos + a_bytes > _file.size()) {
+			throw exception("file read out of range");
+		}
 
 		const auto pos = _pos;
 		_pos += a_bytes;

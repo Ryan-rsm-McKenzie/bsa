@@ -96,7 +96,7 @@ namespace bsa::tes4
 
 			void read(
 				detail::istream_t& a_in,
-				std::endian a_endian) noexcept;
+				std::endian a_endian);
 
 			void write(
 				detail::ostream_t& a_out,
@@ -204,21 +204,21 @@ namespace bsa::tes4
 			directory& a_dir,
 			detail::istream_t& a_in,
 			const detail::header_t& a_header,
-			std::size_t a_count) noexcept -> std::optional<std::string_view>;
+			std::size_t a_count) -> std::optional<std::string_view>;
 
 		void read_file_data(
 			file& a_file,
 			detail::istream_t& a_in,
 			const detail::header_t& a_header,
-			std::size_t a_size) noexcept;
+			std::size_t a_size);
 
 		void read_file_names(
 			detail::istream_t& a_in,
-			const detail::header_t& a_header) noexcept;
+			const detail::header_t& a_header);
 
 		void read_directory(
 			detail::istream_t& a_in,
-			const detail::header_t& a_header) noexcept;
+			const detail::header_t& a_header);
 
 		[[nodiscard]] auto test_flag(archive_flag a_flag) const noexcept
 			-> bool { return (_flags & a_flag) != archive_flag::none; }

@@ -181,7 +181,7 @@ namespace bsa::fo4
 
 		auto operator>>(
 			detail::istream_t& a_in,
-			hash& a_hash) noexcept
+			hash& a_hash)
 			-> detail::istream_t&
 		{
 			return a_in >>
@@ -222,7 +222,7 @@ namespace bsa::fo4
 
 	auto operator>>(
 		detail::istream_t& a_in,
-		chunk::mips_t& a_mips) noexcept
+		chunk::mips_t& a_mips)
 		-> detail::istream_t&
 	{
 		return a_in >>
@@ -242,7 +242,7 @@ namespace bsa::fo4
 
 	auto operator>>(
 		detail::istream_t& a_in,
-		file::header_t& a_header) noexcept
+		file::header_t& a_header)
 		-> detail::istream_t&
 	{
 		return a_in >>
@@ -376,7 +376,7 @@ namespace bsa::fo4
 	void archive::read_chunk(
 		chunk& a_chunk,
 		detail::istream_t& a_in,
-		format a_format) noexcept
+		format a_format)
 	{
 		std::uint64_t dataFileOffset = 0;
 		std::uint32_t compressedSize = 0;
@@ -414,7 +414,7 @@ namespace bsa::fo4
 	void archive::read_file(
 		file& a_file,
 		detail::istream_t& a_in,
-		format a_format) noexcept
+		format a_format)
 	{
 		std::uint8_t count = 0;
 
