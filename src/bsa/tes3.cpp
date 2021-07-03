@@ -281,6 +281,7 @@ namespace bsa::tes3
 			a_in.seek_relative(4u * a_idx);
 			std::uint32_t offset = 0;
 			a_in >> offset;
+			a_in.seek_absolute(a_offsets.names + offset);
 			return detail::read_zstring(a_in);
 		}();
 
