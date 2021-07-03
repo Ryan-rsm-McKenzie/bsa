@@ -42,11 +42,6 @@ namespace bsa::fo4
 				_stringTableOffset(a_stringTableOffset)
 			{}
 
-			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
-			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
-			[[nodiscard]] auto string_table_offset() const noexcept
-				-> std::uint64_t { return _stringTableOffset; }
-
 			friend auto operator>>(
 				istream_t& a_in,
 				header_t& a_header)
@@ -83,6 +78,11 @@ namespace bsa::fo4
 				       << a_header._fileCount
 				       << a_header._stringTableOffset;
 			}
+
+			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
+			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
+			[[nodiscard]] auto string_table_offset() const noexcept
+				-> std::uint64_t { return _stringTableOffset; }
 
 		private:
 			std::uint32_t _format{ 0 };

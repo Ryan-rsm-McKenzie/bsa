@@ -28,9 +28,6 @@ namespace bsa::tes3
 				_fileCount(a_fileCount)
 			{}
 
-			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
-			[[nodiscard]] auto hash_offset() const noexcept -> std::size_t { return _hashOffset; }
-
 			friend auto operator>>(
 				istream_t& a_in,
 				header_t& a_header)
@@ -59,6 +56,9 @@ namespace bsa::tes3
 				       << a_header._hashOffset
 				       << a_header._fileCount;
 			}
+
+			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
+			[[nodiscard]] auto hash_offset() const noexcept -> std::size_t { return _hashOffset; }
 
 		private:
 			std::uint32_t _hashOffset{ 0 };
