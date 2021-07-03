@@ -29,12 +29,11 @@ namespace bsa::tes3
 			{}
 
 			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
-			[[nodiscard]] bool good() const noexcept { return _good; }
 			[[nodiscard]] auto hash_offset() const noexcept -> std::size_t { return _hashOffset; }
 
 			friend auto operator>>(
 				istream_t& a_in,
-				header_t& a_header) noexcept
+				header_t& a_header)
 				-> istream_t&
 			{
 				std::uint32_t magic = 0;
@@ -44,7 +43,7 @@ namespace bsa::tes3
 					a_header._fileCount;
 
 				if (magic != 0x100) {
-					a_header._good = false;
+					throw exception("invalid magic");
 				}
 
 				return a_in;
@@ -64,7 +63,6 @@ namespace bsa::tes3
 		private:
 			std::uint32_t _hashOffset{ 0 };
 			std::uint32_t _fileCount{ 0 };
-			bool _good{ true };
 		};
 
 		namespace
@@ -181,21 +179,14 @@ namespace bsa::tes3
 		}
 	};
 
-	bool archive::read(std::filesystem::path a_path) noexcept
+	void archive::read(std::filesystem::path a_path)
 	{
 		detail::istream_t in{ std::move(a_path) };
-		if (!in.is_open()) {
-			return false;
-		}
-
-		const auto header = [&]() noexcept {
-			detail::header_t header;
-			in >> header;
-			return header;
+		const auto header = [&]() {
+			detail::header_t result;
+			in >> result;
+			return result;
 		}();
-		if (!header.good()) {
-			return false;
-		}
 
 		this->clear();
 
@@ -209,8 +200,6 @@ namespace bsa::tes3
 		for (std::size_t i = 0; i < header.file_count(); ++i) {
 			this->read_file(in, offsets, i);
 		}
-
-		return true;
 	}
 
 	bool archive::verify_offsets() const noexcept
@@ -245,13 +234,9 @@ namespace bsa::tes3
 		return true;
 	}
 
-	bool archive::write(std::filesystem::path a_path) const noexcept
+	void archive::write(std::filesystem::path a_path) const
 	{
 		detail::ostream_t out{ std::move(a_path) };
-		if (!out.is_open()) {
-			return false;
-		}
-
 		out << this->make_header();
 
 		this->write_file_entries(out);
@@ -259,8 +244,6 @@ namespace bsa::tes3
 		this->write_file_names(out);
 		this->write_file_hashes(out);
 		this->write_file_data(out);
-
-		return true;
 	}
 
 	auto archive::make_header() const noexcept

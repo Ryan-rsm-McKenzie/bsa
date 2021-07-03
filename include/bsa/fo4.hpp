@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -194,8 +193,8 @@ namespace bsa::fo4
 	public:
 		using super::clear;
 
-		[[nodiscard]] auto read(std::filesystem::path a_path) noexcept -> std::optional<format>;
-		bool write(std::filesystem::path a_path, format a_format) noexcept;
+		auto read(std::filesystem::path a_path) -> format;
+		void write(std::filesystem::path a_path, format a_format);
 
 	private:
 		[[nodiscard]] auto make_header(format a_format) const noexcept

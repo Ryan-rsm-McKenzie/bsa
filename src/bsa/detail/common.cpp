@@ -2,10 +2,12 @@
 
 #include <array>
 #include <cassert>
+#include <cerrno>
 #include <cstddef>
 #include <exception>
 #include <limits>
 #include <string>
+#include <system_error>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/nowide/cstdio.hpp>
@@ -120,11 +122,15 @@ namespace bsa::detail
 		a_out << std::byte{ '\0' };
 	}
 
-	istream_t::istream_t(std::filesystem::path a_path) noexcept
+	istream_t::istream_t(std::filesystem::path a_path)
 	{
-		try {
-			_file.open(boost::filesystem::path{ a_path.native() });
-		} catch (const std::exception&) {}
+		_file.open(boost::filesystem::path{ a_path.native() });
+		if (!_file.is_open()) {  // boost should throw an exception on failure
+			throw std::system_error{
+				std::error_code{ errno, std::generic_category() },
+				"failed to open file"
+			};
+		}
 	}
 
 	auto istream_t::read_bytes(std::size_t a_bytes) noexcept
@@ -140,11 +146,17 @@ namespace bsa::detail
 		};
 	}
 
-	ostream_t::ostream_t(std::filesystem::path a_path) noexcept
+	ostream_t::ostream_t(std::filesystem::path a_path)
 	{
 		_file = boost::nowide::fopen(
 			reinterpret_cast<const char*>(a_path.u8string().data()),
 			"wb");
+		if (_file == nullptr) {
+			throw std::system_error{
+				std::error_code{ errno, std::generic_category() },
+				"failed to open file"
+			};
+		}
 	}
 
 	ostream_t::~ostream_t() noexcept

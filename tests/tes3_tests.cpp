@@ -100,7 +100,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 		const std::filesystem::path root{ "tes3_test"sv };
 
 		bsa::tes3::archive bsa;
-		REQUIRE(bsa.read(root / "test.bsa"sv));
+		bsa.read(root / "test.bsa"sv);
 		REQUIRE(!bsa.empty());
 
 		constexpr std::array files{

@@ -61,7 +61,7 @@ namespace bsa::tes4
 
 			friend auto operator>>(
 				istream_t& a_in,
-				header_t& a_header) noexcept
+				header_t& a_header)
 				-> istream_t&
 			{
 				std::array<std::byte, 4> magic;
@@ -84,13 +84,13 @@ namespace bsa::tes4
 					magic[1] != std::byte{ 'S' } ||
 					magic[2] != std::byte{ 'A' } ||
 					magic[3] != std::byte{ '\0' }) {
-					a_header._good = false;
+					throw exception("invalid magic");
 				} else if (a_header._version != 103 &&
 						   a_header._version != 104 &&
 						   a_header._version != 105) {
-					a_header._good = false;
+					throw exception("unsupported version");
 				} else if (a_header._directoriesOffset != constants::header_size) {
-					a_header._good = false;
+					throw exception("invalid header size");
 				}
 
 				return a_in;
@@ -120,8 +120,6 @@ namespace bsa::tes4
 				       << a_header._archiveTypes
 				       << std::uint16_t{ 0 };
 			}
-
-			[[nodiscard]] bool good() const noexcept { return _good; }
 
 			[[nodiscard]] auto archive_version() const noexcept -> std::size_t { return _version; }
 			[[nodiscard]] auto directories_offset() const noexcept
@@ -177,7 +175,6 @@ namespace bsa::tes4
 			info_t _file;
 			std::endian _endian{ std::endian::little };
 			std::uint16_t _archiveTypes{ 0 };
-			bool _good{ true };
 		};
 
 		namespace
@@ -513,22 +510,15 @@ namespace bsa::tes4
 		return true;
 	}
 
-	auto archive::read(std::filesystem::path a_path) noexcept
-		-> std::optional<version>
+	auto archive::read(std::filesystem::path a_path)
+		-> version
 	{
 		detail::istream_t in{ std::move(a_path) };
-		if (!in.is_open()) {
-			return std::nullopt;
-		}
-
-		const auto header = [&]() noexcept {
+		const auto header = [&]() {
 			detail::header_t result;
 			in >> result;
 			return result;
 		}();
-		if (!header.good()) {
-			return std::nullopt;
-		}
 
 		this->clear();
 
@@ -544,7 +534,7 @@ namespace bsa::tes4
 			this->read_file_names(in, header);
 		}
 
-		return { static_cast<version>(header.archive_version()) };
+		return static_cast<version>(header.archive_version());
 	}
 
 	[[nodiscard]] bool archive::verify_offsets(version a_version) const noexcept
@@ -569,13 +559,9 @@ namespace bsa::tes4
 		return offset <= std::numeric_limits<std::int32_t>::max();
 	}
 
-	bool archive::write(std::filesystem::path a_path, version a_version) const noexcept
+	void archive::write(std::filesystem::path a_path, version a_version) const
 	{
 		detail::ostream_t out{ std::move(a_path) };
-		if (!out.is_open()) {
-			return false;
-		}
-
 		const auto header = this->make_header(a_version);
 		out << header;
 
@@ -585,8 +571,6 @@ namespace bsa::tes4
 			this->write_file_names(out);
 		}
 		this->write_file_data(out, header);
-
-		return true;
 	}
 
 	auto archive::make_header(version a_version) const noexcept

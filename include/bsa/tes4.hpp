@@ -193,9 +193,9 @@ namespace bsa::tes4
 			_types = archive_type::none;
 		}
 
-		auto read(std::filesystem::path a_path) noexcept -> std::optional<version>;
+		auto read(std::filesystem::path a_path) -> version;
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
-		bool write(std::filesystem::path a_path, version a_version) const noexcept;
+		void write(std::filesystem::path a_path, version a_version) const;
 
 	private:
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;

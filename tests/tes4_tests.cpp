@@ -8,6 +8,7 @@
 #include <limits>
 #include <memory>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
@@ -217,8 +218,12 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 	SECTION("attempting to read an invalid file will fail")
 	{
-		bsa::tes4::archive bsa;
-		REQUIRE(!bsa.read("."sv));
+		try {
+			bsa::tes4::archive bsa;
+			bsa.read("."sv);
+			REQUIRE(false);
+		} catch (const std::system_error&) {
+		}
 	}
 
 	{
@@ -227,7 +232,6 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 			bsa::tes4::archive bsa;
 			const auto version = bsa.read(root / a_name);
-			REQUIRE(version);
 			REQUIRE(bsa.compressed());
 
 			constexpr std::array files{
@@ -247,13 +251,13 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				bsa::tes4::file original;
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
-				REQUIRE(original.compress(*version));
+				REQUIRE(original.compress(version));
 
 				REQUIRE(read->size() == original.size());
 				REQUIRE(read->decompressed_size() == original.decompressed_size());
 				REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
 
-				REQUIRE(read->decompress(*version));
+				REQUIRE(read->decompress(version));
 				REQUIRE(read->size() == origsrc.size());
 				REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
 			}
@@ -275,7 +279,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		const std::filesystem::path root{ "tes4_compression_mismatch_test"sv };
 
 		bsa::tes4::archive bsa;
-		REQUIRE(bsa.read(root / "test.bsa"sv));
+		bsa.read(root / "test.bsa"sv);
 		REQUIRE(bsa.compressed());
 
 		constexpr std::array files{
@@ -409,12 +413,10 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				for (std::size_t j = i; j < flags.size(); ++j) {
 					af |= flags[j];
 					in.archive_flags(af);
-					REQUIRE(in.write(outPath, version));
+					in.write(outPath, version);
 
 					bsa::tes4::archive out;
-					const auto verOut = out.read(outPath);
-					REQUIRE(verOut);
-					REQUIRE(*verOut == version);
+					REQUIRE(out.read(outPath) == version);
 					REQUIRE(out.size() == index.size());
 					for (std::size_t idx = 0; idx < index.size(); ++idx) {
 						const auto& [dir, file] = index[idx];

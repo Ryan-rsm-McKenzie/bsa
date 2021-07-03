@@ -44,13 +44,12 @@ namespace bsa::fo4
 
 			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
 			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
-			[[nodiscard]] bool good() const noexcept { return _good; }
 			[[nodiscard]] auto string_table_offset() const noexcept
 				-> std::uint64_t { return _stringTableOffset; }
 
 			friend auto operator>>(
 				istream_t& a_in,
-				header_t& a_header) noexcept
+				header_t& a_header)
 				-> istream_t&
 			{
 				std::uint32_t magic = 0;
@@ -64,9 +63,9 @@ namespace bsa::fo4
 					a_header._stringTableOffset;
 
 				if (magic != constants::btdx) {
-					a_header._good = false;
+					throw exception("invalid magic");
 				} else if (version != 1) {
-					a_header._good = false;
+					throw exception("invalid version");
 				}
 
 				return a_in;
@@ -89,7 +88,6 @@ namespace bsa::fo4
 			std::uint32_t _format{ 0 };
 			std::uint32_t _fileCount{ 0 };
 			std::uint64_t _stringTableOffset{ 0 };
-			bool _good{ true };
 		};
 	}
 
@@ -270,22 +268,15 @@ namespace bsa::fo4
 		       << a_header.tileMode;
 	}
 
-	auto archive::read(std::filesystem::path a_path) noexcept
-		-> std::optional<format>
+	auto archive::read(std::filesystem::path a_path)
+		-> format
 	{
 		detail::istream_t in{ std::move(a_path) };
-		if (!in.is_open()) {
-			return std::nullopt;
-		}
-
 		const auto header = [&]() {
-			detail::header_t header;
-			in >> header;
-			return header;
+			detail::header_t result;
+			in >> result;
+			return result;
 		}();
-		if (!header.good()) {
-			return std::nullopt;
-		}
 
 		this->clear();
 		const auto fmt = static_cast<format>(header.archive_format());
@@ -314,18 +305,14 @@ namespace bsa::fo4
 			this->read_file(it->second, in, fmt);
 		}
 
-		return { fmt };
+		return fmt;
 	}
 
-	bool archive::write(
+	void archive::write(
 		std::filesystem::path a_path,
-		format a_format) noexcept
+		format a_format)
 	{
 		detail::ostream_t out{ std::move(a_path) };
-		if (!out.is_open()) {
-			return false;
-		}
-
 		auto [header, dataOffset] = make_header(a_format);
 		out << header;
 
@@ -343,8 +330,6 @@ namespace bsa::fo4
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			detail::write_wstring(out, key.name());
 		}
-
-		return true;
 	}
 
 	auto archive::make_header(format a_format) const noexcept

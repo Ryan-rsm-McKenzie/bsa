@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <exception>
 #include <filesystem>
 #include <iterator>
 #include <map>
@@ -54,6 +55,20 @@
 namespace bsa
 {
 	using namespace std::literals;
+
+	class exception :
+		public std::exception
+	{
+	public:
+		exception(const char* a_what) noexcept :
+			_what(a_what)
+		{}
+
+		const char* what() const noexcept { return _what; }
+
+	private:
+		const char* _what{ nullptr };
+	};
 }
 
 namespace bsa::detail
@@ -128,14 +143,12 @@ namespace bsa::detail
 	public:
 		using stream_type = boost::iostreams::mapped_file_source;
 
-		istream_t(std::filesystem::path a_path) noexcept;
+		istream_t(std::filesystem::path a_path);
 		istream_t(const istream_t&) = delete;
 		istream_t(istream_t&&) = delete;
 		~istream_t() noexcept = default;
 		istream_t& operator=(const istream_t&) = delete;
 		istream_t& operator=(istream_t&&) = delete;
-
-		[[nodiscard]] bool is_open() const noexcept { return _file.is_open(); }
 
 		template <concepts::integral T>
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little) noexcept
@@ -311,14 +324,12 @@ namespace bsa::detail
 	class ostream_t final
 	{
 	public:
-		ostream_t(std::filesystem::path a_path) noexcept;
+		ostream_t(std::filesystem::path a_path);
 		ostream_t(const ostream_t&) = delete;
 		ostream_t(ostream_t&&) = delete;
 		~ostream_t() noexcept;
 		ostream_t& operator=(const ostream_t&) = delete;
 		ostream_t& operator=(ostream_t&&) = delete;
-
-		[[nodiscard]] bool is_open() const noexcept { return _file != nullptr; }
 
 		template <concepts::integral T>
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
