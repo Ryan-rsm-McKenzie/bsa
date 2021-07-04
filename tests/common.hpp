@@ -38,4 +38,4 @@ inline auto simple_normalize(std::string_view a_path) noexcept
 		c = c == '/' ? '\\' : static_cast<char>(std::tolower(c));
 	}
 	return result;
-};
+}
