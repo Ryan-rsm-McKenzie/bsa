@@ -164,10 +164,9 @@ namespace bsa::detail
 				}
 				break;
 			case std::endian::big:
-				for (std::ptrdiff_t i = std::ssize(bytes) - 1; i >= 0; --i) {
-					result |=
-						static_cast<integral_t>(bytes[static_cast<std::size_t>(i)])
-						<< static_cast<std::size_t>(i) * 8u;
+				for (std::size_t i = 0; i < bytes.size(); ++i) {
+					result |= static_cast<integral_t>(bytes[i])
+					          << (sizeof(integral_t) - i - 1u) * 8u;
 				}
 				break;
 			default:
