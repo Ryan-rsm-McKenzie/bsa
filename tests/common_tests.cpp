@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <memory>
 #include <span>
@@ -38,7 +39,7 @@ namespace
 	}
 }
 
-TEST_CASE("bsa::detail::istream_t", "[bsa.io]")
+TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 {
 	const std::filesystem::path root{ "common_io_test"sv };
 
@@ -74,5 +75,43 @@ TEST_CASE("bsa::detail::istream_t", "[bsa.io]")
 		REQUIRE(in.read<std::uint16_t>(std::endian::big) == 0x0102);
 		REQUIRE(in.read<std::uint32_t>(std::endian::big) == 0x01020304);
 		REQUIRE(in.read<std::uint64_t>(std::endian::big) == 0x0102030405060708);
+	}
+
+	{
+		const auto outPath = root / "out.bin"sv;
+		const auto verify = [&]() {
+			const auto in = map_file(outPath);
+			REQUIRE(in.is_open());
+			REQUIRE(in.size() == data.size_bytes());
+			REQUIRE(std::memcmp(in.data(), data.data(), in.size()) == 0);
+		};
+
+		SECTION("we can write data in little endian format")
+		{
+			{
+				bsa::detail::ostream_t out{ outPath };
+
+				out.write<std::uint8_t>(0x01, std::endian::little);
+				out.write<std::uint16_t>(0x0201, std::endian::little);
+				out.write<std::uint32_t>(0x04030201, std::endian::little);
+				out.write<std::uint64_t>(0x0807060504030201, std::endian::little);
+			}
+
+			verify();
+		}
+
+		SECTION("we can write data in big endian format")
+		{
+			{
+				bsa::detail::ostream_t out{ outPath };
+
+				out.write<std::uint8_t>(0x01, std::endian::big);
+				out.write<std::uint16_t>(0x0102, std::endian::big);
+				out.write<std::uint32_t>(0x01020304, std::endian::big);
+				out.write<std::uint64_t>(0x0102030405060708, std::endian::big);
+			}
+
+			verify();
+		}
 	}
 }
