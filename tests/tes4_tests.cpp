@@ -16,7 +16,7 @@
 #include <boost/nowide/cstdio.hpp>
 #include <boost/regex.hpp>
 
-#include "common.hpp"
+#include "utility.hpp"
 
 #include <catch2/catch.hpp>
 

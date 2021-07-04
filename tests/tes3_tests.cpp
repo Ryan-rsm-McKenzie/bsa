@@ -11,7 +11,7 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/regex.hpp>
 
-#include "common.hpp"
+#include "utility.hpp"
 
 #include <catch2/catch.hpp>
 

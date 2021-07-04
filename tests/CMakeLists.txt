@@ -2,7 +2,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set(INCLUDE_DIR ${ROOT_DIR}/tests)
 set(HEADER_FILES
-	${INCLUDE_DIR}/common.hpp
+	${INCLUDE_DIR}/utility.hpp
 )
 source_group("include" FILES ${HEADER_FILES})
 

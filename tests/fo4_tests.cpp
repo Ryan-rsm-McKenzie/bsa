@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 
-#include "common.hpp"
+#include "utility.hpp"
 
 #include <catch2/catch.hpp>
 
