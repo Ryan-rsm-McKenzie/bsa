@@ -2,11 +2,14 @@
 
 #include <array>
 #include <cstring>
+#include <exception>
 #include <filesystem>
+#include <string>
 #include <string_view>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/regex.hpp>
 
 #include "common.hpp"
 
@@ -97,7 +100,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 
 	SECTION("we can read archives")
 	{
-		const std::filesystem::path root{ "tes3_test"sv };
+		const std::filesystem::path root{ "tes3_read_test"sv };
 
 		bsa::tes3::archive bsa;
 		bsa.read(root / "test.bsa"sv);
@@ -183,6 +186,41 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 			REQUIRE(f->first.name() == simple_normalize(file.path));
 			REQUIRE(f->second.size() == mapped.size());
 			REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+		}
+	}
+
+	SECTION("archives will bail on malformed inputs")
+	{
+		const std::filesystem::path root{ "tes3_invalid_test"sv };
+		constexpr std::array types{
+			"magic"sv,
+			"range"sv,
+		};
+
+		for (const auto& type : types) {
+			try {
+				std::string filename;
+				filename += "invalid_"sv;
+				filename += type;
+				filename += ".bsa"sv;
+
+				bsa::tes3::archive bsa;
+				bsa.read(root / filename);
+
+				REQUIRE(false);
+			} catch (bsa::exception& a_err) {
+				std::string fmt;
+				fmt += "\\b"sv;
+				fmt += type;
+				fmt += "\\b"sv;
+
+				boost::regex pattern{
+					fmt.c_str(),
+					boost::regex_constants::ECMAScript | boost::regex_constants::icase
+				};
+
+				REQUIRE(boost::regex_search(a_err.what(), pattern));
+			}
 		}
 	}
 }
