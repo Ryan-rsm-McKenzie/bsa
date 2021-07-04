@@ -57,30 +57,34 @@ TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 	std::fwrite(data.data(), 1, data.size_bytes(), f.get());
 	f.reset();
 
-	SECTION("we can read data in little endian format")
 	{
-		bsa::detail::istream_t in{ root / "in.bin"sv };
+		const auto path = root / "in.bin"sv;
 
-		REQUIRE(in.read<std::uint8_t>(std::endian::little) == 0x01);
-		REQUIRE(in.read<std::uint16_t>(std::endian::little) == 0x0201);
-		REQUIRE(in.read<std::uint32_t>(std::endian::little) == 0x04030201);
-		REQUIRE(in.read<std::uint64_t>(std::endian::little) == 0x0807060504030201);
+		SECTION("we can read data in little endian format")
+		{
+			bsa::detail::istream_t in{ path };
+
+			REQUIRE(in.read<std::uint8_t>(std::endian::little) == 0x01);
+			REQUIRE(in.read<std::uint16_t>(std::endian::little) == 0x0201);
+			REQUIRE(in.read<std::uint32_t>(std::endian::little) == 0x04030201);
+			REQUIRE(in.read<std::uint64_t>(std::endian::little) == 0x0807060504030201);
+		}
+
+		SECTION("we can read data in big endian format")
+		{
+			bsa::detail::istream_t in{ path };
+
+			REQUIRE(in.read<std::uint8_t>(std::endian::big) == 0x01);
+			REQUIRE(in.read<std::uint16_t>(std::endian::big) == 0x0102);
+			REQUIRE(in.read<std::uint32_t>(std::endian::big) == 0x01020304);
+			REQUIRE(in.read<std::uint64_t>(std::endian::big) == 0x0102030405060708);
+		}
 	}
 
-	SECTION("we can read data in big endian format")
 	{
-		bsa::detail::istream_t in{ root / "in.bin"sv };
-
-		REQUIRE(in.read<std::uint8_t>(std::endian::big) == 0x01);
-		REQUIRE(in.read<std::uint16_t>(std::endian::big) == 0x0102);
-		REQUIRE(in.read<std::uint32_t>(std::endian::big) == 0x01020304);
-		REQUIRE(in.read<std::uint64_t>(std::endian::big) == 0x0102030405060708);
-	}
-
-	{
-		const auto outPath = root / "out.bin"sv;
+		const auto path = root / "out.bin"sv;
 		const auto verify = [&]() {
-			const auto in = map_file(outPath);
+			const auto in = map_file(path);
 			REQUIRE(in.is_open());
 			REQUIRE(in.size() == data.size_bytes());
 			REQUIRE(std::memcmp(in.data(), data.data(), in.size()) == 0);
@@ -89,7 +93,7 @@ TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 		SECTION("we can write data in little endian format")
 		{
 			{
-				bsa::detail::ostream_t out{ outPath };
+				bsa::detail::ostream_t out{ path };
 
 				out.write<std::uint8_t>(0x01, std::endian::little);
 				out.write<std::uint16_t>(0x0201, std::endian::little);
@@ -103,7 +107,7 @@ TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 		SECTION("we can write data in big endian format")
 		{
 			{
-				bsa::detail::ostream_t out{ outPath };
+				bsa::detail::ostream_t out{ path };
 
 				out.write<std::uint8_t>(0x01, std::endian::big);
 				out.write<std::uint16_t>(0x0102, std::endian::big);
