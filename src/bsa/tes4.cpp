@@ -628,7 +628,7 @@ namespace bsa::tes4
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(offset & ~file::isecondary_archive);
 
-			const auto fname = [&]() noexcept -> std::string_view {
+			const auto fname = [&]() -> std::string_view {
 				if (a_header.embedded_file_names()) {
 					auto name = detail::read_bstring(a_in);
 					size -= static_cast<std::uint32_t>(name.length() + 1u);

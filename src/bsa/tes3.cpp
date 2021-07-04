@@ -267,7 +267,7 @@ namespace bsa::tes3
 		const offsets_t& a_offsets,
 		std::size_t a_idx)
 	{
-		const auto hash = [&]() noexcept {
+		const auto hash = [&]() {
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(a_offsets.hashes);
 			a_in.seek_relative(detail::constants::hash_size * a_idx);
@@ -275,7 +275,7 @@ namespace bsa::tes3
 			a_in >> h;
 			return h;
 		}();
-		const auto name = [&]() noexcept {
+		const auto name = [&]() {
 			const detail::restore_point _{ a_in };
 			a_in.seek_absolute(a_offsets.nameOffsets);
 			a_in.seek_relative(4u * a_idx);
