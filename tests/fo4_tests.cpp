@@ -262,4 +262,34 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 			}
 		}
 	}
+
+	SECTION("archives do not have to contain a string table")
+	{
+		const std::filesystem::path root{ "fo4_missing_string_table_test"sv };
+		const auto inPath = root / "in.ba2"sv;
+		const auto outPath = root / "out.ba2"sv;
+		const auto filename = "misc/example.txt"sv;
+
+		{
+			bsa::fo4::archive ba2;
+			REQUIRE(ba2.read(inPath) == bsa::fo4::format::general);
+			const auto f = ba2[filename];
+			REQUIRE(f);
+			REQUIRE(f->size() == 1);
+
+			const auto mapped = map_file(root / "data"sv / filename);
+			const auto& c = f->front();
+
+			REQUIRE(!c.compressed());
+			REQUIRE(c.size() == mapped.size());
+			REQUIRE(std::memcmp(c.data(), mapped.data(), c.size()) == 0);
+
+			ba2.write(outPath, bsa::fo4::format::general, false);
+		}
+
+		const auto in = map_file(inPath);
+		const auto out = map_file(outPath);
+		REQUIRE(in.size() == out.size());
+		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+	}
 }
