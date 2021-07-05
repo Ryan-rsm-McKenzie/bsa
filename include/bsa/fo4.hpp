@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -103,7 +105,11 @@ namespace bsa::fo4
 		}
 
 		bool compress() noexcept;
+		[[nodiscard]] auto compress_bound() const noexcept -> std::size_t;
+		[[nodiscard]] auto compress_into(std::span<std::byte> a_out) noexcept
+			-> std::optional<std::size_t>;
 		bool decompress() noexcept;
+		bool decompress_into(std::span<std::byte> a_out) noexcept;
 	};
 
 	class file final

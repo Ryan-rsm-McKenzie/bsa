@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -123,12 +124,25 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
+		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) noexcept
+			-> std::optional<std::size_t>;
+		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) noexcept
+			-> std::optional<std::size_t>;
+		[[nodiscard]] bool decompress_into_lz4(std::span<std::byte> a_out) noexcept;
+		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
+
 	public:
 		using key = detail::key_t<hashing::hash, hashing::hash_file>;
 		using super::clear;
 
 		bool compress(version a_version) noexcept;
+		[[nodiscard]] auto compress_bound(version a_version) const noexcept -> std::size_t;
+		[[nodiscard]] auto compress_into(
+			version a_version,
+			std::span<std::byte> a_out) noexcept
+			-> std::optional<std::size_t>;
 		bool decompress(version a_version) noexcept;
+		bool decompress_into(version a_version, std::span<std::byte> a_out) noexcept;
 	};
 
 	class directory final :

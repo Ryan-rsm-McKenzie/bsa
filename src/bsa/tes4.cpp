@@ -33,6 +33,19 @@ namespace bsa::tes4
 				constexpr std::size_t file_entry_size = 0x10;
 				constexpr std::size_t header_size = 0x24;
 			}
+
+			inline constexpr auto lz4f_decompress_options = []() {
+				::LZ4F_decompressOptions_t options = {};
+				options.stableDst = true;
+				return options;
+			}();
+
+			inline constexpr auto lz4f_preferences = []() noexcept {
+				::LZ4F_preferences_t pref = LZ4F_INIT_PREFERENCES;
+				pref.compressionLevel = LZ4HC_CLEVEL_DEFAULT;
+				pref.autoFlush = 1;
+				return pref;
+			}();
 		}
 
 		class header_t final
@@ -376,140 +389,189 @@ namespace bsa::tes4
 		}
 	}
 
-	bool file::compress(version a_version) noexcept
+	auto file::compress_into_lz4(std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
 	{
 		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
 
 		const auto in = this->as_bytes();
-		std::vector<std::byte> out;
 
+		const auto result = ::LZ4F_compressFrame(
+			a_out.data(),
+			a_out.size_bytes(),
+			in.data(),
+			in.size_bytes(),
+			&detail::lz4f_preferences);
+		if (!::LZ4F_isError(result)) {
+			return result;
+		} else {
+			return std::nullopt;
+		}
+	}
+
+	auto file::compress_into_zlib(std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound(version::tes4));
+
+		const auto in = this->as_bytes();
+		auto outsz = static_cast<::uLong>(a_out.size_bytes());
+
+		const auto result = ::compress(
+			reinterpret_cast<::Byte*>(a_out.data()),
+			&outsz,
+			reinterpret_cast<const ::Byte*>(in.data()),
+			static_cast<::uLong>(in.size_bytes()));
+		if (result == Z_OK) {
+			return static_cast<std::size_t>(outsz);
+		} else {
+			return std::nullopt;
+		}
+	}
+
+	bool file::decompress_into_lz4(std::span<std::byte> a_out) noexcept
+	{
+		assert(this->compressed());
+		assert(a_out.size_bytes() >= this->decompressed_size());
+
+		::LZ4F_dctx* pdctx = nullptr;
+		if (::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION) != 0) {
+			return false;
+		}
+		std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
+			pdctx,
+			::LZ4F_freeDecompressionContext
+		};
+
+		const auto in = this->as_bytes();
+
+		std::size_t insz = 0;
+		const std::byte* inptr = in.data();
+		std::size_t outsz = 0;
+		std::byte* outptr = a_out.data();
+		std::size_t result = 0;
+		do {
+			inptr += insz;
+			insz = static_cast<std::size_t>(std::to_address(in.end()) - inptr);
+			outptr += outsz;
+			outsz = static_cast<std::size_t>(std::to_address(a_out.end()) - outptr);
+			result = ::LZ4F_decompress(
+				dctx.get(),
+				outptr,
+				&outsz,
+				inptr,
+				&insz,
+				&detail::lz4f_decompress_options);
+		} while (result != 0 && !::LZ4F_isError(result));
+
+		const auto totalsz = static_cast<std::size_t>(
+			(outptr + outsz) - std::to_address(a_out.begin()));
+		if (!::LZ4F_isError(result) && totalsz == this->decompressed_size()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	bool file::decompress_into_zlib(std::span<std::byte> a_out) noexcept
+	{
+		assert(this->compressed());
+		assert(a_out.size_bytes() >= this->decompressed_size());
+
+		const auto in = this->as_bytes();
+		auto outsz = static_cast<::uLong>(a_out.size_bytes());
+
+		const auto result = ::uncompress(
+			reinterpret_cast<::Byte*>(a_out.data()),
+			&outsz,
+			reinterpret_cast<const ::Byte*>(in.data()),
+			static_cast<::uLong>(in.size_bytes()));
+		if (result == Z_OK && outsz == this->decompressed_size()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	bool file::compress(version a_version) noexcept
+	{
+		std::vector<std::byte> out;
+		out.resize(this->compress_bound(a_version));
+
+		const auto outsz = this->compress_into(a_version, { out.data(), out.size() });
+		if (outsz) {
+			out.resize(*outsz);
+			out.shrink_to_fit();
+			this->set_data(std::move(out), this->size());
+
+			assert(this->compressed());
+			return true;
+		} else {
+			assert(!this->compressed());
+			return false;
+		}
+	}
+
+	auto file::compress_bound(version a_version) const noexcept
+		-> std::size_t
+	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
 		case 104:
-			{
-				auto outsz = ::compressBound(static_cast<::uLong>(in.size()));
-				out.resize(outsz);
-
-				const auto result = ::compress(
-					reinterpret_cast<::Byte*>(out.data()),
-					&outsz,
-					reinterpret_cast<const ::Byte*>(in.data()),
-					static_cast<::uLong>(in.size_bytes()));
-				if (result == Z_OK) {
-					out.resize(outsz);
-					out.shrink_to_fit();
-				} else {
-					return false;
-				}
-			}
-			break;
+			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
-			{
-				::LZ4F_preferences_t pref = LZ4F_INIT_PREFERENCES;
-				pref.compressionLevel = LZ4HC_CLEVEL_DEFAULT;
-				pref.autoFlush = 1;
-				out.resize(::LZ4F_compressFrameBound(in.size(), &pref));
-
-				const auto result = ::LZ4F_compressFrame(
-					out.data(),
-					out.size(),
-					in.data(),
-					in.size(),
-					&pref);
-				if (!::LZ4F_isError(result)) {
-					out.resize(result);
-					out.shrink_to_fit();
-				} else {
-					return false;
-				}
-			}
-			break;
+			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
 			detail::declare_unreachable();
 		}
+	}
 
-		this->set_data(std::move(out), in.size_bytes());
-
-		assert(this->compressed());
-		return true;
+	auto file::compress_into(
+		version a_version,
+		std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
+	{
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+		case 104:
+			return this->compress_into_zlib(a_out);
+		case 105:
+			return this->compress_into_lz4(a_out);
+		default:
+			detail::declare_unreachable();
+		}
 	}
 
 	bool file::decompress(version a_version) noexcept
 	{
-		assert(this->compressed());
-
-		const auto in = this->as_bytes();
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
+		if (this->decompress_into(a_version, { out.data(), out.size() })) {
+			this->set_data(std::move(out));
 
+			assert(!this->compressed());
+			return true;
+		} else {
+			assert(this->compressed());
+			return false;
+		}
+	}
+
+	bool file::decompress_into(
+		version a_version,
+		std::span<std::byte> a_out) noexcept
+	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
 		case 104:
-			{
-				auto outsz = static_cast<::uLong>(out.size());
-
-				const auto result = ::uncompress(
-					reinterpret_cast<::Byte*>(out.data()),
-					&outsz,
-					reinterpret_cast<const ::Byte*>(in.data()),
-					static_cast<::uLong>(in.size_bytes()));
-				if (result == Z_OK) {
-					assert(static_cast<std::size_t>(outsz) == this->decompressed_size());
-				} else {
-					return false;
-				}
-			}
-			break;
+			return this->decompress_into_zlib(a_out);
 		case 105:
-			{
-				::LZ4F_dctx* pdctx = nullptr;
-				if (::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION) != 0) {
-					return false;
-				}
-				std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
-					pdctx,
-					::LZ4F_freeDecompressionContext
-				};
-
-				std::size_t insz = 0;
-				const std::byte* inptr = in.data();
-				std::size_t outsz = 0;
-				std::byte* outptr = out.data();
-				const auto options = []() {
-					::LZ4F_decompressOptions_t options = {};
-					options.stableDst = true;
-					return options;
-				}();
-				std::size_t result = 0;
-				do {
-					inptr += insz;
-					insz = static_cast<std::size_t>(std::to_address(in.end()) - inptr);
-					outptr += outsz;
-					outsz = static_cast<std::size_t>(std::to_address(out.end()) - outptr);
-					result = ::LZ4F_decompress(
-						dctx.get(),
-						outptr,
-						&outsz,
-						inptr,
-						&insz,
-						&options);
-				} while (result != 0 && !::LZ4F_isError(result));
-
-				if (!::LZ4F_isError(result)) {
-					assert(outptr + outsz == std::to_address(out.end()));
-				} else {
-					return false;
-				}
-			}
-			break;
+			return this->decompress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
 		}
-
-		this->set_data(std::move(out));
-
-		assert(!this->compressed());
-		return true;
 	}
 
 	auto archive::read(std::filesystem::path a_path)

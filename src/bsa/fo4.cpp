@@ -5,8 +5,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <zlib.h>
 
@@ -247,57 +249,84 @@ namespace bsa::fo4
 
 	bool chunk::compress() noexcept
 	{
+		std::vector<std::byte> out;
+		out.resize(this->compress_bound());
+
+		const auto outsz = this->compress_into({ out.data(), out.size() });
+		if (outsz) {
+			out.resize(*outsz);
+			out.shrink_to_fit();
+			this->set_data(std::move(out), this->size());
+
+			assert(this->compressed());
+			return true;
+		} else {
+			assert(!this->compressed());
+			return false;
+		}
+	}
+
+	auto chunk::compress_bound() const noexcept
+		-> std::size_t
+	{
 		assert(!this->compressed());
+		return ::compressBound(static_cast<::uLong>(this->size()));
+	}
+
+	auto chunk::compress_into(std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound());
 
 		const auto in = this->as_bytes();
-		std::vector<std::byte> out;
-
-		auto outsz = ::compressBound(static_cast<::uLong>(in.size()));
-		out.resize(outsz);
+		auto outsz = static_cast<::uLong>(a_out.size());
 
 		const auto result = ::compress(
-			reinterpret_cast<::Byte*>(out.data()),
+			reinterpret_cast<::Byte*>(a_out.data()),
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
 		if (result == Z_OK) {
-			out.resize(outsz);
-			out.shrink_to_fit();
+			return static_cast<std::size_t>(outsz);
 		} else {
-			return false;
+			return std::nullopt;
 		}
-
-		this->set_data(std::move(out), in.size_bytes());
-
-		assert(this->compressed());
-		return true;
 	}
 
 	bool chunk::decompress() noexcept
 	{
-		assert(this->compressed());
-
-		const auto in = this->as_bytes();
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
+		if (this->decompress_into({ out.data(), out.size() })) {
+			this->set_data(std::move(out));
 
-		auto outsz = static_cast<::uLong>(out.size());
+			assert(!this->compressed());
+			return true;
+		} else {
+			assert(this->compressed());
+			return false;
+		}
+	}
+
+	bool chunk::decompress_into(std::span<std::byte> a_out) noexcept
+	{
+		assert(this->compressed());
+		assert(a_out.size_bytes() >= this->decompressed_size());
+
+		const auto in = this->as_bytes();
+		auto outsz = static_cast<::uLong>(a_out.size_bytes());
 
 		const auto result = ::uncompress(
-			reinterpret_cast<::Byte*>(out.data()),
+			reinterpret_cast<::Byte*>(a_out.data()),
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
-		if (result == Z_OK) {
-			assert(static_cast<std::size_t>(outsz) == this->decompressed_size());
+		if (result == Z_OK && outsz == this->decompressed_size()) {
+			return true;
 		} else {
 			return false;
 		}
-
-		this->set_data(std::move(out));
-
-		assert(!this->compressed());
-		return true;
 	}
 
 	auto operator>>(
