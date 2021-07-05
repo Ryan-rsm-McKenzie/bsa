@@ -417,6 +417,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			bsa::tes4::archive_flag::directory_strings,
 			bsa::tes4::archive_flag::file_strings,
 			bsa::tes4::archive_flag::compressed,
+			bsa::tes4::archive_flag::xbox_archive,
 			bsa::tes4::archive_flag::embedded_file_names,
 		};
 
