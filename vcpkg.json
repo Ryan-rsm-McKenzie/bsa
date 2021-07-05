@@ -3,6 +3,7 @@
   "version-string": "1",
   "dependencies": [
     "boost-container",
+    "boost-endian",
     "boost-filesystem",
     "boost-iostreams",
     "boost-nowide",

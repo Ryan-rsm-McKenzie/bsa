@@ -19,6 +19,7 @@
 #include <variant>
 #include <vector>
 
+#include <boost/endian/conversion.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
 
@@ -153,7 +154,27 @@ namespace bsa::detail
 		template <concepts::integral T>
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
 		{
-			return do_read<T>(a_endian, std::make_index_sequence<sizeof(T)>{});
+			const auto load = [&]<std::size_t I>(std::in_place_index_t<I>) {
+				using integral_t = type_traits::integral_type_t<T>;
+				const auto bytes = this->read_bytes(sizeof(T));
+
+				return boost::endian::endian_load<
+					integral_t,
+					sizeof(integral_t),
+					static_cast<boost::endian::order>(I)>(
+					reinterpret_cast<const unsigned char*>(bytes.data()));
+			};
+
+			switch (a_endian) {
+			case std::endian::little:
+				return static_cast<T>(load(
+					std::in_place_index<to_underlying(boost::endian::order::little)>));
+			case std::endian::big:
+				return static_cast<T>(load(
+					std::in_place_index<to_underlying(boost::endian::order::big)>));
+			default:
+				declare_unreachable();
+			}
 		}
 
 		[[nodiscard]] auto read_bytes(std::size_t a_bytes)
@@ -187,21 +208,6 @@ namespace bsa::detail
 		}
 
 	private :
-		template <class T, std::size_t... I>
-		[[nodiscard]] T
-		do_read(
-			std::endian a_endian,
-			std::index_sequence<I...>)
-		{
-			using integral_t = type_traits::integral_type_t<T>;
-			const auto bytes = read_bytes(sizeof(T));
-			return a_endian == std::endian::little ?
-                       static_cast<T>(
-						   ((static_cast<integral_t>(bytes[I]) << I * 8u) | ...)) :
-                       static_cast<T>(
-						   ((static_cast<integral_t>(bytes[I]) << (sizeof(T) - I - 1u) * 8u) | ...));
-		}
-
 		stream_type _file;
 		std::size_t _pos{ 0 };
 	};
@@ -328,7 +334,30 @@ namespace bsa::detail
 		template <concepts::integral T>
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
 		{
-			do_write(a_value, a_endian, std::make_index_sequence<sizeof(T)>{});
+			const auto store = [&]<std::size_t I>(std::in_place_index_t<I>) noexcept {
+				using integral_t = type_traits::integral_type_t<T>;
+				const auto value = static_cast<integral_t>(a_value);
+				std::array<std::byte, sizeof(T)> bytes{};
+
+				boost::endian::endian_store<
+					integral_t,
+					sizeof(integral_t),
+					static_cast<boost::endian::order>(I)>(
+					reinterpret_cast<unsigned char*>(bytes.data()),
+					value);
+				this->write_bytes({ bytes.cbegin(), bytes.cend() });
+			};
+
+			switch (a_endian) {
+			case std::endian::little:
+				store(std::in_place_index<to_underlying(boost::endian::order::little)>);
+				break;
+			case std::endian::big:
+				store(std::in_place_index<to_underlying(boost::endian::order::big)>);
+				break;
+			default:
+				declare_unreachable();
+			}
 		}
 
 		void write_bytes(std::span<const std::byte> a_bytes) noexcept
@@ -356,26 +385,6 @@ namespace bsa::detail
 		}
 
 	private :
-		template <class T, std::size_t... I>
-		void
-		do_write(
-			T a_value,
-			std::endian a_endian,
-			std::index_sequence<I...>) noexcept
-		{
-			using integral_t = type_traits::integral_type_t<T>;
-			const auto value = static_cast<integral_t>(a_value);
-			std::array<std::byte, sizeof(T)> bytes{};
-
-			if (a_endian == std::endian::little) {
-				((bytes[I] = static_cast<std::byte>((value >> I * 8u) & 0xFFu)), ...);
-			} else {
-				((bytes[I] = static_cast<std::byte>((value >> (sizeof(T) - I - 1) * 8u) & 0xFFu)), ...);
-			}
-
-			write_bytes({ bytes.cbegin(), bytes.cend() });
-		}
-
 		std::FILE* _file{ nullptr };
 	};
 
