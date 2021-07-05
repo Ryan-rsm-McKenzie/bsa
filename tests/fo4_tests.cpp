@@ -200,28 +200,47 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 			REQUIRE(in.insert(file.path, std::move(f)).second);
 		}
 
-		in.write(outPath, bsa::fo4::format::general);
+		const auto test = [&](bool a_strings) {
+			in.write(outPath, bsa::fo4::format::general, a_strings);
 
-		bsa::fo4::archive out;
-		REQUIRE(out.read(outPath) == bsa::fo4::format::general);
-		REQUIRE(out.size() == index.size());
-		for (std::size_t idx = 0; idx < index.size(); ++idx) {
-			const auto& file = index[idx];
-			const auto& mapped = mmapped[idx];
+			bsa::fo4::archive out;
+			REQUIRE(out.read(outPath) == bsa::fo4::format::general);
+			REQUIRE(out.size() == index.size());
+			for (std::size_t idx = 0; idx < index.size(); ++idx) {
+				const auto& file = index[idx];
+				const auto& mapped = mmapped[idx];
 
-			REQUIRE(out[file.path]);
+				REQUIRE(out[file.path]);
 
-			const auto f = out.find(file.path);
-			REQUIRE(f != out.end());
-			REQUIRE(f->first.hash() == file.hash);
-			REQUIRE(f->first.name() == simple_normalize(file.path));
-			REQUIRE(f->second.size() == 1);
+				const auto f = out.find(file.path);
+				REQUIRE(f != out.end());
+				REQUIRE(f->first.hash() == file.hash);
+				if (a_strings) {
+					REQUIRE(f->first.name() == simple_normalize(file.path));
+				}
+				REQUIRE(f->second.size() == 1);
 
-			const auto& c = f->second.front();
-			REQUIRE(!c.compressed());
-			REQUIRE(c.size() == mapped.size());
-			REQUIRE(std::memcmp(c.data(), mapped.data(), mapped.size()) == 0);
+				auto& c = f->second.front();
+				if (c.compressed()) {
+					REQUIRE(c.decompressed_size() == mapped.size());
+					REQUIRE(c.decompress());
+				}
+				REQUIRE(c.size() == mapped.size());
+				REQUIRE(std::memcmp(c.data(), mapped.data(), mapped.size()) == 0);
+			}
+		};
+
+		test(true);
+		test(false);
+
+		for (auto& f : in) {
+			for (auto& c : f.second) {
+				c.compress();
+			}
 		}
+
+		test(true);
+		test(false);
 	}
 
 	SECTION("archives will bail on malformed inputs")
