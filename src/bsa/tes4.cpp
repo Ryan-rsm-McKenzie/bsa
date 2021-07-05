@@ -525,13 +525,10 @@ namespace bsa::tes4
 		_flags = header.archive_flags();
 		_types = header.archive_types();
 
+		std::size_t namesOffset = detail::offsetof_file_strings(header);
 		in.seek_absolute(header.directories_offset());
 		for (std::size_t i = 0; i < header.directory_count(); ++i) {
-			this->read_directory(in, header);
-		}
-
-		if (header.file_strings() && !header.embedded_file_names()) {
-			this->read_file_names(in, header);
+			this->read_directory(in, header, namesOffset);
 		}
 
 		return static_cast<version>(header.archive_version());
@@ -612,7 +609,8 @@ namespace bsa::tes4
 		directory& a_dir,
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
-		std::size_t a_count)
+		std::size_t a_count,
+		std::size_t& a_namesOffset)
 		-> std::optional<std::string_view>
 	{
 		std::optional<std::string_view> dirname;
@@ -640,6 +638,12 @@ namespace bsa::tes4
 						name = name.substr(pos + 1);
 					}
 
+					return name;
+				} else if (a_header.file_strings()) {
+					const detail::restore_point r{ a_in };
+					a_in.seek_absolute(a_namesOffset);
+					const auto name = detail::read_zstring(a_in);
+					a_namesOffset = a_in.tell();
 					return name;
 				} else {
 					return {};
@@ -681,21 +685,10 @@ namespace bsa::tes4
 		a_file.set_data(a_in.read_bytes(a_size), a_in, decompsz);
 	}
 
-	void archive::read_file_names(
-		detail::istream_t& a_in,
-		const detail::header_t& a_header)
-	{
-		a_in.seek_absolute(detail::offsetof_file_strings(a_header));
-		for (auto& dir : *this) {
-			for (auto& file : dir.second) {
-				const_cast<file::key&>(file.first).set_name(detail::read_zstring(a_in), a_in);
-			}
-		}
-	}
-
 	void archive::read_directory(
 		detail::istream_t& a_in,
-		const detail::header_t& a_header)
+		const detail::header_t& a_header,
+		std::size_t& a_namesOffset)
 	{
 		hashing::hash hash;
 		hash.read(a_in, a_header.endian());
@@ -729,7 +722,7 @@ namespace bsa::tes4
 			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
 
 		directory d;
-		const auto backup = this->read_file_entries(d, a_in, a_header, count);
+		const auto backup = this->read_file_entries(d, a_in, a_header, count, a_namesOffset);
 		[[maybe_unused]] const auto [it, success] =
 			this->emplace(
 				std::piecewise_construct,
