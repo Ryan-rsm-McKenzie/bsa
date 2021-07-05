@@ -50,8 +50,8 @@ namespace bsa::fo4
 		struct hash final
 		{
 			std::uint32_t file{ 0 };
-			std::uint32_t ext{ 0 };
-			std::uint32_t dir{ 0 };
+			std::uint32_t extension{ 0 };
+			std::uint32_t directory{ 0 };
 
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 			[[nodiscard]] friend auto operator<=>(const hash&, const hash&) noexcept
@@ -112,10 +112,10 @@ namespace bsa::fo4
 		{
 			std::uint16_t height{ 0 };
 			std::uint16_t width{ 0 };
-			std::uint8_t mipCount{ 0 };
+			std::uint8_t mip_count{ 0 };
 			std::uint8_t format{ 0 };
 			std::uint8_t flags{ 0 };
-			std::uint8_t tileMode{ 0 };
+			std::uint8_t tile_mode{ 0 };
 
 			friend auto operator>>(
 				detail::istream_t& a_in,

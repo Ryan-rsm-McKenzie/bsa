@@ -189,8 +189,8 @@ namespace bsa::fo4
 		{
 			return a_in >>
 			       a_hash.file >>
-			       a_hash.ext >>
-			       a_hash.dir;
+			       a_hash.extension >>
+			       a_hash.directory;
 		}
 
 		auto operator<<(
@@ -200,8 +200,8 @@ namespace bsa::fo4
 		{
 			return a_out
 			       << a_hash.file
-			       << a_hash.ext
-			       << a_hash.dir;
+			       << a_hash.extension
+			       << a_hash.directory;
 		}
 
 		hash hash_file(std::string& a_path) noexcept
@@ -210,13 +210,13 @@ namespace bsa::fo4
 			const auto pieces = split_path(a_path);
 
 			hash h;
-			h.dir = crc32(pieces.parent);
+			h.directory = crc32(pieces.parent);
 			h.file = crc32(pieces.stem);
 
 			const auto len = std::min<std::size_t>(pieces.extension.length(), 4u);
 			for (std::size_t i = 0; i < len; ++i) {
-				h.ext |= std::uint32_t{ static_cast<unsigned char>(pieces.extension[i]) }
-				         << i * 8u;
+				h.extension |= std::uint32_t{ static_cast<unsigned char>(pieces.extension[i]) }
+				               << i * 8u;
 			}
 
 			return h;
@@ -251,10 +251,10 @@ namespace bsa::fo4
 		return a_in >>
 		       a_header.height >>
 		       a_header.width >>
-		       a_header.mipCount >>
+		       a_header.mip_count >>
 		       a_header.format >>
 		       a_header.flags >>
-		       a_header.tileMode;
+		       a_header.tile_mode;
 	}
 
 	auto operator<<(
@@ -265,10 +265,10 @@ namespace bsa::fo4
 		return a_out
 		       << a_header.height
 		       << a_header.width
-		       << a_header.mipCount
+		       << a_header.mip_count
 		       << a_header.format
 		       << a_header.flags
-		       << a_header.tileMode;
+		       << a_header.tile_mode;
 	}
 
 	auto archive::read(std::filesystem::path a_path)
