@@ -195,10 +195,15 @@ namespace bsa::fo4
 		using super::clear;
 
 		auto read(std::filesystem::path a_path) -> format;
-		void write(std::filesystem::path a_path, format a_format);
+		void write(
+			std::filesystem::path a_path,
+			format a_format,
+			bool a_stringTable = true);
 
 	private:
-		[[nodiscard]] auto make_header(format a_format) const noexcept
+		[[nodiscard]] auto make_header(
+			format a_format,
+			bool a_stringTable) const noexcept
 			-> std::pair<detail::header_t, std::uint64_t>;
 
 		void read_chunk(

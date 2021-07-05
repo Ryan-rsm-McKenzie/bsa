@@ -291,11 +291,15 @@ namespace bsa::fo4
 			in >> hash;
 
 			const auto name = [&]() {
-				const detail::restore_point _{ in };
-				in.seek_absolute(strpos);
-				const auto name = detail::read_wstring(in);
-				strpos = in.tell();
-				return name;
+				if (strpos != 0) {
+					const detail::restore_point _{ in };
+					in.seek_absolute(strpos);
+					const auto name = detail::read_wstring(in);
+					strpos = in.tell();
+					return name;
+				} else {
+					return ""sv;
+				}
 			}();
 
 			[[maybe_unused]] const auto [it, success] =
@@ -313,10 +317,11 @@ namespace bsa::fo4
 
 	void archive::write(
 		std::filesystem::path a_path,
-		format a_format)
+		format a_format,
+		bool a_stringTable)
 	{
 		detail::ostream_t out{ std::move(a_path) };
-		auto [header, dataOffset] = make_header(a_format);
+		auto [header, dataOffset] = make_header(a_format, a_stringTable);
 		out << header;
 
 		for (const auto& [key, file] : *this) {
@@ -330,12 +335,16 @@ namespace bsa::fo4
 			}
 		}
 
-		for ([[maybe_unused]] const auto& [key, file] : *this) {
-			detail::write_wstring(out, key.name());
+		if (a_stringTable) {
+			for ([[maybe_unused]] const auto& [key, file] : *this) {
+				detail::write_wstring(out, key.name());
+			}
 		}
 	}
 
-	auto archive::make_header(format a_format) const noexcept
+	auto archive::make_header(
+		format a_format,
+		bool a_stringTable) const noexcept
 		-> std::pair<detail::header_t, std::uint64_t>
 	{
 		const auto inspect = [&](auto a_gnrl, auto a_dx10) noexcept {
@@ -371,7 +380,7 @@ namespace bsa::fo4
 			detail::header_t{
 				a_format,
 				this->size(),
-				dataOffset + dataSize },
+				a_stringTable ? dataOffset + dataSize : 0u },
 			dataOffset
 		};
 	}
