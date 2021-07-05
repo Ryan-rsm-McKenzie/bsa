@@ -574,7 +574,7 @@ namespace bsa::tes4
 		this->write_file_data(intermediate, out, header);
 	}
 
-	struct archive::xsort_t final
+	struct archive::xbox_sort_t final
 	{
 		// i legitimately have no idea how they sort hashes in the xbox format
 		// it simply defies all reason
@@ -779,12 +779,12 @@ namespace bsa::tes4
 			}
 
 			if (a_xbox) {
-				std::sort(elem.second.begin(), elem.second.end(), xsort_t{});
+				std::sort(elem.second.begin(), elem.second.end(), xbox_sort_t{});
 			}
 		}
 
 		if (a_xbox) {
-			std::sort(result.begin(), result.end(), xsort_t{});
+			std::sort(result.begin(), result.end(), xbox_sort_t{});
 		}
 
 		return result;

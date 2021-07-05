@@ -205,7 +205,7 @@ namespace bsa::tes4
 					const value_type*,
 					std::vector<const mapped_type::value_type*>>>;
 
-		struct xsort_t;
+		struct xbox_sort_t;
 
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
 
