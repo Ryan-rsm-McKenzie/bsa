@@ -30,6 +30,14 @@ static_assert(assert_nothrowable<bsa::fo4::archive>());
 
 TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 {
+	SECTION("hashes start empty")
+	{
+		const bsa::fo4::hashing::hash hash;
+		REQUIRE(hash.file == 0);
+		REQUIRE(hash.extension == 0);
+		REQUIRE(hash.directory == 0);
+	}
+
 	SECTION("validate hash values")
 	{
 		using hash_t = bsa::fo4::hashing::hash;
@@ -103,8 +111,46 @@ TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 	}
 }
 
+TEST_CASE("bsa::fo4::chunk", "[fo4.chunk]")
+{
+	SECTION("files start empty")
+	{
+		const bsa::fo4::chunk chunk;
+		REQUIRE(chunk.empty());
+		REQUIRE(!chunk.compressed());
+		REQUIRE(chunk.size() == 0);
+		REQUIRE(chunk.mips.first == 0);
+		REQUIRE(chunk.mips.last == 0);
+	}
+}
+
+TEST_CASE("bsa::fo4::file", "[fo4.file]")
+{
+	SECTION("files start empty")
+	{
+		const bsa::fo4::file file;
+		REQUIRE(file.empty());
+		REQUIRE(file.begin() == file.end());
+		REQUIRE(file.size() == 0);
+		REQUIRE(file.header.height == 0);
+		REQUIRE(file.header.width == 0);
+		REQUIRE(file.header.mip_count == 0);
+		REQUIRE(file.header.format == 0);
+		REQUIRE(file.header.flags == 0);
+		REQUIRE(file.header.tile_mode == 0);
+	}
+}
+
 TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 {
+	SECTION("archives start empty")
+	{
+		const bsa::fo4::archive ba2;
+		REQUIRE(ba2.empty());
+		REQUIRE(ba2.begin() == ba2.end());
+		REQUIRE(ba2.size() == 0);
+	}
+
 	SECTION("archives will bail on malformed inputs")
 	{
 		const std::filesystem::path root{ "fo4_invalid_test"sv };
