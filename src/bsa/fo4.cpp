@@ -556,9 +556,9 @@ namespace bsa::fo4
 	{
 		const auto size = a_chunk.size();
 		a_out << a_dataOffset
+			  << static_cast<std::uint32_t>(a_chunk.compressed() ? size : 0u)
 			  << static_cast<std::uint32_t>(
-					 a_chunk.compressed() ? a_chunk.decompressed_size() : 0u)
-			  << static_cast<std::uint32_t>(size);
+					 a_chunk.compressed() ? a_chunk.decompressed_size() : size);
 		a_dataOffset += size;
 
 		if (a_format == format::directx) {
