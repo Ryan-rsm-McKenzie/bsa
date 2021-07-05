@@ -287,6 +287,46 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		}
 	}
 
+	SECTION("we can read archives written in the xbox format")
+	{
+		const std::filesystem::path root{ "tes4_xbox_read_test"sv };
+
+		bsa::tes4::archive normal;
+		normal.read(root / "normal.bsa"sv);
+		REQUIRE(!normal.xbox_archive());
+		REQUIRE(!normal.xbox_compressed());
+
+		bsa::tes4::archive xbox;
+		xbox.read(root / "xbox.bsa"sv);
+		REQUIRE(xbox.xbox_archive());
+		REQUIRE(!normal.xbox_compressed());
+
+		REQUIRE(normal.size() == xbox.size());
+		for (const auto& dnorm : normal) {
+			const auto dxbox = xbox.find(dnorm.first.hash());
+			REQUIRE(dxbox != xbox.end());
+
+			REQUIRE(dnorm.first.hash() == dxbox->first.hash());
+			REQUIRE(dnorm.first.name() == dxbox->first.name());
+			REQUIRE(dnorm.second.size() == dxbox->second.size());
+
+			for (const auto& fnorm : dnorm.second) {
+				const auto fxbox = dxbox->second.find(fnorm.first.hash());
+				REQUIRE(fxbox != dxbox->second.end());
+
+				REQUIRE(fnorm.first.hash() == fxbox->first.hash());
+				REQUIRE(fnorm.first.name() == fxbox->first.name());
+				REQUIRE(!fnorm.second.compressed());
+				REQUIRE(!fxbox->second.compressed());
+				REQUIRE(fnorm.second.size() == fxbox->second.size());
+				REQUIRE(std::memcmp(
+							fnorm.second.data(),
+							fxbox->second.data(),
+							fnorm.second.size()) == 0);
+			}
+		}
+	}
+
 	SECTION("files can be compressed independently of the archive's compression")
 	{
 		const std::filesystem::path root{ "tes4_compression_mismatch_test"sv };
