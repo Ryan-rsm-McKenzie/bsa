@@ -61,6 +61,9 @@ namespace bsa::fo4
 					throw exception("invalid magic");
 				} else if (version != 1) {
 					throw exception("invalid version");
+				} else if (a_header._format != constants::gnrl &&
+						   a_header._format != constants::dx10) {
+					throw exception("invalid format");
 				}
 
 				return a_in;
@@ -401,7 +404,9 @@ namespace bsa::fo4
 
 		std::uint32_t sentinel = 0;
 		a_in >> sentinel;
-		assert(sentinel == 0xBAADF00D);
+		if (sentinel != 0xBAADF00D) {
+			throw exception("invalid chunk sentinel");
+		}
 
 		const detail::restore_point _{ a_in };
 		a_in.seek_absolute(dataFileOffset);
@@ -425,10 +430,14 @@ namespace bsa::fo4
 		a_in >> hdrsz;
 		switch (a_format) {
 		case format::general:
-			assert(hdrsz == detail::constants::chunk_header_size_gnrl);
+			if (hdrsz != detail::constants::chunk_header_size_gnrl) {
+				throw exception("invalid chunk header size");
+			}
 			break;
 		case format::directx:
-			assert(hdrsz == detail::constants::chunk_header_size_dx10);
+			if (hdrsz != detail::constants::chunk_header_size_dx10) {
+				throw exception("invalid chunk header size");
+			}
 			a_in >> a_file.header;
 			break;
 		default:
