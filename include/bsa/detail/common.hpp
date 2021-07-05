@@ -99,15 +99,6 @@ namespace bsa::detail
 			std::constructible_from<std::string, T>;
 	}
 
-	namespace type_traits
-	{
-		template <class T>
-		using integral_type_t = typename std::conditional_t<
-			std::is_enum_v<T>,
-			std::underlying_type<T>,
-			std::type_identity<T>>::type;
-	}
-
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
@@ -155,23 +146,19 @@ namespace bsa::detail
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
 		{
 			const auto load = [&]<std::size_t I>(std::in_place_index_t<I>) {
-				using integral_t = type_traits::integral_type_t<T>;
 				const auto bytes = this->read_bytes(sizeof(T));
-
 				return boost::endian::endian_load<
-					integral_t,
-					sizeof(integral_t),
+					T,
+					sizeof(T),
 					static_cast<boost::endian::order>(I)>(
 					reinterpret_cast<const unsigned char*>(bytes.data()));
 			};
 
 			switch (a_endian) {
 			case std::endian::little:
-				return static_cast<T>(load(
-					std::in_place_index<to_underlying(boost::endian::order::little)>));
+				return load(std::in_place_index<to_underlying(boost::endian::order::little)>);
 			case std::endian::big:
-				return static_cast<T>(load(
-					std::in_place_index<to_underlying(boost::endian::order::big)>));
+				return load(std::in_place_index<to_underlying(boost::endian::order::big)>);
 			default:
 				declare_unreachable();
 			}
@@ -335,16 +322,13 @@ namespace bsa::detail
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
 		{
 			const auto store = [&]<std::size_t I>(std::in_place_index_t<I>) noexcept {
-				using integral_t = type_traits::integral_type_t<T>;
-				const auto value = static_cast<integral_t>(a_value);
 				std::array<std::byte, sizeof(T)> bytes{};
-
 				boost::endian::endian_store<
-					integral_t,
-					sizeof(integral_t),
+					T,
+					sizeof(T),
 					static_cast<boost::endian::order>(I)>(
 					reinterpret_cast<unsigned char*>(bytes.data()),
-					value);
+					a_value);
 				this->write_bytes({ bytes.cbegin(), bytes.cend() });
 			};
 
