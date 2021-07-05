@@ -1,6 +1,9 @@
 #include "bsa/fo4.hpp"
 
 #include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <string>
 #include <string_view>
@@ -149,6 +152,76 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 		REQUIRE(ba2.empty());
 		REQUIRE(ba2.begin() == ba2.end());
 		REQUIRE(ba2.size() == 0);
+	}
+
+	SECTION("we can write archives")
+	{
+		const std::filesystem::path root{ "fo4_write_test"sv };
+		const std::filesystem::path outPath = root / "out.ba2"sv;
+
+		struct info_t
+		{
+			consteval info_t(
+				std::uint32_t a_file,
+				std::array<char, 4> a_extension,
+				std::uint32_t a_directory,
+				std::string_view a_path) noexcept :
+				hash{ a_file, bsa::fo4::detail::make_file_type(a_extension), a_directory },
+				path(a_path)
+			{}
+
+			bsa::fo4::hashing::hash hash;
+			std::string_view path;
+		};
+
+		constexpr std::array index{
+			info_t{ 0x35B94567, { 'p', 'n', 'g', '\0' }, 0x5FE2DC26, "Background/background_tilemap.png"sv },
+			info_t{ 0x53D5F897, { 'p', 'n', 'g', '\0' }, 0xD9A32978, "Characters/character_0003.png"sv },
+			info_t{ 0x36F72750, { 't', 'x', 't', '\0' }, 0x60648919, "Construct 3/Readme.txt"sv },
+			info_t{ 0xCA042B67, { 't', 'x', 't', '\0' }, 0x29246A47, "Share/License.txt"sv },
+			info_t{ 0xDA3773A6, { 'p', 'n', 'g', '\0' }, 0x0B0A447E, "Tilemap/tiles.png"sv },
+			info_t{ 0x785183FF, { 'p', 'n', 'g', '\0' }, 0xDA3773A6, "Tiles/tile_0003.png"sv },
+		};
+
+		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		bsa::fo4::archive in;
+		for (const auto& file : index) {
+			const auto& data = mmapped.emplace_back(
+				map_file(root / "data"sv / file.path));
+			REQUIRE(data.is_open());
+			bsa::fo4::chunk c;
+			c.set_data({ //
+				reinterpret_cast<const std::byte*>(data.data()),
+				data.size() });
+
+			bsa::fo4::file f;
+			f.push_back(std::move(c));
+
+			REQUIRE(in.insert(file.path, std::move(f)).second);
+		}
+
+		in.write(outPath, bsa::fo4::format::general);
+
+		bsa::fo4::archive out;
+		REQUIRE(out.read(outPath) == bsa::fo4::format::general);
+		REQUIRE(out.size() == index.size());
+		for (std::size_t idx = 0; idx < index.size(); ++idx) {
+			const auto& file = index[idx];
+			const auto& mapped = mmapped[idx];
+
+			REQUIRE(out[file.path]);
+
+			const auto f = out.find(file.path);
+			REQUIRE(f != out.end());
+			REQUIRE(f->first.hash() == file.hash);
+			REQUIRE(f->first.name() == simple_normalize(file.path));
+			REQUIRE(f->second.size() == 1);
+
+			const auto& c = f->second.front();
+			REQUIRE(!c.compressed());
+			REQUIRE(c.size() == mapped.size());
+			REQUIRE(std::memcmp(c.data(), mapped.data(), mapped.size()) == 0);
+		}
 	}
 
 	SECTION("archives will bail on malformed inputs")
