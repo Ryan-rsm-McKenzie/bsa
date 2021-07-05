@@ -35,7 +35,7 @@ TEST_CASE("bsa::tes3::hashing", "[tes3.hashing]")
 {
 	SECTION("hashes start empty")
 	{
-		bsa::tes3::hashing::hash h;
+		const bsa::tes3::hashing::hash h;
 		REQUIRE(h.lo == 0);
 		REQUIRE(h.hi == 0);
 		REQUIRE(h.numeric() == 0);
@@ -71,8 +71,8 @@ TEST_CASE("bsa::tes3::hashing", "[tes3.hashing]")
 
 	SECTION("hashes are sorted first by their low value, then their high value")
 	{
-		bsa::tes3::hashing::hash lhs{ 0, 1 };
-		bsa::tes3::hashing::hash rhs{ 1, 0 };
+		const bsa::tes3::hashing::hash lhs{ 0, 1 };
+		const bsa::tes3::hashing::hash rhs{ 1, 0 };
 		REQUIRE(lhs < rhs);
 	}
 }
@@ -81,7 +81,7 @@ TEST_CASE("bsa::tes3::file", "[tes3.file]")
 {
 	SECTION("files start empty")
 	{
-		bsa::tes3::file f;
+		const bsa::tes3::file f;
 		REQUIRE(f.empty());
 		REQUIRE(f.size() == 0);
 		REQUIRE(f.as_bytes().empty());
@@ -92,7 +92,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 {
 	SECTION("archives start empty")
 	{
-		bsa::tes3::archive bsa;
+		const bsa::tes3::archive bsa;
 		REQUIRE(bsa.empty());
 		REQUIRE(bsa.begin() == bsa.end());
 		REQUIRE(bsa.size() == 0);
@@ -158,7 +158,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 		std::vector<boost::iostreams::mapped_file_source> mmapped;
 		bsa::tes3::archive in;
 		for (const auto& file : index) {
-			auto& data = mmapped.emplace_back(
+			const auto& data = mmapped.emplace_back(
 				map_file(root / "data"sv / file.path));
 			REQUIRE(data.is_open());
 			bsa::tes3::file f;

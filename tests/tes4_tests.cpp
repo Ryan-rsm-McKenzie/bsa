@@ -186,7 +186,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 {
 	SECTION("archives start empty")
 	{
-		bsa::tes4::archive bsa;
+		const bsa::tes4::archive bsa;
 
 		REQUIRE(bsa.empty());
 		REQUIRE(bsa.size() == 0);
@@ -455,13 +455,13 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		std::vector<boost::iostreams::mapped_file_source> mmapped;
 		bsa::tes4::archive in;
 		for (const auto& [dir, file] : index) {
-			const auto data = map_file(root / "data"sv / dir.name / file.name);
+			const auto& data = mmapped.emplace_back(
+				map_file(root / "data"sv / dir.name / file.name));
 			REQUIRE(data.is_open());
 			bsa::tes4::file f;
 			f.set_data({ //
 				reinterpret_cast<const std::byte*>(data.data()),
 				data.size() });
-			mmapped.push_back(std::move(data));
 
 			bsa::tes4::directory d;
 			REQUIRE(d.insert(file.name, std::move(f)).second);
