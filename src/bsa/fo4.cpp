@@ -8,6 +8,8 @@
 #include <string>
 #include <string_view>
 
+#include <zlib.h>
+
 namespace bsa::fo4
 {
 	namespace detail
@@ -241,6 +243,61 @@ namespace bsa::fo4
 		return a_out
 		       << a_mips.first
 		       << a_mips.last;
+	}
+
+	bool chunk::compress() noexcept
+	{
+		assert(!this->compressed());
+
+		const auto in = this->as_bytes();
+		std::vector<std::byte> out;
+
+		auto outsz = ::compressBound(static_cast<::uLong>(in.size()));
+		out.resize(outsz);
+
+		const auto result = ::compress(
+			reinterpret_cast<::Byte*>(out.data()),
+			&outsz,
+			reinterpret_cast<const ::Byte*>(in.data()),
+			static_cast<::uLong>(in.size_bytes()));
+		if (result == Z_OK) {
+			out.resize(outsz);
+			out.shrink_to_fit();
+		} else {
+			return false;
+		}
+
+		this->set_data(std::move(out), in.size_bytes());
+
+		assert(this->compressed());
+		return true;
+	}
+
+	bool chunk::decompress() noexcept
+	{
+		assert(this->compressed());
+
+		const auto in = this->as_bytes();
+		std::vector<std::byte> out;
+		out.resize(this->decompressed_size());
+
+		auto outsz = static_cast<::uLong>(out.size());
+
+		const auto result = ::uncompress(
+			reinterpret_cast<::Byte*>(out.data()),
+			&outsz,
+			reinterpret_cast<const ::Byte*>(in.data()),
+			static_cast<::uLong>(in.size_bytes()));
+		if (result == Z_OK) {
+			assert(static_cast<std::size_t>(outsz) == this->decompressed_size());
+		} else {
+			return false;
+		}
+
+		this->set_data(std::move(out));
+
+		assert(!this->compressed());
+		return true;
 	}
 
 	auto operator>>(

@@ -101,6 +101,9 @@ namespace bsa::fo4
 			super::clear();
 			this->mips = mips_t{};
 		}
+
+		bool compress() noexcept;
+		bool decompress() noexcept;
 	};
 
 	class file final

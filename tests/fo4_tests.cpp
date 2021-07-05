@@ -292,4 +292,36 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 		REQUIRE(in.size() == out.size());
 		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
 	}
+
+	SECTION("archives can contain compressed files")
+	{
+		const std::filesystem::path root{ "fo4_compression_test"sv };
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.read(root / "test.ba2"sv) == bsa::fo4::format::general);
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(root / "data"sv)) {
+			if (entry.is_regular_file()) {
+				const auto p = std::filesystem::relative(entry.path(), root / "data"sv);
+				const auto arch = ba2[p.string()];
+				REQUIRE(arch);
+				REQUIRE(arch->size() == 1);
+				auto archC = arch->front();
+				REQUIRE(archC.compressed());
+
+				const auto disk = map_file(entry.path());
+
+				bsa::fo4::chunk diskC;
+				diskC.set_data({ //
+					reinterpret_cast<const std::byte*>(disk.data()),
+					disk.size() });
+				REQUIRE(diskC.compress());
+				REQUIRE(archC.size() == diskC.size());
+				REQUIRE(std::memcmp(archC.data(), diskC.data(), archC.size()) == 0);
+
+				REQUIRE(archC.decompress());
+				REQUIRE(!archC.compressed());
+				REQUIRE(archC.size() == disk.size());
+				REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);
+			}
+		}
+	}
 }
