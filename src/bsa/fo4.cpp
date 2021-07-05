@@ -404,10 +404,10 @@ namespace bsa::fo4
 	void archive::write(
 		std::filesystem::path a_path,
 		format a_format,
-		bool a_stringTable)
+		bool a_strings)
 	{
 		detail::ostream_t out{ std::move(a_path) };
-		auto [header, dataOffset] = make_header(a_format, a_stringTable);
+		auto [header, dataOffset] = make_header(a_format, a_strings);
 		out << header;
 
 		for (const auto& [key, file] : *this) {
@@ -421,7 +421,7 @@ namespace bsa::fo4
 			}
 		}
 
-		if (a_stringTable) {
+		if (a_strings) {
 			for ([[maybe_unused]] const auto& [key, file] : *this) {
 				detail::write_wstring(out, key.name());
 			}
@@ -430,7 +430,7 @@ namespace bsa::fo4
 
 	auto archive::make_header(
 		format a_format,
-		bool a_stringTable) const noexcept
+		bool a_strings) const noexcept
 		-> std::pair<detail::header_t, std::uint64_t>
 	{
 		const auto inspect = [&](auto a_gnrl, auto a_dx10) noexcept {
@@ -466,7 +466,7 @@ namespace bsa::fo4
 			detail::header_t{
 				a_format,
 				this->size(),
-				a_stringTable ? dataOffset + dataSize : 0u },
+				a_strings ? dataOffset + dataSize : 0u },
 			dataOffset
 		};
 	}

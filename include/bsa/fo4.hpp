@@ -207,12 +207,12 @@ namespace bsa::fo4
 		void write(
 			std::filesystem::path a_path,
 			format a_format,
-			bool a_stringTable = true);
+			bool a_strings = true);
 
 	private:
 		[[nodiscard]] auto make_header(
 			format a_format,
-			bool a_stringTable) const noexcept
+			bool a_strings) const noexcept
 			-> std::pair<detail::header_t, std::uint64_t>;
 
 		void read_chunk(
