@@ -461,9 +461,8 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			bsa::tes4::archive_flag::embedded_file_names,
 		};
 
-		const auto test = [&](
-			bsa::tes4::version a_version,
-			bsa::tes4::archive_flag a_flags) {
+		const auto test = [&](bsa::tes4::version a_version,
+							  bsa::tes4::archive_flag a_flags) {
 			in.archive_flags(a_flags);
 			in.write(outPath, a_version);
 
