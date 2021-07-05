@@ -153,27 +153,7 @@ namespace bsa::detail
 		template <concepts::integral T>
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
 		{
-			using integral_t = type_traits::integral_type_t<T>;
-			auto result = integral_t{ 0 };
-			const auto bytes = read_bytes(sizeof(integral_t));
-
-			switch (a_endian) {
-			case std::endian::little:
-				for (std::size_t i = 0; i < bytes.size(); ++i) {
-					result |= static_cast<integral_t>(bytes[i]) << i * 8u;
-				}
-				break;
-			case std::endian::big:
-				for (std::size_t i = 0; i < bytes.size(); ++i) {
-					result |= static_cast<integral_t>(bytes[i])
-					          << (sizeof(integral_t) - i - 1u) * 8u;
-				}
-				break;
-			default:
-				declare_unreachable();
-			}
-
-			return static_cast<T>(result);
+			return do_read<T>(a_endian, std::make_index_sequence<sizeof(T)>{});
 		}
 
 		[[nodiscard]] auto read_bytes(std::size_t a_bytes)
@@ -207,6 +187,21 @@ namespace bsa::detail
 		}
 
 	private :
+		template <class T, std::size_t... I>
+		[[nodiscard]] T
+		do_read(
+			std::endian a_endian,
+			std::index_sequence<I...>)
+		{
+			using integral_t = type_traits::integral_type_t<T>;
+			const auto bytes = read_bytes(sizeof(T));
+			return a_endian == std::endian::little ?
+                       static_cast<T>(
+						   ((static_cast<integral_t>(bytes[I]) << I * 8u) | ...)) :
+                       static_cast<T>(
+						   ((static_cast<integral_t>(bytes[I]) << (sizeof(T) - I - 1u) * 8u) | ...));
+		}
+
 		stream_type _file;
 		std::size_t _pos{ 0 };
 	};
@@ -333,27 +328,7 @@ namespace bsa::detail
 		template <concepts::integral T>
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
 		{
-			using integral_t = type_traits::integral_type_t<T>;
-			const auto value = static_cast<integral_t>(a_value);
-			std::array<std::byte, sizeof(integral_t)> bytes;
-
-			switch (a_endian) {
-			case std::endian::little:
-				for (std::size_t i = 0; i < bytes.size(); ++i) {
-					bytes[i] = static_cast<std::byte>((value >> i * 8u) & 0xFFu);
-				}
-				break;
-			case std::endian::big:
-				for (std::size_t i = 0; i < bytes.size(); ++i) {
-					bytes[i] = static_cast<std::byte>(
-						(value >> (sizeof(integral_t) - i - 1) * 8u) & 0xFFu);
-				}
-				break;
-			default:
-				declare_unreachable();
-			}
-
-			write_bytes(std::span<const std::byte>{ bytes.data(), bytes.size() });
+			do_write(a_value, a_endian, std::make_index_sequence<sizeof(T)>{});
 		}
 
 		void write_bytes(std::span<const std::byte> a_bytes) noexcept
@@ -381,6 +356,26 @@ namespace bsa::detail
 		}
 
 	private :
+		template <class T, std::size_t... I>
+		void
+		do_write(
+			T a_value,
+			std::endian a_endian,
+			std::index_sequence<I...>) noexcept
+		{
+			using integral_t = type_traits::integral_type_t<T>;
+			const auto value = static_cast<integral_t>(a_value);
+			std::array<std::byte, sizeof(T)> bytes{};
+
+			if (a_endian == std::endian::little) {
+				((bytes[I] = static_cast<std::byte>((value >> I * 8u) & 0xFFu)), ...);
+			} else {
+				((bytes[I] = static_cast<std::byte>((value >> (sizeof(T) - I - 1) * 8u) & 0xFFu)), ...);
+			}
+
+			write_bytes({ bytes.cbegin(), bytes.cend() });
+		}
+
 		std::FILE* _file{ nullptr };
 	};
 
