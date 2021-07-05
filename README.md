@@ -49,3 +49,4 @@ bsa.write("example.bsa", bsa::tes4::version::sse);
 - Avoid writing file paths which are close to the limit of `MAX_PATH`. Bethesda uses fixed buffers everywhere with no input validation, so they will most likely crash the game.
 - Make sure to lexically normalize your paths before you pass them. Bethesda uses *really* basic file extension detection methods, and `bsa` replicates those methods.
 - Files can not be split into more than 4 chunks inside a ba2. Bethesda uses a fixed buffer to store the chunks, and exceeding that limit will likely crash the game.
+- The XMem Codec available for compressing Xbox archives is ostensibly [LZXD](https://docs.microsoft.com/en-us/openspecs/exchange_server_protocols/ms-patch/cc78752a-b4af-4eee-88cb-01f4d8a4c2bf) which is available in the XNA 4.0 framework. Since this is a C#/Windows only library, and I can't find any C/C++ implementation of the method, `bsa` does not support Xbox compression.
