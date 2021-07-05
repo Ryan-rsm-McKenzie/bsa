@@ -1,7 +1,11 @@
 #include "bsa/fo4.hpp"
 
+#include <array>
+#include <filesystem>
 #include <string>
 #include <string_view>
+
+#include <boost/regex.hpp>
 
 #include "utility.hpp"
 
@@ -96,5 +100,47 @@ TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 		REQUIRE(h(R"(Textures\Terrain\SanctuaryHillsWorld\SanctuaryHillsWorld.4.-36.40.DDS)"sv) == hash_t{ 0xDD27070A, 0x00736464, 0x49AAA5E1 });
 		REQUIRE(h(R"(Textures\Terrain\SanctuaryHillsWorld\SanctuaryHillsWorld.4.76.-24.DDS)"sv) == hash_t{ 0x71560B31, 0x00736464, 0x49AAA5E1 });
 		REQUIRE(h(R"(Sound\Voice\Fallout4.esm\NPCMTravisMiles\000A6032_1.fuz)"sv) == hash_t{ 0x34402DE0, 0x007A7566, 0xF186D761 });
+	}
+}
+
+TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
+{
+	SECTION("archives will bail on malformed inputs")
+	{
+		const std::filesystem::path root{ "fo4_invalid_test"sv };
+		constexpr std::array types{
+			"format"sv,
+			"magic"sv,
+			"range"sv,
+			"sentinel"sv,
+			"size"sv,
+			"version"sv,
+		};
+
+		for (const auto& type : types) {
+			try {
+				std::string filename;
+				filename += "invalid_"sv;
+				filename += type;
+				filename += ".ba2"sv;
+
+				bsa::fo4::archive ba2;
+				ba2.read(root / filename);
+
+				REQUIRE(false);
+			} catch (bsa::exception& a_err) {
+				std::string fmt;
+				fmt += "\\b"sv;
+				fmt += type;
+				fmt += "\\b"sv;
+
+				boost::regex pattern{
+					fmt.c_str(),
+					boost::regex_constants::ECMAScript | boost::regex_constants::icase
+				};
+
+				REQUIRE(boost::regex_search(a_err.what(), pattern));
+			}
+		}
 	}
 }
