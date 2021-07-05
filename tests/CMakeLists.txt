@@ -8,13 +8,13 @@ source_group("include" FILES ${HEADER_FILES})
 
 set(SOURCE_DIR ${ROOT_DIR}/tests)
 set(SOURCE_FILES
-	${SOURCE_DIR}/common_tests.cpp
-	${SOURCE_DIR}/fo4_tests.cpp
+	${SOURCE_DIR}/detail/common.test.cpp
+	${SOURCE_DIR}/fo4.test.cpp
 	${SOURCE_DIR}/main.cpp
-	${SOURCE_DIR}/tes3_tests.cpp
-	${SOURCE_DIR}/tes4_tests.cpp
+	${SOURCE_DIR}/tes3.test.cpp
+	${SOURCE_DIR}/tes4.test.cpp
 )
-source_group("src" FILES ${SOURCE_FILES})
+source_group(TREE ${SOURCE_DIR} PREFIX "src" FILES ${SOURCE_FILES})
 
 set(NATVIS_DIR ${ROOT_DIR}/extern/CPPDebuggerVisualizers/VS2019/Visualizers)
 set(NATVIS_FILES
@@ -36,6 +36,13 @@ target_compile_definitions(
 	tests
 	PRIVATE
 		_CRT_SECURE_NO_WARNINGS
+)
+
+target_include_directories(
+	tests
+	PRIVATE
+		${INCLUDE_DIR}
+		${SOURCE_DIR}
 )
 
 find_package(Boost
