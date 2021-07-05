@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "bsa/detail/common.hpp"
 
@@ -198,6 +199,14 @@ namespace bsa::tes4
 		void write(std::filesystem::path a_path, version a_version) const;
 
 	private:
+		using intermediate_t =
+			std::vector<
+				std::pair<
+					const value_type*,
+					std::vector<const mapped_type::value_type*>>>;
+
+		struct xsort_t;
+
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
 
 		[[nodiscard]] auto read_file_entries(
@@ -218,6 +227,8 @@ namespace bsa::tes4
 			const detail::header_t& a_header,
 			std::size_t& a_namesOffset);
 
+		[[nodiscard]] auto sort_for_write(bool a_xbox) const noexcept -> intermediate_t;
+
 		[[nodiscard]] auto test_flag(archive_flag a_flag) const noexcept
 			-> bool { return (_flags & a_flag) != archive_flag::none; }
 
@@ -225,18 +236,23 @@ namespace bsa::tes4
 			-> bool { return (_types & a_type) != archive_type::none; }
 
 		void write_directory_entries(
+			const intermediate_t& a_intermediate,
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header) const noexcept;
 
 		void write_file_data(
+			const intermediate_t& a_intermediate,
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header) const noexcept;
 
 		void write_file_entries(
+			const intermediate_t& a_intermediate,
 			detail::ostream_t& a_out,
 			const detail::header_t& a_header) const noexcept;
 
-		void write_file_names(detail::ostream_t& a_out) const noexcept;
+		void write_file_names(
+			const intermediate_t& a_intermediate,
+			detail::ostream_t& a_out) const noexcept;
 
 		archive_flag _flags{ archive_flag::none };
 		archive_type _types{ archive_type::none };

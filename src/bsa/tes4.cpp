@@ -14,6 +14,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/endian/conversion.hpp>
+
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
@@ -562,13 +564,45 @@ namespace bsa::tes4
 		const auto header = this->make_header(a_version);
 		out << header;
 
-		this->write_directory_entries(out, header);
-		this->write_file_entries(out, header);
+		const auto intermediate = sort_for_write(header.xbox_archive());
+
+		this->write_directory_entries(intermediate, out, header);
+		this->write_file_entries(intermediate, out, header);
 		if (header.file_strings()) {
-			this->write_file_names(out);
+			this->write_file_names(intermediate, out);
 		}
-		this->write_file_data(out, header);
+		this->write_file_data(intermediate, out, header);
 	}
+
+	struct archive::xsort_t final
+	{
+		// i legitimately have no idea how they sort hashes in the xbox format
+		// it simply defies all reason
+
+		template <class T>
+		[[nodiscard]] bool operator()(
+			const T& a_lhs,
+			const T& a_rhs) const noexcept
+		{
+			return key_for(a_lhs) < key_for(a_rhs);
+		}
+
+		[[nodiscard]] static auto key_for(
+			const intermediate_t::value_type& a_value) noexcept
+			-> std::uint64_t
+		{
+			return boost::endian::endian_reverse(
+				a_value.first->first.hash().numeric());
+		}
+
+		[[nodiscard]] static auto key_for(
+			const mapped_type::value_type* a_value) noexcept
+			-> std::uint64_t
+		{
+			return boost::endian::endian_reverse(
+				a_value->first.hash().numeric());
+		}
+	};
 
 	auto archive::make_header(version a_version) const noexcept
 		-> detail::header_t
@@ -731,14 +765,41 @@ namespace bsa::tes4
 		assert(success);
 	}
 
+	auto archive::sort_for_write(bool a_xbox) const noexcept
+		-> intermediate_t
+	{
+		intermediate_t result;
+		result.reserve(this->size());
+		for (const auto& dir : *this) {
+			auto& elem = result.emplace_back();
+			elem.first = &dir;
+			elem.second.reserve(dir.second.size());
+			for (const auto& file : dir.second) {
+				elem.second.push_back(&file);
+			}
+
+			if (a_xbox) {
+				std::sort(elem.second.begin(), elem.second.end(), xsort_t{});
+			}
+		}
+
+		if (a_xbox) {
+			std::sort(result.begin(), result.end(), xsort_t{});
+		}
+
+		return result;
+	}
+
 	void archive::write_directory_entries(
+		const intermediate_t& a_intermediate,
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_entries(a_header));
 		offset += static_cast<std::uint32_t>(a_header.file_names_length());
 
-		for (const auto& [key, dir] : *this) {
+		for (const auto& elem : a_intermediate) {
+			const auto& [key, dir] = *elem.first;
 			key.hash().write(a_out, a_header.endian());
 			a_out << static_cast<std::uint32_t>(dir.size());
 
@@ -771,19 +832,21 @@ namespace bsa::tes4
 	}
 
 	void archive::write_file_data(
+		const intermediate_t& a_intermediate,
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
-		for (const auto& dir : *this) {
+		for (const auto& elem : a_intermediate) {
+			const auto& dir = *elem.first;
 			const auto dirname = dir.first.name();
 			std::span dirbytes{
 				reinterpret_cast<const std::byte*>(dirname.data()),
 				dirname.size()
 			};
 
-			for (const auto& [key, file] : dir.second) {
+			for (const auto file : elem.second) {
 				if (a_header.embedded_file_names()) {
-					const auto fname = key.name();
+					const auto fname = file->first.name();
 					const auto len = dirbytes.size() +
 					                 1u +  // directory separator
 					                 fname.size();
@@ -795,30 +858,32 @@ namespace bsa::tes4
 						fname.size() });
 				}
 
-				if (file.compressed()) {
-					a_out << static_cast<std::uint32_t>(file.decompressed_size());
+				if (file->second.compressed()) {
+					a_out << static_cast<std::uint32_t>(file->second.decompressed_size());
 				}
 
-				a_out.write_bytes(file.as_bytes());
+				a_out.write_bytes(file->second.as_bytes());
 			}
 		}
 	}
 
 	void archive::write_file_entries(
+		const intermediate_t& a_intermediate,
 		detail::ostream_t& a_out,
 		const detail::header_t& a_header) const noexcept
 	{
 		auto offset = static_cast<std::uint32_t>(detail::offsetof_file_data(a_header));
-		for (const auto& dir : *this) {
+		for (const auto& elem : a_intermediate) {
+			const auto& dir = *elem.first;
 			if (a_header.directory_strings()) {
 				detail::write_bzstring(a_out, dir.first.name());
 			}
 
-			for (const auto& file : dir.second) {
-				file.first.hash().write(a_out, a_header.endian());
-				auto fsize = file.second.size();
+			for (const auto file : elem.second) {
+				file->first.hash().write(a_out, a_header.endian());
+				auto fsize = file->second.size();
 
-				if (!!a_header.compressed() != !!file.second.compressed()) {
+				if (!!a_header.compressed() != !!file->second.compressed()) {
 					fsize |= file::icompression;
 				}
 
@@ -827,10 +892,10 @@ namespace bsa::tes4
 						1u +  // prefixed byte length
 						dir.first.name().length() +
 						1u +  // directory separator
-						file.first.name().length());
+						file->first.name().length());
 				}
 
-				if (file.second.compressed()) {
+				if (file->second.compressed()) {
 					fsize += 4u;
 				}
 
@@ -841,11 +906,13 @@ namespace bsa::tes4
 		}
 	}
 
-	void archive::write_file_names(detail::ostream_t& a_out) const noexcept
+	void archive::write_file_names(
+		const intermediate_t& a_intermediate,
+		detail::ostream_t& a_out) const noexcept
 	{
-		for (const auto& dir : *this) {
-			for (const auto& file : dir.second) {
-				detail::write_zstring(a_out, file.first.name());
+		for (const auto& elem : a_intermediate) {
+			for (const auto file : elem.second) {
+				detail::write_zstring(a_out, file->first.name());
 			}
 		}
 	}
