@@ -461,44 +461,53 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			bsa::tes4::archive_flag::embedded_file_names,
 		};
 
+		const auto test = [&](
+			bsa::tes4::version a_version,
+			bsa::tes4::archive_flag a_flags) {
+			in.archive_flags(a_flags);
+			in.write(outPath, a_version);
+
+			bsa::tes4::archive out;
+			REQUIRE(out.read(outPath) == a_version);
+			REQUIRE(out.size() == index.size());
+			for (std::size_t idx = 0; idx < index.size(); ++idx) {
+				const auto& [dir, file] = index[idx];
+				const auto& mapped = mmapped[idx];
+
+				REQUIRE(out[dir.name][file.name]);
+
+				const auto d = out.find(dir.name);
+				REQUIRE(d != out.end());
+				REQUIRE(d->first.hash().numeric() == dir.hash);
+				if (out.directory_strings() ||
+					(a_version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
+					REQUIRE(d->first.name() == simple_normalize(dir.name));
+				}
+				REQUIRE(d->second.size() == 1);
+
+				const auto f = d->second.find(file.name);
+				REQUIRE(f != d->second.end());
+				REQUIRE(f->first.hash().numeric() == file.hash);
+				if (out.file_strings() ||
+					(a_version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
+					REQUIRE(f->first.name() == simple_normalize(file.name));
+				}
+				if (f->second.compressed()) {
+					REQUIRE(f->second.decompress(a_version));
+				}
+				REQUIRE(f->second.size() == mapped.size());
+				REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+			}
+		};
+
 		for (const auto version : versions) {
 			for (std::size_t i = 0; i < flags.size(); ++i) {
-				auto af = flags[i];
-				for (std::size_t j = i; j < flags.size(); ++j) {
-					af |= flags[j];
-					in.archive_flags(af);
-					in.write(outPath, version);
-
-					bsa::tes4::archive out;
-					REQUIRE(out.read(outPath) == version);
-					REQUIRE(out.size() == index.size());
-					for (std::size_t idx = 0; idx < index.size(); ++idx) {
-						const auto& [dir, file] = index[idx];
-						const auto& mapped = mmapped[idx];
-
-						REQUIRE(out[dir.name][file.name]);
-
-						const auto d = out.find(dir.name);
-						REQUIRE(d != out.end());
-						REQUIRE(d->first.hash().numeric() == dir.hash);
-						if (out.directory_strings() ||
-							(version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
-							REQUIRE(d->first.name() == simple_normalize(dir.name));
-						}
-						REQUIRE(d->second.size() == 1);
-
-						const auto f = d->second.find(file.name);
-						REQUIRE(f != d->second.end());
-						REQUIRE(f->first.hash().numeric() == file.hash);
-						if (out.file_strings() ||
-							(version != bsa::tes4::version::tes4 && out.embedded_file_names())) {
-							REQUIRE(f->first.name() == simple_normalize(file.name));
-						}
-						if (f->second.compressed()) {
-							REQUIRE(f->second.decompress(version));
-						}
-						REQUIRE(f->second.size() == mapped.size());
-						REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+				test(version, flags[i]);
+				for (std::size_t j = i + 1; j < flags.size(); ++j) {
+					auto af = flags[i];
+					for (std::size_t k = j; k < flags.size(); ++k) {
+						af |= flags[k];
+						test(version, af);
 					}
 				}
 			}
