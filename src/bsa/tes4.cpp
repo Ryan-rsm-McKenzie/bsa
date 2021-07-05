@@ -152,7 +152,7 @@ namespace bsa::tes4
 			[[nodiscard]] auto xbox_archive() const noexcept
 				-> bool { return test_flag(archive_flag::xbox_archive); }
 			[[nodiscard]] auto xbox_compressed() const noexcept
-				-> bool { return test_flag(archive_flag::xbox_compressed); }
+				-> bool { return _version > 103 && test_flag(archive_flag::xbox_compressed); }
 
 		private:
 			[[nodiscard]] bool test_flag(archive_flag a_flag) const noexcept
