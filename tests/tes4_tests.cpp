@@ -327,6 +327,27 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		}
 	}
 
+	SECTION("we can write archives written in the xbox format")
+	{
+		const std::filesystem::path root{ "tes4_xbox_write_test"sv };
+		const auto inPath = root / "in.bsa"sv;
+		const auto outPath = root / "out.bsa"sv;
+
+		{
+			bsa::tes4::archive bsa;
+			const auto format = bsa.read(inPath);
+			REQUIRE(bsa.xbox_archive());
+			REQUIRE(!bsa.xbox_compressed());
+
+			bsa.write(outPath, format);
+		}
+
+		const auto in = map_file(inPath);
+		const auto out = map_file(outPath);
+		REQUIRE(in.size() == out.size());
+		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+	}
+
 	SECTION("files can be compressed independently of the archive's compression")
 	{
 		const std::filesystem::path root{ "tes4_compression_mismatch_test"sv };
