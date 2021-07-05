@@ -53,6 +53,7 @@ namespace bsa::fo4
 			std::uint32_t extension{ 0 };
 			std::uint32_t directory{ 0 };
 
+			// archives are sorted in whatever order you add files, i.e. not at all
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 			[[nodiscard]] friend auto operator<=>(const hash&, const hash&) noexcept
 				-> std::strong_ordering = default;
