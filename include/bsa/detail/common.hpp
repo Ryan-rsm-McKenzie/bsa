@@ -368,6 +368,8 @@ namespace bsa::components
 		}
 
 	protected:
+		/// \cond
+
 		void clear() noexcept { _data.emplace<data_view>(); }
 
 		void set_data(
@@ -376,6 +378,8 @@ namespace bsa::components
 		{
 			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
 		}
+
+		/// \endcond
 	};
 
 	/// \brief	A byte storage container with compression support.
@@ -420,6 +424,8 @@ namespace bsa::components
 		}
 
 	protected:
+		/// \cond
+
 		void clear() noexcept
 		{
 			_data.emplace<data_view>();
@@ -434,6 +440,8 @@ namespace bsa::components
 			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
 			_decompsz = a_decompressedSize;
 		}
+
+		/// \endcond
 
 	private:
 		std::optional<std::size_t> _decompsz;
@@ -590,7 +598,11 @@ namespace bsa::components
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
 
 	protected:
+		/// \cond
+
 		void clear() { _map.clear(); }
+
+		/// \endcond
 
 	private:
 		container_type _map;
