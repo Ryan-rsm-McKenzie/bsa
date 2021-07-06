@@ -1,0 +1,19 @@
+author = 'Ryan McKenzie'
+cpp = 20
+description = 'Bethesda archives meet C++'
+github = 'Ryan-rsm-McKenzie/bsa'
+license = [ 'MIT', 'https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE' ]
+name = 'bsa'
+navbar = [ 'classes', 'namespaces' ]
+
+[macros]
+'BSA_DOXYGEN' = 1
+'protected' = 'private'
+
+[sources]
+extract_all = true
+recursive_paths = '@INCLUDE_DIR@'
+strip_paths = '@INCLUDE_DIR@'
+
+[warnings]
+treat_as_errors = true

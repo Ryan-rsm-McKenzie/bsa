@@ -1,25 +1,26 @@
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-find_package(Doxygen MODULE REQUIRED)
-if(DOXYGEN_FOUND)
-	set(DOXYGEN_BUILTIN_STL_SUPPORT "YES")
-	set(DOXYGEN_EXPAND_ONLY_PREDEF "YES")
-	set(DOXYGEN_EXTRACT_ALL "YES")
-	set(DOXYGEN_HTML_HEADER "${ROOT_DIR}/docs/header.html")
-	set(DOXYGEN_MACRO_EXPANSION "YES")
-	set(DOXYGEN_PREDEFINED
-		"BSA_DOXYGEN"
-		"protected=private"
-	)
-	set(DOXYGEN_PROJECT_BRIEF "A C++ library for working with the Bethesda archive file format")
-	set(DOXYGEN_STRIP_FROM_INC_PATH "${ROOT_DIR}/include")
-	set(DOXYGEN_STRIP_FROM_PATH "${ROOT_DIR}/include")
-	set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${ROOT_DIR}/README.md")
+find_program(POXY_PATH "poxy")
 
-	doxygen_add_docs(docs
-		${ROOT_DIR}/include
-		${ROOT_DIR}/README.md
+if(POXY_PATH)
+	set(DOCS_DIR ${ROOT_DIR}/docs)
+	set(INCLUDE_DIR ${ROOT_DIR}/include)
+
+	configure_file(
+		${DOCS_DIR}/poxy.toml.in
+		${CMAKE_CURRENT_BINARY_DIR}/poxy.toml
+		@ONLY
+	)
+
+	add_custom_target(
+		docs
+		COMMAND
+			${POXY_PATH}
+			"${CMAKE_CURRENT_BINARY_DIR}/poxy.toml"
+		VERBATIM
+		SOURCES
+			${DOCS_DIR}/poxy.toml.in
 	)
 else()
-	message(WARNING "failed to find doxygen: docs will not be built")
+	message(WARNING "failed to find poxy: docs will not be built")
 endif()
