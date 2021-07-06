@@ -388,252 +388,242 @@ namespace bsa::detail
 		istream_t& _proxy;
 		std::size_t _pos;
 	};
+}
 
-	namespace components
+namespace bsa::components
+{
+	class basic_byte_container
 	{
-		namespace detail
+	public:
+		basic_byte_container() noexcept = default;
+		basic_byte_container(const basic_byte_container&) noexcept = default;
+		basic_byte_container(basic_byte_container&&) noexcept = default;
+		~basic_byte_container() noexcept = default;
+		basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
+		basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
+
+		auto as_bytes() const noexcept -> std::span<const std::byte>;
+		[[nodiscard]] auto data() const noexcept
+			-> const std::byte* { return as_bytes().data(); }
+		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
+		[[nodiscard]] auto size() const noexcept
+			-> std::size_t { return as_bytes().size(); }
+
+	private:
+		friend compressed_byte_container;
+		friend byte_container;
+
+		enum : std::size_t
 		{
-			class basic_byte_container
-			{
-			public:
-				basic_byte_container() noexcept = default;
-				basic_byte_container(const basic_byte_container&) noexcept = default;
-				basic_byte_container(basic_byte_container&&) noexcept = default;
-				~basic_byte_container() noexcept = default;
-				basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
-				basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
+			data_view,
+			data_owner,
+			data_proxied,
 
-				auto as_bytes() const noexcept -> std::span<const std::byte>;
-				[[nodiscard]] auto data() const noexcept
-					-> const std::byte* { return as_bytes().data(); }
-				[[nodiscard]] bool empty() const noexcept { return size() == 0; }
-				[[nodiscard]] auto size() const noexcept
-					-> std::size_t { return as_bytes().size(); }
+			data_count
+		};
 
-			private:
-				friend components::compressed_byte_container;
-				friend components::byte_container;
+		using data_proxy = detail::istream_proxy<std::span<const std::byte>>;
 
-				enum : std::size_t
-				{
-					data_view,
-					data_owner,
-					data_proxied,
+		std::variant<
+			std::span<const std::byte>,
+			std::vector<std::byte>,
+			data_proxy>
+			_data;
 
-					data_count
-				};
+		static_assert(data_count == std::variant_size_v<decltype(_data)>);
+	};
 
-				using data_proxy = istream_proxy<std::span<const std::byte>>;
-
-				std::variant<
-					std::span<const std::byte>,
-					std::vector<std::byte>,
-					data_proxy>
-					_data;
-
-				static_assert(data_count == std::variant_size_v<decltype(_data)>);
-			};
+	class byte_container :
+		public basic_byte_container
+	{
+	public:
+		void set_data(std::span<const std::byte> a_data) noexcept
+		{
+			_data.emplace<data_view>(a_data);
 		}
 
-		class byte_container :
-			public detail::basic_byte_container
+		void set_data(std::vector<std::byte> a_data) noexcept
+		{
+			_data.emplace<data_owner>(std::move(a_data));
+		}
+
+	protected:
+		void clear() noexcept { _data.emplace<data_view>(); }
+
+		void set_data(
+			std::span<const std::byte> a_data,
+			const detail::istream_t& a_in) noexcept
+		{
+			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+		}
+	};
+
+	class compressed_byte_container :
+		public basic_byte_container
+	{
+	public:
+		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+
+		[[nodiscard]] auto decompressed_size() const noexcept
+			-> std::size_t
+		{
+			assert(this->compressed());
+			return *_decompsz;
+		}
+
+		void set_data(
+			std::span<const std::byte> a_data,
+			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+		{
+			_data.emplace<data_view>(a_data);
+			_decompsz = a_decompressedSize;
+		}
+
+		void set_data(
+			std::vector<std::byte> a_data,
+			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+		{
+			_data.emplace<data_owner>(std::move(a_data));
+			_decompsz = a_decompressedSize;
+		}
+
+	protected:
+		void clear() noexcept
+		{
+			_data.emplace<data_view>();
+			_decompsz.reset();
+		}
+
+		void set_data(
+			std::span<const std::byte> a_data,
+			const detail::istream_t& a_in,
+			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
+		{
+			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+			_decompsz = a_decompressedSize;
+		}
+
+	private:
+		std::optional<std::size_t> _decompsz;
+	};
+
+	template <class T, bool RECURSE>
+	class hashmap
+	{
+	private:
+		using container_type =
+			std::map<typename T::key, T>;
+
+	public:
+		using key_type = typename container_type::key_type;
+		using mapped_type = typename container_type::mapped_type;
+		using value_type = typename container_type::value_type;
+		using key_compare = typename container_type::key_compare;
+		using iterator = typename container_type::iterator;
+		using const_iterator = typename container_type::const_iterator;
+
+	private:
+		template <class U>
+		class index_t final
 		{
 		public:
-			void set_data(std::span<const std::byte> a_data) noexcept
+			using value_type = U;
+			using pointer = value_type*;
+			using reference = value_type&;
+
+			index_t() noexcept = default;
+
+			template <class K>
+			[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
+				requires(RECURSE)
 			{
-				_data.emplace<data_view>(a_data);
+				return (**this)[std::forward<K>(a_key)];
 			}
 
-			void set_data(std::vector<std::byte> a_data) noexcept
+			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
+
+			[[nodiscard]] auto operator*() const noexcept -> reference
 			{
-				_data.emplace<data_owner>(std::move(a_data));
+				assert(*this);
+				return *_proxy;
 			}
 
-		protected:
-			void clear() noexcept { _data.emplace<data_view>(); }
+			[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
-			void set_data(
-				std::span<const std::byte> a_data,
-				const istream_t& a_in) noexcept
-			{
-				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
-			}
+		private:
+			friend hashmap;
+
+			explicit index_t(value_type& a_value) noexcept :
+				_proxy(&a_value)
+			{}
+
+			value_type* _proxy{ nullptr };
 		};
 
-		class compressed_byte_container :
-			public detail::basic_byte_container
+	public:
+		using index = index_t<mapped_type>;
+		using const_index = index_t<const mapped_type>;
+
+		hashmap() noexcept = default;
+		hashmap(const hashmap&) noexcept = default;
+		hashmap(hashmap&&) noexcept = default;
+		~hashmap() noexcept = default;
+		hashmap& operator=(const hashmap&) noexcept = default;
+		hashmap& operator=(hashmap&&) noexcept = default;
+
+		[[nodiscard]] auto operator[](const key_type& a_key) noexcept
+			-> index
 		{
-		public:
-			[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+			const auto it = _map.find(a_key);
+			return it != _map.end() ? index{ it->second } : index{};
+		}
 
-			[[nodiscard]] auto decompressed_size() const noexcept
-				-> std::size_t
-			{
-				assert(this->compressed());
-				return *_decompsz;
-			}
-
-			void set_data(
-				std::span<const std::byte> a_data,
-				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
-			{
-				_data.emplace<data_view>(a_data);
-				_decompsz = a_decompressedSize;
-			}
-
-			void set_data(
-				std::vector<std::byte> a_data,
-				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
-			{
-				_data.emplace<data_owner>(std::move(a_data));
-				_decompsz = a_decompressedSize;
-			}
-
-		protected:
-			void clear() noexcept
-			{
-				_data.emplace<data_view>();
-				_decompsz.reset();
-			}
-
-			void set_data(
-				std::span<const std::byte> a_data,
-				const istream_t& a_in,
-				std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
-			{
-				_data.emplace<data_proxied>(a_data, a_in.rdbuf());
-				_decompsz = a_decompressedSize;
-			}
-
-		private:
-			std::optional<std::size_t> _decompsz;
-		};
-
-		template <class T, bool RECURSE>
-		class hashmap
+		[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
+			-> const_index
 		{
-		private:
-			using container_type =
-				std::map<typename T::key, T>;
+			const auto it = _map.find(a_key);
+			return it != _map.end() ? const_index{ it->second } : const_index{};
+		}
 
-		public:
-			using key_type = typename container_type::key_type;
-			using mapped_type = typename container_type::mapped_type;
-			using value_type = typename container_type::value_type;
-			using key_compare = typename container_type::key_compare;
-			using iterator = typename container_type::iterator;
-			using const_iterator = typename container_type::const_iterator;
+		[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
+		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
+		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
 
-		private:
-			template <class U>
-			class index_t final
-			{
-			public:
-				using value_type = U;
-				using pointer = value_type*;
-				using reference = value_type&;
+		[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
+		[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
+		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
 
-				index_t() noexcept = default;
+		[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
 
-				template <class K>
-				[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
-					requires(RECURSE)
-				{
-					return (**this)[std::forward<K>(a_key)];
-				}
-
-				[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
-
-				[[nodiscard]] auto operator*() const noexcept -> reference
-				{
-					assert(*this);
-					return *_proxy;
-				}
-
-				[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
-
-			private:
-				friend hashmap;
-
-				explicit index_t(value_type& a_value) noexcept :
-					_proxy(&a_value)
-				{}
-
-				value_type* _proxy{ nullptr };
-			};
-
-		public:
-			using index = index_t<mapped_type>;
-			using const_index = index_t<const mapped_type>;
-
-			hashmap() noexcept = default;
-			hashmap(const hashmap&) noexcept = default;
-			hashmap(hashmap&&) noexcept = default;
-			~hashmap() noexcept = default;
-			hashmap& operator=(const hashmap&) noexcept = default;
-			hashmap& operator=(hashmap&&) noexcept = default;
-
-			[[nodiscard]] auto operator[](const key_type& a_key) noexcept
-				-> index
-			{
-				const auto it = _map.find(a_key);
-				return it != _map.end() ? index{ it->second } : index{};
+		bool erase(const key_type& a_key) noexcept
+		{
+			const auto it = _map.find(a_key);
+			if (it != _map.end()) {
+				_map.erase(it);
+				return true;
+			} else {
+				return false;
 			}
+		}
 
-			[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
-				-> const_index
-			{
-				const auto it = _map.find(a_key);
-				return it != _map.end() ? const_index{ it->second } : const_index{};
-			}
+		[[nodiscard]] auto find(const key_type& a_key) noexcept
+			-> iterator { return _map.find(a_key); }
 
-			[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
-			[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
-			[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
+		[[nodiscard]] auto find(const key_type& a_key) const noexcept
+			-> const_iterator { return _map.find(a_key); }
 
-			[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
-			[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
-			[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
+		auto insert(key_type a_key, mapped_type a_value) noexcept
+			-> std::pair<iterator, bool>
+		{
+			return _map.emplace(std::move(a_key), std::move(a_value));
+		}
 
-			[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
+		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
 
-			bool erase(const key_type& a_key) noexcept
-			{
-				const auto it = _map.find(a_key);
-				if (it != _map.end()) {
-					_map.erase(it);
-					return true;
-				} else {
-					return false;
-				}
-			}
+	protected:
+		void clear() { _map.clear(); }
 
-			[[nodiscard]] auto find(const key_type& a_key) noexcept
-				-> iterator { return _map.find(a_key); }
-
-			[[nodiscard]] auto find(const key_type& a_key) const noexcept
-				-> const_iterator { return _map.find(a_key); }
-
-			auto insert(key_type a_key, mapped_type a_value) noexcept
-				-> std::pair<iterator, bool>
-			{
-				return _map.emplace(std::move(a_key), std::move(a_value));
-			}
-
-			[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
-
-		protected:
-			void clear() { _map.clear(); }
-
-			template <class... Args>
-			auto emplace(Args&&... a_args) noexcept
-				-> std::pair<iterator, bool>
-			{
-				return _map.emplace(std::forward<Args>(a_args)...);
-			}
-
-		private:
-			container_type _map;
-		};
-	}
+	private:
+		container_type _map;
+	};
 }
