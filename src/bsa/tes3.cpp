@@ -9,7 +9,6 @@
 #include <limits>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <utility>
 
 namespace bsa::tes3
@@ -286,10 +285,9 @@ namespace bsa::tes3
 		}();
 
 		[[maybe_unused]] const auto [it, success] =
-			this->emplace(
-				std::piecewise_construct,
-				std::forward_as_tuple(hash, name, a_in),
-				std::forward_as_tuple());
+			this->insert(
+				key_type{ hash, name, a_in },
+				mapped_type{});
 		assert(success);
 
 		std::uint32_t size = 0;

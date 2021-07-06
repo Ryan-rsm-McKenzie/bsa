@@ -75,11 +75,11 @@ namespace bsa::fo4
 	}
 
 	class chunk final :
-		public detail::components::compressed_byte_container
+		public components::compressed_byte_container
 	{
 	private:
 		friend archive;
-		using super = detail::components::compressed_byte_container;
+		using super = components::compressed_byte_container;
 
 	public:
 		struct mips_t final
@@ -142,7 +142,7 @@ namespace bsa::fo4
 		using iterator = container_type::iterator;
 		using const_iterator = container_type::const_iterator;
 
-		using key = detail::key_t<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file>;
 
 		file() noexcept = default;
 		file(const file&) noexcept = default;
@@ -195,10 +195,10 @@ namespace bsa::fo4
 	};
 
 	class archive final :
-		public detail::components::hashmap<file>
+		public components::hashmap<file>
 	{
 	private:
-		using super = detail::components::hashmap<file>;
+		using super = components::hashmap<file>;
 
 	public:
 		using super::clear;

@@ -110,11 +110,11 @@ namespace bsa::tes4
 	}
 
 	class file final :
-		public detail::components::compressed_byte_container
+		public components::compressed_byte_container
 	{
 	private:
 		friend archive;
-		using super = detail::components::compressed_byte_container;
+		using super = components::compressed_byte_container;
 
 		enum : std::uint32_t
 		{
@@ -132,7 +132,7 @@ namespace bsa::tes4
 		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
 
 	public:
-		using key = detail::key_t<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file>;
 		using super::clear;
 
 		bool compress(version a_version) noexcept;
@@ -146,22 +146,22 @@ namespace bsa::tes4
 	};
 
 	class directory final :
-		public detail::components::hashmap<file>
+		public components::hashmap<file>
 	{
 	private:
 		friend archive;
-		using super = detail::components::hashmap<file>;
+		using super = components::hashmap<file>;
 
 	public:
-		using key = detail::key_t<hashing::hash, hashing::hash_directory>;
+		using key = components::key<hashing::hash, hashing::hash_directory>;
 		using super::clear;
 	};
 
 	class archive final :
-		public detail::components::hashmap<directory, true>
+		public components::hashmap<directory, true>
 	{
 	private:
-		using super = detail::components::hashmap<directory, true>;
+		using super = components::hashmap<directory, true>;
 
 	public:
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }

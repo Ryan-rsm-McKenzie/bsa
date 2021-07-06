@@ -389,10 +389,9 @@ namespace bsa::fo4
 			}();
 
 			[[maybe_unused]] const auto [it, success] =
-				this->emplace(
-					std::piecewise_construct,
-					std::forward_as_tuple(hash, name, in),
-					std::forward_as_tuple());
+				this->insert(
+					key_type{ hash, name, in },
+					mapped_type{});
 			assert(success);
 
 			this->read_file(it->second, in, fmt);

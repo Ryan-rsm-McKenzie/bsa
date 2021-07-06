@@ -52,22 +52,22 @@ namespace bsa::tes3
 	}
 
 	class file final :
-		public detail::components::byte_container
+		public components::byte_container
 	{
 	private:
 		friend archive;
-		using super = detail::components::byte_container;
+		using super = components::byte_container;
 
 	public:
-		using key = detail::key_t<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file>;
 		using super::clear;
 	};
 
 	class archive final :
-		public detail::components::hashmap<file>
+		public components::hashmap<file>
 	{
 	private:
-		using super = detail::components::hashmap<file>;
+		using super = components::hashmap<file>;
 
 	public:
 		using super::clear;

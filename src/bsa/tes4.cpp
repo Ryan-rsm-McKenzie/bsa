@@ -747,10 +747,9 @@ namespace bsa::tes4
 			}();
 
 			[[maybe_unused]] const auto [it, success] =
-				a_dir.emplace(
-					std::piecewise_construct,
-					std::forward_as_tuple(hash, fname, a_in),
-					std::forward_as_tuple());
+				a_dir.insert(
+					directory::key_type{ hash, fname, a_in },
+					directory::mapped_type{});
 			assert(success);
 
 			this->read_file_data(it->second, a_in, a_header, size);
@@ -820,10 +819,9 @@ namespace bsa::tes4
 		directory d;
 		const auto backup = this->read_file_entries(d, a_in, a_header, count, a_namesOffset);
 		[[maybe_unused]] const auto [it, success] =
-			this->emplace(
-				std::piecewise_construct,
-				std::forward_as_tuple(hash, backup.value_or(name), a_in),
-				std::forward_as_tuple(std::move(d)));
+			this->insert(
+				key_type{ hash, backup.value_or(name), a_in },
+				std::move(d));
 		assert(success);
 	}
 
