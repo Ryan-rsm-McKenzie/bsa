@@ -1,0 +1,27 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy_docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Doxygen
+      run: sudo apt install doxygen -y
+
+    - name: Configure CMake
+      run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBSA_BUILD_DOCS=ON -DBSA_BUILD_SRC=OFF -DBUILD_TESTING=OFF
+
+    - name: Build
+      run: cmake --build ${{ github.workspace }}/build --target docs
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ github.workspace }}/build/docs/html/
