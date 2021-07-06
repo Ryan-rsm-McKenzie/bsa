@@ -4,6 +4,7 @@
 
 namespace bsa
 {
+	/// \cond
 	namespace detail
 	{
 		class istream_t;
@@ -13,6 +14,7 @@ namespace bsa
 		template <class T>
 		struct istream_proxy;
 	}
+	/// \endcond
 
 	namespace components
 	{
