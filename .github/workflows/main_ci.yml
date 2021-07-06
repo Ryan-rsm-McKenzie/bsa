@@ -96,7 +96,7 @@ jobs:
           label: build
           message: passing
           namedLogo: github
-          style: flat
+          style: flat-square
 
   update_badges_failure:
     if: ${{ failure() }}
@@ -114,4 +114,4 @@ jobs:
           label: build
           message: failing
           namedLogo: github
-          style: flat
+          style: flat-square
