@@ -613,13 +613,6 @@ namespace bsa::components
 			_name(std::in_place_index<name_proxied>, a_name, a_in.rdbuf())
 		{}
 
-		void set_name(
-			std::string_view a_name,
-			const detail::istream_t& a_in) noexcept
-		{
-			_name.emplace<name_proxied>(a_name, a_in.rdbuf());
-		}
-
 		hash_type _hash;
 		std::variant<
 			std::monostate,
