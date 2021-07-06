@@ -399,7 +399,7 @@ namespace bsa::components
 			return *_decompsz;
 		}
 
-		/// \copydoc byte_container::set_data(std::span<const std::byte>)
+		/// \copydoc bsa::components::byte_container::set_data(std::span<const std::byte>)
 		///
 		/// \param	a_decompressedSize	The decompressed size of the data,
 		///		if the given data is compressed.
@@ -411,7 +411,7 @@ namespace bsa::components
 			_decompsz = a_decompressedSize;
 		}
 
-		/// \copydoc byte_container::set_data(std::vector<std::byte>)
+		/// \copydoc bsa::components::byte_container::set_data(std::vector<std::byte>)
 		///
 		/// \param	a_decompressedSize	The decompressed size of the data,
 		///		if the given data is compressed.
@@ -446,7 +446,8 @@ namespace bsa::components
 	/// \brief	Establishes a basic mapping between a \ref key and its
 	///		associated files.
 	///
-	/// \tparam	The `mapped_type`
+	/// \tparam	T	The `mapped_type`.
+	/// \tparam	RECURSE	Determines if indexing via `operator[]` is a recursive action.
 	template <class T, bool RECURSE>
 	class hashmap
 	{
@@ -537,7 +538,7 @@ namespace bsa::components
 			return it != _map.end() ? index{ it->second } : index{};
 		}
 
-		/// \copybrief hashmap::operator[]
+		/// \copybrief operator[]()
 		[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
 			-> const_index
 		{
@@ -547,16 +548,16 @@ namespace bsa::components
 
 		/// \brief	Obtains an interator to the beginning of the container.
 		[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
-		/// \copybrief hashmap::begin
+		/// \copybrief begin()
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
-		/// \copybrief hashmap::begin
+		/// \copybrief begin()
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
 
 		/// \brief	Obtains an iterator to the end of the container.
 		[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
-		/// \copybrief hashmap::end
+		/// \copybrief end()
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
-		/// \copybrief hashmap::end
+		/// \copybrief end()
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
 
 		/// \brief	Checks if the container is empty.
@@ -580,7 +581,7 @@ namespace bsa::components
 		[[nodiscard]] auto find(const key_type& a_key) noexcept
 			-> iterator { return _map.find(a_key); }
 
-		/// \copybrief hashmap::find
+		/// \copybrief find()
 		[[nodiscard]] auto find(const key_type& a_key) const noexcept
 			-> const_iterator { return _map.find(a_key); }
 
@@ -682,9 +683,11 @@ namespace bsa::components
 			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
 
 	private:
+#ifndef BSA_DOXYGEN
 		friend fo4::archive;
 		friend tes3::archive;
 		friend tes4::archive;
+#endif
 
 		enum : std::size_t
 		{

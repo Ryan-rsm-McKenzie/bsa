@@ -61,7 +61,9 @@ namespace bsa::tes4
 		xbox_compressed = 1u << 9u
 	};
 
+#ifndef BSA_DOXYGEN
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_flag)
+#endif
 
 	/// \brief	Specifies file types contained within an archive.
 	/// \remarks	It's not apparent if the game actually uses these flags for anything.
@@ -80,7 +82,9 @@ namespace bsa::tes4
 		misc = 1u << 8u
 	};
 
+#ifndef BSA_DOXYGEN
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type)
+#endif
 
 	/// \brief	The archive version.
 	/// \remark	Each version has an impact on the abi of the TES:4 archive file format.
@@ -145,8 +149,10 @@ namespace bsa::tes4
 			}
 
 		private:
+#ifndef BSA_DOXYGEN
 			friend tes4::archive;
 			friend tes4::directory;
+#endif
 
 			void read(
 				detail::istream_t& a_in,
