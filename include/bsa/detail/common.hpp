@@ -441,8 +441,8 @@ namespace bsa::components
 
 	/// \brief	Establishes a basic mapping between a \ref key and its
 	///		associated files.
-	/// 
-	/// \tparam	The `mapped_type` 
+	///
+	/// \tparam	The `mapped_type`
 	template <class T, bool RECURSE>
 	class hashmap
 	{
