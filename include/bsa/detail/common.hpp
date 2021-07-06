@@ -55,7 +55,9 @@
 
 namespace bsa
 {
+#ifndef BSA_DOXYGEN
 	using namespace std::literals;
+#endif
 
 	/// \brief	The base exception type for all `bsa` exceptions.
 	class exception :
