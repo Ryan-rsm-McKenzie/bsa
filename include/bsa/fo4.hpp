@@ -81,9 +81,7 @@ namespace bsa::fo4
 #endif
 		};
 
-		/// \brief	Produces a hash using the given path.
-		/// \remark	The path is normalized in place. After the function returns,
-		///		the path contains the string that would be stored on disk.
+		/// \copydoc bsa::tes3::hashing::hash_file()
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
