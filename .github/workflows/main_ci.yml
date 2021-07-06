@@ -80,7 +80,7 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
 
-  update_badges:
+  update_badges_success:
     if: ${{ success() }}
     name: Update CI badges (passing)
     needs: build
@@ -98,7 +98,7 @@ jobs:
           namedLogo: github
           style: flat
 
-  update_badges:
+  update_badges_failure:
     if: ${{ failure() }}
     name: Update CI badges (failing)
     needs: build
