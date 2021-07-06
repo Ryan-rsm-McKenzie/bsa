@@ -34,10 +34,12 @@ namespace bsa
 
 	namespace fo4
 	{
+		/// \cond
 		namespace detail
 		{
 			class header_t;
 		}
+		/// \endcond
 
 		namespace hashing
 		{
@@ -53,10 +55,12 @@ namespace bsa
 
 	namespace tes3
 	{
+		/// \cond
 		namespace detail
 		{
 			class header_t;
 		}
+		/// \endcond
 
 		namespace hashing
 		{
@@ -69,10 +73,12 @@ namespace bsa
 
 	namespace tes4
 	{
+		/// \cond
 		namespace detail
 		{
 			class header_t;
 		}
+		/// \endcond
 
 		namespace hashing
 		{
