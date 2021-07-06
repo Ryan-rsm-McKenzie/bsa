@@ -438,7 +438,10 @@ namespace bsa::components
 			[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
 				requires(RECURSE)
 			{
-				return (**this)[std::forward<K>(a_key)];
+				using result_t = decltype((**this)[std::forward<K>(a_key)]);
+				return (*this) ?
+                           (**this)[std::forward<K>(a_key)] :
+                           result_t{};
 			}
 
 			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }

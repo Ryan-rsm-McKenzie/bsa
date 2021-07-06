@@ -570,4 +570,11 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			}
 		}
 	}
+
+	SECTION("we can use multi-level indexing even when the given directory doesn't exist")
+	{
+		bsa::tes4::archive bsa;
+		REQUIRE(!bsa["foo"sv]);
+		REQUIRE(!bsa["foo"sv]["bar"sv]);
+	}
 }
