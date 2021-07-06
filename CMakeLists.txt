@@ -17,3 +17,8 @@ if(BUILD_TESTING)
 
 	add_subdirectory(tests)
 endif()
+
+option(BSA_BUILD_DOCS "whether we should build documentation" OFF)
+if(BSA_BUILD_DOCS)
+	add_subdirectory(docs)
+endif()

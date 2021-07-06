@@ -3,6 +3,10 @@
     {
       "binaryDir": "build",
       "cacheVariables": {
+        "BSA_BUILD_DOCS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
           "value": "Debug"
