@@ -3,9 +3,16 @@ name: Main CI
 on:
   push:
     branches: [ master ]
-    paths-ignore:
-      - 'docs/*'
-      - 'README.md'
+    paths:
+      - '.github/workflows/main_ci.yml'
+      - 'cmake/**'
+      - 'include/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
   pull_request:
     branches: [ master ]
 
