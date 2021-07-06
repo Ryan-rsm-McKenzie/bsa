@@ -10,13 +10,16 @@
 
 namespace bsa::tes3
 {
+	/// \cond
 	namespace detail
 	{
 		using namespace bsa::detail;
 	}
+	/// \endcond
 
 	namespace hashing
 	{
+		/// \brief	The underlying hash object used to uniquely identify archives within TES:3.
 		struct hash final
 		{
 		public:
@@ -28,6 +31,7 @@ namespace bsa::tes3
 			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
 				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
 
+			/// \brief	Obtains the numeric value of the hash used for comparisons.
 			[[nodiscard]] auto numeric() const noexcept
 				-> std::uint64_t
 			{
@@ -36,6 +40,8 @@ namespace bsa::tes3
 					std::uint64_t{ lo } << 4u * 8u
 				};
 			}
+
+			/// \cond
 
 			friend auto operator>>(
 				detail::istream_t& a_in,
@@ -46,11 +52,17 @@ namespace bsa::tes3
 				detail::ostream_t& a_out,
 				const hash& a_hash) noexcept
 				-> detail::ostream_t&;
+
+			/// \endcond
 		};
 
+		/// \brief	Produces a hash using the given path.
+		/// \remark	The path is normalized in place. After the function returns, the path contains
+		///		the string that would be stored on disk.
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
+	/// \brief	Represents a file within the TES:3 virtual filesystem.
 	class file final :
 		public components::byte_container
 	{
@@ -59,10 +71,14 @@ namespace bsa::tes3
 		using super = components::byte_container;
 
 	public:
+		/// \brief	The key used to indentify files.
 		using key = components::key<hashing::hash, hashing::hash_file>;
+
+		/// \brief	Clears the contents of the file.
 		using super::clear;
 	};
 
+	/// \brief	Used to interact with the TES:3 revision of the bsa format.
 	class archive final :
 		public components::hashmap<file>
 	{
@@ -70,10 +86,35 @@ namespace bsa::tes3
 		using super = components::hashmap<file>;
 
 	public:
+#ifdef BSA_DOXYGEN
+		/// \brief	Clears the contents of the archive.
+		void clear() noexcept;
+#else
 		using super::clear;
+#endif
 
+		/// \brief	Reads the contents of the archive from disk.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
+		///
+		/// \remark	If `std::system_error` is thrown, the archive is left unmodified.
+		///	\remark	If `bsa::exception` is throw, the archive is left in an unspecified state.
+		///		Use \ref clear to return it to a valid state.
+		/// \remark	If the function returns successfully, the contents of the archived are replaced
+		///		with the contents of the archive on disk.
+		///
+		/// \param	a_path	The path to the given archive on the native filesystem.
 		void read(std::filesystem::path a_path);
+
+		/// \brief	Verifies that offsets within the archive will be valid when written to disk.
+		///
+		/// \return	Returns `true` is the archive passes validation, `false` otherwise.
 		[[nodiscard]] bool verify_offsets() const noexcept;
+
+		/// \brief	Writes the contents of the archive to disk.
+		///
+		/// \param	a_path	The path to the given archive on the native filesystem.
 		void write(std::filesystem::path a_path) const;
 
 	private:
