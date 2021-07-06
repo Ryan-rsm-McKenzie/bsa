@@ -105,7 +105,7 @@ jobs:
           gistID: 634174b328f6d356cf369bd94b3ecad6
           filename: bsa-main-ci.json
           color: ${{ env.BADGE_COLOR }}
-        label: build
-        message: ${{ env.BADGE_MESSAGE }}
-        namedLogo: github
-        style: flat
+          label: build
+          message: ${{ env.BADGE_MESSAGE }}
+          namedLogo: github
+          style: flat
