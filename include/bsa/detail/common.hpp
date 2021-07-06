@@ -93,10 +93,6 @@ namespace bsa::detail
 			std::same_as<T, unsigned int> ||
 			std::same_as<T, unsigned long int> ||
 			std::same_as<T, unsigned long long int>;
-
-		template <class T>
-		concept stringable =
-			std::constructible_from<std::string, T>;
 	}
 
 	[[noreturn]] inline void declare_unreachable()
@@ -206,108 +202,6 @@ namespace bsa::detail
 		boost::iostreams::mapped_file_source f;
 	};
 
-	template <class Hash, hasher_t<Hash> Hasher>
-	class key_t final
-	{
-	public:
-		using hash_type = Hash;
-
-		key_t() = delete;
-
-		key_t(hash_type a_hash) noexcept :
-			_hash(a_hash)
-		{}
-
-		template <concepts::stringable String>
-		key_t(String&& a_string) noexcept
-		{
-			_name.emplace<name_owner>(std::forward<String>(a_string));
-			_hash = Hasher(*std::get_if<name_owner>(&_name));
-		}
-
-		key_t(
-			hash_type a_hash,
-			std::string_view a_name,
-			const istream_t& a_in) noexcept :
-			_hash(a_hash),
-			_name(std::in_place_index<name_proxied>, a_name, a_in.rdbuf())
-		{}
-
-		key_t(const key_t&) noexcept = default;
-		key_t(key_t&&) noexcept = default;
-		~key_t() noexcept = default;
-		key_t& operator=(const key_t&) noexcept = default;
-		key_t& operator=(key_t&&) noexcept = default;
-
-		[[nodiscard]] auto hash() const noexcept -> const hash_type& { return _hash; }
-
-		[[nodiscard]] auto name() const noexcept
-			-> std::string_view
-		{
-			switch (_name.index()) {
-			case name_null:
-				return {};
-			case name_owner:
-				return *std::get_if<name_owner>(&_name);
-			case name_proxied:
-				return std::get_if<name_proxied>(&_name)->d;
-			default:
-				declare_unreachable();
-			}
-		}
-
-		[[nodiscard]] friend auto operator==(
-			const key_t& a_lhs,
-			const key_t& a_rhs) noexcept
-			-> bool { return a_lhs.hash() == a_rhs.hash(); }
-
-		[[nodiscard]] friend auto operator==(
-			const key_t& a_lhs,
-			const hash_type& a_rhs) noexcept
-			-> bool { return a_lhs.hash() == a_rhs; }
-
-		[[nodiscard]] friend auto operator<=>(
-			const key_t& a_lhs,
-			const key_t& a_rhs) noexcept
-			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs.hash(); }
-
-		[[nodiscard]] friend auto operator<=>(
-			const key_t& a_lhs,
-			const hash_type& a_rhs) noexcept
-			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
-
-	private:
-		friend tes4::archive;
-		friend tes4::directory;
-
-		enum : std::size_t
-		{
-			name_null,
-			name_owner,
-			name_proxied,
-
-			name_count
-		};
-
-		using name_proxy = detail::istream_proxy<std::string_view>;
-
-		void set_name(
-			std::string_view a_name,
-			const istream_t& a_in) noexcept
-		{
-			_name.emplace<name_proxied>(a_name, a_in.rdbuf());
-		}
-
-		hash_type _hash;
-		std::variant<
-			std::monostate,
-			std::string,
-			name_proxy>
-			_name;
-
-		static_assert(name_count == std::variant_size_v<decltype(_name)>);
-	};
-
 	class ostream_t final
 	{
 	public:
@@ -388,6 +282,13 @@ namespace bsa::detail
 		istream_t& _proxy;
 		std::size_t _pos;
 	};
+}
+
+namespace bsa::concepts
+{
+	template <class T>
+	concept stringable =
+		std::constructible_from<std::string, T>;
 }
 
 namespace bsa::components
@@ -625,5 +526,107 @@ namespace bsa::components
 
 	private:
 		container_type _map;
+	};
+
+	template <class Hash, hasher_t<Hash> Hasher>
+	class key final
+	{
+	public:
+		using hash_type = Hash;
+
+		key() = delete;
+
+		key(hash_type a_hash) noexcept :
+			_hash(a_hash)
+		{}
+
+		template <concepts::stringable String>
+		key(String&& a_string) noexcept
+		{
+			_name.emplace<name_owner>(std::forward<String>(a_string));
+			_hash = Hasher(*std::get_if<name_owner>(&_name));
+		}
+
+		key(const key&) noexcept = default;
+		key(key&&) noexcept = default;
+		~key() noexcept = default;
+		key& operator=(const key&) noexcept = default;
+		key& operator=(key&&) noexcept = default;
+
+		[[nodiscard]] auto hash() const noexcept -> const hash_type& { return _hash; }
+
+		[[nodiscard]] auto name() const noexcept
+			-> std::string_view
+		{
+			switch (_name.index()) {
+			case name_null:
+				return {};
+			case name_owner:
+				return *std::get_if<name_owner>(&_name);
+			case name_proxied:
+				return std::get_if<name_proxied>(&_name)->d;
+			default:
+				detail::declare_unreachable();
+			}
+		}
+
+		[[nodiscard]] friend auto operator==(
+			const key& a_lhs,
+			const key& a_rhs) noexcept
+			-> bool { return a_lhs.hash() == a_rhs.hash(); }
+
+		[[nodiscard]] friend auto operator==(
+			const key& a_lhs,
+			const hash_type& a_rhs) noexcept
+			-> bool { return a_lhs.hash() == a_rhs; }
+
+		[[nodiscard]] friend auto operator<=>(
+			const key& a_lhs,
+			const key& a_rhs) noexcept
+			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs.hash(); }
+
+		[[nodiscard]] friend auto operator<=>(
+			const key& a_lhs,
+			const hash_type& a_rhs) noexcept
+			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
+
+	private:
+		friend fo4::archive;
+		friend tes3::archive;
+		friend tes4::archive;
+
+		enum : std::size_t
+		{
+			name_null,
+			name_owner,
+			name_proxied,
+
+			name_count
+		};
+
+		using name_proxy = detail::istream_proxy<std::string_view>;
+
+		key(hash_type a_hash,
+			std::string_view a_name,
+			const detail::istream_t& a_in) noexcept :
+			_hash(a_hash),
+			_name(std::in_place_index<name_proxied>, a_name, a_in.rdbuf())
+		{}
+
+		void set_name(
+			std::string_view a_name,
+			const detail::istream_t& a_in) noexcept
+		{
+			_name.emplace<name_proxied>(a_name, a_in.rdbuf());
+		}
+
+		hash_type _hash;
+		std::variant<
+			std::monostate,
+			std::string,
+			name_proxy>
+			_name;
+
+		static_assert(name_count == std::variant_size_v<decltype(_name)>);
 	};
 }
