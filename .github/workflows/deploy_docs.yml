@@ -3,6 +3,11 @@ name: Deploy Docs
 on:
   push:
     branches: [ master ]
+    paths:
+      - '.github/workflows/deploy_docs.yml'
+      - 'docs/**'
+      - 'include/**'
+      - 'README.md'
 
 jobs:
   deploy_docs:
