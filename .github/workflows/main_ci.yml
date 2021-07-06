@@ -77,13 +77,15 @@ jobs:
         run: ctest -C ${{ env.BUILD_TYPE }} -V
 
       - name: Set CI badge values
-        run: echo "::set-env name=BADGE_COLOR::success"
-        run: echo "::set-env name=BADGE_MESSAGE::passing"
+        run: |
+          echo "::set-env name=BADGE_COLOR::success"
+          echo "::set-env name=BADGE_MESSAGE::passing"
 
       - name: Set CI badge values
         if: ${{ failure() }}
-        run: echo "::set-env name=BADGE_COLOR::critical"
-        run: echo "::set-env name=BADGE_MESSAGE::failing"
+        run: |
+          echo "::set-env name=BADGE_COLOR::critical"
+          echo "::set-env name=BADGE_MESSAGE::failing"
 
       - name: Update CI badge
         if: ${{ always() }}
