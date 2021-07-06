@@ -8,7 +8,10 @@ endif()
 
 include(cmake/common.cmake)
 
-add_subdirectory(src)
+option(BSA_BUILD_SRC "whether we should build the library itself" ON)
+if(BSA_BUILD_SRC)
+	add_subdirectory(src)
+endif()
 
 include(CTest)
 if(BUILD_TESTING)
