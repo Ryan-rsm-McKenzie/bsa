@@ -194,7 +194,7 @@ namespace bsa::tes4
 		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
 
 	public:
-		/// \brief	The key used to indentify files.
+		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file>;
 
 #ifdef BSA_DOXYGEN
@@ -204,54 +204,32 @@ namespace bsa::tes4
 		using super::clear;
 #endif
 
-		/// \brief	Compresses the file using the given version's compression format.
-		///
-		/// \pre	The file must *not* be compressed.
-		/// \post	The file will be compressed.
+		/// \copydoc bsa::fo4::chunk::compress
 		///
 		/// \param	a_version	The version to compress the file for.
-		/// \return	Returns `true` if compression succeeded, `false` otherwise.
 		bool compress(version a_version) noexcept;
 
-		/// \brief	Returns an upper bound on the storage size required to compress the file.
-		///
-		/// \pre	The file must *not* be compressed.
+		/// \copydoc bsa::fo4::chunk::compress_bound
 		///
 		/// \param	a_version	The version the file would be compressed for.
-		/// \return	Returns the size required to successfully compress the file.
 		[[nodiscard]] auto compress_bound(version a_version) const noexcept -> std::size_t;
 
-		/// \brief	Compresses the file into the given buffer, using the given version's format.
-		///
-		/// \pre	The file must *not* be compressed.
-		/// \pre	`a_out` must be large enough compress the file into.
+		/// \copydoc bsa::fo4::chunk::compress_into
 		///
 		/// \param	a_version	The version to compress the file for.
-		/// \param	a_out	The buffer to compress the file into.
-		/// \return	The final size of the compressed buffer, or `std::nullopt` if compression failed.
 		[[nodiscard]] auto compress_into(
 			version a_version,
 			std::span<std::byte> a_out) noexcept
 			-> std::optional<std::size_t>;
 
-		/// \brief	Decompresses the file using the given version's compression format.
-		///
-		/// \pre	The file *must* be compressed.
-		/// \post	The file will be decompressed.
+		/// \copydoc bsa::fo4::chunk::decompress
 		///
 		/// \param	a_version	The version to decompress the file for.
-		/// \return Returns `true` if decompression succeeded, `false` otherwise.
 		bool decompress(version a_version) noexcept;
 
-		/// \brief	Decompresses the file into the given buffer using the version's
-		///		compression format.
-		///
-		/// \pre	The file *must* be compressed.
-		/// \pre	`a_out` must be large enough to decompress the file into.
+		/// \copydoc bsa::fo4::chunk::decompress_into
 		///
 		/// \param	a_version	The version to decompress the file for.
-		/// \param	a_out	The buffer to decompress the file into.
-		/// \return	Returns `true` if decompression succeeded, `false` otherwise.
 		bool decompress_into(version a_version, std::span<std::byte> a_out) noexcept;
 	};
 
@@ -264,7 +242,7 @@ namespace bsa::tes4
 		using super = components::hashmap<file>;
 
 	public:
-		/// \brief	The key used to indentify directories.
+		/// \brief	The key used to indentify a directory.
 		using key = components::key<hashing::hash, hashing::hash_directory>;
 
 #ifdef BSA_DOXYGEN
@@ -363,7 +341,7 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::tes3::archive::write
 		///
-		/// \param	The version format to write the archive in.
+		/// \param	a_version The version format to write the archive in.
 		void write(std::filesystem::path a_path, version a_version) const;
 
 	private:

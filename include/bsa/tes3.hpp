@@ -71,7 +71,7 @@ namespace bsa::tes3
 		using super = components::byte_container;
 
 	public:
-		/// \brief	The key used to indentify files.
+		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file>;
 
 		/// \brief	Clears the contents of the file.
