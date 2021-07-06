@@ -93,4 +93,6 @@ namespace bsa
 		enum class archive_type : std::uint16_t;
 		enum class version : std::uint32_t;
 	}
+
+	class exception;
 }
