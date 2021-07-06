@@ -19,7 +19,7 @@ namespace bsa::tes4
 	{
 		none = 0u,
 
-		/// \brief	Includes direcotry paths within the archive.
+		/// \brief	Includes directory paths within the archive.
 		/// \remark	archive.exe does not let you write archives without this flag set.
 		/// \remark	This includes only the parent path of all files, and not filenames.
 		directory_strings = 1u << 0u,
