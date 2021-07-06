@@ -12,7 +12,7 @@ private_repo = true
 
 [badges]
 'build' = [
-	'https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Ryan-rsm-McKenzie/634174b328f6d356cf369bd94b3ecad6/raw/3d5bb692f79b1c0b1b847cfd3e5cb6a6c56a8895/bsa-main-ci.json',
+	'https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Ryan-rsm-McKenzie/634174b328f6d356cf369bd94b3ecad6/raw/bsa-main-ci.json',
 	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml'
 ]
 
