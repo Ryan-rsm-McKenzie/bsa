@@ -48,6 +48,12 @@ jobs:
       - name: Run setup script
         run: ${{ matrix.setup }}
 
+      - name: Set compiler
+        if: ${{ matrix.os == ubuntu-latest }}
+        run: |
+          echo "CC=gcc-10" >> $GITHUB_ENV
+          echo "CXX=g++10" >> $GITHUB_ENV
+
       - name: Setup vcpkg
         run: |
           mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
@@ -64,9 +70,6 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json', 'vcpkg-version') }}
 
       - name: Configure CMake
-        env:
-          CC: gcc-10
-          CXX: g++-10
         run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
 
       - name: Build
