@@ -30,7 +30,7 @@ namespace bsa::tes4
 		file_strings = 1u << 1u,
 
 		/// \brief	Compresses the data within the archive.
-		/// \remark	The v103/v104 format use zlib.
+		/// \remark	The v103/v104 format uses zlib.
 		/// \remark	The v105 format uses lz4.
 		compressed = 1u << 2u,
 
