@@ -1,18 +1,32 @@
 author = 'Ryan McKenzie'
 cpp = 20
-description = 'Bethesda archives meet C++'
+description = 'bethesda archives meet c++'
+extra_files = [
+	'@DOCS_DIR@/images/banner_small.png'
+]
 github = 'Ryan-rsm-McKenzie/bsa'
 license = [ 'MIT', 'https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE' ]
 name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
+private_repo = true
+
+[badges]
+'build' = [
+	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml/badge.svg',
+	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml'
+]
+
+[images]
+paths = [ '@DOCS_DIR@/images' ]
 
 [macros]
 'protected' = 'private'
 
 [sources]
 extract_all = true
-recursive_paths = '@INCLUDE_DIR@'
-strip_paths = '@INCLUDE_DIR@'
+paths = [ '@DOCS_DIR@/index.doxy' ]
+recursive_paths = [ '@INCLUDE_DIR@' ]
+strip_paths = [ '@INCLUDE_DIR@' ]
 
 [warnings]
 treat_as_errors = true
