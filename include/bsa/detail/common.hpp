@@ -291,6 +291,7 @@ namespace bsa::detail
 
 namespace bsa::concepts
 {
+	/// \brief	Defines a type that can be used to construct `std::string`
 	template <class T>
 	concept stringable =
 		std::constructible_from<std::string, T>;
