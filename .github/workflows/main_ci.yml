@@ -80,33 +80,38 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
 
-      - name: Set CI badge values
-        run: |
-          echo "BADGE_COLOR=success" >> $GITHUB_ENV
-          echo "BADGE_MESSAGE=passing" >> $GITHUB_ENV
-
   update_badges:
-    if: ${{ always() }}
-    name: Update CI badges
+    if: ${{ success() }}
+    name: Update CI badges (passing)
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set CI badge values
-        if: ${{ failure() }}
-        run: |
-          echo "BADGE_COLOR=critical" >> $GITHUB_ENV
-          echo "BADGE_MESSAGE=failing" >> $GITHUB_ENV
-
       - name: Update CI badge
-        if: ${{ always() }}
         uses: schneegans/dynamic-badges-action@v1.1.0
         with:
           auth: ${{ secrets.MAIN_CI_GIST }}
           gistID: 634174b328f6d356cf369bd94b3ecad6
           filename: bsa-main-ci.json
-          color: ${{ env.BADGE_COLOR }}
+          color: success
           label: build
-          message: ${{ env.BADGE_MESSAGE }}
+          message: passing
+          namedLogo: github
+          style: flat
+
+  update_badges:
+    if: ${{ failure() }}
+    name: Update CI badges (failing)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update CI badge
+        uses: schneegans/dynamic-badges-action@v1.1.0
+        with:
+          auth: ${{ secrets.MAIN_CI_GIST }}
+          gistID: 634174b328f6d356cf369bd94b3ecad6
+          filename: bsa-main-ci.json
+          color: critical
+          label: build
+          message: failing
           namedLogo: github
           style: flat
