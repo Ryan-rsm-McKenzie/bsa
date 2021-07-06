@@ -72,6 +72,7 @@ namespace bsa
 	};
 }
 
+/// \cond
 namespace bsa::detail
 {
 	namespace concepts
@@ -283,6 +284,7 @@ namespace bsa::detail
 		std::size_t _pos;
 	};
 }
+/// \endcond
 
 namespace bsa::concepts
 {
@@ -293,6 +295,9 @@ namespace bsa::concepts
 
 namespace bsa::components
 {
+	/// \brief	A basic byte storage container.
+	/// \details	Primarily stores non-allocating, immutable views into externally backed data,
+	///		but is capable of managing its data's lifetime as a convenience.
 	class basic_byte_container
 	{
 	public:
@@ -303,10 +308,17 @@ namespace bsa::components
 		basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
 		basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
 
+		/// \brief	Retrieves an immutable view into the underlying bytes.
 		auto as_bytes() const noexcept -> std::span<const std::byte>;
+
+		/// \brief	Retrieves an immutable pointer to the underlying bytes.
 		[[nodiscard]] auto data() const noexcept
 			-> const std::byte* { return as_bytes().data(); }
+
+		/// \brief	Checks if the underlying byte container is empty.
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
+
+		/// \brief	Returns the size of the underlying byte container.
 		[[nodiscard]] auto size() const noexcept
 			-> std::size_t { return as_bytes().size(); }
 
@@ -334,15 +346,22 @@ namespace bsa::components
 		static_assert(data_count == std::variant_size_v<decltype(_data)>);
 	};
 
+	/// \brief	A byte storage container without compression support.
 	class byte_container :
 		public basic_byte_container
 	{
 	public:
+		/// \brief	Assigns the underlying container to be a non-owning view into the given data.
+		///
+		/// \param	a_data	The data to store a view to.
 		void set_data(std::span<const std::byte> a_data) noexcept
 		{
 			_data.emplace<data_view>(a_data);
 		}
 
+		/// \brief	Assigns the underlying container to be an owning view into the given data.
+		///
+		/// \param	a_data	The data to take ownership of.
 		void set_data(std::vector<std::byte> a_data) noexcept
 		{
 			_data.emplace<data_owner>(std::move(a_data));
@@ -359,12 +378,16 @@ namespace bsa::components
 		}
 	};
 
+	/// \brief	A byte storage container with compression support.
 	class compressed_byte_container :
 		public basic_byte_container
 	{
 	public:
+		/// \brief	Checks if the underlying bytes are compressed.
 		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
 
+		/// \brief	Retrieves the decompressed size of the compressed storage.
+		/// \details	Only valid if the container *is* compressed.
 		[[nodiscard]] auto decompressed_size() const noexcept
 			-> std::size_t
 		{
@@ -372,6 +395,10 @@ namespace bsa::components
 			return *_decompsz;
 		}
 
+		/// \copydoc byte_container::set_data(std::span<const std::byte>)
+		///
+		/// \param	a_decompressedSize	The decompressed size of the data,
+		///		if the given data is compressed.
 		void set_data(
 			std::span<const std::byte> a_data,
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
@@ -380,6 +407,10 @@ namespace bsa::components
 			_decompsz = a_decompressedSize;
 		}
 
+		/// \copydoc byte_container::set_data(std::vector<std::byte>)
+		///
+		/// \param	a_decompressedSize	The decompressed size of the data,
+		///		if the given data is compressed.
 		void set_data(
 			std::vector<std::byte> a_data,
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
@@ -408,6 +439,10 @@ namespace bsa::components
 		std::optional<std::size_t> _decompsz;
 	};
 
+	/// \brief	Establishes a basic mapping between a \ref key and its
+	///		associated files.
+	/// 
+	/// \tparam	The `mapped_type` 
 	template <class T, bool RECURSE>
 	class hashmap
 	{
@@ -423,7 +458,8 @@ namespace bsa::components
 		using iterator = typename container_type::iterator;
 		using const_iterator = typename container_type::const_iterator;
 
-	private:
+		/// \brief	A proxy value used to facilitate the usage/chaining of \ref hashmap::operator[]
+		///		in an intuitive manner.
 		template <class U>
 		class index_t final
 		{
@@ -432,8 +468,11 @@ namespace bsa::components
 			using pointer = value_type*;
 			using reference = value_type&;
 
+			/// \brief	Constructs an empty index.
 			index_t() noexcept = default;
 
+			/// \brief	Indexes the stored index with the given key.
+			/// \remark	Indexing an empty index is valid, and will simply yield another empty index.
 			template <class K>
 			[[nodiscard]] auto operator[](K&& a_key) const noexcept  //
 				requires(RECURSE)
@@ -444,14 +483,19 @@ namespace bsa::components
                            result_t{};
 			}
 
+			/// \brief	Checks if the current index is valid.
 			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
 
+			/// \brief	Obtains a reference to the currently held index.
+			/// \pre	The current index *must* be valid.
 			[[nodiscard]] auto operator*() const noexcept -> reference
 			{
 				assert(*this);
 				return *_proxy;
 			}
 
+			/// \brief	Obtains a pointer to the currently held index.
+			/// \remark	The current index does *not* need to be valid.
 			[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
 
 		private:
@@ -464,7 +508,6 @@ namespace bsa::components
 			value_type* _proxy{ nullptr };
 		};
 
-	public:
 		using index = index_t<mapped_type>;
 		using const_index = index_t<const mapped_type>;
 
@@ -475,6 +518,8 @@ namespace bsa::components
 		hashmap& operator=(const hashmap&) noexcept = default;
 		hashmap& operator=(hashmap&&) noexcept = default;
 
+		/// \brief	Obtains a proxy to the underlying `mapped_type`. The validity of the
+		///		proxy depends on the presence of the key within the container.
 		[[nodiscard]] auto operator[](const key_type& a_key) noexcept
 			-> index
 		{
@@ -482,6 +527,7 @@ namespace bsa::components
 			return it != _map.end() ? index{ it->second } : index{};
 		}
 
+		/// \copybrief hashmap::operator[]
 		[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
 			-> const_index
 		{
@@ -489,16 +535,26 @@ namespace bsa::components
 			return it != _map.end() ? const_index{ it->second } : const_index{};
 		}
 
+		/// \brief	Obtains an interator to the beginning of the container.
 		[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
+		/// \copybrief hashmap::begin
 		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
+		/// \copybrief hashmap::begin
 		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
 
+		/// \brief	Obtains an iterator to the end of the container.
 		[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
+		/// \copybrief hashmap::end
 		[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
+		/// \copybrief hashmap::end
 		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
 
+		/// \brief	Checks if the container is empty.
 		[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
 
+		/// \brief	Erases any element with the given key from the container.
+		///
+		/// \return	Returns `true` if the element was successfully deleted, `false` otherwise.
 		bool erase(const key_type& a_key) noexcept
 		{
 			const auto it = _map.find(a_key);
@@ -510,18 +566,27 @@ namespace bsa::components
 			}
 		}
 
+		/// \brief	Finds a `value_type` with the given key within the container.
 		[[nodiscard]] auto find(const key_type& a_key) noexcept
 			-> iterator { return _map.find(a_key); }
 
+		/// \copybrief hashmap::find(const key_type&) const noexcept
 		[[nodiscard]] auto find(const key_type& a_key) const noexcept
 			-> const_iterator { return _map.find(a_key); }
 
+		/// \brief	Inserts `a_value` into the container with the given `a_key`.
+		///
+		/// \param	a_key	The key of the `value_type`.
+		/// \param	a_value The value of the `value_type`.
+		/// \return	Returns an `iterator` to the position at which the given `value_type`
+		///		was inserted, and a `bool` to indicate if the insertion was successful.
 		auto insert(key_type a_key, mapped_type a_value) noexcept
 			-> std::pair<iterator, bool>
 		{
 			return _map.emplace(std::move(a_key), std::move(a_value));
 		}
 
+		/// \brief	Returns the number of elements in the container.
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
 
 	protected:
@@ -531,18 +596,29 @@ namespace bsa::components
 		container_type _map;
 	};
 
+	/// \brief	A generic key used to uniquely identify an object inside the virtual filesystem.
+	///
+	/// \tparam	Hash	The hash type used as the underlying key.
+	/// \tparam	Hasher	The function used to generate the hash.
 	template <class Hash, hasher_t<Hash> Hasher>
 	class key final
 	{
 	public:
+		/// \brief	The underlying hash type.
 		using hash_type = Hash;
 
 		key() = delete;
 
+		/// \brief	Construct a key using a raw hash.
+		///
+		/// \param	a_hash	The raw hash that identifies the key.
 		key(hash_type a_hash) noexcept :
 			_hash(a_hash)
 		{}
 
+		/// \brief	Construct a key using a string-like object.
+		///
+		/// \param	a_string	The string-like object used to generate the underlying hash.
 		template <concepts::stringable String>
 		key(String&& a_string) noexcept
 		{
@@ -556,8 +632,10 @@ namespace bsa::components
 		key& operator=(const key&) noexcept = default;
 		key& operator=(key&&) noexcept = default;
 
+		/// \brief	Retrieve a reference to the underlying hash.
 		[[nodiscard]] auto hash() const noexcept -> const hash_type& { return _hash; }
 
+		/// \brief	Retrieve the name that generated the underlying hash.
 		[[nodiscard]] auto name() const noexcept
 			-> std::string_view
 		{
