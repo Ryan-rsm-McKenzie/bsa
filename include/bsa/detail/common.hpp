@@ -57,14 +57,17 @@ namespace bsa
 {
 	using namespace std::literals;
 
+	/// \brief	The base exception type for all `bsa` exceptions.
 	class exception :
 		public std::exception
 	{
 	public:
+		/// \brief	Constructs an exception with the given message.
 		exception(const char* a_what) noexcept :
 			_what(a_what)
 		{}
 
+		/// \brief	Obtains the explanations for why the exception was thrown.
 		const char* what() const noexcept { return _what; }
 
 	private:
