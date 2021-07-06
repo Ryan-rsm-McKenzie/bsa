@@ -75,3 +75,26 @@ jobs:
       - name: Test
         working-directory: ${{ github.workspace }}/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
+
+      - name: Set CI badge values
+        if: ${{ always() }}
+        uses: haya14busa/action-cond@v1.0.0
+        id: badge
+        with:
+          cond: ${{ success() }}
+          if_true: "passing"
+          if_false: "failed"
+
+      - name: Update CI badge
+        if: ${{ always() }}
+        uses: schneegans/dynamic-badges-action@v1.1.0
+        with:
+          auth: ${{ secrets.MAIN_CI_GIST }}
+          gistID: 634174b328f6d356cf369bd94b3ecad6
+          filename: bsa-main-ci.json
+          color: success
+          isError: ${{ failure() }}
+          label: build
+          message: ${{ steps.badge.outputs.value }}
+          namedLogo: github
+          style: flat
