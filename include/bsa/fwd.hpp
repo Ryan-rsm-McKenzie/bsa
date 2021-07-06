@@ -4,7 +4,7 @@
 
 namespace bsa
 {
-	/// \cond
+#ifndef BSA_DOXYGEN
 	namespace detail
 	{
 		class istream_t;
@@ -14,7 +14,7 @@ namespace bsa
 		template <class T>
 		struct istream_proxy;
 	}
-	/// \endcond
+#endif
 
 	namespace components
 	{
@@ -34,12 +34,12 @@ namespace bsa
 
 	namespace fo4
 	{
-		/// \cond
+#ifndef BSA_DOXYGEN
 		namespace detail
 		{
 			class header_t;
 		}
-		/// \endcond
+#endif
 
 		namespace hashing
 		{
@@ -55,12 +55,12 @@ namespace bsa
 
 	namespace tes3
 	{
-		/// \cond
+#ifndef BSA_DOXYGEN
 		namespace detail
 		{
 			class header_t;
 		}
-		/// \endcond
+#endif
 
 		namespace hashing
 		{
@@ -73,12 +73,12 @@ namespace bsa
 
 	namespace tes4
 	{
-		/// \cond
+#ifndef BSA_DOXYGEN
 		namespace detail
 		{
 			class header_t;
 		}
-		/// \endcond
+#endif
 
 		namespace hashing
 		{

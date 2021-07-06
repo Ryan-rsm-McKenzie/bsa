@@ -18,7 +18,7 @@
 
 namespace bsa::fo4
 {
-	/// \cond
+#ifndef BSA_DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
@@ -41,7 +41,7 @@ namespace bsa::fo4
 			inline constexpr auto dx10 = detail::make_file_type({ 'D', 'X', '1', '0' });
 		}
 	}
-	/// \endcond
+#endif
 
 	/// \brief	Represents the file format for an archive.
 	enum class format : std::uint32_t
@@ -68,8 +68,7 @@ namespace bsa::fo4
 			[[nodiscard]] friend auto operator<=>(const hash&, const hash&) noexcept
 				-> std::strong_ordering = default;
 
-			/// \cond
-
+#ifndef BSA_DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash)
@@ -79,8 +78,7 @@ namespace bsa::fo4
 				detail::ostream_t& a_out,
 				const hash& a_hash) noexcept
 				-> detail::ostream_t&;
-
-			/// \endcond
+#endif
 		};
 
 		/// \brief	Produces a hash using the given path.
@@ -104,8 +102,7 @@ namespace bsa::fo4
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 
-			/// \cond
-
+#ifndef BSA_DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				mips_t& a_mips)
@@ -115,8 +112,7 @@ namespace bsa::fo4
 				detail::ostream_t& a_out,
 				const mips_t& a_mips) noexcept
 				-> detail::ostream_t&;
-
-			/// \endcond
+#endif
 		} mips;
 
 		/// \brief	Clears the data and mips of the chunk.

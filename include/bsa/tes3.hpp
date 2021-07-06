@@ -10,12 +10,12 @@
 
 namespace bsa::tes3
 {
-	/// \cond
+#ifndef BSA_DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
 	}
-	/// \endcond
+#endif
 
 	namespace hashing
 	{
@@ -41,8 +41,7 @@ namespace bsa::tes3
 				};
 			}
 
-			/// \cond
-
+#ifndef BSA_DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash)
@@ -52,8 +51,7 @@ namespace bsa::tes3
 				detail::ostream_t& a_out,
 				const hash& a_hash) noexcept
 				-> detail::ostream_t&;
-
-			/// \endcond
+#endif
 		};
 
 		/// \brief	Produces a hash using the given path.

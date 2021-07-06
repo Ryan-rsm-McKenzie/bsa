@@ -99,17 +99,15 @@ namespace bsa::tes4
 		sse = 105,
 	};
 
-	/// \cond
+#ifndef BSA_DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
 	}
-	/// \endcond
+#endif
 
 	namespace hashing
 	{
-		namespace detail = tes4::detail;
-
 		/// \copybrief bsa::tes3::hashing::hash
 		struct hash final
 		{

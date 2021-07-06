@@ -75,7 +75,7 @@ namespace bsa
 	};
 }
 
-/// \cond
+#ifndef BSA_DOXYGEN
 namespace bsa::detail
 {
 	namespace concepts
@@ -102,13 +102,13 @@ namespace bsa::detail
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
-#if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
 		__builtin_unreachable();
-#elif BOOST_COMP_MSVC || BOOST_COMP_EDG
+#	elif BOOST_COMP_MSVC || BOOST_COMP_EDG
 		__assume(false);
-#else
+#	else
 		static_assert(false);
-#endif
+#	endif
 	}
 
 	void normalize_path(std::string& a_path) noexcept;
@@ -287,7 +287,7 @@ namespace bsa::detail
 		std::size_t _pos;
 	};
 }
-/// \endcond
+#endif
 
 namespace bsa::concepts
 {
@@ -371,8 +371,6 @@ namespace bsa::components
 		}
 
 	protected:
-		/// \cond
-
 		void clear() noexcept { _data.emplace<data_view>(); }
 
 		void set_data(
@@ -381,8 +379,6 @@ namespace bsa::components
 		{
 			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
 		}
-
-		/// \endcond
 	};
 
 	/// \brief	A byte storage container with compression support.
@@ -427,8 +423,6 @@ namespace bsa::components
 		}
 
 	protected:
-		/// \cond
-
 		void clear() noexcept
 		{
 			_data.emplace<data_view>();
@@ -443,8 +437,6 @@ namespace bsa::components
 			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
 			_decompsz = a_decompressedSize;
 		}
-
-		/// \endcond
 
 	private:
 		std::optional<std::size_t> _decompsz;
@@ -587,7 +579,7 @@ namespace bsa::components
 		[[nodiscard]] auto find(const key_type& a_key) noexcept
 			-> iterator { return _map.find(a_key); }
 
-		/// \copybrief hashmap::find(const key_type&) const noexcept
+		/// \copybrief hashmap::find
 		[[nodiscard]] auto find(const key_type& a_key) const noexcept
 			-> const_iterator { return _map.find(a_key); }
 
@@ -607,11 +599,7 @@ namespace bsa::components
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
 
 	protected:
-		/// \cond
-
 		void clear() noexcept { _map.clear(); }
-
-		/// \endcond
 
 	private:
 		container_type _map;
