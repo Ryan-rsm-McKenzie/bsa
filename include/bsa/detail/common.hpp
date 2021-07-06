@@ -603,7 +603,7 @@ namespace bsa::components
 	protected:
 		/// \cond
 
-		void clear() { _map.clear(); }
+		void clear() noexcept { _map.clear(); }
 
 		/// \endcond
 
