@@ -19,7 +19,7 @@ namespace bsa::tes3
 
 	namespace hashing
 	{
-		/// \brief	The underlying hash object used to uniquely identify archives within TES:3.
+		/// \brief	The underlying hash object used to uniquely identify objects within the archive.
 		struct hash final
 		{
 		public:
@@ -57,8 +57,8 @@ namespace bsa::tes3
 		};
 
 		/// \brief	Produces a hash using the given path.
-		/// \remark	The path is normalized in place. After the function returns, the path contains
-		///		the string that would be stored on disk.
+		/// \remark	The path is normalized in place. After the function returns,
+		///		the path contains the string that would be stored on disk.
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
@@ -78,7 +78,7 @@ namespace bsa::tes3
 		using super::clear;
 	};
 
-	/// \brief	Used to interact with the TES:3 revision of the bsa format.
+	/// \brief	Represents the TES:3 revision of the bsa format.
 	class archive final :
 		public components::hashmap<file>
 	{
@@ -114,7 +114,7 @@ namespace bsa::tes3
 
 		/// \brief	Writes the contents of the archive to disk.
 		///
-		/// \param	a_path	The path to the given archive on the native filesystem.
+		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
 
 	private:

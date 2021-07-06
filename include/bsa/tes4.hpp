@@ -14,24 +14,57 @@
 
 namespace bsa::tes4
 {
+	/// \brief	Archive flags can impact the layout of an archive, or how it is read.
 	enum class archive_flag : std::uint32_t
 	{
 		none = 0u,
 
+		/// \brief	Includes direcotry paths within the archive.
+		/// \remark	archive.exe does not let you write archives without this flag set.
+		/// \remark	This includes only the parent path of all files, and not filenames.
 		directory_strings = 1u << 0u,
+
+		/// \brief	Includes filenames within the archive.
+		/// \remark	archive.exe does not let you write archives without this flag set.
+		/// \remark	This includes only the filename of all files, and not the parent path.
 		file_strings = 1u << 1u,
+
+		/// \brief	Compresses the data within the archive.
+		/// \remark	The v103/v104 format use zlib.
+		/// \remark	The v105 format uses lz4.
 		compressed = 1u << 2u,
+
+		/// \brief	Impacts runtime parsing.
 		retain_directory_names = 1u << 3u,
+
+		/// \brief	Impacts runtime parsing.
 		retain_file_names = 1u << 4u,
+
+		/// \brief	Impacts runtime parsing.
 		retain_file_name_offsets = 1 << 5u,
+
+		/// \brief	Writes the archive in the xbox (big-endian) format.
+		/// \remark	This flag affects the sort order of files on disk.
+		/// \remark	Only the crc hash is actually written in big-endian format.
 		xbox_archive = 1u << 6u,
+
+		/// \brief	Impacts runtime parsing.
 		retain_strings_during_startup = 1u << 7u,
+
+		/// \brief	Writes the full (virtual) path of a file next to the data blob.
+		/// \remark	This flag has a different meaning in the v103 format.
 		embedded_file_names = 1u << 8u,
+
+		/// \brief	Uses the xmem codec from XNA 4.0 to compress the archive.
+		/// \remark	This flag is unsupported by `bsa`.
+		/// \remark	This flag requires \ref archive_flag::compressed to be set as well.
 		xbox_compressed = 1u << 9u
 	};
 
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_flag)
 
+	/// \brief	Specifies file types contained within an archive.
+	/// \remarks	It's not apparent if the game actually uses these flags for anything.
 	enum class archive_type : std::uint16_t
 	{
 		none = 0u,
@@ -49,30 +82,50 @@ namespace bsa::tes4
 
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type)
 
+	/// \brief	The archive version.
+	/// \remark	Each version has an impact on the abi of the TES:4 archive file format.
 	enum class version : std::uint32_t
 	{
-		tes4 = 103,  // The Elder Scrolls IV: Oblivion
-		fo3 = 104,   // Fallout 3
-		tes5 = 104,  // The Elder Scrolls V: Skyrim
-		sse = 105,   // The Elder Scrolls V: Skyrim - Special Edition
+		/// \brief	The Elder Scrolls IV: Oblivion
+		tes4 = 103,
+
+		/// \brief	Fallout 3
+		fo3 = 104,
+
+		/// \brief	The Elder Scrolls V: Skyrim
+		tes5 = 104,
+
+		/// \brief	The Elder Scrolls V: Skyrim - Special Edition
+		sse = 105,
 	};
 
+	/// \cond
 	namespace detail
 	{
 		using namespace bsa::detail;
 	}
+	/// \endcond
 
 	namespace hashing
 	{
 		namespace detail = tes4::detail;
 
+		/// \copybrief bsa::tes3::hashing::hash
 		struct hash final
 		{
 		public:
+			/// \brief	The last character of the path (directory) or stem (file).
 			std::uint8_t last{ 0 };
+
+			/// \brief	The second to last character of the path (directory) or stem (file).
 			std::uint8_t last2{ 0 };
+
+			/// \brief	The length of the path (directory) or stem (file).
 			std::uint8_t length{ 0 };
+
+			/// \brief	The first character of the path (directory) or stem (file).
 			std::uint8_t first{ 0 };
+
 			std::uint32_t crc{ 0 };
 
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
@@ -80,6 +133,7 @@ namespace bsa::tes4
 			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
 				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
 
+			/// \copybrief bsa::tes3::hashing::hash
 			[[nodiscard]] auto numeric() const noexcept
 				-> std::uint64_t
 			{
@@ -105,10 +159,18 @@ namespace bsa::tes4
 				std::endian a_endian) const noexcept;
 		};
 
+		/// \brief	Produces a hash using the given path.
+		/// \remark	The path is normalized in place. After the function returns,
+		///		the path contains the string that would be stored on disk.
 		[[nodiscard]] hash hash_directory(std::string& a_path) noexcept;
+
+		/// \brief	Produces a hash using the given path.
+		/// \remark	The path is normalized in place. After the function returns,
+		///		the path contains the string that would be stored on disk.
 		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
 	}
 
+	/// \brief	Represents a file within the TES:4 virtual filesystem.
 	class file final :
 		public components::compressed_byte_container
 	{
@@ -132,19 +194,68 @@ namespace bsa::tes4
 		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
 
 	public:
+		/// \brief	The key used to indentify files.
 		using key = components::key<hashing::hash, hashing::hash_file>;
-		using super::clear;
 
+#ifdef BSA_DOXYGEN
+		/// \brief	Clears the contents of the file.
+		void clear() noexcept;
+#else
+		using super::clear;
+#endif
+
+		/// \brief	Compresses the file using the given version's compression format.
+		///
+		/// \pre	The file must *not* be compressed.
+		/// \post	The file will be compressed.
+		///
+		/// \param	a_version	The version to compress the file for.
+		/// \return	Returns `true` if compression succeeded, `false` otherwise.
 		bool compress(version a_version) noexcept;
+
+		/// \brief	Returns an upper bound on the storage size required to compress the file.
+		///
+		/// \pre	The file must *not* be compressed.
+		///
+		/// \param	a_version	The version the file would be compressed for.
+		/// \return	Returns the size required to successfully compress the file.
 		[[nodiscard]] auto compress_bound(version a_version) const noexcept -> std::size_t;
+
+		/// \brief	Compresses the file into the given buffer, using the given version's format.
+		///
+		/// \pre	The file must *not* be compressed.
+		/// \pre	`a_out` must be large enough compress the file into.
+		///
+		/// \param	a_version	The version to compress the file for.
+		/// \param	a_out	The buffer to compress the file into.
+		/// \return	The final size of the compressed buffer, or `std::nullopt` if compression failed.
 		[[nodiscard]] auto compress_into(
 			version a_version,
 			std::span<std::byte> a_out) noexcept
 			-> std::optional<std::size_t>;
+
+		/// \brief	Decompresses the file using the given version's compression format.
+		///
+		/// \pre	The file *must* be compressed.
+		/// \post	The file will be decompressed.
+		///
+		/// \param	a_version	The version to decompress the file for.
+		/// \return Returns `true` if decompression succeeded, `false` otherwise.
 		bool decompress(version a_version) noexcept;
+
+		/// \brief	Decompresses the file into the given buffer using the version's
+		///		compression format.
+		///
+		/// \pre	The file *must* be compressed.
+		/// \pre	`a_out` must be large enough to decompress the file into.
+		///
+		/// \param	a_version	The version to decompress the file for.
+		/// \param	a_out	The buffer to decompress the file into.
+		/// \return	Returns `true` if decompression succeeded, `false` otherwise.
 		bool decompress_into(version a_version, std::span<std::byte> a_out) noexcept;
 	};
 
+	/// \brief	Represents a directory within the TES:4 virtual filesystem.
 	class directory final :
 		public components::hashmap<file>
 	{
@@ -153,10 +264,18 @@ namespace bsa::tes4
 		using super = components::hashmap<file>;
 
 	public:
+		/// \brief	The key used to indentify directories.
 		using key = components::key<hashing::hash, hashing::hash_directory>;
+
+#ifdef BSA_DOXYGEN
+		/// \brief	Clears the contents of the directory.
+		void clear() noexcept;
+#else
 		using super::clear;
+#endif
 	};
 
+	/// \brief	Represents the TES:4 revision of the bsa format.
 	class archive final :
 		public components::hashmap<directory, true>
 	{
@@ -164,43 +283,67 @@ namespace bsa::tes4
 		using super = components::hashmap<directory, true>;
 
 	public:
+		/// \brief	Retrieves the current archive flags.
 		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
+		/// \brief	Sets the current archive flags.
 		void archive_flags(archive_flag a_flags) noexcept { _flags = a_flags; }
 
+		/// \brief	Retrieves the current archive types.
 		[[nodiscard]] auto archive_types() const noexcept -> archive_type { return _types; }
+		/// \brief	Sets the current archive types.
 		void archive_types(archive_type a_types) noexcept { _types = a_types; }
 
+		/// \brief	Checks if \ref archive_flag::compressed is set.
 		[[nodiscard]] auto compressed() const noexcept
 			-> bool { return test_flag(archive_flag::compressed); }
+		/// \brief	Checks if \ref archive_flag::directory_strings is set.
 		[[nodiscard]] auto directory_strings() const noexcept
 			-> bool { return test_flag(archive_flag::directory_strings); }
+		/// \brief	Checks if \ref archive_flag::embedded_file_names is set.
 		[[nodiscard]] auto embedded_file_names() const noexcept
 			-> bool { return test_flag(archive_flag::embedded_file_names); }
+		/// \brief	Checks if \ref archive_flag::file_strings is set.
 		[[nodiscard]] auto file_strings() const noexcept
 			-> bool { return test_flag(archive_flag::file_strings); }
+		/// \brief	Checks if \ref archive_flag::retain_directory_names is set.
 		[[nodiscard]] auto retain_directory_names() const noexcept
 			-> bool { return test_flag(archive_flag::retain_directory_names); }
+		/// \brief	Checks if \ref archive_flag::retain_file_name_offsets is set.
 		[[nodiscard]] auto retain_file_name_offsets() const noexcept
 			-> bool { return test_flag(archive_flag::retain_file_name_offsets); }
+		/// \brief	Checks if \ref archive_flag::retain_file_names is set.
 		[[nodiscard]] auto retain_file_names() const noexcept
 			-> bool { return test_flag(archive_flag::retain_file_names); }
+		/// \brief	Checks if \ref archive_flag::retain_strings_during_startup is set.
 		[[nodiscard]] auto retain_strings_during_startup() const noexcept
 			-> bool { return test_flag(archive_flag::retain_strings_during_startup); }
+		/// \brief	Checks if \ref archive_flag::xbox_archive is set.
 		[[nodiscard]] auto xbox_archive() const noexcept
 			-> bool { return test_flag(archive_flag::xbox_archive); }
+		/// \brief	Checks if \ref archive_flag::xbox_compressed is set.
 		[[nodiscard]] auto xbox_compressed() const noexcept
 			-> bool { return test_flag(archive_flag::xbox_compressed); }
 
+		/// \brief	Checks if \ref archive_type::fonts is set.
 		[[nodiscard]] bool fonts() const noexcept { return test_type(archive_type::fonts); }
+		/// \brief	Checks if \ref archive_type::menus is set.
 		[[nodiscard]] bool menus() const noexcept { return test_type(archive_type::menus); }
+		/// \brief	Checks if \ref archive_type::meshes is set.
 		[[nodiscard]] bool meshes() const noexcept { return test_type(archive_type::meshes); }
+		/// \brief	Checks if \ref archive_type::misc is set.
 		[[nodiscard]] bool misc() const noexcept { return test_type(archive_type::misc); }
+		/// \brief	Checks if \ref archive_type::shaders is set.
 		[[nodiscard]] bool shaders() const noexcept { return test_type(archive_type::shaders); }
+		/// \brief	Checks if \ref archive_type::sounds is set.
 		[[nodiscard]] bool sounds() const noexcept { return test_type(archive_type::sounds); }
+		/// \brief	Checks if \ref archive_type::textures is set.
 		[[nodiscard]] bool textures() const noexcept { return test_type(archive_type::textures); }
+		/// \brief	Checks if \ref archive_type::trees is set.
 		[[nodiscard]] bool trees() const noexcept { return test_type(archive_type::trees); }
+		/// \brief	Checks if \ref archive_type::voices is set.
 		[[nodiscard]] bool voices() const noexcept { return test_type(archive_type::voices); }
 
+		/// \brief	Clears the contents, flags, and file types of the archive.
 		void clear() noexcept
 		{
 			super::clear();
@@ -208,8 +351,19 @@ namespace bsa::tes4
 			_types = archive_type::none;
 		}
 
+		/// \copydoc bsa::tes3::archive::read
+		///
+		/// \return	The version of the archive that was read.
 		auto read(std::filesystem::path a_path) -> version;
+
+		/// \copydoc bsa::tes3::archive::verify_offsets
+		///
+		/// \param	a_version	The version format to check for.
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
+
+		/// \copydoc bsa::tes3::archive::write
+		///
+		/// \param	The version format to write the archive in.
 		void write(std::filesystem::path a_path, version a_version) const;
 
 	private:

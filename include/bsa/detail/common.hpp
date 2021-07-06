@@ -462,9 +462,15 @@ namespace bsa::components
 			std::map<typename T::key, T>;
 
 	public:
+#ifdef BSA_DOXYGEN
+		using key_type = typename T::key;
+		using mapped_type = T;
+		using value_type = std::pair<const key_type, mapped_type>;
+#else
 		using key_type = typename container_type::key_type;
 		using mapped_type = typename container_type::mapped_type;
 		using value_type = typename container_type::value_type;
+#endif
 		using key_compare = typename container_type::key_compare;
 		using iterator = typename container_type::iterator;
 		using const_iterator = typename container_type::const_iterator;
