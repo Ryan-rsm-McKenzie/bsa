@@ -77,13 +77,13 @@ jobs:
         run: ctest -C ${{ env.BUILD_TYPE }} -V
 
       - name: Set CI badge values
-        if: ${{ always() }}
-        uses: haya14busa/action-cond@v1.0.0
-        id: badge
-        with:
-          cond: ${{ success() }}
-          if_true: "passing"
-          if_false: "failed"
+        run: echo "::set-env name=BADGE_COLOR::success"
+        run: echo "::set-env name=BADGE_MESSAGE::passing"
+
+      - name: Set CI badge values
+        if: ${{ failure() }}
+        run: echo "::set-env name=BADGE_COLOR::critical"
+        run: echo "::set-env name=BADGE_MESSAGE::failing"
 
       - name: Update CI badge
         if: ${{ always() }}
@@ -92,9 +92,8 @@ jobs:
           auth: ${{ secrets.MAIN_CI_GIST }}
           gistID: 634174b328f6d356cf369bd94b3ecad6
           filename: bsa-main-ci.json
-          color: success
-          isError: ${{ failure() }}
+          color: ${{ env.BADGE_COLOR }}
           label: build
-          message: ${{ steps.badge.outputs.value }}
+          message: ${{ env.BADGE_MESSAGE }}
           namedLogo: github
           style: flat
