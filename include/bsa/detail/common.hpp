@@ -55,7 +55,7 @@
 
 namespace bsa
 {
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	using namespace std::literals;
 #endif
 
@@ -77,7 +77,7 @@ namespace bsa
 	};
 }
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 namespace bsa::detail
 {
 	namespace concepts
@@ -458,7 +458,7 @@ namespace bsa::components
 			std::map<typename T::key, T>;
 
 	public:
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		using key_type = typename T::key;
 		using mapped_type = T;
 		using value_type = std::pair<const key_type, mapped_type>;
@@ -685,7 +685,7 @@ namespace bsa::components
 			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
 
 	private:
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 		friend fo4::archive;
 		friend tes3::archive;
 		friend tes4::archive;

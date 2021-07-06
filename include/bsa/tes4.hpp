@@ -61,7 +61,7 @@ namespace bsa::tes4
 		xbox_compressed = 1u << 9u
 	};
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_flag)
 #endif
 
@@ -82,7 +82,7 @@ namespace bsa::tes4
 		misc = 1u << 8u
 	};
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type)
 #endif
 
@@ -103,7 +103,7 @@ namespace bsa::tes4
 		sse = 105,
 	};
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
@@ -149,7 +149,7 @@ namespace bsa::tes4
 			}
 
 		private:
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 			friend tes4::archive;
 			friend tes4::directory;
 #endif
@@ -201,7 +201,7 @@ namespace bsa::tes4
 		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file>;
 
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		/// \brief	Clears the contents of the file.
 		void clear() noexcept;
 #else
@@ -249,7 +249,7 @@ namespace bsa::tes4
 		/// \brief	The key used to indentify a directory.
 		using key = components::key<hashing::hash, hashing::hash_directory>;
 
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		/// \brief	Clears the contents of the directory.
 		void clear() noexcept;
 #else

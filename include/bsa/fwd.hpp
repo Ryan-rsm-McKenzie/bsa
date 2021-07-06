@@ -4,7 +4,7 @@
 
 namespace bsa
 {
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	namespace detail
 	{
 		class istream_t;
@@ -34,7 +34,7 @@ namespace bsa
 
 	namespace fo4
 	{
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 		namespace detail
 		{
 			class header_t;
@@ -55,7 +55,7 @@ namespace bsa
 
 	namespace tes3
 	{
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 		namespace detail
 		{
 			class header_t;
@@ -73,7 +73,7 @@ namespace bsa
 
 	namespace tes4
 	{
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 		namespace detail
 		{
 			class header_t;

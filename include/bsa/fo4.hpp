@@ -18,7 +18,7 @@
 
 namespace bsa::fo4
 {
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
@@ -68,7 +68,7 @@ namespace bsa::fo4
 			[[nodiscard]] friend auto operator<=>(const hash&, const hash&) noexcept
 				-> std::strong_ordering = default;
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash)
@@ -102,7 +102,7 @@ namespace bsa::fo4
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				mips_t& a_mips)
@@ -193,7 +193,7 @@ namespace bsa::fo4
 				-> detail::ostream_t&;
 		} header;
 
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		using value_type = chunk;
 #else
 		using value_type = container_type::value_type;
@@ -292,7 +292,7 @@ namespace bsa::fo4
 		using super = components::hashmap<file>;
 
 	public:
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		/// \brief	Clears the contents of the archive.
 		void clear() noexcept;
 #else

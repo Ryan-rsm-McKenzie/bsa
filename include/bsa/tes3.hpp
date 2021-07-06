@@ -10,7 +10,7 @@
 
 namespace bsa::tes3
 {
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 	namespace detail
 	{
 		using namespace bsa::detail;
@@ -41,7 +41,7 @@ namespace bsa::tes3
 				};
 			}
 
-#ifndef BSA_DOXYGEN
+#ifndef DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				hash& a_hash)
@@ -84,7 +84,7 @@ namespace bsa::tes3
 		using super = components::hashmap<file>;
 
 	public:
-#ifdef BSA_DOXYGEN
+#ifdef DOXYGEN
 		/// \brief	Clears the contents of the archive.
 		void clear() noexcept;
 #else

@@ -7,7 +7,6 @@ name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
 
 [macros]
-'BSA_DOXYGEN' = 1
 'protected' = 'private'
 
 [sources]
