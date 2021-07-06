@@ -7,7 +7,6 @@ on:
       - '.github/workflows/main_ci.yml'
       - 'cmake/**'
       - 'include/**'
-      - 'scripts/**'
       - 'src/**'
       - 'tests/**'
       - 'CMakeLists.txt'
@@ -31,13 +30,11 @@ jobs:
             cmake-generator: ninja
             cmake-platform: linux
             env-access: '$'
-            setup: bash scripts/setup.sh
             shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
             env-access: '$env:'
-            setup: '' # nothing right now
             shell-extension: bat
 
     steps:
@@ -45,14 +42,18 @@ jobs:
         with:
           submodules: 'true'
 
-      - name: Run setup script
-        run: ${{ matrix.setup }}
-
       - name: Set compiler
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           echo "CC=gcc-10" >> $GITHUB_ENV
           echo "CXX=g++-10" >> $GITHUB_ENV
+
+      - name: Download Ninja
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
+          unzip ninja-linux.zip
+          sudo mv ninja /usr/local/bin
 
       - name: Setup vcpkg
         run: |
