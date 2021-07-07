@@ -17,7 +17,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-archives
+  VCPKG_COMITTISH: bb002cd
 
 jobs:
   build:
@@ -29,13 +29,9 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
-            env-access: '$'
-            shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
-            env-access: '$env:'
-            shell-extension: bat
 
     steps:
       - uses: actions/checkout@v2
@@ -55,20 +51,11 @@ jobs:
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
-      - name: Setup vcpkg
-        run: |
-          mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          cd ${{ matrix.env-access }}VCPKG_INSTALLATION_ROOT
-          ./bootstrap-vcpkg.${{ matrix.shell-extension }}
-          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version
-
-      - name: Cache vcpkg archives
-        uses: actions/cache@v2
-        env:
-          cache-name: vcpkg-cache
+      - uses: friendlyanon/setup-vcpkg@v1
         with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json', 'vcpkg-version') }}
+          comittish: ${{ env.VCPKG_COMITTISH }}
+          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMITTISH }}-${{ hashFiles('**/vcpkg.json') }}
+          cache-restore-keys: ''
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
