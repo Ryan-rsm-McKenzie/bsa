@@ -74,4 +74,16 @@ bsa.write("example.bsa", bsa::tes4::version::sse);
 - [Catch2](https://github.com/catchorg/Catch2)
 - [poxy](https://github.com/marzer/poxy)
 
+\section alternatives Alternatives
+
+- C#
+	- [BSA Browser](https://github.com/AlexxEG/BSA_Browser)
+- C++
+	- [Bethesda Archive Extractor](https://www.nexusmods.com/skyrimspecialedition/mods/974) (no source)
+	- [DDSopt](https://github.com/Ethatron/ddsopt)
+- Pascal
+	- [BSArch](https://github.com/TES5Edit/TES5Edit)
+- Python
+	- [Bethesda Structs](https://bethesda-structs.readthedocs.io/en/latest/index.html)
+
 */
