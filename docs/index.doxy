@@ -104,15 +104,27 @@ bsa.write("example.bsa", bsa::tes4::version::sse);
 
 - C#
 	- [BSA Browser](https://github.com/AlexxEG/BSA_Browser)
+	- [Oblivion Mod Manager](https://www.nexusmods.com/oblivion/mods/2097)
+	- [Wabbajack](https://github.com/wabbajack-tools/wabbajack)
 - C++
 	- [Bethesda Archive Extractor](https://www.nexusmods.com/skyrimspecialedition/mods/974) (no source)
+	- [BSAopt](https://github.com/Ethatron/bsaopt)
+	- [BSAPACK](https://web.archive.org/web/20071010081047/http://www34.brinkster.com:80/ghostwheel/)
 	- [Cathedral Assets Optimizer](https://gitlab.com/G_ka/Cathedral_Assets_Optimizer)
 	- [DDSopt](https://github.com/Ethatron/ddsopt)
+	- [Fallout 4 Tools](https://f4se.silverlock.org/)
+	- [Libbsa](https://github.com/Ortham/libbsa)
 	- [Mod Organizer 2](https://github.com/ModOrganizer2/modorganizer-bsatk)
+- Java
+	- [FO3 Archive Utility](https://www.nexusmods.com/fallout3/mods/34) (no source)
 - Pascal
 	- [BSArch](https://github.com/TES5Edit/TES5Edit)
 - Python
 	- [Bethesda Structs](https://github.com/stephen-bunn/bethesda-structs)
 	- [Wrye Bash](https://github.com/wrye-bash/wrye-bash)
+- Unknown
+	- [BSA Commander](https://www.nexusmods.com/oblivion/mods/3311) (no source)
+	- [BSA Unpacker](https://www.nexusmods.com/skyrim/mods/4804/) (no source)
+	- [TES4BSA](https://web.archive.org/web/20071010081047/http://www34.brinkster.com:80/ghostwheel/) (no source)
 
 */
