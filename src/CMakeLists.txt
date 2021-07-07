@@ -45,6 +45,7 @@ add_library(
 )
 add_library(bsa::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
+include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 set_target_properties(
@@ -107,9 +108,15 @@ configure_file(
 	@ONLY
 )
 
+write_basic_package_version_file(
+	${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}ConfigVersion.cmake
+	COMPATIBILITY SameMajorVersion
+)
+
 install(
 	FILES
 		${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}Config.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}ConfigVersion.cmake
 		${ROOT_DIR}/cmake/FindLZ4.cmake
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
 )
@@ -117,4 +124,9 @@ install(
 install(
 	DIRECTORY ${INCLUDE_DIR}/bsa
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+	FILES ${NATVIS_FILES}
+	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TARGET_NAME}
 )
