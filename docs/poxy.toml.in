@@ -8,7 +8,6 @@ github = 'Ryan-rsm-McKenzie/bsa'
 license = [ 'MIT', 'https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE' ]
 name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
-private_repo = true
 
 [badges]
 'build' = [
