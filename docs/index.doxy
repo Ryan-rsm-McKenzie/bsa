@@ -6,7 +6,26 @@
 
 \section overview Overview
 
-\subsection overview-reading Reading
+\subsection what What is a BSA?
+The Bethesda archive file is a proprietary format used to store game files for the [The Elder Scrolls](https://en.wikipedia.org/wiki/The_Elder_Scrolls) and [Fallout](https://en.wikipedia.org/wiki/Fallout_(series)) series of games beginning with the [The Elder Scrolls III](https://en.wikipedia.org/wiki/The_Elder_Scrolls_III:_Morrowind). This format is essentially a zip file which stores some extra meta information to be used with their internal virtual filesystem. There are many tools that can be used to work with these files, but most are written as user facing applications, without the intention to be used as a _library_. `bsa` intends to provide a low-ish level interface for C++ programmers to work with the format.
+
+\subsection why Why bsa?
+
+\subsubsection why-cxx It's written in contemporary C++
+Nope, it's not written in C#, Pascal, or Python. It's all native, with contemporary C++ features in mind. `bsa` provides interfaces that \ref bsa::components::hashmap "model standard containers", so that programmers intuitively understand how to work with its interface without needing to dive into the documentation.
+
+\subsubsection why-testing It's actively tested.
+The [testsuite](https://github.com/Ryan-rsm-McKenzie/bsa/tree/master/tests) covers a wide range of features, ensuring that `bsa` handles archives accurately, and that bugs never regress.
+
+\subsubsection why-low-overhead It's low overhead
+`bsa` primarily stores no-copy views into file data/strings so that objects are cheap to copy and the resulting memory overhead is low. However, `bsa` can also take ownership of data, as a convenience.
+
+\subsubsection why-low-level It's low level
+`bsa` provides \ref bsa::tes4::file::decompress_into() "low level interfaces" into the underlying data, so that programmers who feel they can "do it better" don't feel burdened by arbitrary restrictions. This does not mean that there aren't high level interfaces, it simply means that `bsa` will step out of your way when appropriate.
+
+\section examples Examples
+
+\subsection examples-reading Reading
 \cpp
 #include <bsa/tes4.hpp>
 #include <cstdio>
@@ -23,7 +42,7 @@ if (file) {
 }
 \ecpp
 
-\subsection overview-writing Writing
+\subsection examples-writing Writing
 \cpp
 #include <bsa/tes4.hpp>
 #include <cstddef>
