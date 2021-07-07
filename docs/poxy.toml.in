@@ -11,7 +11,7 @@ navbar = [ 'classes', 'namespaces' ]
 
 [badges]
 'build' = [
-	'https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Ryan-rsm-McKenzie/634174b328f6d356cf369bd94b3ecad6/raw/bsa-main-ci.json',
+	'https://img.shields.io/github/workflow/status/Ryan-rsm-McKenzie/bsa/Main%20CI?logo=github&style=flat-square',
 	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml'
 ]
 
