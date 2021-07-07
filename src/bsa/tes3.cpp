@@ -68,32 +68,32 @@ namespace bsa::tes3
 		{
 			namespace constants
 			{
-				inline constexpr std::size_t file_entry_size = 0x8;
-				inline constexpr std::size_t hash_size = 0x8;
-				inline constexpr std::size_t header_size = 0xC;
+				constexpr std::size_t file_entry_size = 0x8;
+				constexpr std::size_t hash_size = 0x8;
+				constexpr std::size_t header_size = 0xC;
 			}
 
-			[[nodiscard]] inline auto offsetof_file_entries(const detail::header_t&) noexcept
+			[[nodiscard]] auto offsetof_file_entries(const detail::header_t&) noexcept
 				-> std::size_t { return constants::header_size; }
 
-			[[nodiscard]] inline auto offsetof_name_offsets(const detail::header_t& a_header) noexcept
+			[[nodiscard]] auto offsetof_name_offsets(const detail::header_t& a_header) noexcept
 				-> std::size_t
 			{
 				return offsetof_file_entries(a_header) +
 				       a_header.file_count() * constants::file_entry_size;
 			}
 
-			[[nodiscard]] inline auto offsetof_names(const detail::header_t& a_header) noexcept
+			[[nodiscard]] auto offsetof_names(const detail::header_t& a_header) noexcept
 				-> std::size_t
 			{
 				return offsetof_name_offsets(a_header) +
 				       a_header.file_count() * 4u;
 			}
 
-			[[nodiscard]] inline auto offsetof_hashes(const detail::header_t& a_header) noexcept
+			[[nodiscard]] auto offsetof_hashes(const detail::header_t& a_header) noexcept
 				-> std::size_t { return a_header.hash_offset() + constants::header_size; }
 
-			[[nodiscard]] inline auto offsetof_file_data(const detail::header_t& a_header) noexcept
+			[[nodiscard]] auto offsetof_file_data(const detail::header_t& a_header) noexcept
 				-> std::size_t
 			{
 				return offsetof_hashes(a_header) +

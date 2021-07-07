@@ -20,15 +20,15 @@ namespace bsa::fo4
 		{
 			namespace
 			{
-				inline constexpr auto btdx = make_file_type({ 'B', 'T', 'D', 'X' });
+				constexpr auto btdx = make_file_type({ 'B', 'T', 'D', 'X' });
 
-				inline constexpr std::size_t header_size = 0x18;
+				constexpr std::size_t header_size = 0x18;
 
-				inline constexpr std::size_t chunk_header_size_gnrl = 0x10;
-				inline constexpr std::size_t chunk_header_size_dx10 = 0x18;
+				constexpr std::size_t chunk_header_size_gnrl = 0x10;
+				constexpr std::size_t chunk_header_size_dx10 = 0x18;
 
-				inline constexpr std::size_t chunk_size_gnrl = 0x14;
-				inline constexpr std::size_t chunk_size_dx10 = 0x18;
+				constexpr std::size_t chunk_size_gnrl = 0x14;
+				constexpr std::size_t chunk_size_dx10 = 0x18;
 			}
 		}
 

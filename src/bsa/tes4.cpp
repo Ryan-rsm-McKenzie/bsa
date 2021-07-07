@@ -34,13 +34,13 @@ namespace bsa::tes4
 				constexpr std::size_t header_size = 0x24;
 			}
 
-			inline constexpr auto lz4f_decompress_options = []() {
+			constexpr auto lz4f_decompress_options = []() {
 				::LZ4F_decompressOptions_t options = {};
 				options.stableDst = true;
 				return options;
 			}();
 
-			inline constexpr auto lz4f_preferences = []() noexcept {
+			constexpr auto lz4f_preferences = []() noexcept {
 				::LZ4F_preferences_t pref = LZ4F_INIT_PREFERENCES;
 				pref.compressionLevel = LZ4HC_CLEVEL_DEFAULT;
 				pref.autoFlush = 1;
@@ -598,7 +598,7 @@ namespace bsa::tes4
 		return static_cast<version>(header.archive_version());
 	}
 
-	[[nodiscard]] bool archive::verify_offsets(version a_version) const noexcept
+	bool archive::verify_offsets(version a_version) const noexcept
 	{
 		const auto header = this->make_header(a_version);
 		auto offset = detail::offsetof_file_data(header);
