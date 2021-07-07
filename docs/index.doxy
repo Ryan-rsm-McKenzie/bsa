@@ -29,16 +29,20 @@ The [testsuite](https://github.com/Ryan-rsm-McKenzie/bsa/tree/master/tests) cove
 \cpp
 #include <bsa/tes4.hpp>
 #include <cstdio>
+#include <filesystem>
 
-std::filesystem::path oblivion{ "path/to/oblivion" };
-bsa::tes4::archive bsa;
-bsa.read(oblivion / "Data/Oblivion - Voices2.bsa");
-const auto file = bsa["sound/voice/oblivion.esm/imperial/m"]["testtoddquest_testtoddhappy_00027fa2_1.mp3"];
-if (file) {
-	const auto bytes = file->as_bytes();
-	const auto out = std::fopen("happy.mp3", "wb");
-	std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
-	std::fclose(out);
+int main()
+{
+	std::filesystem::path oblivion{ R"(E:\Games\SteamLibrary\steamapps\common\Oblivion)" };
+	bsa::tes4::archive bsa;
+	bsa.read(oblivion / "Data/Oblivion - Voices2.bsa");
+	const auto file = bsa["sound/voice/oblivion.esm/imperial/m"]["testtoddquest_testtoddhappy_00027fa2_1.mp3"];
+	if (file) {
+		const auto bytes = file->as_bytes();
+		const auto out = std::fopen("happy.mp3", "wb");
+		std::fwrite(bytes.data(), 1, bytes.size_bytes(), out);
+		std::fclose(out);
+	}
 }
 \ecpp
 
@@ -48,19 +52,22 @@ if (file) {
 #include <cstddef>
 #include <utility>
 
-const char payload[] = { "Hello world!\n" };
-bsa::tes4::file f;
-f.set_data({ reinterpret_cast<const std::byte*>(payload), sizeof(payload) - 1 });
+int main()
+{
+	const char payload[] = { "Hello world!\n" };
+	bsa::tes4::file f;
+	f.set_data({ reinterpret_cast<const std::byte*>(payload), sizeof(payload) - 1 });
 
-bsa::tes4::directory d;
-d.insert("hello.txt", std::move(f));
+	bsa::tes4::directory d;
+	d.insert("hello.txt", std::move(f));
 
-bsa::tes4::archive bsa;
-bsa.insert("misc", std::move(d));
-bsa.archive_flags(bsa::tes4::archive_flag::file_strings | bsa::tes4::archive_flag::directory_strings);
-bsa.archive_types(bsa::tes4::archive_type::misc);
+	bsa::tes4::archive archive;
+	archive.insert("misc", std::move(d));
+	archive.archive_flags(bsa::tes4::archive_flag::file_strings | bsa::tes4::archive_flag::directory_strings);
+	archive.archive_types(bsa::tes4::archive_type::misc);
 
-bsa.write("example.bsa", bsa::tes4::version::sse);
+	archive.write("example.bsa", bsa::tes4::version::sse);
+}
 \ecpp
 
 \section integration Integration
