@@ -33,7 +33,7 @@ The [testsuite](https://github.com/Ryan-rsm-McKenzie/bsa/tree/master/tests) cove
 
 int main()
 {
-	std::filesystem::path oblivion{ R"(E:\Games\SteamLibrary\steamapps\common\Oblivion)" };
+	std::filesystem::path oblivion{ "path/to/oblivion" };
 	bsa::tes4::archive bsa;
 	bsa.read(oblivion / "Data/Oblivion - Voices2.bsa");
 	const auto file = bsa["sound/voice/oblivion.esm/imperial/m"]["testtoddquest_testtoddhappy_00027fa2_1.mp3"];
