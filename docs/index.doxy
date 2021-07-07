@@ -14,7 +14,7 @@ The Bethesda archive file is a proprietary format used to store game files for t
 \subsubsection why-cxx It's written in contemporary C++
 Nope, it's not written in C#, Pascal, or Python. It's all native, with contemporary C++ features in mind. `bsa` provides interfaces that \ref bsa::components::hashmap "model standard containers", so that programmers intuitively understand how to work with its interface without needing to dive into the documentation.
 
-\subsubsection why-testing It's actively tested.
+\subsubsection why-testing It's actively tested
 The [testsuite](https://github.com/Ryan-rsm-McKenzie/bsa/tree/master/tests) covers a wide range of features, ensuring that `bsa` handles archives accurately, and that bugs never regress.
 
 \subsubsection why-low-overhead It's low overhead
