@@ -106,10 +106,13 @@ bsa.write("example.bsa", bsa::tes4::version::sse);
 	- [BSA Browser](https://github.com/AlexxEG/BSA_Browser)
 - C++
 	- [Bethesda Archive Extractor](https://www.nexusmods.com/skyrimspecialedition/mods/974) (no source)
+	- [Cathedral Assets Optimizer](https://gitlab.com/G_ka/Cathedral_Assets_Optimizer)
 	- [DDSopt](https://github.com/Ethatron/ddsopt)
+	- [Mod Organizer 2](https://github.com/ModOrganizer2/modorganizer-bsatk)
 - Pascal
 	- [BSArch](https://github.com/TES5Edit/TES5Edit)
 - Python
-	- [Bethesda Structs](https://bethesda-structs.readthedocs.io/en/latest/index.html)
+	- [Bethesda Structs](https://github.com/stephen-bunn/bethesda-structs)
+	- [Wrye Bash](https://github.com/wrye-bash/wrye-bash)
 
 */
