@@ -53,7 +53,7 @@ jobs:
 
       - uses: friendlyanon/setup-vcpkg@v1
         with:
-          comittish: ${{ env.VCPKG_COMITTISH }}
+          committish: ${{ env.VCPKG_COMITTISH }}
           cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMITTISH }}-${{ hashFiles('**/vcpkg.json') }}
           cache-restore-keys: ''
 
