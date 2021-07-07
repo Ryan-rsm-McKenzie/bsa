@@ -63,6 +63,13 @@ bsa.archive_types(bsa::tes4::archive_type::misc);
 bsa.write("example.bsa", bsa::tes4::version::sse);
 \ecpp
 
+\section integration Integration
+
+`bsa` uses [CMake](https://cmake.org/) as its primary build system. Assuming that `bsa` and its dependencies have been installed to a place where CMake can find it, then using it in your project is as simple as:
+
+	find_package(bsa REQUIRED CONFIG)
+	target_link_libraries(${PROJECT_NAME} PUBLIC bsa::bsa)
+
 \section important-notes Important Notes
 
 - `bsa` uses copy-on-write semantics. Under the hood, it memory maps input files and stores no-copy views into that data, so that the resulting memory profile is very low. As a consequence, this means that archives you wish to read from must be stored on disk. `bsa` can not read from arbitrary input streams.
