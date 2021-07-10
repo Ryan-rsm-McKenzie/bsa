@@ -20,7 +20,7 @@ namespace bsa::fo4
 		{
 			namespace
 			{
-				constexpr auto btdx = make_file_type({ 'B', 'T', 'D', 'X' });
+				constexpr auto btdx = make_four_cc("BTDX"sv);
 
 				constexpr std::size_t header_size = 0x18;
 

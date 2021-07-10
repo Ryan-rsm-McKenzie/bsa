@@ -260,16 +260,6 @@ namespace bsa::tes4
 				}
 				return crc;
 			}
-
-			[[nodiscard]] constexpr auto make_file_extension(std::string_view a_extension) noexcept
-				-> std::uint32_t
-			{
-				std::uint32_t ext = 0;
-				for (std::size_t i = 0; i < std::min<std::size_t>(a_extension.size(), 4u); ++i) {
-					ext |= std::uint32_t{ static_cast<unsigned char>(a_extension[i]) } << i * 8;
-				}
-				return ext;
-			}
 		}
 
 		void hash::read(
@@ -330,12 +320,12 @@ namespace bsa::tes4
 		hash hash_file(std::string& a_path) noexcept
 		{
 			constexpr std::array lut{
-				make_file_extension(""sv),
-				make_file_extension(".nif"sv),
-				make_file_extension(".kf"sv),
-				make_file_extension(".dds"sv),
-				make_file_extension(".wav"sv),
-				make_file_extension(".adp"sv),
+				make_four_cc(""sv),
+				make_four_cc(".nif"sv),
+				make_four_cc(".kf"sv),
+				make_four_cc(".dds"sv),
+				make_four_cc(".wav"sv),
+				make_four_cc(".adp"sv),
 			};
 
 			detail::normalize_path(a_path);
@@ -374,7 +364,7 @@ namespace bsa::tes4
 				const auto it = std::find(
 					lut.begin(),
 					lut.end(),
-					make_file_extension(extension));
+					make_four_cc(extension));
 				if (it != lut.end()) {
 					const auto i = static_cast<std::uint8_t>(it - lut.begin());
 					h.first += 32u * (i & 0xFCu);

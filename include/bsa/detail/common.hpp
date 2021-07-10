@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <compare>
 #include <concepts>
@@ -75,6 +76,19 @@ namespace bsa
 	private:
 		const char* _what{ nullptr };
 	};
+
+	/// \brief	Converts, at most, the first 4 characters of the given string into a 4 byte integer.
+	[[nodiscard]] constexpr auto make_four_cc(
+		std::string_view a_cc) noexcept
+		-> std::uint32_t
+	{
+		std::uint32_t result = 0;
+		for (std::size_t i = 0; i < std::min<std::size_t>(a_cc.size(), 4); ++i) {
+			result |= std::uint32_t{ static_cast<unsigned char>(a_cc[i]) }
+			          << i * 8u;
+		}
+		return result;
+	}
 }
 
 #ifndef DOXYGEN

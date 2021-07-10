@@ -163,10 +163,10 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 		{
 			consteval info_t(
 				std::uint32_t a_file,
-				std::array<char, 4> a_extension,
+				std::string_view a_extension,
 				std::uint32_t a_directory,
 				std::string_view a_path) noexcept :
-				hash{ a_file, bsa::fo4::detail::make_file_type(a_extension), a_directory },
+				hash{ a_file, bsa::make_four_cc(a_extension), a_directory },
 				path(a_path)
 			{}
 
@@ -175,12 +175,12 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 		};
 
 		constexpr std::array index{
-			info_t{ 0x35B94567, { 'p', 'n', 'g', '\0' }, 0x5FE2DC26, "Background/background_tilemap.png"sv },
-			info_t{ 0x53D5F897, { 'p', 'n', 'g', '\0' }, 0xD9A32978, "Characters/character_0003.png"sv },
-			info_t{ 0x36F72750, { 't', 'x', 't', '\0' }, 0x60648919, "Construct 3/Readme.txt"sv },
-			info_t{ 0xCA042B67, { 't', 'x', 't', '\0' }, 0x29246A47, "Share/License.txt"sv },
-			info_t{ 0xDA3773A6, { 'p', 'n', 'g', '\0' }, 0x0B0A447E, "Tilemap/tiles.png"sv },
-			info_t{ 0x785183FF, { 'p', 'n', 'g', '\0' }, 0xDA3773A6, "Tiles/tile_0003.png"sv },
+			info_t{ 0x35B94567, "png"sv, 0x5FE2DC26, "Background/background_tilemap.png"sv },
+			info_t{ 0x53D5F897, "png"sv, 0xD9A32978, "Characters/character_0003.png"sv },
+			info_t{ 0x36F72750, "txt"sv, 0x60648919, "Construct 3/Readme.txt"sv },
+			info_t{ 0xCA042B67, "txt"sv, 0x29246A47, "Share/License.txt"sv },
+			info_t{ 0xDA3773A6, "png"sv, 0x0B0A447E, "Tilemap/tiles.png"sv },
+			info_t{ 0x785183FF, "png"sv, 0xDA3773A6, "Tiles/tile_0003.png"sv },
 		};
 
 		std::vector<boost::iostreams::mapped_file_source> mmapped;

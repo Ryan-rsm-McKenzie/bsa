@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <cassert>
 #include <compare>
 #include <cstddef>
@@ -23,22 +22,10 @@ namespace bsa::fo4
 	{
 		using namespace bsa::detail;
 
-		[[nodiscard]] consteval auto make_file_type(
-			std::array<char, 4> a_type) noexcept
-			-> std::uint32_t
-		{
-			std::uint32_t result = 0;
-			for (std::size_t i = 0; i < a_type.size(); ++i) {
-				result |= std::uint32_t{ static_cast<unsigned char>(a_type[i]) }
-				          << i * 8u;
-			}
-			return result;
-		}
-
 		namespace constants
 		{
-			inline constexpr auto gnrl = detail::make_file_type({ 'G', 'N', 'R', 'L' });
-			inline constexpr auto dx10 = detail::make_file_type({ 'D', 'X', '1', '0' });
+			inline constexpr auto gnrl = make_four_cc("GNRL"sv);
+			inline constexpr auto dx10 = make_four_cc("DX10"sv);
 		}
 	}
 #endif
