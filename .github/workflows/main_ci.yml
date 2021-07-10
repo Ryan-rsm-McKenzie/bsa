@@ -36,6 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          path: bsa
           submodules: 'true'
 
       - name: Set compiler
@@ -54,15 +55,15 @@ jobs:
       - uses: friendlyanon/setup-vcpkg@v1
         with:
           committish: ${{ env.VCPKG_COMITTISH }}
-          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMITTISH }}-${{ hashFiles('**/vcpkg.json') }}
+          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
           cache-restore-keys: ''
 
       - name: Configure CMake
-        run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
+        run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
 
       - name: Build
-        run: cmake --build ${{ github.workspace }}/build
+        run: cmake --build ${{ github.workspace }}/bsa/build
 
       - name: Test
-        working-directory: ${{ github.workspace }}/build
+        working-directory: ${{ github.workspace }}/bsa/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
