@@ -17,7 +17,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMITTISH: bb002cd
+  VCPKG_COMMITTISH: 1559315ea69718224345930cbf435e9a24311f2c
 
 jobs:
   build:
@@ -54,8 +54,8 @@ jobs:
 
       - uses: friendlyanon/setup-vcpkg@v1
         with:
-          committish: ${{ env.VCPKG_COMITTISH }}
-          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
+          committish: ${{ env.VCPKG_COMMITTISH }}
+          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
           cache-restore-keys: ''
 
       - name: Configure CMake
