@@ -18,6 +18,7 @@ on:
 env:
   BUILD_TYPE: Debug
   VCPKG_COMMITTISH: 1559315ea69718224345930cbf435e9a24311f2c
+  VCPKG_ROOT: vcpkg
 
 jobs:
   build:
@@ -29,9 +30,11 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
+            shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
+            shell-extension: bat
 
     steps:
       - uses: actions/checkout@v2
@@ -52,11 +55,25 @@ jobs:
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
-      - uses: friendlyanon/setup-vcpkg@v1
+      - name: Cache vcpkg
+        uses: actions/cache@v2
+        env:
+          cache-name: vcpkg-cache
         with:
-          committish: ${{ env.VCPKG_COMMITTISH }}
-          cache-key: vcpkg-${{ matrix.os }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
-          cache-restore-keys: ''
+          path: ${{ env.VCPKG_ROOT }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
+
+      - name: Clone vcpkg
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.VCPKG_COMMITTISH }}
+          path: ${{ env.VCPKG_ROOT }}
+          repository: microsoft/vcpkg
+
+      - name: Setup vcpkg
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
