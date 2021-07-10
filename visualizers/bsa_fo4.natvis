@@ -2,11 +2,11 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
 	<Type Name="bsa::fo4::hashing::hash">
-		<DisplayString>{ file,X } { ext,X } { dir,X }</DisplayString>
+		<DisplayString>{ file,X } { extension,X } { directory,X }</DisplayString>
 		<Expand>
 			<Item Name="[file]">file,X</Item>
-			<Item Name="[extension]">ext,X</Item>
-			<Item Name="[directory]">dir,X</Item>
+			<Item Name="[extension]">extension,X</Item>
+			<Item Name="[directory]">directory,X</Item>
 		</Expand>
 	</Type>
 
@@ -19,13 +19,14 @@
 	<Type Name="bsa::fo4::file">
 		<Expand>
 			<Item Name="[header]">header</Item>
+			<Item Name="[chunks]">_chunks</Item>
 		</Expand>
 	</Type>
 
 	<Type Name="bsa::fo4::archive">
 		<DisplayString>fo4 archive</DisplayString>
 		<Expand>
-			<ExpandedItem>(bsa::detail::components::hashmap&lt;bsa::fo4::file,0&gt;*)this,nd</ExpandedItem>
+			<ExpandedItem>(bsa::components::hashmap&lt;bsa::fo4::file,0&gt;*)this,nd</ExpandedItem>
 		</Expand>
 	</Type>
 

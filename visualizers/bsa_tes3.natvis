@@ -16,7 +16,7 @@
 	<Type Name="bsa::tes3::archive">
 		<DisplayString>tes3 archive</DisplayString>
 		<Expand>
-			<ExpandedItem>(bsa::detail::components::hashmap&lt;bsa::tes3::file,0&gt;*)this,nd</ExpandedItem>
+			<ExpandedItem>(bsa::components::hashmap&lt;bsa::tes3::file,0&gt;*)this,nd</ExpandedItem>
 		</Expand>
 	</Type>
 
