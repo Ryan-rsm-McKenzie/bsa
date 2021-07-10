@@ -154,6 +154,50 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 		REQUIRE(ba2.size() == 0);
 	}
 
+	SECTION("we can read/write texture archives")
+	{
+		const std::filesystem::path root{ "fo4_dds_test"sv };
+		const std::filesystem::path inPath = root / "in.ba2"sv;
+		const std::filesystem::path outPath = root / "out.ba2"sv;
+
+		{
+			bsa::fo4::archive ba2;
+			REQUIRE(ba2.read(inPath) == bsa::fo4::format::directx);
+			REQUIRE(ba2.size() == 1);
+
+			const auto file = ba2["Fence006_1K_Roughness.dds"sv];
+			REQUIRE(file);
+			REQUIRE(file->size() == 3);
+			REQUIRE(file->header.height == 1024);
+			REQUIRE(file->header.width == 1024);
+			REQUIRE(file->header.mip_count == 11);
+			REQUIRE(file->header.format == 98);
+			REQUIRE(file->header.flags == 0);
+			REQUIRE(file->header.tile_mode == 8);
+
+			REQUIRE((*file)[0].size() == 0x100'000);
+			REQUIRE((*file)[0].mips.first == 0);
+			REQUIRE((*file)[0].mips.last == 0);
+
+			REQUIRE((*file)[1].size() == 0x40'000);
+			REQUIRE((*file)[1].mips.first == 1);
+			REQUIRE((*file)[1].mips.last == 1);
+
+			REQUIRE((*file)[2].size() == 0x15'570);
+			REQUIRE((*file)[2].mips.first == 2);
+			REQUIRE((*file)[2].mips.last == 10);
+
+			ba2.write(outPath, bsa::fo4::format::directx);
+		}
+
+		const auto in = map_file(inPath);
+		const auto out = map_file(outPath);
+		REQUIRE(in.is_open());
+		REQUIRE(out.is_open());
+		REQUIRE(in.size() == out.size());
+		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+	}
+
 	SECTION("we can write archives")
 	{
 		const std::filesystem::path root{ "fo4_write_test"sv };
