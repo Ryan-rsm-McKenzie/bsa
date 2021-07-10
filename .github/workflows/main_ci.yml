@@ -18,7 +18,7 @@ on:
 env:
   BUILD_TYPE: Debug
   VCPKG_COMMITTISH: 1559315ea69718224345930cbf435e9a24311f2c
-  VCPKG_ROOT: vcpkg
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
   build:
@@ -60,7 +60,7 @@ jobs:
         env:
           cache-name: vcpkg-cache
         with:
-          path: ${{ env.VCPKG_ROOT }}
+          path: vcpkg
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
 
       - name: Clone vcpkg
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ env.VCPKG_COMMITTISH }}
-          path: ${{ env.VCPKG_ROOT }}
+          path: vcpkg
           repository: microsoft/vcpkg
 
       - name: Setup vcpkg
