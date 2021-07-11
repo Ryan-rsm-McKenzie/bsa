@@ -109,41 +109,44 @@ namespace bsa::fo4
 
 		/// \brief	Compresses the file.
 		///
-		/// \pre	The file must *not* be compressed.
-		/// \post	The file will be compressed.
+		/// \pre	The file must *not* be \ref compressed() "compressed".
+		/// \post	The file will be \ref compressed() "compressed".
 		///
 		/// \return	Returns `true` if compression succeeded, `false` otherwise.
 		bool compress() noexcept;
 
 		/// \brief	Returns an upper bound on the storage size required to compress the file.
 		///
-		/// \pre	The file must *not* be compressed.
+		/// \pre	The file must *not* be \ref compressed() "compressed".
 		///
 		/// \return	Returns the size required to successfully compress the file.
 		[[nodiscard]] auto compress_bound() const noexcept -> std::size_t;
 
 		/// \brief	Compresses the file into the given buffer.
 		///
-		/// \pre	The file must *not* be compressed.
-		/// \pre	`a_out` must be large enough compress the file into.
+		/// \pre	The file must *not* be \ref compressed() "compressed".
+		/// \pre	`a_out` must be \ref compress_bound() "large enough" to compress the
+		/// 	file into.
 		///
 		/// \param	a_out	The buffer to compress the file into.
-		/// \return	The final size of the compressed buffer, or `std::nullopt` if compression failed.
+		/// \return	The final size of the compressed buffer, or `std::nullopt` if
+		/// 	compression failed.
 		[[nodiscard]] auto compress_into(std::span<std::byte> a_out) noexcept
 			-> std::optional<std::size_t>;
 
 		/// \brief	Decompresses the file.
 		///
-		/// \pre	The file *must* be compressed.
-		/// \post	The file will be decompressed.
+		/// \pre	The file *must* be \ref compressed() "compressed".
+		/// \post	The file will be \ref compressed() "decompressed".
 		///
 		/// \return Returns `true` if decompression succeeded, `false` otherwise.
 		bool decompress() noexcept;
 
 		/// \brief	Decompresses the file into the given buffer.
 		///
-		/// \pre	The file *must* be compressed.
-		/// \pre	`a_out` must be large enough to decompress the file into.
+		/// \pre	The file *must* be \ref compressed() "compressed".
+		/// \pre	`a_out` must be \ref decompressed_size() "large enough" to
+		/// 	decompress the file into.
 		///
 		/// \param	a_out	The buffer to decompress the file into.
 		/// \return	Returns `true` if decompression succeeded, `false` otherwise.
