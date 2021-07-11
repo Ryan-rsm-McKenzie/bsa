@@ -26,33 +26,35 @@
 
 #include "bsa/fwd.hpp"
 
-#define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
-	[[nodiscard]] constexpr a_type operator a_op(a_type a_lhs, a_type a_rhs) noexcept \
-	{                                                                                 \
-		return static_cast<a_type>(                                                   \
-			static_cast<std::underlying_type_t<a_type>>(a_lhs)                        \
-				a_op static_cast<std::underlying_type_t<a_type>>(a_rhs));             \
-	}                                                                                 \
-                                                                                      \
-	constexpr a_type& operator a_op##=(a_type& a_lhs, a_type a_rhs) noexcept          \
-	{                                                                                 \
-		return a_lhs = a_lhs a_op a_rhs;                                              \
-	}
+#ifndef DOXYGEN
+#	define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
+		[[nodiscard]] constexpr a_type operator a_op(a_type a_lhs, a_type a_rhs) noexcept \
+		{                                                                                 \
+			return static_cast<a_type>(                                                   \
+				static_cast<std::underlying_type_t<a_type>>(a_lhs)                        \
+					a_op static_cast<std::underlying_type_t<a_type>>(a_rhs));             \
+		}                                                                                 \
+                                                                                          \
+		constexpr a_type& operator a_op##=(a_type& a_lhs, a_type a_rhs) noexcept          \
+		{                                                                                 \
+			return a_lhs = a_lhs a_op a_rhs;                                              \
+		}
 
-#define BSA_MAKE_ALL_ENUM_OPERATORS(a_type)                                  \
-	static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum"); \
-                                                                             \
-	[[nodiscard]] constexpr a_type operator~(a_type a_val) noexcept          \
-	{                                                                        \
-		return static_cast<a_type>(                                          \
-			~static_cast<std::underlying_type_t<a_type>>(a_val));            \
-	}                                                                        \
-                                                                             \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                   \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                   \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                   \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                  \
-	BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
+#	define BSA_MAKE_ALL_ENUM_OPERATORS(a_type)                                  \
+		static_assert(std::is_enum_v<a_type>, "\'" #a_type "\' is not an enum"); \
+                                                                                 \
+		[[nodiscard]] constexpr a_type operator~(a_type a_val) noexcept          \
+		{                                                                        \
+			return static_cast<a_type>(                                          \
+				~static_cast<std::underlying_type_t<a_type>>(a_val));            \
+		}                                                                        \
+                                                                                 \
+		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, ^)                                   \
+		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, &)                                   \
+		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                   \
+		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                  \
+		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
+#endif
 
 namespace bsa
 {
