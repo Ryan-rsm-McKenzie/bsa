@@ -1,4 +1,4 @@
-#include "bsa/detail/common.hpp"
+#include "utility.hpp"
 
 #include <cstdint>
 #include <cstdio>
@@ -10,10 +10,9 @@
 #include <type_traits>
 
 #include <boost/nowide/cstdio.hpp>
-
-#include "utility.hpp"
-
 #include <catch2/catch.hpp>
+
+#include "bsa/detail/common.hpp"
 
 using namespace std::literals;
 
