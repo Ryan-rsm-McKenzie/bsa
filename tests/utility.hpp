@@ -2,6 +2,7 @@
 
 #include <boost/predef.h>
 #if BOOST_OS_WINDOWS
+#	define NOGDI
 #	include <Windows.h>  // ensure windows.h compatibility
 #endif
 
