@@ -1,4 +1,4 @@
-#include "bsa/tes3.hpp"
+#include "utility.hpp"
 
 #include <array>
 #include <cstring>
@@ -10,10 +10,9 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/regex.hpp>
-
-#include "utility.hpp"
-
 #include <catch2/catch.hpp>
+
+#include "bsa/tes3.hpp"
 
 using namespace std::literals;
 

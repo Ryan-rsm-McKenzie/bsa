@@ -1,4 +1,4 @@
-#include "bsa/tes4.hpp"
+#include "utility.hpp"
 
 #include <array>
 #include <cstring>
@@ -15,10 +15,9 @@
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/nowide/cstdio.hpp>
 #include <boost/regex.hpp>
-
-#include "utility.hpp"
-
 #include <catch2/catch.hpp>
+
+#include "bsa/tes4.hpp"
 
 using namespace std::literals;
 
@@ -390,12 +389,12 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				it->second.insert(a_hash, std::move(f));
 			};
 
-		constexpr auto largesz = std::numeric_limits<std::int32_t>::max();
+		constexpr auto largesz = (std::numeric_limits<std::int32_t>::max)();
 		const auto plarge = std::make_unique<std::byte[]>(largesz);
 		const std::span large{ plarge.get(), largesz };
 
-		const std::array<std::byte, 1u << 4> smallbuf{};
-		const std::span small{ smallbuf.data(), smallbuf.size() };
+		const std::array<std::byte, 1u << 4> littlebuf{};
+		const std::span little{ littlebuf.data(), littlebuf.size() };
 
 		const auto verify = [&]() {
 			return bsa.verify_offsets(bsa::tes4::version::tes4);
@@ -403,7 +402,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 		REQUIRE(verify());
 
-		add({ 0 }, small);
+		add({ 0 }, little);
 		REQUIRE(verify());
 
 		add({ 1 }, large);
@@ -413,7 +412,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 		add({ 0 }, large);
 		REQUIRE(verify());
 
-		add({ 1 }, small);
+		add({ 1 }, little);
 		REQUIRE(!verify());
 	}
 

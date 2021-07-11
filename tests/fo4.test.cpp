@@ -1,4 +1,4 @@
-#include "bsa/fo4.hpp"
+#include "utility.hpp"
 
 #include <array>
 #include <cstddef>
@@ -9,10 +9,9 @@
 #include <string_view>
 
 #include <boost/regex.hpp>
-
-#include "utility.hpp"
-
 #include <catch2/catch.hpp>
+
+#include "bsa/fo4.hpp"
 
 using namespace std::literals;
 

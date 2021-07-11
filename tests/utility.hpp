@@ -1,5 +1,10 @@
 #pragma once
 
+#include <boost/predef.h>
+#if BOOST_OS_WINDOWS
+#	include <Windows.h>  // ensure windows.h compatibility
+#endif
+
 #include <cctype>
 #include <filesystem>
 #include <string>
