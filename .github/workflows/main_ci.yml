@@ -17,7 +17,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: b361c2eefa3966cb7cec45275aff32e90430aaa6
+  VCPKG_COMMITTISH: 7d169b467c06b92bc893a680173fc774cf2b17fd
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
