@@ -17,6 +17,7 @@ if(POXY_PATH)
 		COMMAND
 			${POXY_PATH}
 			"${CMAKE_CURRENT_BINARY_DIR}/poxy.toml"
+			"--mcss" "${ROOT_DIR}/external/m.css"
 		VERBATIM
 		SOURCES
 			${DOCS_DIR}/poxy.toml.in
