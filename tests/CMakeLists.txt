@@ -50,7 +50,6 @@ find_package(Boost
 	REQUIRED
 	COMPONENTS
 		iostreams
-		nowide
 		regex
 )
 
@@ -58,7 +57,6 @@ target_link_libraries(
 	tests
 	PRIVATE
 		Boost::iostreams
-		Boost::nowide
 		Boost::regex
 		bsa::bsa
 		bsa::common

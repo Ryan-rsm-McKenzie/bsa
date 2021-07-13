@@ -5,7 +5,6 @@
     "boost-container",
     "boost-filesystem",
     "boost-iostreams",
-    "boost-nowide",
     "boost-predef",
     "lz4",
     "zlib"

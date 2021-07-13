@@ -80,7 +80,6 @@ find_package(Boost
 		container
 		filesystem
 		iostreams
-		nowide
 )
 find_package(LZ4 MODULE REQUIRED)
 find_package(ZLIB MODULE REQUIRED)
@@ -89,7 +88,6 @@ target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
 		Boost::filesystem
-		Boost::nowide
 		LZ4::LZ4
 		ZLIB::ZLIB
 	PUBLIC

@@ -11,7 +11,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/nowide/cstdio.hpp>
 #include <catch2/catch.hpp>
 
 #include "bsa/detail/common.hpp"
@@ -30,9 +29,7 @@ namespace
 
 		std::filesystem::create_directories(a_path.parent_path());
 		auto result = std::unique_ptr<std::FILE, decltype(close)>{
-			boost::nowide::fopen(
-				reinterpret_cast<const char*>(a_path.u8string().c_str()),
-				a_mode),
+			bsa::detail::unicode::fopen(a_path, a_mode),
 			close
 		};
 		REQUIRE(result);
@@ -98,6 +95,27 @@ TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 	{
 		test(std::in_place_type<std::uint64_t>, 0x0807060504030201, 0x0102030405060708);
 	}
+}
+
+TEST_CASE("bsa::detail::unicode", "[bsa.unicode]")
+{
+	const std::filesystem::path root{ "common_unicode_test"sv };
+	const std::filesystem::path path = root / u8"\u1E9E"sv;
+	const char payload[] = "hello world!\n";
+
+	std::filesystem::create_directory(root);
+
+	auto f = bsa::detail::unicode::fopen(path, "wb");
+	REQUIRE(f != nullptr);
+	REQUIRE(std::fwrite(payload, 1, sizeof(payload) - 1, f) == sizeof(payload) - 1);
+	REQUIRE(std::fclose(f) == 0);
+
+	f = bsa::detail::unicode::fopen(path, "rb");
+	REQUIRE(f != nullptr);
+	std::array<char, sizeof(payload) - 1> buf{};
+	REQUIRE(std::fread(buf.data(), 1, buf.size(), f) == buf.size());
+	REQUIRE(std::memcmp(payload, buf.data(), buf.size()) == 0);
+	REQUIRE(std::fclose(f) == 0);
 }
 
 TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")

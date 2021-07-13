@@ -95,7 +95,6 @@ int main()
 	- Container
 	- Filesystem
 	- Iostreams
-	- Nowide
 	- Predef
 - [LZ4](https://github.com/lz4/lz4)
 - [zlib](https://github.com/madler/zlib)

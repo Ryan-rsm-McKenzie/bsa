@@ -13,7 +13,6 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
-#include <boost/nowide/cstdio.hpp>
 #include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 

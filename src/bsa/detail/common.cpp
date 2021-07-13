@@ -1,16 +1,17 @@
 #include "bsa/detail/common.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cerrno>
 #include <cstddef>
+#include <cstring>
 #include <exception>
 #include <limits>
 #include <string>
 #include <system_error>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/nowide/cstdio.hpp>
 
 namespace bsa::detail
 {
@@ -35,6 +36,33 @@ namespace bsa::detail
 			}();
 
 			return lut[static_cast<unsigned char>(a_ch)];
+		}
+	}
+
+	namespace unicode
+	{
+		auto fopen(std::filesystem::path a_path, const char* a_mode)
+			-> std::FILE*
+		{
+#if BOOST_OS_WINDOWS
+			std::FILE* result = nullptr;
+
+			// a_mode is basic ASCII which means it's valid utf-16 with a simple cast
+			std::wstring mode;
+			mode.resize(std::strlen(a_mode));
+			std::copy(a_mode, a_mode + mode.size(), mode.begin());
+
+			(void)::_wfopen_s(
+				&result,
+				a_path.native().c_str(),
+				mode.c_str());
+
+			return result;
+#else
+			return std::fopen(
+				reinterpret_cast<const char*>(a_path.u8string().c_str()),
+				a_mode);
+#endif
 		}
 	}
 
@@ -150,7 +178,7 @@ namespace bsa::detail
 
 	ostream_t::ostream_t(std::filesystem::path a_path)
 	{
-		_file = boost::nowide::fopen(
+		_file = unicode::fopen(
 			reinterpret_cast<const char*>(a_path.u8string().data()),
 			"wb");
 		if (_file == nullptr) {

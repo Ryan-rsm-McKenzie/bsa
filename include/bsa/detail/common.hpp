@@ -190,6 +190,11 @@ namespace bsa::detail
 		}
 	}
 
+	namespace unicode
+	{
+		[[nodiscard]] auto fopen(std::filesystem::path a_path, const char* a_mode) -> std::FILE*;
+	}
+
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
