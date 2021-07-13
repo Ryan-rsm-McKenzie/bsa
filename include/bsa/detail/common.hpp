@@ -22,11 +22,45 @@
 #include <vector>
 
 #include <boost/iostreams/device/mapped_file.hpp>
-#include <boost/predef.h>
 
 #include "bsa/fwd.hpp"
 
 #ifndef DOXYGEN
+
+#	if defined(__clang__)
+#		define BSA_COMP_CLANG true
+#	else
+#		define BSA_COMP_CLANG false
+#	endif
+
+#	if !BSA_COMP_CLANG && defined(__GNUC__)
+#		define BSA_COMP_GNUC true
+#	else
+#		define BSA_COMP_GNUC false
+#	endif
+
+#	if defined(__EDG__)
+#		define BSA_COMP_EDG true
+#	else
+#		define BSA_COMP_EDG false
+#	endif
+
+#	if !BSA_COMP_CLANG && !BSA_COMP_EDG && defined(_MSC_VER)
+#		define BSA_COMP_MSVC true
+#	else
+#		define BSA_COMP_MSVC false
+#	endif
+
+#	if defined(_WIN32) ||      \
+		defined(_WIN64) ||      \
+		defined(__WIN32__) ||   \
+		defined(__TOS_WIN__) || \
+		defined(__WINDOWS)
+#		define BSA_OS_WINDOWS true
+#	else
+#		define BSA_OS_WINDOWS false
+#	endif
+
 #	define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
 		[[nodiscard]] constexpr a_type operator a_op(a_type a_lhs, a_type a_rhs) noexcept \
 		{                                                                                 \
@@ -55,17 +89,17 @@
 		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                  \
 		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
 
-#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#	if BSA_COMP_GNUC || BSA_COMP_CLANG
 #		define BSA_VISIBLE __attribute__((visibility("default")))
 #	else
 #		define BSA_VISIBLE
 #	endif
 
-#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#	if BSA_COMP_GNUC || BSA_COMP_CLANG
 #		define BSA_BSWAP16 __builtin_bswap16
 #		define BSA_BSWAP32 __builtin_bswap32
 #		define BSA_BSWAP64 __builtin_bswap64
-#	elif BOOST_COMP_MSVC || BOOST_COMP_EDG
+#	elif BSA_COMP_MSVC || BSA_COMP_EDG
 #		define BSA_BSWAP16 _byteswap_ushort
 #		define BSA_BSWAP32 _byteswap_ulong
 #		define BSA_BSWAP64 _byteswap_uint64
@@ -198,9 +232,9 @@ namespace bsa::detail
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
-#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#	if BSA_COMP_GNUC || BSA_COMP_CLANG
 		__builtin_unreachable();
-#	elif BOOST_COMP_MSVC || BOOST_COMP_EDG
+#	elif BSA_COMP_MSVC || BSA_COMP_EDG
 		__assume(false);
 #	else
 		static_assert(false);

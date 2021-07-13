@@ -44,7 +44,7 @@ namespace bsa::detail
 		auto fopen(std::filesystem::path a_path, const char* a_mode)
 			-> std::FILE*
 		{
-#if BOOST_OS_WINDOWS
+#if BSA_OS_WINDOWS
 			std::FILE* result = nullptr;
 
 			// a_mode is basic ASCII which means it's valid utf-16 with a simple cast

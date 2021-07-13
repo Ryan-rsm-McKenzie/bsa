@@ -1,7 +1,6 @@
 #pragma once
 
-#include <boost/predef.h>
-#if BOOST_OS_WINDOWS
+#if defined(_WIN32)
 #	define NOGDI
 #	include <Windows.h>  // ensure windows.h compatibility
 #endif
