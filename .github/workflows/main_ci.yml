@@ -57,6 +57,7 @@ jobs:
 
       - name: Cache vcpkg
         uses: actions/cache@v2
+        id: vcpkg-cache
         env:
           cache-name: vcpkg-cache
         with:
