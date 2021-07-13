@@ -18,7 +18,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: 1559315ea69718224345930cbf435e9a24311f2c
+  VCPKG_COMMITTISH: 9b96f7fce0904fc3d625991464199c4a88903b86
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -68,8 +68,6 @@ jobs:
             ${{ env.VCPKG_ROOT }}/*
             !${{ env.VCPKG_ROOT }}/buildtrees
             !${{ env.VCPKG_ROOT }}/downloads
-            !${{ env.VCPKG_ROOT }}/installed
-            !${{ env.VCPKG_ROOT }}/packages
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
 
       - name: Clone vcpkg
