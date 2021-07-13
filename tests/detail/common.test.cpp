@@ -99,23 +99,26 @@ TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 
 TEST_CASE("bsa::detail::unicode", "[bsa.unicode]")
 {
-	const std::filesystem::path root{ "common_unicode_test"sv };
-	const std::filesystem::path path = root / u8"\u1E9E"sv;
-	const char payload[] = "hello world!\n";
+	SECTION("we can open files with utf-8 characters")
+	{
+		const std::filesystem::path root{ "common_unicode_test"sv };
+		const std::filesystem::path path = root / u8"\u1E9E"sv;
+		const char payload[] = "hello world!\n";
 
-	std::filesystem::create_directory(root);
+		std::filesystem::create_directory(root);
 
-	auto f = bsa::detail::unicode::fopen(path, "wb");
-	REQUIRE(f != nullptr);
-	REQUIRE(std::fwrite(payload, 1, sizeof(payload) - 1, f) == sizeof(payload) - 1);
-	REQUIRE(std::fclose(f) == 0);
+		auto f = bsa::detail::unicode::fopen(path, "wb");
+		REQUIRE(f != nullptr);
+		REQUIRE(std::fwrite(payload, 1, sizeof(payload) - 1, f) == sizeof(payload) - 1);
+		REQUIRE(std::fclose(f) == 0);
 
-	f = bsa::detail::unicode::fopen(path, "rb");
-	REQUIRE(f != nullptr);
-	std::array<char, sizeof(payload) - 1> buf{};
-	REQUIRE(std::fread(buf.data(), 1, buf.size(), f) == buf.size());
-	REQUIRE(std::memcmp(payload, buf.data(), buf.size()) == 0);
-	REQUIRE(std::fclose(f) == 0);
+		f = bsa::detail::unicode::fopen(path, "rb");
+		REQUIRE(f != nullptr);
+		std::array<char, sizeof(payload) - 1> buf{};
+		REQUIRE(std::fread(buf.data(), 1, buf.size(), f) == buf.size());
+		REQUIRE(std::memcmp(payload, buf.data(), buf.size()) == 0);
+		REQUIRE(std::fclose(f) == 0);
+	}
 }
 
 TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
