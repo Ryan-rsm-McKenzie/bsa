@@ -1,5 +1,5 @@
 {
-  "name": "bsa-tes4",
+  "name": "bsa",
   "version-string": "1",
   "dependencies": [
     "boost-container",
