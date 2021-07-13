@@ -32,7 +32,7 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
-            executable-extension: ''
+            shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
