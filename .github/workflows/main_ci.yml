@@ -18,7 +18,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: 7d169b467c06b92bc893a680173fc774cf2b17fd
+  VCPKG_COMMITTISH: 1559315ea69718224345930cbf435e9a24311f2c
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -64,7 +64,7 @@ jobs:
           cache-name: vcpkg-cache
         with:
           path: |
-            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
             ${{ env.VCPKG_ROOT }}/*
             !${{ env.VCPKG_ROOT }}/buildtrees
             !${{ env.VCPKG_ROOT }}/downloads
