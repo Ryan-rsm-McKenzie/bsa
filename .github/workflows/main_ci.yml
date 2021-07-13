@@ -18,7 +18,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: b1b4808228377515acd849b8706ee2ad25ba455d
+  VCPKG_COMMITTISH: 1af1e604cdfa56408782f00c0134b168fecac3c6
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -75,7 +75,7 @@ jobs:
           path: |
             ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
             ${{ env.VCPKG_ROOT }}/vcpkg${{ matrix.executable-extension }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('vcpkg-cache/**.zip') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
 
       - name: Setup vcpkg
         if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
