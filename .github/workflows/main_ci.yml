@@ -18,7 +18,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: e681ff653cf7d6ace95a0dbcb92a1c1a9d5cfccc
+  VCPKG_COMMITTISH: 514473137d810a7754fe0de5e12d0a0655abbd57
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -33,11 +33,9 @@ jobs:
             cmake-generator: ninja
             cmake-platform: linux
             executable-extension: ''
-            shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
-            executable-extension: .exe
             shell-extension: bat
 
     steps:
@@ -72,9 +70,7 @@ jobs:
         env:
           cache-name: vcpkg-cache
         with:
-          path: |
-            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-            ${{ env.VCPKG_ROOT }}/vcpkg${{ matrix.executable-extension }}
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
 
       - name: Setup vcpkg
