@@ -81,7 +81,9 @@ jobs:
 
       - name: Setup vcpkg
         if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
-        run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
+        run: |
+          mkdir vcpkg-cache
+          ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
