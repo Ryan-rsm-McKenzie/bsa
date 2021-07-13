@@ -20,6 +20,7 @@ paths = [ '@DOCS_DIR@/images' ]
 
 [macros]
 'protected' = 'private'
+'BSA_VISIBLE' = ''
 
 [sources]
 extract_all = true

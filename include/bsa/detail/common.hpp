@@ -54,6 +54,13 @@
 		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, |)                                   \
 		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, <<)                                  \
 		BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, >>)
+
+#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#		define BSA_VISIBLE __attribute__((visibility("default")))
+#	else
+#		define BSA_VISIBLE
+#	endif
+
 #endif
 
 namespace bsa
@@ -63,7 +70,7 @@ namespace bsa
 #endif
 
 	/// \brief	The base exception type for all `bsa` exceptions.
-	class exception :
+	class BSA_VISIBLE exception :
 		public std::exception
 	{
 	public:

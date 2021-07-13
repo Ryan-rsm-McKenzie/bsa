@@ -54,6 +54,14 @@ set_target_properties(
 		DEBUG_POSTFIX "d"
 )
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(
+		${TARGET_NAME}
+		PRIVATE
+			"-fvisibility=hidden"
+	)
+endif()
+
 target_include_directories(
 	${TARGET_NAME}
 	PUBLIC
