@@ -52,16 +52,10 @@ namespace bsa::detail
 			mode.resize(std::strlen(a_mode));
 			std::copy(a_mode, a_mode + mode.size(), mode.begin());
 
-			(void)::_wfopen_s(
-				&result,
-				a_path.native().c_str(),
-				mode.c_str());
-
+			(void)::_wfopen_s(&result, a_path.c_str(), mode.c_str());
 			return result;
 #else
-			return std::fopen(
-				reinterpret_cast<const char*>(a_path.u8string().c_str()),
-				a_mode);
+			return std::fopen(a_path.c_str(), a_mode);
 #endif
 		}
 	}
