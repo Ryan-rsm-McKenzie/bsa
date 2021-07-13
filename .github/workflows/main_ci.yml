@@ -18,7 +18,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: 1af1e604cdfa56408782f00c0134b168fecac3c6
+  VCPKG_COMMITTISH: e681ff653cf7d6ace95a0dbcb92a1c1a9d5cfccc
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -32,12 +32,12 @@ jobs:
           - os: ubuntu-latest
             cmake-generator: ninja
             cmake-platform: linux
-            executable-extension: exe
+            executable-extension: ''
             shell-extension: sh
           - os: windows-latest
             cmake-generator: vs2019
             cmake-platform: windows
-            executable-extension: ''
+            executable-extension: .exe
             shell-extension: bat
 
     steps:
