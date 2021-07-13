@@ -1,5 +1,6 @@
 #include "utility.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -8,6 +9,7 @@
 #include <span>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 #include <boost/nowide/cstdio.hpp>
 #include <catch2/catch.hpp>
@@ -35,6 +37,66 @@ namespace
 		};
 		REQUIRE(result);
 		return result;
+	}
+}
+
+TEST_CASE("bsa::detail::endian", "[bsa.endian]")
+{
+	const auto test = []<class T>(std::in_place_type_t<T>, std::size_t a_little, std::size_t a_big) {
+		const char payload[] = "\x01\x02\x03\x04\x05\x06\x07\x08";
+		std::array<char, 8> buffer{};
+
+		const auto readable = std::as_bytes(std::span{ payload }).subspan<0, sizeof(T)>();
+		const auto writable = std::as_writable_bytes(std::span{ buffer }).subspan<0, sizeof(T)>();
+
+		SECTION("reverse")
+		{
+			REQUIRE(a_little == bsa::detail::endian::reverse(static_cast<T>(a_big)));
+		}
+
+		SECTION("load little-endian")
+		{
+			const auto i = bsa::detail::endian::load<std::endian::little, T>(readable);
+			REQUIRE(i == a_little);
+		}
+
+		SECTION("load big-endian")
+		{
+			const auto i = bsa::detail::endian::load<std::endian::big, T>(readable);
+			REQUIRE(i == a_big);
+		}
+
+		SECTION("store little-endian")
+		{
+			bsa::detail::endian::store<std::endian::little>(writable, static_cast<T>(a_little));
+			REQUIRE(std::ranges::equal(readable, writable));
+		}
+
+		SECTION("store big-endian")
+		{
+			bsa::detail::endian::store<std::endian::big>(writable, static_cast<T>(a_big));
+			REQUIRE(std::ranges::equal(readable, writable));
+		}
+	};
+
+	SECTION("1 byte")
+	{
+		test(std::in_place_type<std::uint8_t>, 0x01, 0x01);
+	}
+
+	SECTION("2 bytes")
+	{
+		test(std::in_place_type<std::uint16_t>, 0x0201, 0x0102);
+	}
+
+	SECTION("4 bytes")
+	{
+		test(std::in_place_type<std::uint32_t>, 0x04030201, 0x01020304);
+	}
+
+	SECTION("8 bytes")
+	{
+		test(std::in_place_type<std::uint64_t>, 0x0807060504030201, 0x0102030405060708);
 	}
 }
 

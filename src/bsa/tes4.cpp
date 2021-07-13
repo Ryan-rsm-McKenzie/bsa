@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/endian/conversion.hpp>
-
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
@@ -643,7 +641,7 @@ namespace bsa::tes4
 			const intermediate_t::value_type& a_value) noexcept
 			-> std::uint64_t
 		{
-			return boost::endian::endian_reverse(
+			return detail::endian::reverse(
 				a_value.first->first.hash().numeric());
 		}
 
@@ -651,7 +649,7 @@ namespace bsa::tes4
 			const mapped_type::value_type* a_value) noexcept
 			-> std::uint64_t
 		{
-			return boost::endian::endian_reverse(
+			return detail::endian::reverse(
 				a_value->first.hash().numeric());
 		}
 	};

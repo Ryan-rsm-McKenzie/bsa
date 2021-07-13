@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <iterator>
 #include <map>
+#include <new>
 #include <optional>
 #include <span>
 #include <string>
@@ -20,7 +21,6 @@
 #include <variant>
 #include <vector>
 
-#include <boost/endian/conversion.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/predef.h>
 
@@ -59,6 +59,18 @@
 #		define BSA_VISIBLE __attribute__((visibility("default")))
 #	else
 #		define BSA_VISIBLE
+#	endif
+
+#	if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+#		define BSA_BSWAP16 __builtin_bswap16
+#		define BSA_BSWAP32 __builtin_bswap32
+#		define BSA_BSWAP64 __builtin_bswap64
+#	elif BOOST_COMP_MSVC || BOOST_COMP_EDG
+#		define BSA_BSWAP16 _byteswap_ushort
+#		define BSA_BSWAP32 _byteswap_ulong
+#		define BSA_BSWAP64 _byteswap_uint64
+#	else
+#		error "unsupported"
 #	endif
 
 #endif
@@ -124,6 +136,60 @@ namespace bsa::detail
 			std::same_as<T, unsigned long long int>;
 	}
 
+	namespace type_traits
+	{
+		template <class T>
+		using integral_type_t = typename std::conditional_t<
+			std::is_enum_v<T>,
+			std::underlying_type<T>,
+			std::type_identity<T>>::type;
+	}
+
+	namespace endian
+	{
+		template <concepts::integral T>
+		[[nodiscard]] constexpr T reverse(T a_value) noexcept
+		{
+			using integral_t = type_traits::integral_type_t<T>;
+			const auto value = static_cast<integral_t>(a_value);
+			if constexpr (sizeof(T) == 1) {
+				return static_cast<T>(value);
+			} else if constexpr (sizeof(T) == 2) {
+				return static_cast<T>(BSA_BSWAP16(value));
+			} else if constexpr (sizeof(T) == 4) {
+				return static_cast<T>(BSA_BSWAP32(value));
+			} else if constexpr (sizeof(T) == 8) {
+				return static_cast<T>(BSA_BSWAP64(value));
+			} else {
+				static_assert(sizeof(T) && false);
+			}
+		}
+
+		template <std::endian E, concepts::integral T>
+		[[nodiscard]] T load(std::span<const std::byte, sizeof(T)> a_src) noexcept
+		{
+			const auto val = *std::launder(reinterpret_cast<const T*>(a_src.data()));
+			if constexpr (std::endian::native != E) {
+				return reverse(val);
+			} else {
+				return val;
+			}
+		}
+
+		template <std::endian E, concepts::integral T>
+		void store(std::span<std::byte, sizeof(T)> a_dst, T a_value) noexcept
+		{
+			using integral_t = type_traits::integral_type_t<T>;
+			auto val = static_cast<integral_t>(a_value);
+
+			if constexpr (std::endian::native != E) {
+				val = reverse(val);
+			}
+
+			*std::launder(reinterpret_cast<integral_t*>(a_dst.data())) = val;
+		}
+	}
+
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
@@ -170,20 +236,13 @@ namespace bsa::detail
 		template <concepts::integral T>
 		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
 		{
-			const auto load = [&]<std::size_t I>(std::in_place_index_t<I>) {
-				const auto bytes = this->read_bytes(sizeof(T));
-				return boost::endian::endian_load<
-					T,
-					sizeof(T),
-					static_cast<boost::endian::order>(I)>(
-					reinterpret_cast<const unsigned char*>(bytes.data()));
-			};
+			const auto bytes = this->read_bytes<sizeof(T)>();
 
 			switch (a_endian) {
 			case std::endian::little:
-				return load(std::in_place_index<to_underlying(boost::endian::order::little)>);
+				return endian::load<std::endian::little, T>(bytes);
 			case std::endian::big:
-				return load(std::in_place_index<to_underlying(boost::endian::order::big)>);
+				return endian::load<std::endian::big, T>(bytes);
 			default:
 				declare_unreachable();
 			}
@@ -191,6 +250,13 @@ namespace bsa::detail
 
 		[[nodiscard]] auto read_bytes(std::size_t a_bytes)
 			-> std::span<const std::byte>;
+
+		template <std::size_t N>
+		[[nodiscard]] auto read_bytes()
+			-> std::span<const std::byte, N>
+		{
+			return this->read_bytes(N).subspan<0, N>();
+		}
 
 		void seek_absolute(std::size_t a_pos) noexcept { _pos = a_pos; }
 		void seek_relative(std::ptrdiff_t a_off) noexcept { _pos += a_off; }
@@ -244,27 +310,21 @@ namespace bsa::detail
 		template <concepts::integral T>
 		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
 		{
-			const auto store = [&]<std::size_t I>(std::in_place_index_t<I>) noexcept {
-				std::array<std::byte, sizeof(T)> bytes{};
-				boost::endian::endian_store<
-					T,
-					sizeof(T),
-					static_cast<boost::endian::order>(I)>(
-					reinterpret_cast<unsigned char*>(bytes.data()),
-					a_value);
-				this->write_bytes({ bytes.cbegin(), bytes.cend() });
-			};
+			std::array<std::byte, sizeof(T)> buffer{};
+			const auto bytes = std::span{ buffer };
 
 			switch (a_endian) {
 			case std::endian::little:
-				store(std::in_place_index<to_underlying(boost::endian::order::little)>);
+				endian::store<std::endian::little>(bytes, a_value);
 				break;
 			case std::endian::big:
-				store(std::in_place_index<to_underlying(boost::endian::order::big)>);
+				endian::store<std::endian::big>(bytes, a_value);
 				break;
 			default:
 				declare_unreachable();
 			}
+
+			this->write_bytes(std::as_bytes(bytes));
 		}
 
 		void write_bytes(std::span<const std::byte> a_bytes) noexcept

@@ -93,7 +93,6 @@ int main()
 \subsection dependencies-consumption Consumption
 - [Boost](https://www.boost.org/)
 	- Container
-	- Endian
 	- Filesystem
 	- Iostreams
 	- Nowide
