@@ -17,7 +17,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: b1b4808228377515acd849b8706ee2ad25ba455d
+  VCPKG_COMMITTISH: 7d169b467c06b92bc893a680173fc774cf2b17fd
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
@@ -63,12 +63,12 @@ jobs:
           cache-name: vcpkg-cache
         with:
           path: |
-            vcpkg-cache
-            vcpkg/*
-            !vcpkg/buildtrees
-            !vcpkg/downloads
-            !vcpkg/installed
-            !vcpkg/packages
+            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+            ${{ env.VCPKG_ROOT }}/*
+            !${{ env.VCPKG_ROOT }}/buildtrees
+            !${{ env.VCPKG_ROOT }}/downloads
+            !${{ env.VCPKG_ROOT }}/installed
+            !${{ env.VCPKG_ROOT }}/packages
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
 
       - name: Clone vcpkg
@@ -76,13 +76,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ env.VCPKG_COMMITTISH }}
-          path: vcpkg
+          path: ${{ env.VCPKG_ROOT }}
           repository: microsoft/vcpkg
 
       - name: Setup vcpkg
         if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
         run: |
-          mkdir vcpkg-cache
+          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
           ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
 
       - name: Configure CMake
