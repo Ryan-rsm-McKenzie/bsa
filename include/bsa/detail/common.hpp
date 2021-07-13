@@ -148,7 +148,7 @@ namespace bsa::detail
 	namespace endian
 	{
 		template <concepts::integral T>
-		[[nodiscard]] constexpr T reverse(T a_value) noexcept
+		[[nodiscard]] T reverse(T a_value) noexcept
 		{
 			using integral_t = type_traits::integral_type_t<T>;
 			const auto value = static_cast<integral_t>(a_value);
