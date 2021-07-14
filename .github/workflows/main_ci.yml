@@ -48,7 +48,7 @@ jobs:
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
-          sudo apt install zlib1g-dev liblz4-dev -y
+          sudo apt install catch2 liblz4-dev zlib1g-dev -y
 
       - name: Setup vcpkg
         if: ${{ matrix.os == 'windows-latest' }}
