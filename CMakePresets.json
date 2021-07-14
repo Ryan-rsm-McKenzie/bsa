@@ -70,7 +70,11 @@
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": {
           "type": "STRING",
-          "value": "-pedantic -pedantic-errors -Wall -Werror -Wextra"
+          "value": "-fsanitize=address,undefined -pedantic -pedantic-errors -Wall -Werror -Wextra"
+        },
+        "CMAKE_EXE_LINKER_FLAGS": {
+          "type": "STRING",
+          "value": "-fsanitize=address,undefined"
         },
         "CMAKE_EXPORT_COMPILE_COMMANDS": {
           "type": "BOOL",
