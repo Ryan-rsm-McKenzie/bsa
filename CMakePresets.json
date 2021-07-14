@@ -99,21 +99,9 @@
       "generator": "Ninja",
       "inherits": [
         "cmake-dev",
-        "vcpkg",
-        "vs2019",
-        "windows"
+        "linux"
       ],
-      "name": "ninja-windows-vcpkg"
-    },
-    {
-      "description": "Ninja/Windows/VCPkg",
-      "generator": "Ninja",
-      "inherits": [
-        "cmake-dev",
-        "linux",
-        "vcpkg"
-      ],
-      "name": "ninja-linux-vcpkg"
+      "name": "ninja-linux-apt"
     }
   ],
   "version": 2

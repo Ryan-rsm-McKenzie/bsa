@@ -18,9 +18,8 @@ on:
 
 env:
   BUILD_TYPE: Debug
-  VCPKG_COMMITTISH: 514473137d810a7754fe0de5e12d0a0655abbd57
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+  VCPKG_ROOT: ${{ env.VCPKG_INSTALLATION_ROOT }}
 
 jobs:
   build:
@@ -30,13 +29,9 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         include:
           - os: ubuntu-latest
-            cmake-generator: ninja
-            cmake-platform: linux
-            shell-extension: sh
+            cmake-preset: ninja-linux-apt
           - os: windows-latest
-            cmake-generator: vs2019
-            cmake-platform: windows
-            shell-extension: bat
+            cmake-preset: vs2019-windows-vcpkg
 
     steps:
       - uses: actions/checkout@v2
@@ -44,43 +39,37 @@ jobs:
           path: bsa
           submodules: 'true'
 
-      - name: Set compiler
+      - name: Setup Linux
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           echo "CC=gcc-10" >> $GITHUB_ENV
           echo "CXX=g++-10" >> $GITHUB_ENV
 
-      - name: Download Ninja
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
           wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
-      - name: Clone vcpkg
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ env.VCPKG_COMMITTISH }}
-          path: ${{ env.VCPKG_ROOT }}
-          repository: microsoft/vcpkg
+          sudo apt install zlib1g-dev liblz4-dev -y
+
+      - name: Setup vcpkg
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.bat
+          vcpkg --version >> vcpkg-version.txt
 
       - name: Cache vcpkg
+        if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/cache@v2
         id: vcpkg-cache
         env:
           cache-name: vcpkg-cache
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.VCPKG_COMMITTISH }}-${{ hashFiles('bsa/**/vcpkg.json') }}
-
-      - name: Setup vcpkg
-        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
-        run: |
-          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.${{ matrix.shell-extension }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
 
       - name: Configure CMake
-        run: cmake --preset ${{ matrix.cmake-generator }}-${{ matrix.cmake-platform }}-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
+        run: cmake --preset ${{ matrix.cmake-preset }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/bsa/build
