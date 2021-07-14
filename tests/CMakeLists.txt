@@ -16,19 +16,10 @@ set(SOURCE_FILES
 )
 source_group(TREE ${SOURCE_DIR} PREFIX "src" FILES ${SOURCE_FILES})
 
-set(NATVIS_DIR ${ROOT_DIR}/external/CPPDebuggerVisualizers/VS2019/Visualizers)
-set(NATVIS_FILES
-	${NATVIS_DIR}/boost.natvis
-	${NATVIS_DIR}/boost_Containers.natvis
-	${NATVIS_DIR}/boost_Regex.natvis
-)
-source_group("visualizers" FILES ${NATVIS_FILES})
-
 add_executable(
 	tests
 	${HEADER_FILES}
 	${SOURCE_FILES}
-	${NATVIS_FILES}
 )
 catch_discover_tests(tests)
 

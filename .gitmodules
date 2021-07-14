@@ -1,6 +1,3 @@
-[submodule "extern/CPPDebuggerVisualizers"]
-	path = external/CPPDebuggerVisualizers
-	url = https://github.com/KindDragon/CPPDebuggerVisualizers
 [submodule "external/m.css"]
 	path = external/m.css
 	url = https://github.com/Ryan-rsm-McKenzie/m.css
