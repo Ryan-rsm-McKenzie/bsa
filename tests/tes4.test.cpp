@@ -373,7 +373,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 				it->second.insert(a_hash, std::move(f));
 			};
 
-		constexpr auto largesz = (std::numeric_limits<std::int32_t>::max)();
+		constexpr auto largesz = static_cast<std::size_t>((std::numeric_limits<std::int32_t>::max)());
 		const auto plarge = std::make_unique<std::byte[]>(largesz);
 		const std::span large{ plarge.get(), largesz };
 
