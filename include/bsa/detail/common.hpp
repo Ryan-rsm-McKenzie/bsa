@@ -255,8 +255,7 @@ namespace bsa::detail
 				-> const std::byte* { return static_cast<const std::byte*>(this->_view); }
 			[[nodiscard]] bool is_open() const noexcept;
 			bool open(std::filesystem::path a_path) noexcept;
-			[[nodiscard]] auto size() const noexcept
-				-> const std::size_t { return this->_size; }
+			[[nodiscard]] auto size() const noexcept -> std::size_t { return this->_size; }
 
 		private:
 			void do_move(file&& a_rhs) noexcept;
