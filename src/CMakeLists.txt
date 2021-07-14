@@ -73,12 +73,6 @@ target_include_directories(
 
 list(APPEND CMAKE_MODULE_PATH "${ROOT_DIR}/cmake")
 
-find_package(Boost
-	MODULE
-	REQUIRED
-	COMPONENTS
-		container
-)
 find_package(LZ4 MODULE REQUIRED)
 find_package(ZLIB MODULE REQUIRED)
 
@@ -88,8 +82,6 @@ target_link_libraries(
 		LZ4::LZ4
 		ZLIB::ZLIB
 	PUBLIC
-		Boost::container
-		Boost::headers
 		bsa::common
 )
 

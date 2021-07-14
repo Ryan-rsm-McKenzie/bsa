@@ -10,8 +10,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <boost/container/small_vector.hpp>
+#include <vector>
 
 #include "bsa/detail/common.hpp"
 
@@ -157,7 +156,7 @@ namespace bsa::fo4
 	class file final
 	{
 	private:
-		using container_type = boost::container::small_vector<chunk, 1>;
+		using container_type = std::vector<chunk>;
 
 	public:
 		/// \brief	Unique to \ref format::directx.

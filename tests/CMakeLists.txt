@@ -36,8 +36,6 @@ target_include_directories(
 		${SOURCE_DIR}
 )
 
-find_package(Boost MODULE REQUIRED)
-
 target_link_libraries(
 	tests
 	PRIVATE
