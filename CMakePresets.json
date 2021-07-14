@@ -46,10 +46,6 @@
     },
     {
       "cacheVariables": {
-        "Boost_USE_STATIC_RUNTIME": {
-          "type": "BOOL",
-          "value": "OFF"
-        },
         "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
           "type": "STRING",
           "value": "/DEBUG:FASTLINK"
