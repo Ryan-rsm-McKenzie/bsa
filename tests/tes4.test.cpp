@@ -214,24 +214,14 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 
 	SECTION("attempting to read an invalid file will fail")
 	{
-		try {
-			bsa::tes4::archive bsa;
-			bsa.read("."sv);
-			REQUIRE(false);
-		} catch (const std::system_error&) {
-			REQUIRE(true);
-		}
+		bsa::tes4::archive bsa;
+		REQUIRE_THROWS_AS(bsa.read("."sv), std::system_error);
 	}
 
 	SECTION("attempting to write to an invalid location will fail")
 	{
-		try {
-			bsa::tes4::archive bsa;
-			bsa.write("."sv, bsa::tes4::version::tes5);
-			REQUIRE(false);
-		} catch (const std::system_error&) {
-			REQUIRE(true);
-		}
+		bsa::tes4::archive bsa;
+		REQUIRE_THROWS_AS(bsa.write("."sv, bsa::tes4::version::tes5), std::system_error);
 	}
 
 	{
