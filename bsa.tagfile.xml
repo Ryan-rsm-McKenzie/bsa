@@ -1,0 +1,2947 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile>
+  <compound kind="file">
+    <name>index.doxy</name>
+    <filename>index_8doxy.html</filename>
+  </compound>
+  <compound kind="file">
+    <name>common.hpp</name>
+    <filename>common_8hpp.html</filename>
+    <includes id="fwd_8hpp" name="fwd.hpp" local="yes" imported="no">bsa/fwd.hpp</includes>
+    <class kind="class">bsa::exception</class>
+    <class kind="class">bsa::components::basic_byte_container</class>
+    <class kind="class">bsa::components::byte_container</class>
+    <class kind="class">bsa::components::compressed_byte_container</class>
+    <class kind="class">bsa::components::hashmap</class>
+    <class kind="class">bsa::components::hashmap::index_t</class>
+    <class kind="class">bsa::components::key</class>
+    <namespace>bsa</namespace>
+    <namespace>bsa::concepts</namespace>
+    <namespace>bsa::components</namespace>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>make_four_cc</name>
+      <anchorfile>namespacebsa.html</anchorfile>
+      <anchor>afb4a4044ea70d08337cb4e0564044592</anchor>
+      <arglist>(std::string_view a_cc) noexcept -&gt; std::uint32_t</arglist>
+    </member>
+    <member kind="variable">
+      <type>concept</type>
+      <name>stringable</name>
+      <anchorfile>namespacebsa_1_1concepts.html</anchorfile>
+      <anchor>a77432ae89b7ecfa3c536b98d80a14e48</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>fo4.hpp</name>
+    <filename>fo4_8hpp.html</filename>
+    <includes id="common_8hpp" name="common.hpp" local="yes" imported="no">bsa/detail/common.hpp</includes>
+    <class kind="struct">bsa::fo4::hashing::hash</class>
+    <class kind="class">bsa::fo4::chunk</class>
+    <class kind="struct">bsa::fo4::chunk::mips_t</class>
+    <class kind="class">bsa::fo4::file</class>
+    <class kind="struct">bsa::fo4::file::header_t</class>
+    <class kind="class">bsa::fo4::archive</class>
+    <namespace>bsa</namespace>
+    <namespace>bsa::fo4</namespace>
+    <namespace>bsa::fo4::hashing</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>format</name>
+      <anchorfile>namespacebsa_1_1fo4.html</anchorfile>
+      <anchor>af174c67d25a517d23a6abeda822b25ae</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1fo4.html" anchor="af174c67d25a517d23a6abeda822b25aea958153f1b8b96ec4c4eb2147429105d9">general</enumvalue>
+      <enumvalue file="namespacebsa_1_1fo4.html" anchor="af174c67d25a517d23a6abeda822b25aeaa9fd6347608dab0c518e601b176cf896">directx</enumvalue>
+    </member>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1fo4_1_1hashing.html</anchorfile>
+      <anchor>aadff7c61e18334eb3fe5b9924b6e8ab4</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>fwd.hpp</name>
+    <filename>fwd_8hpp.html</filename>
+    <class kind="class">bsa::components::hashmap</class>
+    <class kind="class">bsa::components::key</class>
+    <namespace>bsa</namespace>
+    <namespace>bsa::components</namespace>
+    <namespace>bsa::fo4</namespace>
+    <namespace>bsa::fo4::hashing</namespace>
+    <namespace>bsa::tes3</namespace>
+    <namespace>bsa::tes3::hashing</namespace>
+    <namespace>bsa::tes4</namespace>
+    <namespace>bsa::tes4::hashing</namespace>
+    <member kind="typedef">
+      <type>Hash(*)(std::string &amp;) noexcept</type>
+      <name>hasher_t</name>
+      <anchorfile>namespacebsa_1_1components.html</anchorfile>
+      <anchor>ad74fb7e52fe738b2d5466d26d7934fae</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>tes3.hpp</name>
+    <filename>tes3_8hpp.html</filename>
+    <includes id="common_8hpp" name="common.hpp" local="yes" imported="no">bsa/detail/common.hpp</includes>
+    <class kind="struct">bsa::tes3::hashing::hash</class>
+    <class kind="class">bsa::tes3::file</class>
+    <class kind="class">bsa::tes3::archive</class>
+    <namespace>bsa</namespace>
+    <namespace>bsa::tes3</namespace>
+    <namespace>bsa::tes3::hashing</namespace>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1tes3_1_1hashing.html</anchorfile>
+      <anchor>a2195f39a7c2669a965411356ab919592</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>tes4.hpp</name>
+    <filename>tes4_8hpp.html</filename>
+    <includes id="common_8hpp" name="common.hpp" local="yes" imported="no">bsa/detail/common.hpp</includes>
+    <class kind="struct">bsa::tes4::hashing::hash</class>
+    <class kind="class">bsa::tes4::file</class>
+    <class kind="class">bsa::tes4::directory</class>
+    <class kind="class">bsa::tes4::archive</class>
+    <namespace>bsa</namespace>
+    <namespace>bsa::tes4</namespace>
+    <namespace>bsa::tes4::hashing</namespace>
+    <member kind="enumeration">
+      <type></type>
+      <name>archive_flag</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>a929dbf32826a657e850c6c563e47347b</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347baa7dc9140432a962a83524e4206abf256">directory_strings</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba481811567b0b34aee94c54a3473c6adc">file_strings</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">compressed</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347baa9a41705977069b26d7e30dc2501d8b9">retain_directory_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bad28bc7ccc5087c8c47d5d2c1f31403a7">retain_file_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba6d061ee081309ebce673951e4468775e">retain_file_name_offsets</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba349e12e1da168ba0f0651fcc8120d3b8">xbox_archive</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bae82e4eb0d7802c56696a8d6689609793">retain_strings_during_startup</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bafe3ff6f81e61f998602d0b1c66c7b944">embedded_file_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba08678295c8b2e35e4b32058998bd859e">xbox_compressed</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>archive_type</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>ae0c17a039f112258e48dc29f4582ed39</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a1541efdcede8c5a0c2ed7e32c89b361f">meshes</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39ac5e62798e528da9080811018cbb27cd3">textures</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a81ca0b7c951be89184c130d2860a5b00">menus</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39aad1588d76517dd34c49c3f901bce7fcf">sounds</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39aac163f065d2b3ecd5fc2f8e6365b367e">voices</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a1aa355706e1767666124331a716c7890">shaders</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a2d5563ed288ac5396add9b78fbca810b">trees</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a980d14c0c85495b48b9a9134658e6121">fonts</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39abc957e26ff41470c556ee5d09e96880b">misc</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>version</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>a80407ad9bc5b93ad43225b2bb9f5100c</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca27069e6baf4eba0ad33686287d582c97">tes4</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca9251dddd50ef30adce51ad629526d447">fo3</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca305506069f2dda79d68e638186b83a5e">tes5</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca64192ca465194480a4621d6905dac5b7">sse</enumvalue>
+    </member>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_directory</name>
+      <anchorfile>namespacebsa_1_1tes4_1_1hashing.html</anchorfile>
+      <anchor>a7b8cada802bd8b109634d042f4608330</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1tes4_1_1hashing.html</anchorfile>
+      <anchor>a25347463a149213d0d76e383b4d180f8</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::fo4::archive</name>
+    <filename>classbsa_1_1fo4_1_1archive.html</filename>
+    <base>hashmap&lt; file &gt;</base>
+    <member kind="typedef">
+      <type>typename file ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>file</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1fo4_1_1archive.html</anchorfile>
+      <anchor>a06bf61b5ca97d9442f3906ae45f3869a</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>read</name>
+      <anchorfile>classbsa_1_1fo4_1_1archive.html</anchorfile>
+      <anchor>a43d8d913e56b0e545ae7066dfd93fe1c</anchor>
+      <arglist>(std::filesystem::path a_path) -&gt; format</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbsa_1_1fo4_1_1archive.html</anchorfile>
+      <anchor>a05e08b811f661ef95eaac12031d72d78</anchor>
+      <arglist>(std::filesystem::path a_path, format a_format, bool a_strings=true)</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::tes3::archive</name>
+    <filename>classbsa_1_1tes3_1_1archive.html</filename>
+    <base>hashmap&lt; file &gt;</base>
+    <member kind="typedef">
+      <type>typename file ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>file</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1tes3_1_1archive.html</anchorfile>
+      <anchor>a96ebf110ee92a31fa53d79929f7beb95</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>read</name>
+      <anchorfile>classbsa_1_1tes3_1_1archive.html</anchorfile>
+      <anchor>af4d1505d11f77b2d52e852981a9d28d3</anchor>
+      <arglist>(std::filesystem::path a_path)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>verify_offsets</name>
+      <anchorfile>classbsa_1_1tes3_1_1archive.html</anchorfile>
+      <anchor>a5e2c944dad757f8b86faad5f4f41ddcb</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbsa_1_1tes3_1_1archive.html</anchorfile>
+      <anchor>a90b4f7757d510543d805a51dc6cb94fc</anchor>
+      <arglist>(std::filesystem::path a_path) const</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::tes4::archive</name>
+    <filename>classbsa_1_1tes4_1_1archive.html</filename>
+    <base>hashmap&lt; directory, true &gt;</base>
+    <member kind="typedef">
+      <type>typename directory ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>directory</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>archive_flags</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a832592704997b04210989f6a800d9649</anchor>
+      <arglist>() const noexcept -&gt; archive_flag</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>archive_flags</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a3c48bfea645e9ad0d45dd0713428e8fb</anchor>
+      <arglist>(archive_flag a_flags) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>archive_types</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a80de0f9b29f43a1bab890ed343a1fb2f</anchor>
+      <arglist>() const noexcept -&gt; archive_type</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>archive_types</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a82051152ff37e9e3aef4e1ad906d2907</anchor>
+      <arglist>(archive_type a_types) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compressed</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a251fa30a6fad0974954af49a22b45d1e</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>directory_strings</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a06fd6f5d56f6e5bac9aaf7df323ab6f3</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>embedded_file_names</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>ae65a006ce13c8a40aca4a284c58f16da</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>file_strings</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>ad955bdf004dc286ff0cd3b05a7fc14c1</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>retain_directory_names</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a2036129a6375bc5c5326257ae1fb77f6</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>retain_file_name_offsets</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a12480f323cd6817359a15ffa6360bafa</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>retain_file_names</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>acf7b9d36136c869c04e96401123e1785</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>retain_strings_during_startup</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>ac40d3705614c0c990f79c4ec6ffd40b8</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>xbox_archive</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>aada86c0acd7797785fda2bf8b3e22009</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>xbox_compressed</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a0a623e27c93774eacd002a369d9a9694</anchor>
+      <arglist>() const noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>fonts</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a0e6eb84e9ad2e32bb64f19d5611b454d</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>menus</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>af6697951d01b3b3b380625c7f864aeef</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>meshes</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>adbc18f17ad352f330400a5a258014db9</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>misc</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a13ff4831ecf3b38cb8a2c632d9603e09</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>shaders</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a7f7c1f7afe0b9979167051d39fb30163</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>sounds</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a4887d88866f6c9f04dd69477db048b82</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>textures</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>abc9a402ddb6180c71385721fe335489c</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>trees</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a522c9330e0909f43a39f05df9d388db4</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>voices</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>aa17417553a34ac4474567316ab03741a</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>ae66d04dfca92cb6337956d4396ffbe1c</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>read</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a1c0fafe185b3c081f02082e6e9e14bd0</anchor>
+      <arglist>(std::filesystem::path a_path) -&gt; version</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>verify_offsets</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a379d3902455021f27fc2d41fbaf8d4d7</anchor>
+      <arglist>(version a_version) const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write</name>
+      <anchorfile>classbsa_1_1tes4_1_1archive.html</anchorfile>
+      <anchor>a159f890bc82700c201f5e13dd3414ff3</anchor>
+      <arglist>(std::filesystem::path a_path, version a_version) const</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::basic_byte_container</name>
+    <filename>classbsa_1_1components_1_1basic__byte__container.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>basic_byte_container</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afd705c069bfad9a2c4358054cad7dd31</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>basic_byte_container</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>aae10118922c1ebd009b7bf8758a16078</anchor>
+      <arglist>(const basic_byte_container &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>basic_byte_container</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a55e9ca55a3af3aae83e6726ece17c3fe</anchor>
+      <arglist>(basic_byte_container &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~basic_byte_container</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a74a0f087e0126ae81921cf17b6b61986</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>basic_byte_container &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>ac0d7f37e20330b7406c6eec4c93d4b20</anchor>
+      <arglist>(const basic_byte_container &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>basic_byte_container &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>aeaec914f782630e0fa3fd40e8f7c160a</anchor>
+      <arglist>(basic_byte_container &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::byte_container</name>
+    <filename>classbsa_1_1components_1_1byte__container.html</filename>
+    <base>bsa::components::basic_byte_container</base>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1byte__container.html</anchorfile>
+      <anchor>a6fc8f1af4e747c6c0fd78e158625445e</anchor>
+      <arglist>(std::span&lt; const std::byte &gt; a_data) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1byte__container.html</anchorfile>
+      <anchor>a7f4a21f08096638f61ac065b0bab5bad</anchor>
+      <arglist>(std::vector&lt; std::byte &gt; a_data) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::fo4::chunk</name>
+    <filename>classbsa_1_1fo4_1_1chunk.html</filename>
+    <base>bsa::components::compressed_byte_container</base>
+    <class kind="struct">bsa::fo4::chunk::mips_t</class>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>a4ead198c358e7f965dc32070618d48a8</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>compress</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>ab13295b31adb41770ea9208653335d26</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compress_bound</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>ad7a9b095897b5c8e2ffa1b671731ced6</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compress_into</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>a3258cddb64621cc7c4c8fef658ff2fc9</anchor>
+      <arglist>(std::span&lt; std::byte &gt; a_out) noexcept -&gt; std::optional&lt; std::size_t &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>decompress</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>ab9619846fc89adce669520ee05011ae6</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>decompress_into</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>afd97e1c27b0fade6188b79670c2355da</anchor>
+      <arglist>(std::span&lt; std::byte &gt; a_out) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>compressed</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>aaa95fbcc92f30c30af345eee6045e145</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>decompressed_size</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a1d4de99c523225f7528073889204524b</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a06b6911070fbf5ad2c219dc3c0747647</anchor>
+      <arglist>(std::span&lt; const std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a81718a49fd319431da6d4c89424dd1e3</anchor>
+      <arglist>(std::vector&lt; std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="variable">
+      <type>struct bsa::fo4::chunk::mips_t</type>
+      <name>mips</name>
+      <anchorfile>classbsa_1_1fo4_1_1chunk.html</anchorfile>
+      <anchor>afe35802fc125ed291a38991db4bfa5bd</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::compressed_byte_container</name>
+    <filename>classbsa_1_1components_1_1compressed__byte__container.html</filename>
+    <base>bsa::components::basic_byte_container</base>
+    <member kind="function">
+      <type>bool</type>
+      <name>compressed</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>aaa95fbcc92f30c30af345eee6045e145</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>decompressed_size</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a1d4de99c523225f7528073889204524b</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a06b6911070fbf5ad2c219dc3c0747647</anchor>
+      <arglist>(std::span&lt; const std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a81718a49fd319431da6d4c89424dd1e3</anchor>
+      <arglist>(std::vector&lt; std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::tes4::directory</name>
+    <filename>classbsa_1_1tes4_1_1directory.html</filename>
+    <base>hashmap&lt; file &gt;</base>
+    <member kind="typedef">
+      <type>components::key&lt; hashing::hash, hashing::hash_directory &gt;</type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1tes4_1_1directory.html</anchorfile>
+      <anchor>a9a483118df2fc9900c89a49eee194b29</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename file ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>file</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1tes4_1_1directory.html</anchorfile>
+      <anchor>a0d92f61cccd73b9d3cfbd8fa82a92138</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::exception</name>
+    <filename>classbsa_1_1exception.html</filename>
+    <base>std::exception</base>
+    <member kind="function">
+      <type></type>
+      <name>exception</name>
+      <anchorfile>classbsa_1_1exception.html</anchorfile>
+      <anchor>a7a6742952d6e8613ee32be64c37d9c04</anchor>
+      <arglist>(const char *a_what) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>const char *</type>
+      <name>what</name>
+      <anchorfile>classbsa_1_1exception.html</anchorfile>
+      <anchor>a9323ebaf201db9c1c2945013901df9c3</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::fo4::file</name>
+    <filename>classbsa_1_1fo4_1_1file.html</filename>
+    <class kind="struct">bsa::fo4::file::header_t</class>
+    <member kind="typedef">
+      <type>chunk</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a307dc4309601d24f6fb201a7f301e392</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ab43a90bd25a1958947ee01e0826e42ff</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a5c852cb44fa1043437f6bc1c97b3f02f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>components::key&lt; hashing::hash, hashing::hash_file &gt;</type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ace7bcdc88ea43bcb7798709c8d7ffb54</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>file</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a3ab343e7f5c886d268b6de94f66d57d8</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>file</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a6a16a78d9fca59dfe6249dae752588a9</anchor>
+      <arglist>(const file &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>file</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a4c39681b62814e7a8f632fdd758c1f07</anchor>
+      <arglist>(file &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~file</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a20ea8979be94d79ea21e98b2c67d199c</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>file &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>aaa575073ea0421eaf8e5d6b841dec465</anchor>
+      <arglist>(const file &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>file &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a48d3ddb51970e704e54fb46be8101ea4</anchor>
+      <arglist>(file &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a1c75c8e4a13dfaa530c496f4db034721</anchor>
+      <arglist>(std::size_t a_pos) noexcept -&gt; value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a52b3416c8d92d08bd1a8b6d1f743086c</anchor>
+      <arglist>(std::size_t a_pos) const noexcept -&gt; const value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>acccb80b4fffc6700f51e2e528a670f54</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a265e645b81d0e448f3344d2185a2d94d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a600ede78f5668d8eef1dd8a408104c75</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a371405c7a4c6974889f71f3961df1ce8</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a3c6416a91f72ce03dba821c433b835f3</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a297300dee125765de3fec6b631844362</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>back</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a37c0068231859ab0a67e9c77370a1572</anchor>
+      <arglist>() noexcept -&gt; value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>back</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>aa0d3cea640527e80a982ef44f4282533</anchor>
+      <arglist>() const noexcept -&gt; const value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>capacity</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a286733bc628a5b0a08f3d53a15d7d1b3</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>afd1b1e634c98de5c7b7df2b3f63bb671</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>value_type &amp;</type>
+      <name>emplace_back</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>aa1a64a9e023ca0659b3cbfe5683f1fa9</anchor>
+      <arglist>(Args &amp;&amp;... a_args) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a30b6c5a1d33059de6706f10d86c35eb6</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>front</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a4257476ee43805ce151ccfde2c0fca3f</anchor>
+      <arglist>() noexcept -&gt; value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>front</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a2584b5b5b2449e1b0f750a6903a18288</anchor>
+      <arglist>() const noexcept -&gt; const value_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>pop_back</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ab6d8819ad4b4814449a6ab1dda95235b</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>push_back</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ad45344276128227325f5d25aa04c8efc</anchor>
+      <arglist>(value_type a_value) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>reserve</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a351d5d0a908b5dd0aa6428c4e6894788</anchor>
+      <arglist>(std::size_t a_count) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>shrink_to_fit</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ab17b9fc41f67c3573a89e6b91dc84d8a</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>ac665ec3c2757cee18184de1468b722ba</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="variable">
+      <type>struct bsa::fo4::file::header_t</type>
+      <name>header</name>
+      <anchorfile>classbsa_1_1fo4_1_1file.html</anchorfile>
+      <anchor>a80ba252a75ba2032a043dcb3edc8f732</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::tes3::file</name>
+    <filename>classbsa_1_1tes3_1_1file.html</filename>
+    <base>bsa::components::byte_container</base>
+    <member kind="typedef">
+      <type>components::key&lt; hashing::hash, hashing::hash_file &gt;</type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1tes3_1_1file.html</anchorfile>
+      <anchor>ab70b677cde47686aa9ee2c89f779ff6e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1byte__container.html</anchorfile>
+      <anchor>a6fc8f1af4e747c6c0fd78e158625445e</anchor>
+      <arglist>(std::span&lt; const std::byte &gt; a_data) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1byte__container.html</anchorfile>
+      <anchor>a7f4a21f08096638f61ac065b0bab5bad</anchor>
+      <arglist>(std::vector&lt; std::byte &gt; a_data) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::tes4::file</name>
+    <filename>classbsa_1_1tes4_1_1file.html</filename>
+    <base>bsa::components::compressed_byte_container</base>
+    <member kind="typedef">
+      <type>components::key&lt; hashing::hash, hashing::hash_file &gt;</type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>ab97fa7c2cf25ca2dc4a8f1c151937d5b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>clear</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>a675181544541f5832709666aec9ca4c3</anchor>
+      <arglist>() noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>compress</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>aedbbc42c555385cf1e5d869ace1a76b0</anchor>
+      <arglist>(version a_version) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compress_bound</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>a2ddc268c5d54e923f8d1f5433137eae4</anchor>
+      <arglist>(version a_version) const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>compress_into</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>abf898ad72b7bf728a74a6418cd4c64c3</anchor>
+      <arglist>(version a_version, std::span&lt; std::byte &gt; a_out) noexcept -&gt; std::optional&lt; std::size_t &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>decompress</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>a60934d41746e559f5facb562232df5d8</anchor>
+      <arglist>(version a_version) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>decompress_into</name>
+      <anchorfile>classbsa_1_1tes4_1_1file.html</anchorfile>
+      <anchor>a2e25ced971185d2726b024ce82f27f97</anchor>
+      <arglist>(version a_version, std::span&lt; std::byte &gt; a_out) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>compressed</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>aaa95fbcc92f30c30af345eee6045e145</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>decompressed_size</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a1d4de99c523225f7528073889204524b</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a06b6911070fbf5ad2c219dc3c0747647</anchor>
+      <arglist>(std::span&lt; const std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_data</name>
+      <anchorfile>classbsa_1_1components_1_1compressed__byte__container.html</anchorfile>
+      <anchor>a81718a49fd319431da6d4c89424dd1e3</anchor>
+      <arglist>(std::vector&lt; std::byte &gt; a_data, std::optional&lt; std::size_t &gt; a_decompressedSize=std::nullopt) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>as_bytes</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a663800f7bac956d98801095ee907dbe4</anchor>
+      <arglist>() const noexcept -&gt; std::span&lt; const std::byte &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>data</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>afc2e6c82b8576a2f779a1ed1b20a156a</anchor>
+      <arglist>() const noexcept -&gt; const std::byte *</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a096ea2d7371c338bf5238b1572c454a7</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1basic__byte__container.html</anchorfile>
+      <anchor>a4709ab2a4c0690b4f057ea1a5dedf1c8</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>bsa::tes3::hashing::hash</name>
+    <filename>structbsa_1_1tes3_1_1hashing_1_1hash.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>numeric</name>
+      <anchorfile>structbsa_1_1tes3_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a05456bab11c52a4e7b9eb19985487431</anchor>
+      <arglist>() const noexcept -&gt; std::uint64_t</arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>lo</name>
+      <anchorfile>structbsa_1_1tes3_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>aef9ef6e667e35839c05ca9eebebeb384</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>hi</name>
+      <anchorfile>structbsa_1_1tes3_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a1b462dc31d6e3516f83fd1059d9d52e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="friend">
+      <type>friend bool</type>
+      <name>operator==</name>
+      <anchorfile>structbsa_1_1tes3_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>adc9625214b248a9afe4a2e14eb0c383f</anchor>
+      <arglist>(const hash &amp;, const hash &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator</name>
+      <anchorfile>structbsa_1_1tes3_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a01b24fcd28f8c5ed982970714c721742</anchor>
+      <arglist>(const hash &amp;a_lhs, const hash &amp;a_rhs) noexcept -&gt; std::strong_ordering</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>bsa::fo4::hashing::hash</name>
+    <filename>structbsa_1_1fo4_1_1hashing_1_1hash.html</filename>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>file</name>
+      <anchorfile>structbsa_1_1fo4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a76bf1debf36cb6c39fa444edac8b1074</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>extension</name>
+      <anchorfile>structbsa_1_1fo4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>ad28d90782c77bccac026e69880c1913e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>directory</name>
+      <anchorfile>structbsa_1_1fo4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>af198c2adc5781bfccd865d244e6446f7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="friend">
+      <type>friend bool</type>
+      <name>operator==</name>
+      <anchorfile>structbsa_1_1fo4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>adc9625214b248a9afe4a2e14eb0c383f</anchor>
+      <arglist>(const hash &amp;, const hash &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator</name>
+      <anchorfile>structbsa_1_1fo4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a1b09f1904cd09928b66a57ba68eeda3c</anchor>
+      <arglist>(const hash &amp;, const hash &amp;) noexcept -&gt; std::strong_ordering=default</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>bsa::tes4::hashing::hash</name>
+    <filename>structbsa_1_1tes4_1_1hashing_1_1hash.html</filename>
+    <member kind="function">
+      <type>auto</type>
+      <name>numeric</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>ad5b4592e479e01dedd30b52547b05afe</anchor>
+      <arglist>() const noexcept -&gt; std::uint64_t</arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>last</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>af985b3192139e32f7da7b219e634daf0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>last2</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a5f475ff8f8becf70e0f1dcaf151c1550</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>length</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a2d0abcbd557a51c0b622809d161130b7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>first</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a92e41801933723f6c79145a5861b02aa</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint32_t</type>
+      <name>crc</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a1178cfe7cb8c70dc4ad1603103975d88</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="friend">
+      <type>friend bool</type>
+      <name>operator==</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>adc9625214b248a9afe4a2e14eb0c383f</anchor>
+      <arglist>(const hash &amp;, const hash &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator</name>
+      <anchorfile>structbsa_1_1tes4_1_1hashing_1_1hash.html</anchorfile>
+      <anchor>a01b24fcd28f8c5ed982970714c721742</anchor>
+      <arglist>(const hash &amp;a_lhs, const hash &amp;a_rhs) noexcept -&gt; std::strong_ordering</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::hashmap</name>
+    <filename>classbsa_1_1components_1_1hashmap.html</filename>
+    <templarg></templarg>
+    <templarg>RECURSE</templarg>
+    <class kind="class">bsa::components::hashmap::index_t</class>
+    <member kind="typedef">
+      <type>typename T::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>T</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a2660f6bf9949da6e12894ffdc171f611</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad07b09513ca0ebdebd7e319264865b14</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5c1d3a1c5041cbad4a4a2a6bb5a3f092</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afc0e83edd822931cccadb62ee607ff06</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a31a678b492fa6df7dff1a145396a66d9</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>adbd488d720b93f799effacad6287a16a</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>hashmap&lt; directory, true &gt;</name>
+    <filename>classbsa_1_1components_1_1hashmap.html</filename>
+    <member kind="typedef">
+      <type>typename directory ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>directory</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a2660f6bf9949da6e12894ffdc171f611</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad07b09513ca0ebdebd7e319264865b14</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5c1d3a1c5041cbad4a4a2a6bb5a3f092</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afc0e83edd822931cccadb62ee607ff06</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a31a678b492fa6df7dff1a145396a66d9</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>adbd488d720b93f799effacad6287a16a</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>hashmap&lt; file &gt;</name>
+    <filename>classbsa_1_1components_1_1hashmap.html</filename>
+    <member kind="typedef">
+      <type>typename file ::key</type>
+      <name>key_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab5a2b045f3895f8e24d8fd60ce4b33be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>file</type>
+      <name>mapped_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a175b6fb459551b1ffc5234f62351fea1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::pair&lt; const key_type, mapped_type &gt;</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afa94e8a401bc1a82150bb80856d0508b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::key_compare</type>
+      <name>key_compare</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a82a1cbe1587f03b5c010e793a664ad78</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::iterator</type>
+      <name>iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6a17f1ff476ae31002e2eaa199246605</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>typename container_type::const_iterator</type>
+      <name>const_iterator</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad7ba34f8859c8d0b2149eabc229f131c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; mapped_type &gt;</type>
+      <name>index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4c8b88df846bfa9be28bfcb4eb876fb3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>index_t&lt; const mapped_type &gt;</type>
+      <name>const_index</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ab11a383ffd618d3a9abc8e7acad6bb4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a2660f6bf9949da6e12894ffdc171f611</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad07b09513ca0ebdebd7e319264865b14</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5c1d3a1c5041cbad4a4a2a6bb5a3f092</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~hashmap</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>afc0e83edd822931cccadb62ee607ff06</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a31a678b492fa6df7dff1a145396a66d9</anchor>
+      <arglist>(const hashmap &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>hashmap &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>adbd488d720b93f799effacad6287a16a</anchor>
+      <arglist>(hashmap &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bbb12b51bd574be67defe0f6022b0bf</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae73627beb54fd173c3f4714d9c359002</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_index</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>af78ec5974b3b6c42fa162a695b25b8c4</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>begin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a6b71d05622a466507267f5e26c123e5d</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cbegin</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4ae8ed84b3bee90a4bf7a5d57d373e93</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a4bc812baa79b58df2f219e9648ddd6f0</anchor>
+      <arglist>() noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>end</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a5070c712046054310a1ad4f84f07980f</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>cend</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa06e43b9454b844707721f7a3533fc12</anchor>
+      <arglist>() const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a8323ce8a4363e9aa1900c702db23d824</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>erase</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ada79189db0781a44d9c4e43bc73b5f9c</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ad8e2a88a020581114c21cca2570018ce</anchor>
+      <arglist>(const key_type &amp;a_key) noexcept -&gt; iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>find</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>aa871afa037e471c4acd3d7c0814c2645</anchor>
+      <arglist>(const key_type &amp;a_key) const noexcept -&gt; const_iterator</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>insert</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>a34c6b49e1513bb837b633c21a247be7c</anchor>
+      <arglist>(key_type a_key, mapped_type a_value) noexcept -&gt; std::pair&lt; iterator, bool &gt;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>size</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap.html</anchorfile>
+      <anchor>ae9b097762ddd2d9a5a5cdf5d365ebf10</anchor>
+      <arglist>() const noexcept -&gt; std::size_t</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>bsa::fo4::file::header_t</name>
+    <filename>structbsa_1_1fo4_1_1file_1_1header__t.html</filename>
+    <member kind="variable">
+      <type>std::uint16_t</type>
+      <name>height</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>a7d32ac300589999d921cd87bfb825992</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint16_t</type>
+      <name>width</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>adcdbf409464f787f4228ce34c35cb81c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>mip_count</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>a7635d6ccf31c230b08cb5ebf35a063f6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>format</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>adf3b580b85f55c0c1b9e311ac10b5bc1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>flags</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>a24c7a290c5f0de8f8a580de2b13c1164</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint8_t</type>
+      <name>tile_mode</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>a945c29baeed5cc1989c949f488ab7fde</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator&gt;&gt;</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>aa578551e49f0a97f6d752ae4ad8b9828</anchor>
+      <arglist>(detail::istream_t &amp;a_in, header_t &amp;a_header) -&gt; detail::istream_t &amp;</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>structbsa_1_1fo4_1_1file_1_1header__t.html</anchorfile>
+      <anchor>adc4c93a90f38e77fae0c5eb0662f2c41</anchor>
+      <arglist>(detail::ostream_t &amp;a_out, const header_t &amp;a_header) noexcept -&gt; detail::ostream_t &amp;</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::hashmap::index_t</name>
+    <filename>classbsa_1_1components_1_1hashmap_1_1index__t.html</filename>
+    <templarg></templarg>
+    <member kind="typedef">
+      <type>U</type>
+      <name>value_type</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a10aa18f113e5563aeb09f5aecd4873d8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>value_type *</type>
+      <name>pointer</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a971f714dbce01f72ce5f79653f4ab054</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>value_type &amp;</type>
+      <name>reference</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a09fc645207d53f4e27c698c697bb53cd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>index_t</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a2798b861fd7feff38219a3922ef8ecc1</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator[]</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a11d8587abef54b36c789a7f94d846034</anchor>
+      <arglist>(K &amp;&amp;a_key) const noexcept requires(RECURSE)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>operator bool</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a9727a8aedfb3b1ede5a09fdfa8da17b8</anchor>
+      <arglist>() const noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator*</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a840e443f9185953364e41731b501731d</anchor>
+      <arglist>() const noexcept -&gt; reference</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>operator-&gt;</name>
+      <anchorfile>classbsa_1_1components_1_1hashmap_1_1index__t.html</anchorfile>
+      <anchor>a1248e0475dbd67e04a2d882544a19cef</anchor>
+      <arglist>() const noexcept -&gt; pointer</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>bsa::components::key</name>
+    <filename>classbsa_1_1components_1_1key.html</filename>
+    <templarg></templarg>
+    <templarg>Hasher</templarg>
+    <member kind="typedef">
+      <type>Hash</type>
+      <name>hash_type</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a255165b9d25841e82d269f9104887120</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a9f9e6048e1ecbb416b7c8bb30aad079e</anchor>
+      <arglist>()=delete</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a3fc45f4a8622e00caf04058289ad8e71</anchor>
+      <arglist>(hash_type a_hash) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a9196938a84820d823181185188aca403</anchor>
+      <arglist>(String &amp;&amp;a_string) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a3ae2cd6d3a03bdb4ce2bd5fda0000af9</anchor>
+      <arglist>(const key &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a28fb9de8062baeb87497f07be768ff64</anchor>
+      <arglist>(key &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>~key</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a8611a24baaf84c8e30e296a36d6b850a</anchor>
+      <arglist>() noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>key &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>ab29943ccf2892f35a92b710a14899a5d</anchor>
+      <arglist>(const key &amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>key &amp;</type>
+      <name>operator=</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a1ffe0ca0a9245bbd89817e7054b20579</anchor>
+      <arglist>(key &amp;&amp;) noexcept=default</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>hash</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a7fa300d4026ef6eaf9af44e9fcc0d68a</anchor>
+      <arglist>() const noexcept -&gt; const hash_type &amp;</arglist>
+    </member>
+    <member kind="function">
+      <type>auto</type>
+      <name>name</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a60ae0b6d1cdff32ab0478bf7ccf0bf81</anchor>
+      <arglist>() const noexcept -&gt; std::string_view</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator==</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a685863ab8707244a9736ef600c34d1ce</anchor>
+      <arglist>(const key &amp;a_lhs, const key &amp;a_rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator==</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>aa3ff06ed4b9a08b9dc4dc4edd3470db1</anchor>
+      <arglist>(const key &amp;a_lhs, const hash_type &amp;a_rhs) noexcept -&gt; bool</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a6d20e609c532c226f50f8a1a7c263a02</anchor>
+      <arglist>(const key &amp;a_lhs, const key &amp;a_rhs) noexcept -&gt; std::strong_ordering</arglist>
+    </member>
+    <member kind="friend">
+      <type>friend auto</type>
+      <name>operator</name>
+      <anchorfile>classbsa_1_1components_1_1key.html</anchorfile>
+      <anchor>a0edbcca530919036946e4475fb7a3c85</anchor>
+      <arglist>(const key &amp;a_lhs, const hash_type &amp;a_rhs) noexcept -&gt; std::strong_ordering</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>bsa::fo4::chunk::mips_t</name>
+    <filename>structbsa_1_1fo4_1_1chunk_1_1mips__t.html</filename>
+    <member kind="variable">
+      <type>std::uint16_t</type>
+      <name>first</name>
+      <anchorfile>structbsa_1_1fo4_1_1chunk_1_1mips__t.html</anchorfile>
+      <anchor>a06c1c1d3dd132f48ff63d0ef0ec00d8c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::uint16_t</type>
+      <name>last</name>
+      <anchorfile>structbsa_1_1fo4_1_1chunk_1_1mips__t.html</anchorfile>
+      <anchor>a542b73d6505cf131b4b70b44347bee42</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa</name>
+    <filename>namespacebsa.html</filename>
+    <namespace>bsa::components</namespace>
+    <namespace>bsa::concepts</namespace>
+    <namespace>bsa::fo4</namespace>
+    <namespace>bsa::tes3</namespace>
+    <namespace>bsa::tes4</namespace>
+    <class kind="class">bsa::exception</class>
+    <member kind="function">
+      <type>constexpr auto</type>
+      <name>make_four_cc</name>
+      <anchorfile>namespacebsa.html</anchorfile>
+      <anchor>afb4a4044ea70d08337cb4e0564044592</anchor>
+      <arglist>(std::string_view a_cc) noexcept -&gt; std::uint32_t</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::components</name>
+    <filename>namespacebsa_1_1components.html</filename>
+    <class kind="class">bsa::components::basic_byte_container</class>
+    <class kind="class">bsa::components::byte_container</class>
+    <class kind="class">bsa::components::compressed_byte_container</class>
+    <class kind="class">bsa::components::hashmap</class>
+    <class kind="class">bsa::components::key</class>
+    <member kind="typedef">
+      <type>Hash(*)(std::string &amp;) noexcept</type>
+      <name>hasher_t</name>
+      <anchorfile>namespacebsa_1_1components.html</anchorfile>
+      <anchor>ad74fb7e52fe738b2d5466d26d7934fae</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::concepts</name>
+    <filename>namespacebsa_1_1concepts.html</filename>
+    <member kind="variable">
+      <type>concept</type>
+      <name>stringable</name>
+      <anchorfile>namespacebsa_1_1concepts.html</anchorfile>
+      <anchor>a77432ae89b7ecfa3c536b98d80a14e48</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::fo4</name>
+    <filename>namespacebsa_1_1fo4.html</filename>
+    <namespace>bsa::fo4::hashing</namespace>
+    <class kind="class">bsa::fo4::archive</class>
+    <class kind="class">bsa::fo4::chunk</class>
+    <class kind="class">bsa::fo4::file</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>format</name>
+      <anchorfile>namespacebsa_1_1fo4.html</anchorfile>
+      <anchor>af174c67d25a517d23a6abeda822b25ae</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1fo4.html" anchor="af174c67d25a517d23a6abeda822b25aea958153f1b8b96ec4c4eb2147429105d9">general</enumvalue>
+      <enumvalue file="namespacebsa_1_1fo4.html" anchor="af174c67d25a517d23a6abeda822b25aeaa9fd6347608dab0c518e601b176cf896">directx</enumvalue>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::fo4::hashing</name>
+    <filename>namespacebsa_1_1fo4_1_1hashing.html</filename>
+    <class kind="struct">bsa::fo4::hashing::hash</class>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1fo4_1_1hashing.html</anchorfile>
+      <anchor>aadff7c61e18334eb3fe5b9924b6e8ab4</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::tes3</name>
+    <filename>namespacebsa_1_1tes3.html</filename>
+    <namespace>bsa::tes3::hashing</namespace>
+    <class kind="class">bsa::tes3::archive</class>
+    <class kind="class">bsa::tes3::file</class>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::tes3::hashing</name>
+    <filename>namespacebsa_1_1tes3_1_1hashing.html</filename>
+    <class kind="struct">bsa::tes3::hashing::hash</class>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1tes3_1_1hashing.html</anchorfile>
+      <anchor>a2195f39a7c2669a965411356ab919592</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::tes4</name>
+    <filename>namespacebsa_1_1tes4.html</filename>
+    <namespace>bsa::tes4::hashing</namespace>
+    <class kind="class">bsa::tes4::archive</class>
+    <class kind="class">bsa::tes4::directory</class>
+    <class kind="class">bsa::tes4::file</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>archive_flag</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>a929dbf32826a657e850c6c563e47347b</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347baa7dc9140432a962a83524e4206abf256">directory_strings</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba481811567b0b34aee94c54a3473c6adc">file_strings</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">compressed</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347baa9a41705977069b26d7e30dc2501d8b9">retain_directory_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bad28bc7ccc5087c8c47d5d2c1f31403a7">retain_file_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba6d061ee081309ebce673951e4468775e">retain_file_name_offsets</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba349e12e1da168ba0f0651fcc8120d3b8">xbox_archive</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bae82e4eb0d7802c56696a8d6689609793">retain_strings_during_startup</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347bafe3ff6f81e61f998602d0b1c66c7b944">embedded_file_names</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a929dbf32826a657e850c6c563e47347ba08678295c8b2e35e4b32058998bd859e">xbox_compressed</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>archive_type</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>ae0c17a039f112258e48dc29f4582ed39</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a1541efdcede8c5a0c2ed7e32c89b361f">meshes</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39ac5e62798e528da9080811018cbb27cd3">textures</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a81ca0b7c951be89184c130d2860a5b00">menus</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39aad1588d76517dd34c49c3f901bce7fcf">sounds</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39aac163f065d2b3ecd5fc2f8e6365b367e">voices</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a1aa355706e1767666124331a716c7890">shaders</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a2d5563ed288ac5396add9b78fbca810b">trees</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39a980d14c0c85495b48b9a9134658e6121">fonts</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="ae0c17a039f112258e48dc29f4582ed39abc957e26ff41470c556ee5d09e96880b">misc</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>version</name>
+      <anchorfile>namespacebsa_1_1tes4.html</anchorfile>
+      <anchor>a80407ad9bc5b93ad43225b2bb9f5100c</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca27069e6baf4eba0ad33686287d582c97">tes4</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca9251dddd50ef30adce51ad629526d447">fo3</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca305506069f2dda79d68e638186b83a5e">tes5</enumvalue>
+      <enumvalue file="namespacebsa_1_1tes4.html" anchor="a80407ad9bc5b93ad43225b2bb9f5100ca64192ca465194480a4621d6905dac5b7">sse</enumvalue>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>bsa::tes4::hashing</name>
+    <filename>namespacebsa_1_1tes4_1_1hashing.html</filename>
+    <class kind="struct">bsa::tes4::hashing::hash</class>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_directory</name>
+      <anchorfile>namespacebsa_1_1tes4_1_1hashing.html</anchorfile>
+      <anchor>a7b8cada802bd8b109634d042f4608330</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+    <member kind="function">
+      <type>hash</type>
+      <name>hash_file</name>
+      <anchorfile>namespacebsa_1_1tes4_1_1hashing.html</anchorfile>
+      <anchor>a25347463a149213d0d76e383b4d180f8</anchor>
+      <arglist>(std::string &amp;a_path) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="page">
+    <name>index</name>
+    <title>bsa</title>
+    <filename>index</filename>
+    <docanchor file="index.html" title="Overview">overview</docanchor>
+    <docanchor file="index.html" title="What is a BSA?">what</docanchor>
+    <docanchor file="index.html" title="Why bsa?">why</docanchor>
+    <docanchor file="index.html" title="It&apos;s written in contemporary C++">why-cxx</docanchor>
+    <docanchor file="index.html" title="It&apos;s actively tested">why-testing</docanchor>
+    <docanchor file="index.html" title="It&apos;s low overhead">why-low-overhead</docanchor>
+    <docanchor file="index.html" title="It&apos;s low level">why-low-level</docanchor>
+    <docanchor file="index.html" title="Examples">examples</docanchor>
+    <docanchor file="index.html" title="Reading">examples-reading</docanchor>
+    <docanchor file="index.html" title="Writing">examples-writing</docanchor>
+    <docanchor file="index.html" title="Integration">integration</docanchor>
+    <docanchor file="index.html" title="Important Notes">important-notes</docanchor>
+    <docanchor file="index.html" title="Dependencies">dependencies</docanchor>
+    <docanchor file="index.html" title="Consumption">dependencies-consumption</docanchor>
+    <docanchor file="index.html" title="Development">dependencies-development</docanchor>
+    <docanchor file="index.html" title="Alternatives">alternatives</docanchor>
+  </compound>
+</tagfile>

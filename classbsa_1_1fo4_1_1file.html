@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>bsa::fo4::file class | bsa bethesda archives meet c++</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" rel="stylesheet"/>
+  <link href="m-dark+documentation.compiled.css" rel="stylesheet"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <meta content="bsa" name="twitter:title"/>
+  <meta content="bsa" property="og:title"/>
+  <meta content="bsa" itemprop="name"/>
+  <meta content="Ryan McKenzie" name="author"/>
+  <meta content="Ryan McKenzie" property="article:author"/>
+  <meta content="bethesda archives meet c++" name="description"/>
+  <meta content="bethesda archives meet c++" name="twitter:description"/>
+  <meta content="bethesda archives meet c++" property="og:description"/>
+  <meta content="bethesda archives meet c++" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.4.5" name="generator"/>
+  <meta content="no-referrer-when-downgrade" name="referrer"/>
+  <link href="poxy-0.4.5.css" rel="stylesheet"/>
+  <link href="poxy-0.4.5-dark.css" rel="stylesheet"/>
+  <script src="poxy-0.4.5.js"></script>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bsa <span class="m-thin">bethesda archives meet c++</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a class="github poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebsa.html">bsa</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespacebsa_1_1fo4.html">fo4</a>::<wbr/></span>file <span class="m-thin">class</span> <span class="m-label m-flat m-warning">final</span>
+          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="fo4_8hpp.html">&lt;bsa/fo4.hpp&gt;</a></div>
+        </h1>
+        <p>Represents a file within the FO:4 virtual filesystem.</p>
+        <div class="m-block m-default poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#pub-types">Public types</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pub-methods">Public functions</a></li>
+                <li><a href="#pub-attribs">Public variables</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <section id="pub-types">
+          <h2><a href="#pub-types">Public types</a></h2>
+          <dl class="m-doc">
+            <dt>
+              struct <a class="m-doc" href="structbsa_1_1fo4_1_1file_1_1header__t.html">header_t</a>
+            </dt>
+            <dd>Unique to <a class="m-doc" href="namespacebsa_1_1fo4.html#af174c67d25a517d23a6abeda822b25aeaa9fd6347608dab0c518e601b176cf896">format::<wbr/>directx</a>.</dd>
+            <dt id="a5c852cb44fa1043437f6bc1c97b3f02f">
+              using <a class="m-doc-self" href="#a5c852cb44fa1043437f6bc1c97b3f02f">const_iterator</a> = container_type::const_iterator
+            </dt>
+            <dd></dd>
+            <dt id="ab43a90bd25a1958947ee01e0826e42ff">
+              using <a class="m-doc-self" href="#ab43a90bd25a1958947ee01e0826e42ff">iterator</a> = container_type::iterator
+            </dt>
+            <dd></dd>
+            <dt id="ace7bcdc88ea43bcb7798709c8d7ffb54">
+              using <a class="m-doc-self" href="#ace7bcdc88ea43bcb7798709c8d7ffb54">key</a> = <a class="m-doc" href="classbsa_1_1components_1_1key.html">components::<wbr/>key</a>&lt;<a class="m-doc" href="structbsa_1_1fo4_1_1hashing_1_1hash.html">hashing::<wbr/>hash</a>, <a class="m-doc" href="namespacebsa_1_1fo4_1_1hashing.html#aadff7c61e18334eb3fe5b9924b6e8ab4">hashing::<wbr/>hash_file</a>&gt;
+            </dt>
+            <dd>The key used to indentify a file.</dd>
+            <dt id="a307dc4309601d24f6fb201a7f301e392">
+              using <a class="m-doc-self" href="#a307dc4309601d24f6fb201a7f301e392">value_type</a> = <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt id="a3ab343e7f5c886d268b6de94f66d57d8">
+              <span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a3ab343e7f5c886d268b6de94f66d57d8">file</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="a6a16a78d9fca59dfe6249dae752588a9">
+              <span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a6a16a78d9fca59dfe6249dae752588a9">file</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp;) <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="a4c39681b62814e7a8f632fdd758c1f07">
+              <span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a4c39681b62814e7a8f632fdd758c1f07">file</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp;&amp;) <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="a20ea8979be94d79ea21e98b2c67d199c">
+              <span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a20ea8979be94d79ea21e98b2c67d199c">~file</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a37c0068231859ab0a67e9c77370a1572">back</a>(</span><span class="m-doc-wrap">) noexcept -&gt; value_type &amp;</span>
+            </dt>
+            <dd>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the back of the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aa0d3cea640527e80a982ef44f4282533">back</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const value_type &amp;</span>
+            </dt>
+            <dd>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the back of the file.</dd>
+            <dt id="acccb80b4fffc6700f51e2e528a670f54">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#acccb80b4fffc6700f51e2e528a670f54">begin</a>(</span><span class="m-doc-wrap">) noexcept -&gt; iterator</span>
+            </dt>
+            <dd>Returns an iterator to the beginning of the file.</dd>
+            <dt id="a265e645b81d0e448f3344d2185a2d94d">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a265e645b81d0e448f3344d2185a2d94d">begin</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const_iterator</span>
+            </dt>
+            <dd>Returns an iterator to the beginning of the file.</dd>
+            <dt id="a286733bc628a5b0a08f3d53a15d7d1b3">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a286733bc628a5b0a08f3d53a15d7d1b3">capacity</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; <a class="m-doc poxy-injected poxy-external" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">std::size_t</a></span>
+            </dt>
+            <dd>Returns the number of chunks the file can store without reallocating.</dd>
+            <dt id="a600ede78f5668d8eef1dd8a408104c75">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a600ede78f5668d8eef1dd8a408104c75">cbegin</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const_iterator</span>
+            </dt>
+            <dd>Returns an iterator to the beginning of the file.</dd>
+            <dt id="a297300dee125765de3fec6b631844362">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a297300dee125765de3fec6b631844362">cend</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const_iterator</span>
+            </dt>
+            <dd>Returns an iterator to the end of the file.</dd>
+            <dt id="afd1b1e634c98de5c7b7df2b3f63bb671">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#afd1b1e634c98de5c7b7df2b3f63bb671">clear</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Clears the chunks and header of the file.</dd>
+            <dt id="aa1a64a9e023ca0659b3cbfe5683f1fa9">
+              <div class="m-doc-template">template&lt;class... Args&gt;</div>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aa1a64a9e023ca0659b3cbfe5683f1fa9">emplace_back</a>(</span><span class="m-doc-wrap">Args &amp;&amp; ... a_args) -&gt; <a class="m-doc" href="classbsa_1_1fo4_1_1file.html#a307dc4309601d24f6fb201a7f301e392">value_<wbr/>type</a>&amp; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Constructs a <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> in-place, inside the file.</dd>
+            <dt id="a30b6c5a1d33059de6706f10d86c35eb6">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a30b6c5a1d33059de6706f10d86c35eb6">empty</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if the file is empty.</dd>
+            <dt id="a371405c7a4c6974889f71f3961df1ce8">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a371405c7a4c6974889f71f3961df1ce8">end</a>(</span><span class="m-doc-wrap">) noexcept -&gt; iterator</span>
+            </dt>
+            <dd>Returns an iterator to the end of the file.</dd>
+            <dt id="a3c6416a91f72ce03dba821c433b835f3">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a3c6416a91f72ce03dba821c433b835f3">end</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const_iterator</span>
+            </dt>
+            <dd>Returns an iterator to the end of the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a4257476ee43805ce151ccfde2c0fca3f">front</a>(</span><span class="m-doc-wrap">) noexcept -&gt; value_type &amp;</span>
+            </dt>
+            <dd>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the front of the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a2584b5b5b2449e1b0f750a6903a18288">front</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const value_type &amp;</span>
+            </dt>
+            <dd>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the front of the file.</dd>
+            <dt id="aaa575073ea0421eaf8e5d6b841dec465">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aaa575073ea0421eaf8e5d6b841dec465">operator=</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp;) -&gt; <a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp; <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt id="a48d3ddb51970e704e54fb46be8101ea4">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a48d3ddb51970e704e54fb46be8101ea4">operator=</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp;&amp;) -&gt; <a class="m-doc" href="classbsa_1_1fo4_1_1file.html">file</a>&amp; <span class="m-label m-flat m-info">defaulted</span> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a1c75c8e4a13dfaa530c496f4db034721">operator[]</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> a_pos) noexcept -&gt; value_type &amp;</span>
+            </dt>
+            <dd>Returns the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the given position.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a52b3416c8d92d08bd1a8b6d1f743086c">operator[]</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> a_pos) const noexcept -&gt; const value_type &amp;</span>
+            </dt>
+            <dd>Returns the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the given position.</dd>
+            <dt id="ab6d8819ad4b4814449a6ab1dda95235b">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#ab6d8819ad4b4814449a6ab1dda95235b">pop_back</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Removes a <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> from the file.</dd>
+            <dt id="ad45344276128227325f5d25aa04c8efc">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#ad45344276128227325f5d25aa04c8efc">push_back</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1fo4_1_1file.html#a307dc4309601d24f6fb201a7f301e392">value_<wbr/>type</a> a_value) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Appends a <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> to the file.</dd>
+            <dt id="a351d5d0a908b5dd0aa6428c4e6894788">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a351d5d0a908b5dd0aa6428c4e6894788">reserve</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> a_count) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Reserves storage for <code>a_count</code> chunks.</dd>
+            <dt id="ab17b9fc41f67c3573a89e6b91dc84d8a">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#ab17b9fc41f67c3573a89e6b91dc84d8a">shrink_to_fit</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Shrinks the file's capacity to its size.</dd>
+            <dt id="ac665ec3c2757cee18184de1468b722ba">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#ac665ec3c2757cee18184de1468b722ba">size</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; <a class="m-doc poxy-injected poxy-external" href="https://en.cppreference.com/w/cpp/types/size_t" target="_blank">std::size_t</a></span>
+            </dt>
+            <dd>Returns the number of chunks in the file.</dd>
+          </dl>
+        </section>
+        <section id="pub-attribs">
+          <h2><a href="#pub-attribs">Public variables</a></h2>
+          <dl class="m-doc">
+            <dt id="a80ba252a75ba2032a043dcb3edc8f732">
+              struct <a class="m-doc" href="structbsa_1_1fo4_1_1file_1_1header__t.html">bsa::<wbr/>fo4::<wbr/>file::<wbr/>header_t</a> <a class="m-doc-self" href="#a80ba252a75ba2032a043dcb3edc8f732">header</a>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a37c0068231859ab0a67e9c77370a1572"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a37c0068231859ab0a67e9c77370a1572">back</a>(</span><span class="m-doc-wrap">) noexcept -&gt; value_type &amp;</span></span>
+            </h3>
+            <p>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the back of the file.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The container must <em>not</em> be empty.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="aa0d3cea640527e80a982ef44f4282533"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa0d3cea640527e80a982ef44f4282533">back</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const value_type &amp;</span></span>
+            </h3>
+            <p>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the back of the file.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The container must <em>not</em> be empty.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a4257476ee43805ce151ccfde2c0fca3f"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a4257476ee43805ce151ccfde2c0fca3f">front</a>(</span><span class="m-doc-wrap">) noexcept -&gt; value_type &amp;</span></span>
+            </h3>
+            <p>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the front of the file.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file must <em>not</em> be empty.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a2584b5b5b2449e1b0f750a6903a18288"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a2584b5b5b2449e1b0f750a6903a18288">front</a>(</span><span class="m-doc-wrap">) const noexcept -&gt; const value_type &amp;</span></span>
+            </h3>
+            <p>Returns a reference to the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the front of the file.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file must <em>not</em> be empty.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a1c75c8e4a13dfaa530c496f4db034721"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a1c75c8e4a13dfaa530c496f4db034721">operator[]</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> a_pos) noexcept -&gt; value_type &amp;</span></span>
+            </h3>
+            <p>Returns the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the given position.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p><code>a_pos</code> <em>must</em> be less than the current size.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a52b3416c8d92d08bd1a8b6d1f743086c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">auto bsa::<wbr/>fo4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a52b3416c8d92d08bd1a8b6d1f743086c">operator[]</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> a_pos) const noexcept -&gt; const value_type &amp;</span></span>
+            </h3>
+            <p>Returns the <a class="m-doc" href="classbsa_1_1fo4_1_1chunk.html">chunk</a> at the given position.</p>
+<aside class="m-note m-success"><h4>Precondition</h4><p><code>a_pos</code> <em>must</em> be less than the current size.</p></aside>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script async="async" src="searchdata-v1.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+    <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/issues" target="_blank">Report an issue</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank">License</a>
+     • <a download="" href="bsa.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+    <br/><br/>
+    Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>
