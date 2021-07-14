@@ -62,8 +62,8 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         working-directory: ${{ github.workspace }}/catch2
         run: |
-          cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
-          cmake --build build -G Ninja --parallel
+          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
+          cmake --build build --parallel
           cmake --install build
 
       - name: Setup vcpkg
