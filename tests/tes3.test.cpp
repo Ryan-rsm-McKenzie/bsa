@@ -214,11 +214,8 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 		const auto add =
 			[&](bsa::tes3::hashing::hash a_hash,
 				std::span<const std::byte> a_data) {
-				constexpr auto dir = "root"sv;
-
 				bsa::tes3::file f;
 				f.set_data(a_data);
-
 				REQUIRE(bsa.insert(a_hash, std::move(f)).second);
 			};
 
