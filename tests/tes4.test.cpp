@@ -15,8 +15,6 @@
 
 #include "bsa/tes4.hpp"
 
-using namespace std::literals;
-
 namespace
 {
 	[[nodiscard]] auto hash_directory(std::string_view a_path) noexcept

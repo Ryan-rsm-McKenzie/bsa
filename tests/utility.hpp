@@ -14,6 +14,8 @@
 
 #include <bsa/detail/common.hpp>
 
+using namespace std::literals;
+
 template <class T>
 consteval bool assert_nothrowable() noexcept
 {
