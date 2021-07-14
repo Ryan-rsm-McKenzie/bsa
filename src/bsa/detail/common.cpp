@@ -144,7 +144,7 @@ namespace bsa::detail
 			}
 #else
 			if (this->_view != MAP_FAILED) {
-				[[maybe_unused]] const auto success = ::munmap(this->_view);
+				[[maybe_unused]] const auto success = ::munmap(this->_view, this->_size);
 				assert(success == 0);
 				this->_view = MAP_FAILED;
 			}
@@ -245,7 +245,7 @@ namespace bsa::detail
 				return false;
 			}
 
-			::stat s = {};
+			struct ::stat s = {};
 			if (::fstat(this->_file, &s) == -1) {
 				return false;
 			}
