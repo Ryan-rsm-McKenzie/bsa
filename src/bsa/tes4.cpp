@@ -795,7 +795,7 @@ namespace bsa::tes4
 		}
 
 		if (a_header.file_strings()) {
-			offset -= a_header.file_names_length();
+			offset -= static_cast<std::uint32_t>(a_header.file_names_length());
 		}
 
 		const detail::restore_point _{ a_in };
