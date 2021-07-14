@@ -95,3 +95,8 @@ jobs:
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
+
+      - name: Collect code coverage
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        working-directory: ${{ github.workspace }}/bsa/build
+        run: bash <(curl -s https://codecov.io/bash)
