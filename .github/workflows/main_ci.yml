@@ -68,10 +68,12 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
 
       - name: Configure CMake
-        run: cmake --preset ${{ matrix.cmake-preset }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF ${{ github.workspace }}/bsa
+        working-directory: ${{ github.workspace }}/bsa
+        run: cmake --preset ${{ matrix.cmake-preset }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
 
       - name: Build
-        run: cmake --build ${{ github.workspace }}/bsa/build
+        working-directory: ${{ github.workspace }}/bsa
+        run: cmake --build build
 
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
