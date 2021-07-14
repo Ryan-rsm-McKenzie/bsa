@@ -11,8 +11,6 @@
 #include <system_error>
 #include <vector>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 
@@ -450,7 +448,7 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 			info_t{ 0x79CD3FEC630A7273, "Characters"sv, 0xD0E4FC14630E3030, "character_0000.png"sv },
 		};
 
-		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		std::vector<bsa::detail::istream_t::stream_type> mmapped;
 		bsa::tes4::archive in;
 		for (const auto& [dir, file] : index) {
 			const auto& data = mmapped.emplace_back(

@@ -226,7 +226,7 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 			info_t{ 0x785183FF, "png"sv, 0xDA3773A6, "Tiles/tile_0003.png"sv },
 		};
 
-		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		std::vector<bsa::detail::istream_t::stream_type> mmapped;
 		bsa::fo4::archive in;
 		for (const auto& file : index) {
 			const auto& data = mmapped.emplace_back(

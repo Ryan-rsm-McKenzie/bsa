@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -11,6 +12,7 @@
 #include <filesystem>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <new>
 #include <optional>
 #include <span>
@@ -20,8 +22,6 @@
 #include <utility>
 #include <variant>
 #include <vector>
-
-#include <boost/iostreams/device/mapped_file.hpp>
 
 #include "bsa/fwd.hpp"
 
@@ -229,6 +229,50 @@ namespace bsa::detail
 		[[nodiscard]] auto fopen(std::filesystem::path a_path, const char* a_mode) -> std::FILE*;
 	}
 
+	namespace mmio
+	{
+		class file final :
+			public std::enable_shared_from_this<file>
+		{
+		public:
+			file() noexcept;
+			file(const file&) = delete;
+			file(file&& a_rhs) noexcept { this->do_move(std::move(a_rhs)); }
+
+			~file() noexcept { this->close(); }
+
+			file& operator=(const file&) = delete;
+			file& operator=(file&& a_rhs) noexcept
+			{
+				if (this != &a_rhs) {
+					this->do_move(std::move(a_rhs));
+				}
+				return *this;
+			}
+
+			void close() noexcept;
+			[[nodiscard]] auto data() const noexcept
+				-> const std::byte* { return static_cast<const std::byte*>(this->_view); }
+			[[nodiscard]] bool is_open() const noexcept;
+			bool open(std::filesystem::path a_path) noexcept;
+			[[nodiscard]] auto size() const noexcept
+				-> const std::size_t { return this->_size; }
+
+		private:
+			void do_move(file&& a_rhs) noexcept;
+			[[nodiscard]] bool do_open(const std::filesystem::path::value_type* a_path) noexcept;
+
+#	if BSA_OS_WINDOWS
+			void* _file{ nullptr };
+			void* _mapping{ nullptr };
+#	else
+			int _file{ -1 };
+#	endif
+			void* _view{ nullptr };
+			std::size_t _size{ 0 };
+		};
+	}
+
 	[[noreturn]] inline void declare_unreachable()
 	{
 		assert(false);
@@ -263,7 +307,7 @@ namespace bsa::detail
 	class istream_t final
 	{
 	public:
-		using stream_type = boost::iostreams::mapped_file_source;
+		using stream_type = mmio::file;
 
 		istream_t(std::filesystem::path a_path);
 		istream_t(const istream_t&) = delete;
@@ -301,7 +345,7 @@ namespace bsa::detail
 		void seek_relative(std::ptrdiff_t a_off) noexcept { _pos += a_off; }
 
 		[[nodiscard]] auto tell() const noexcept { return _pos; }
-		[[nodiscard]] auto rdbuf() const noexcept -> const stream_type& { return _file; }
+		[[nodiscard]] auto rdbuf() const noexcept -> std::shared_ptr<stream_type> { return _file; }
 
 		template <concepts::integral T>
 		friend istream_t& operator>>(istream_t& a_in, T& a_value)
@@ -325,7 +369,8 @@ namespace bsa::detail
 		}
 
 	private :
-		stream_type _file;
+		std::shared_ptr<stream_type>
+			_file;
 		std::size_t _pos{ 0 };
 	};
 
@@ -333,7 +378,7 @@ namespace bsa::detail
 	struct istream_proxy final
 	{
 		T d;
-		boost::iostreams::mapped_file_source f;
+		std::shared_ptr<istream_t::stream_type> f;
 	};
 
 	class ostream_t final

@@ -17,26 +17,6 @@
 
 using namespace std::literals;
 
-namespace
-{
-	[[nodiscard]] auto open_file(
-		std::filesystem::path a_path,
-		const char* a_mode)
-	{
-		const auto close = [](std::FILE* a_file) noexcept {
-			std::fclose(a_file);
-		};
-
-		std::filesystem::create_directories(a_path.parent_path());
-		auto result = std::unique_ptr<std::FILE, decltype(close)>{
-			bsa::detail::unicode::fopen(a_path, a_mode),
-			close
-		};
-		REQUIRE(result);
-		return result;
-	}
-}
-
 TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 {
 	const auto test = []<class T>(std::in_place_type_t<T>, std::size_t a_little, std::size_t a_big) {
@@ -118,6 +98,49 @@ TEST_CASE("bsa::detail::unicode", "[bsa.unicode]")
 		REQUIRE(std::fread(buf.data(), 1, buf.size(), f) == buf.size());
 		REQUIRE(std::memcmp(payload, buf.data(), buf.size()) == 0);
 		REQUIRE(std::fclose(f) == 0);
+	}
+}
+
+TEST_CASE("bsa::detail::mmio", "[bsa.mmio]")
+{
+	SECTION("we can perform read-only memory-mapped io")
+	{
+		const std::filesystem::path root{ "common_mmio_test"sv };
+		const std::filesystem::path path = root / "out.txt"sv;
+
+		const char payload[] = "The quick brown fox jumps over the lazy dog\n";
+		const std::size_t size = sizeof(payload) - 1;
+
+		{
+			const auto f = open_file(path, "wb");
+			REQUIRE(f != nullptr);
+			REQUIRE(std::fwrite(payload, 1, size, f.get()) == size);
+		}
+
+		{
+			const auto isOpen = [](const bsa::detail::mmio::file& a_file) {
+				return a_file.is_open() &&
+				       a_file.data() != nullptr &&
+				       a_file.size() != 0;
+			};
+
+			bsa::detail::mmio::file map;
+			REQUIRE(!isOpen(map));
+
+			REQUIRE(map.open(path));
+			REQUIRE(isOpen(map));
+
+			bsa::detail::mmio::file map2{ std::move(map) };
+			REQUIRE(!isOpen(map));
+			REQUIRE(isOpen(map2));
+
+			map = std::move(map2);
+			REQUIRE(isOpen(map));
+			REQUIRE(!isOpen(map2));
+
+			REQUIRE(map.size() == size);
+			REQUIRE(std::memcmp(map.data(), payload, size) == 0);
+		}
 	}
 }
 

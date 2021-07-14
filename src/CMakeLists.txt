@@ -78,8 +78,6 @@ find_package(Boost
 	REQUIRED
 	COMPONENTS
 		container
-		filesystem
-		iostreams
 )
 find_package(LZ4 MODULE REQUIRED)
 find_package(ZLIB MODULE REQUIRED)
@@ -87,13 +85,11 @@ find_package(ZLIB MODULE REQUIRED)
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
-		Boost::filesystem
 		LZ4::LZ4
 		ZLIB::ZLIB
 	PUBLIC
 		Boost::container
 		Boost::headers
-		Boost::iostreams
 		bsa::common
 )
 

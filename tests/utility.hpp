@@ -6,13 +6,13 @@
 #endif
 
 #include <cctype>
+#include <cstdio>
 #include <filesystem>
 #include <string>
 #include <string_view>
 #include <type_traits>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/iostreams/device/mapped_file.hpp>
+#include <bsa/detail/common.hpp>
 
 template <class T>
 consteval bool assert_nothrowable() noexcept
@@ -27,12 +27,28 @@ consteval bool assert_nothrowable() noexcept
 	return true;
 }
 
-[[nodiscard]] inline auto map_file(const std::filesystem::path& a_path)
-	-> boost::iostreams::mapped_file_source
+[[nodiscard]] inline auto map_file(std::filesystem::path a_path)
+	-> bsa::detail::istream_t::stream_type
 {
-	return boost::iostreams::mapped_file_source{
-		boost::filesystem::path{ a_path.native() }
+	bsa::detail::istream_t::stream_type stream;
+	stream.open(std::move(a_path));
+	return stream;
+}
+
+[[nodiscard]] inline auto open_file(
+	std::filesystem::path a_path,
+	const char* a_mode)
+{
+	const auto close = [](std::FILE* a_file) noexcept {
+		std::fclose(a_file);
 	};
+
+	std::filesystem::create_directories(a_path.parent_path());
+	auto result = std::unique_ptr<std::FILE, decltype(close)>{
+		bsa::detail::unicode::fopen(a_path, a_mode),
+		close
+	};
+	return result;
 }
 
 inline auto simple_normalize(std::string_view a_path) noexcept

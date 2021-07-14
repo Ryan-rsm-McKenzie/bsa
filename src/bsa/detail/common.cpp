@@ -10,8 +10,58 @@
 #include <limits>
 #include <string>
 #include <system_error>
+#include <utility>
 
-#include <boost/filesystem/path.hpp>
+#if BSA_OS_WINDOWS
+#	define WIN32_LEAN_AND_MEAN
+
+#	define NOGDICAPMASKS
+#	define NOVIRTUALKEYCODES
+#	define NOWINMESSAGES
+#	define NOWINSTYLES
+#	define NOSYSMETRICS
+#	define NOMENUS
+#	define NOICONS
+#	define NOKEYSTATES
+#	define NOSYSCOMMANDS
+#	define NORASTEROPS
+#	define NOSHOWWINDOW
+#	define OEMRESOURCE
+#	define NOATOM
+#	define NOCLIPBOARD
+#	define NOCOLOR
+#	define NOCTLMGR
+#	define NODRAWTEXT
+#	define NOGDI
+#	define NOKERNEL
+#	define NOUSER
+#	define NONLS
+#	define NOMB
+#	define NOMEMMGR
+#	define NOMETAFILE
+#	define NOMINMAX
+#	define NOMSG
+#	define NOOPENFILE
+#	define NOSCROLL
+#	define NOSERVICE
+#	define NOSOUND
+#	define NOTEXTMETRIC
+#	define NOWH
+#	define NOWINOFFSETS
+#	define NOCOMM
+#	define NOKANJI
+#	define NOHELP
+#	define NOPROFILER
+#	define NODEFERWINDOWPOS
+#	define NOMCX
+
+#	include <Windows.h>
+#else
+#	include <sys/mman.h>
+#	include <fcntl.h>
+#	include <unistd.h>
+#	include <sys/stat.h>
+#endif
 
 namespace bsa::detail
 {
@@ -58,6 +108,163 @@ namespace bsa::detail
 			return std::fopen(a_path.c_str(), a_mode);
 #endif
 		}
+	}
+
+	namespace mmio
+	{
+		file::file() noexcept
+		{
+#if BSA_OS_WINDOWS
+			this->_file = INVALID_HANDLE_VALUE;
+#else
+			this->_view = MAP_FAILED;
+#endif
+		}
+
+		void file::close() noexcept
+		{
+#if BSA_OS_WINDOWS
+			if (this->_view != nullptr) {
+				[[maybe_unused]] const auto success = ::UnmapViewOfFile(this->_view);
+				assert(success != 0);
+				this->_view = nullptr;
+			}
+
+			if (this->_mapping != nullptr) {
+				[[maybe_unused]] const auto success = ::CloseHandle(this->_mapping);
+				assert(success != 0);
+				this->_mapping = nullptr;
+			}
+
+			if (this->_file != INVALID_HANDLE_VALUE) {
+				[[maybe_unused]] const auto success = ::CloseHandle(this->_file);
+				assert(success != 0);
+				this->_file = INVALID_HANDLE_VALUE;
+				this->_size = 0;
+			}
+#else
+			if (this->_view != MAP_FAILED) {
+				[[maybe_unused]] const auto success = ::munmap(this->_view);
+				assert(success == 0);
+				this->_view = MAP_FAILED;
+			}
+
+			if (this->_file != -1) {
+				[[maybe_unused]] const auto success = ::close(this->_file);
+				assert(success == 0);
+				this->_file = -1;
+				this->_size = 0;
+			}
+#endif
+		}
+
+		bool file::is_open() const noexcept
+		{
+#if BSA_OS_WINDOWS
+			return this->_view != nullptr;
+#else
+			return this->_view != MAP_FAILED;
+#endif
+		}
+
+		bool file::open(std::filesystem::path a_path) noexcept
+		{
+			this->close();
+			if (this->do_open(a_path.c_str())) {
+				return true;
+			} else {
+				this->close();
+				return false;
+			}
+		}
+
+		void file::do_move(file&& a_rhs) noexcept
+		{
+#if BSA_OS_WINDOWS
+			this->_file = std::exchange(a_rhs._file, INVALID_HANDLE_VALUE);
+			this->_mapping = std::exchange(a_rhs._mapping, nullptr);
+			this->_view = std::exchange(a_rhs._view, nullptr);
+#else
+			this->_file = std::exchange(a_rhs._file, -1);
+			this->_view = std::exchange(a_rhs._view, MAP_FAILED);
+#endif
+			this->_size = std::exchange(a_rhs._size, 0);
+		}
+
+#if BSA_OS_WINDOWS
+		bool file::do_open(const wchar_t* a_path) noexcept
+		{
+			this->_file = ::CreateFileW(
+				a_path,
+				GENERIC_READ,
+				FILE_SHARE_READ,
+				nullptr,
+				OPEN_EXISTING,
+				FILE_ATTRIBUTE_READONLY,
+				nullptr);
+			if (this->_file == INVALID_HANDLE_VALUE) {
+				return false;
+			}
+
+			::LARGE_INTEGER size = {};
+			if (::GetFileSizeEx(this->_file, &size) == 0) {
+				return false;
+			}
+			this->_size = static_cast<std::size_t>(size.QuadPart);
+
+			this->_mapping = ::CreateFileMappingW(
+				this->_file,
+				nullptr,
+				PAGE_READONLY,
+				0,
+				0,
+				nullptr);
+			if (this->_mapping == nullptr) {
+				return false;
+			}
+
+			this->_view = ::MapViewOfFile(
+				this->_mapping,
+				FILE_MAP_READ,
+				0,
+				0,
+				0);
+			if (this->_view == nullptr) {
+				return false;
+			}
+
+			return true;
+		}
+#else
+		bool file::do_open(const char* a_path) noexcept
+		{
+			this->_file = ::open(
+				a_path,
+				O_RDONLY);
+			if (this->_file == -1) {
+				return false;
+			}
+
+			::stat s = {};
+			if (::fstat(this->_file, &s) == -1) {
+				return false;
+			}
+			this->_size = static_cast<std::size_t>(s.st_size);
+
+			this->_view = ::mmap(
+				nullptr,
+				this->_size,
+				PROT_READ,
+				MAP_SHARED,
+				this->_file,
+				0);
+			if (this->_view == MAP_FAILED) {
+				return false;
+			}
+
+			return true;
+		}
+#endif
 	}
 
 	void normalize_path(std::string& a_path) noexcept
@@ -146,8 +353,9 @@ namespace bsa::detail
 
 	istream_t::istream_t(std::filesystem::path a_path)
 	{
-		_file.open(boost::filesystem::path{ a_path.native() });
-		if (!_file.is_open()) {  // boost should throw an exception on failure
+		_file = std::make_shared<stream_type>();
+		_file->open(std::move(a_path));
+		if (!_file->is_open()) {
 			throw std::system_error{
 				std::error_code{ errno, std::generic_category() },
 				"failed to open file"
@@ -158,14 +366,14 @@ namespace bsa::detail
 	auto istream_t::read_bytes(std::size_t a_bytes)
 		-> std::span<const std::byte>
 	{
-		if (_pos + a_bytes > _file.size()) {
+		if (_pos + a_bytes > _file->size()) {
 			throw exception("file read out of range");
 		}
 
 		const auto pos = _pos;
 		_pos += a_bytes;
 		return {
-			reinterpret_cast<const std::byte*>(_file.data()) + pos,
+			reinterpret_cast<const std::byte*>(_file->data()) + pos,
 			a_bytes
 		};
 	}

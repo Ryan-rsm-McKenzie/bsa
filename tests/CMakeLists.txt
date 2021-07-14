@@ -49,14 +49,12 @@ find_package(Boost
 	MODULE
 	REQUIRED
 	COMPONENTS
-		iostreams
 		regex
 )
 
 target_link_libraries(
 	tests
 	PRIVATE
-		Boost::iostreams
 		Boost::regex
 		bsa::bsa
 		bsa::common

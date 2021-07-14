@@ -7,8 +7,6 @@
 #include <string>
 #include <string_view>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 
@@ -154,7 +152,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 			info_t{ 0x74491918, 0x2BEBCD0A, "Characters/character_0001.png"sv },
 		};
 
-		std::vector<boost::iostreams::mapped_file_source> mmapped;
+		std::vector<bsa::detail::istream_t::stream_type> mmapped;
 		bsa::tes3::archive in;
 		for (const auto& file : index) {
 			const auto& data = mmapped.emplace_back(
