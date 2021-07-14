@@ -19,7 +19,6 @@ on:
 env:
   BUILD_TYPE: Debug
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
-  VCPKG_ROOT: ${{ env.VCPKG_INSTALLATION_ROOT }}
 
 jobs:
   build:
@@ -55,7 +54,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.bat
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/bootstrap-vcpkg.bat
           vcpkg --version >> vcpkg-version.txt
 
       - name: Cache vcpkg
