@@ -1,9 +1,13 @@
 #include "utility.hpp"
 
 #include <array>
+#include <cstddef>
 #include <cstring>
 #include <exception>
 #include <filesystem>
+#include <limits>
+#include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -202,5 +206,46 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 				bsa.read(root / filename),
 				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
 		}
+	}
+
+	SECTION("we can validate the offsets within an archive (<4gb)")
+	{
+		bsa::tes3::archive bsa;
+		const auto add =
+			[&](bsa::tes3::hashing::hash a_hash,
+				std::span<const std::byte> a_data) {
+				constexpr auto dir = "root"sv;
+
+				bsa::tes3::file f;
+				f.set_data(a_data);
+
+				REQUIRE(bsa.insert(a_hash, std::move(f)).second);
+			};
+
+		constexpr auto largesz = static_cast<std::uint64_t>((std::numeric_limits<std::uint32_t>::max)()) + 1u;
+		const auto plarge = std::make_unique<std::byte[]>(largesz);
+		const std::span large{ plarge.get(), largesz };
+
+		const std::array<std::byte, 1u << 4> littlebuf{};
+		const std::span little{ littlebuf.data(), littlebuf.size() };
+
+		const auto verify = [&]() {
+			return bsa.verify_offsets();
+		};
+
+		REQUIRE(verify());
+
+		add({ 0 }, little);
+		REQUIRE(verify());
+
+		add({ 1 }, large);
+		REQUIRE(verify());
+
+		bsa.clear();
+		add({ 0 }, large);
+		REQUIRE(verify());
+
+		add({ 1 }, little);
+		REQUIRE(!verify());
 	}
 }
