@@ -20,11 +20,12 @@ using namespace std::literals;
 TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 {
 	const auto test = []<class T>(std::in_place_type_t<T>, std::size_t a_little, std::size_t a_big) {
-		const char payload[] = "\x01\x02\x03\x04\x05\x06\x07\x08";
-		std::array<char, 8> buffer{};
+		// test against unaligned memory
+		const char payload[] = "\x00\x01\x02\x03\x04\x05\x06\x07\x08";
+		std::array<char, sizeof(payload) - 1> buffer{};
 
-		const auto readable = std::as_bytes(std::span{ payload }).subspan<0, sizeof(T)>();
-		const auto writable = std::as_writable_bytes(std::span{ buffer }).subspan<0, sizeof(T)>();
+		const auto readable = std::as_bytes(std::span{ payload }).subspan<1, sizeof(T)>();
+		const auto writable = std::as_writable_bytes(std::span{ buffer }).subspan<1, sizeof(T)>();
 
 		SECTION("reverse")
 		{

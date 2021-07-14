@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <exception>
 #include <filesystem>
 #include <iterator>
@@ -202,7 +203,9 @@ namespace bsa::detail
 		template <std::endian E, concepts::integral T>
 		[[nodiscard]] T load(std::span<const std::byte, sizeof(T)> a_src) noexcept
 		{
-			const auto val = *std::launder(reinterpret_cast<const T*>(a_src.data()));
+			alignas(T) std::array<std::byte, sizeof(T)> buf{};
+			std::memcpy(buf.data(), a_src.data(), sizeof(T));
+			const auto val = *std::launder(reinterpret_cast<const T*>(buf.data()));
 			if constexpr (std::endian::native != E) {
 				return reverse(val);
 			} else {
@@ -220,7 +223,7 @@ namespace bsa::detail
 				val = reverse(val);
 			}
 
-			*std::launder(reinterpret_cast<integral_t*>(a_dst.data())) = val;
+			std::memcpy(a_dst.data(), &val, sizeof(T));
 		}
 	}
 
