@@ -72,7 +72,7 @@ jobs:
           mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
           cd $env:VCPKG_INSTALLATION_ROOT
           ./bootstrap-vcpkg.bat
-          ./vcpkg --version > ${{ github.workspace }}vcpkg-version.txt
+          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
 
       - name: Cache vcpkg
         if: ${{ matrix.os == 'windows-latest' }}
