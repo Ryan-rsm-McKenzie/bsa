@@ -7,7 +7,6 @@
 #include <string>
 #include <string_view>
 
-#include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 
 #include "bsa/tes3.hpp"
@@ -190,34 +189,20 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 	{
 		const std::filesystem::path root{ "tes3_invalid_test"sv };
 		constexpr std::array types{
-			"magic"sv,
-			"range"sv,
+			"magic",
+			"range",
 		};
 
-		for (const auto& type : types) {
-			try {
-				std::string filename;
-				filename += "invalid_"sv;
-				filename += type;
-				filename += ".bsa"sv;
+		for (const std::string type : types) {
+			std::string filename;
+			filename += "invalid_"sv;
+			filename += type;
+			filename += ".bsa"sv;
 
-				bsa::tes3::archive bsa;
-				bsa.read(root / filename);
-
-				REQUIRE(false);
-			} catch (bsa::exception& a_err) {
-				std::string fmt;
-				fmt += "\\b"sv;
-				fmt += type;
-				fmt += "\\b"sv;
-
-				boost::regex pattern{
-					fmt.c_str(),
-					boost::regex_constants::ECMAScript | boost::regex_constants::icase
-				};
-
-				REQUIRE(boost::regex_search(a_err.what(), pattern));
-			}
+			bsa::tes3::archive bsa;
+			REQUIRE_THROWS_WITH(
+				bsa.read(root / filename),
+				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
 		}
 	}
 }

@@ -36,17 +36,11 @@ target_include_directories(
 		${SOURCE_DIR}
 )
 
-find_package(Boost
-	MODULE
-	REQUIRED
-	COMPONENTS
-		regex
-)
+find_package(Boost MODULE REQUIRED)
 
 target_link_libraries(
 	tests
 	PRIVATE
-		Boost::regex
 		bsa::bsa
 		bsa::common
 		Catch2::Catch2

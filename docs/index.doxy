@@ -97,8 +97,6 @@ int main()
 - [zlib](https://github.com/madler/zlib)
 
 \subsection dependencies-development Development
-- [Boost](https://www.boost.org/)
-	- Regex
 - [Catch2](https://github.com/catchorg/Catch2)
 - [poxy](https://github.com/marzer/poxy)
 

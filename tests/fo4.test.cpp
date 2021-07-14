@@ -8,7 +8,6 @@
 #include <string>
 #include <string_view>
 
-#include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 
 #include "bsa/fo4.hpp"
@@ -290,38 +289,24 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 	{
 		const std::filesystem::path root{ "fo4_invalid_test"sv };
 		constexpr std::array types{
-			"format"sv,
-			"magic"sv,
-			"range"sv,
-			"sentinel"sv,
-			"size"sv,
-			"version"sv,
+			"format",
+			"magic",
+			"range",
+			"sentinel",
+			"size",
+			"version",
 		};
 
-		for (const auto& type : types) {
-			try {
-				std::string filename;
-				filename += "invalid_"sv;
-				filename += type;
-				filename += ".ba2"sv;
+		for (const std::string type : types) {
+			std::string filename;
+			filename += "invalid_"sv;
+			filename += type;
+			filename += ".ba2"sv;
 
-				bsa::fo4::archive ba2;
-				ba2.read(root / filename);
-
-				REQUIRE(false);
-			} catch (bsa::exception& a_err) {
-				std::string fmt;
-				fmt += "\\b"sv;
-				fmt += type;
-				fmt += "\\b"sv;
-
-				boost::regex pattern{
-					fmt.c_str(),
-					boost::regex_constants::ECMAScript | boost::regex_constants::icase
-				};
-
-				REQUIRE(boost::regex_search(a_err.what(), pattern));
-			}
+			bsa::fo4::archive ba2;
+			REQUIRE_THROWS_WITH(
+				ba2.read(root / filename),
+				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
 		}
 	}
 

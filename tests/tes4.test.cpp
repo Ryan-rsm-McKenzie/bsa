@@ -11,7 +11,6 @@
 #include <system_error>
 #include <vector>
 
-#include <boost/regex.hpp>
 #include <catch2/catch.hpp>
 
 #include "bsa/tes4.hpp"
@@ -534,36 +533,22 @@ TEST_CASE("bsa::tes4::archive", "[tes4.archive]")
 	{
 		const std::filesystem::path root{ "tes4_invalid_test"sv };
 		constexpr std::array types{
-			"magic"sv,
-			"version"sv,
-			"size"sv,
-			"range"sv,
+			"magic",
+			"version",
+			"size",
+			"range",
 		};
 
-		for (const auto& type : types) {
-			try {
-				std::string filename;
-				filename += "invalid_"sv;
-				filename += type;
-				filename += ".bsa"sv;
+		for (const std::string type : types) {
+			std::string filename;
+			filename += "invalid_"sv;
+			filename += type;
+			filename += ".bsa"sv;
 
-				bsa::tes4::archive bsa;
-				bsa.read(root / filename);
-
-				REQUIRE(false);
-			} catch (bsa::exception& a_err) {
-				std::string fmt;
-				fmt += "\\b"sv;
-				fmt += type;
-				fmt += "\\b"sv;
-
-				boost::regex pattern{
-					fmt.c_str(),
-					boost::regex_constants::ECMAScript | boost::regex_constants::icase
-				};
-
-				REQUIRE(boost::regex_search(a_err.what(), pattern));
-			}
+			bsa::tes4::archive bsa;
+			REQUIRE_THROWS_WITH(
+				bsa.read(root / filename),
+				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
 		}
 	}
 
