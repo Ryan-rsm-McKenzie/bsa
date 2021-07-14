@@ -251,8 +251,7 @@ namespace bsa::detail
 			}
 
 			void close() noexcept;
-			[[nodiscard]] auto data() const noexcept
-				-> const std::byte* { return static_cast<const std::byte*>(this->_view); }
+			[[nodiscard]] auto data() const noexcept -> const std::byte*;
 			[[nodiscard]] bool is_open() const noexcept;
 			bool open(std::filesystem::path a_path) noexcept;
 			[[nodiscard]] auto size() const noexcept -> std::size_t { return this->_size; }
@@ -264,10 +263,11 @@ namespace bsa::detail
 #	if BSA_OS_WINDOWS
 			void* _file{ nullptr };
 			void* _mapping{ nullptr };
+			void* _view{ nullptr };
 #	else
 			int _file{ -1 };
+			void* _mapped{ nullptr };
 #	endif
-			void* _view{ nullptr };
 			std::size_t _size{ 0 };
 		};
 	}

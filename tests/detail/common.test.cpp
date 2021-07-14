@@ -123,20 +123,25 @@ TEST_CASE("bsa::detail::mmio", "[bsa.mmio]")
 				       a_file.data() != nullptr &&
 				       a_file.size() != 0;
 			};
+			const auto isClosed = [](const bsa::detail::mmio::file& a_file) {
+				return !a_file.is_open() &&
+				       a_file.data() == nullptr &&
+				       a_file.size() == 0;
+			};
 
 			bsa::detail::mmio::file map;
-			REQUIRE(!isOpen(map));
+			REQUIRE(isClosed(map));
 
 			REQUIRE(map.open(path));
 			REQUIRE(isOpen(map));
 
 			bsa::detail::mmio::file map2{ std::move(map) };
-			REQUIRE(!isOpen(map));
+			REQUIRE(isClosed(map));
 			REQUIRE(isOpen(map2));
 
 			map = std::move(map2);
 			REQUIRE(isOpen(map));
-			REQUIRE(!isOpen(map2));
+			REQUIRE(isClosed(map2));
 
 			REQUIRE(map.size() == size);
 			REQUIRE(std::memcmp(map.data(), payload, size) == 0);

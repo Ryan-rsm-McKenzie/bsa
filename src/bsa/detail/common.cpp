@@ -117,7 +117,7 @@ namespace bsa::detail
 #if BSA_OS_WINDOWS
 			this->_file = INVALID_HANDLE_VALUE;
 #else
-			this->_view = MAP_FAILED;
+			this->_mapped = MAP_FAILED;
 #endif
 		}
 
@@ -143,10 +143,10 @@ namespace bsa::detail
 				this->_size = 0;
 			}
 #else
-			if (this->_view != MAP_FAILED) {
-				[[maybe_unused]] const auto success = ::munmap(this->_view, this->_size);
+			if (this->_mapped != MAP_FAILED) {
+				[[maybe_unused]] const auto success = ::munmap(this->_mapped, this->_size);
 				assert(success == 0);
-				this->_view = MAP_FAILED;
+				this->_mapped = MAP_FAILED;
 			}
 
 			if (this->_file != -1) {
@@ -158,12 +158,24 @@ namespace bsa::detail
 #endif
 		}
 
+		auto file::data() const noexcept
+			-> const std::byte*
+		{
+#if BSA_OS_WINDOWS
+			return static_cast<const std::byte*>(this->_view);
+#else
+			return this->_mapped != MAP_FAILED ?
+                       static_cast<const std::byte*>(this->_mapped) :
+                       nullptr;
+#endif
+		}
+
 		bool file::is_open() const noexcept
 		{
 #if BSA_OS_WINDOWS
 			return this->_view != nullptr;
 #else
-			return this->_view != MAP_FAILED;
+			return this->_mapped != MAP_FAILED;
 #endif
 		}
 
@@ -186,7 +198,7 @@ namespace bsa::detail
 			this->_view = std::exchange(a_rhs._view, nullptr);
 #else
 			this->_file = std::exchange(a_rhs._file, -1);
-			this->_view = std::exchange(a_rhs._view, MAP_FAILED);
+			this->_mapped = std::exchange(a_rhs._mapped, MAP_FAILED);
 #endif
 			this->_size = std::exchange(a_rhs._size, 0);
 		}
@@ -251,14 +263,14 @@ namespace bsa::detail
 			}
 			this->_size = static_cast<std::size_t>(s.st_size);
 
-			this->_view = ::mmap(
+			this->_mapped = ::mmap(
 				nullptr,
 				this->_size,
 				PROT_READ,
 				MAP_SHARED,
 				this->_file,
 				0);
-			if (this->_view == MAP_FAILED) {
+			if (this->_mapped == MAP_FAILED) {
 				return false;
 			}
 
