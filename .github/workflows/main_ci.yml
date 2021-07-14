@@ -64,7 +64,7 @@ jobs:
         run: |
           cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
           cmake --build build --parallel
-          cmake --install build
+          sudo cmake --install build
 
       - name: Setup vcpkg
         if: ${{ matrix.os == 'windows-latest' }}
