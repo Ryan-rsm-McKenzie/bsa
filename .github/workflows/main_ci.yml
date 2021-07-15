@@ -98,5 +98,8 @@ jobs:
 
       - name: Collect code coverage
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        working-directory: ${{ github.workspace }}/bsa/build
-        run: bash <(curl -s https://codecov.io/bash)
+        uses: codecov/codecov-action@v1.5.2
+        with:
+          fail_ci_if_error: true
+          functionalities: coveragepy
+          working-directory: ${{ github.workspace }}/bsa/build
