@@ -51,6 +51,8 @@ macro(acquire_test NAME)
 	)
 endmacro()
 
+acquire_test("common_guess_test")
+
 acquire_test("fo4_compression_test")
 acquire_test("fo4_dds_test")
 acquire_test("fo4_invalid_test")
