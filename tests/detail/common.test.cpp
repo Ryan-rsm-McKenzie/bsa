@@ -15,8 +15,6 @@
 
 #include "bsa/detail/common.hpp"
 
-using namespace std::literals;
-
 TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 {
 	const auto test = []<class T>(std::in_place_type_t<T>, std::size_t a_little, std::size_t a_big) {
