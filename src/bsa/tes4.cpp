@@ -26,6 +26,8 @@ namespace bsa::tes4
 		{
 			namespace constants
 			{
+				constexpr auto bsa = make_four_cc("BSA"sv);
+
 				constexpr std::size_t directory_entry_size_x86 = 0x10;
 				constexpr std::size_t directory_entry_size_x64 = 0x18;
 				constexpr std::size_t file_entry_size = 0x10;
@@ -77,7 +79,7 @@ namespace bsa::tes4
 				header_t& a_header)
 				-> istream_t&
 			{
-				std::array<std::byte, 4> magic;
+				std::uint32_t magic;
 
 				a_in >>
 					magic >>
@@ -93,10 +95,7 @@ namespace bsa::tes4
 
 				a_header.evaluate_endian();
 
-				if (magic[0] != std::byte{ 'B' } ||
-					magic[1] != std::byte{ 'S' } ||
-					magic[2] != std::byte{ 'A' } ||
-					magic[3] != std::byte{ '\0' }) {
+				if (magic != constants::bsa) {
 					throw exception("invalid magic");
 				} else if (a_header._version != 103 &&
 						   a_header._version != 104 &&
@@ -114,15 +113,8 @@ namespace bsa::tes4
 				const header_t& a_header) noexcept
 				-> ostream_t&
 			{
-				std::array magic{
-					std::byte{ 'B' },
-					std::byte{ 'S' },
-					std::byte{ 'A' },
-					std::byte{ '\0' }
-				};
-
 				return a_out
-				       << magic
+				       << constants::bsa
 				       << a_header._version
 				       << a_header._directoriesOffset
 				       << a_header._archiveFlags
