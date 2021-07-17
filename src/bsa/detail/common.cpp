@@ -55,7 +55,9 @@
 #	define NODEFERWINDOWPOS
 #	define NOMCX
 
+#	pragma warning(push, 0)
 #	include <Windows.h>
+#	pragma warning(pop)
 #else
 #	include <fcntl.h>
 #	include <sys/mman.h>
