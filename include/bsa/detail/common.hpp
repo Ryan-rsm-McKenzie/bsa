@@ -356,21 +356,7 @@ namespace bsa::detail
 			return a_in;
 		}
 
-		template <class T, std::size_t N>
-		friend istream_t& operator>>(
-			istream_t& a_in,
-			std::array<T, N>& a_value)  //
-			requires(sizeof(T) == 1)
-		{
-			const auto bytes = a_in.read_bytes(a_value.size());
-			std::copy(
-				bytes.begin(),
-				bytes.end(),
-				reinterpret_cast<std::byte*>(a_value.data()));
-			return a_in;
-		}
-
-	private :
+	private:
 		std::shared_ptr<stream_type>
 			_file;
 		std::size_t _pos{ 0 };
@@ -425,19 +411,7 @@ namespace bsa::detail
 			return a_out;
 		}
 
-		template <class T, std::size_t N>
-		friend ostream_t& operator<<(
-			ostream_t& a_out,
-			const std::array<T, N>& a_value) noexcept  //
-			requires(sizeof(T) == 1)
-		{
-			a_out.write_bytes({ //
-				reinterpret_cast<const std::byte*>(a_value.data()),
-				a_value.size() * sizeof(T) });
-			return a_out;
-		}
-
-	private :
+	private:
 		std::FILE* _file{ nullptr };
 	};
 
