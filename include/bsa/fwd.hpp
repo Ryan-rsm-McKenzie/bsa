@@ -95,4 +95,6 @@ namespace bsa
 	}
 
 	class exception;
+
+	enum class file_format;
 }

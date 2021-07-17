@@ -63,6 +63,25 @@
 #	include <unistd.h>
 #endif
 
+namespace bsa
+{
+	auto guess_file_format(std::filesystem::path a_path)
+		-> std::optional<file_format>
+	{
+		detail::istream_t in{ std::move(a_path) };
+		switch (in.read<std::uint32_t>()) {
+		case 0x100:
+			return file_format::tes3;
+		case make_four_cc("BSA"sv):
+			return file_format::tes4;
+		case make_four_cc("BTDX"sv):
+			return file_format::fo4;
+		default:
+			return std::nullopt;
+		}
+	}
+}
+
 namespace bsa::detail
 {
 	namespace

@@ -116,6 +116,14 @@ namespace bsa
 	using namespace std::literals;
 #endif
 
+	/// \brief	The file format for a given archive.
+	enum class file_format
+	{
+		tes3,
+		tes4,
+		fo4
+	};
+
 	/// \brief	The base exception type for all `bsa` exceptions.
 	class BSA_VISIBLE exception :
 		public std::exception
@@ -132,6 +140,19 @@ namespace bsa
 	private:
 		const char* _what{ nullptr };
 	};
+
+	/// \brief	Guesses the archive format for a given file.
+	///
+	/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+	///
+	/// \remark	This function does not guarantee that the given file constitutes a well-formed archive
+	/// 	of the deduced format. It merely remarks that if the file *were* a well-formed archive, it
+	/// 	would be of the deduced format.
+	///
+	/// \return	The guessed archive format for the given file, or `std::nullopt` if the file doesn't
+	/// 	match any known format.
+	[[nodiscard]] auto guess_file_format(std::filesystem::path a_path)
+		-> std::optional<file_format>;
 
 	/// \brief	Converts, at most, the first 4 characters of the given string into a 4 byte integer.
 	[[nodiscard]] constexpr auto make_four_cc(
