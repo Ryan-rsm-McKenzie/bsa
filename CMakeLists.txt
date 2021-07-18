@@ -17,6 +17,11 @@ if(BSA_BUILD_SRC)
 	add_subdirectory(src)
 endif()
 
+option(BSA_BUILD_EXAMPLES "whether we should build the examples" OFF)
+if(BSA_BUILD_EXAMPLES)
+	add_subdirectory(examples)
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
 	find_package(Catch2 REQUIRED CONFIG)

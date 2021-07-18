@@ -7,6 +7,10 @@
           "type": "BOOL",
           "value": "ON"
         },
+        "BSA_BUILD_EXAMPLES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
           "value": "Debug"
