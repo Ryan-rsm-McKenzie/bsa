@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/main_ci.yml'
       - 'cmake/**'
+      - 'examples/**'
       - 'include/**'
       - 'src/**'
       - 'tests/**'
