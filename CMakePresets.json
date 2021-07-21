@@ -81,7 +81,6 @@
       "name": "linux"
     },
     {
-      "description": "VS2019/Windows/VCPkg",
       "environment": {
         "CXXFLAGS": "/MP /W4 /WX /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
@@ -94,7 +93,6 @@
       "name": "vs2019-windows-vcpkg"
     },
     {
-      "description": "VS2019/Windows/VCPkg",
       "environment": {
         "CXXFLAGS": "/MP /W4 /WX $penv{CXXFLAGS}"
       },
@@ -108,7 +106,6 @@
       "toolset": "v143"
     },
     {
-      "description": "Ninja/Windows/VCPkg",
       "generator": "Ninja",
       "inherits": [
         "cmake-dev",
