@@ -144,6 +144,7 @@ namespace bsa
 	/// \brief	Guesses the archive format for a given file.
 	///
 	/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+	/// \exception	bsa::exception	Thrown when parsing errors are encountered.
 	///
 	/// \remark	This function does not guarantee that the given file constitutes a well-formed archive
 	/// 	of the deduced format. It merely remarks that if the file *were* a well-formed archive, it
