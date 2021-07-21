@@ -238,14 +238,11 @@ namespace bsa::detail
 		template <std::endian E, concepts::integral T>
 		void store(std::span<std::byte, sizeof(T)> a_dst, T a_value) noexcept
 		{
-			using integral_t = type_traits::integral_type_t<T>;
-			auto val = static_cast<integral_t>(a_value);
-
 			if constexpr (std::endian::native != E) {
-				val = reverse(val);
+				a_value = reverse(a_value);
 			}
 
-			std::memcpy(a_dst.data(), &val, sizeof(T));
+			std::memcpy(a_dst.data(), &a_value, sizeof(T));
 		}
 	}
 
