@@ -275,7 +275,7 @@ namespace bsa::tes4
 			a_out.write(crc, a_endian);
 		}
 
-		hash hash_directory(std::string& a_path) noexcept
+		hash hash_directory_in_place(std::string& a_path) noexcept
 		{
 			detail::normalize_path(a_path);
 			const std::span<const std::byte> view{
@@ -307,7 +307,7 @@ namespace bsa::tes4
 			return h;
 		}
 
-		hash hash_file(std::string& a_path) noexcept
+		hash hash_file_in_place(std::string& a_path) noexcept
 		{
 			constexpr std::array lut{
 				make_four_cc(""sv),

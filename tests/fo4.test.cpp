@@ -12,16 +12,6 @@
 
 #include "bsa/fo4.hpp"
 
-namespace
-{
-	[[nodiscard]] auto hash_file(std::string_view a_path) noexcept
-		-> bsa::fo4::hashing::hash
-	{
-		std::string t(a_path);
-		return bsa::fo4::hashing::hash_file(t);
-	}
-}
-
 static_assert(assert_nothrowable<bsa::fo4::hashing::hash>());
 static_assert(assert_nothrowable<bsa::fo4::chunk>());
 static_assert(assert_nothrowable<bsa::fo4::file>());
@@ -41,7 +31,7 @@ TEST_CASE("bsa::fo4::hashing", "[fo4.hashing]")
 	{
 		using hash_t = bsa::fo4::hashing::hash;
 		const auto h = [](std::string_view a_path) noexcept {
-			return hash_file(a_path);
+			return bsa::fo4::hashing::hash_file(a_path);
 		};
 
 		REQUIRE(h(R"(Sound\Voice\Fallout4.esm\RobotMrHandy\María_M.fuz)"sv) == hash_t{ 0x7644F04B, 0x007A7566, 0x8A9C014E });

@@ -15,16 +15,6 @@
 
 #include "bsa/tes3.hpp"
 
-namespace
-{
-	[[nodiscard]] auto hash_file(std::string_view a_path) noexcept
-		-> bsa::tes3::hashing::hash
-	{
-		std::string t(a_path);
-		return bsa::tes3::hashing::hash_file(t);
-	}
-}
-
 static_assert(assert_nothrowable<bsa::tes3::hashing::hash>());
 static_assert(assert_nothrowable<bsa::tes3::file>());
 static_assert(assert_nothrowable<bsa::tes3::archive>());
@@ -42,7 +32,7 @@ TEST_CASE("bsa::tes3::hashing", "[tes3.hashing]")
 	SECTION("validate hash values")
 	{
 		const auto hash = [](std::string_view a_path) noexcept {
-			return hash_file(a_path).numeric();
+			return bsa::tes3::hashing::hash_file(a_path).numeric();
 		};
 
 		REQUIRE(hash("meshes/c/artifact_bloodring_01.nif"sv) == 0x1C3C1149920D5F0C);
@@ -59,12 +49,14 @@ TEST_CASE("bsa::tes3::hashing", "[tes3.hashing]")
 
 	SECTION("forward slashes '/' are treated the same as backwards slashes '\\'")
 	{
-		REQUIRE(hash_file("foo/bar/baz") == hash_file("foo\\bar\\baz"));
+		REQUIRE(bsa::tes3::hashing::hash_file("foo/bar/baz") ==
+				bsa::tes3::hashing::hash_file("foo\\bar\\baz"));
 	}
 
 	SECTION("hashes are case-insensitive")
 	{
-		REQUIRE(hash_file("FOO/BAR/BAZ") == hash_file("foo/bar/baz"));
+		REQUIRE(bsa::tes3::hashing::hash_file("FOO/BAR/BAZ") ==
+				bsa::tes3::hashing::hash_file("foo/bar/baz"));
 	}
 
 	SECTION("hashes are sorted first by their low value, then their high value")

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <utility>
 
 #include "bsa/detail/common.hpp"
 
@@ -57,7 +58,16 @@ namespace bsa::tes3
 		/// \brief	Produces a hash using the given path.
 		/// \remark	The path is normalized in place. After the function returns,
 		///		the path contains the string that would be stored on disk.
-		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
+		[[nodiscard]] hash hash_file_in_place(std::string& a_path) noexcept;
+
+		/// \copybrief	hash_file_in_place()
+		/// \remark	See also \ref concepts::stringable.
+		template <concepts::stringable String>
+		[[nodiscard]] hash hash_file(String&& a_path) noexcept
+		{
+			std::string str(std::forward<String>(a_path));
+			return hash_file_in_place(str);
+		}
 	}
 
 	/// \brief	Represents a file within the TES:3 virtual filesystem.
@@ -70,7 +80,7 @@ namespace bsa::tes3
 
 	public:
 		/// \brief	The key used to indentify a file.
-		using key = components::key<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
 
 		/// \brief	Clears the contents of the file.
 		using super::clear;

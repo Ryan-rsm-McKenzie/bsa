@@ -15,23 +15,6 @@
 
 #include "bsa/tes4.hpp"
 
-namespace
-{
-	[[nodiscard]] auto hash_directory(std::string_view a_path) noexcept
-		-> bsa::tes4::hashing::hash
-	{
-		std::string t(a_path);
-		return bsa::tes4::hashing::hash_directory(t);
-	}
-
-	[[nodiscard]] auto hash_file(std::string_view a_path) noexcept
-		-> bsa::tes4::hashing::hash
-	{
-		std::string t(a_path);
-		return bsa::tes4::hashing::hash_file(t);
-	}
-}
-
 static_assert(assert_nothrowable<bsa::tes4::hashing::hash>());
 static_assert(assert_nothrowable<bsa::tes4::file>());
 static_assert(assert_nothrowable<bsa::tes4::directory>());
@@ -42,10 +25,10 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 	SECTION("validate hash values")
 	{
 		const auto dhash = [](std::string_view a_path) {
-			return hash_directory(a_path).numeric();
+			return bsa::tes4::hashing::hash_directory(a_path).numeric();
 		};
 		const auto fhash = [](std::string_view a_path) {
-			return hash_file(a_path).numeric();
+			return bsa::tes4::hashing::hash_file(a_path).numeric();
 		};
 
 		REQUIRE(dhash("textures/armor/amuletsandrings/elder council"sv) == 0x04BC422C742C696C);
@@ -60,8 +43,8 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 	SECTION("the empty path \"\" is equivalent to the current path \".\"")
 	{
-		const auto empty = hash_directory(""sv);
-		const auto current = hash_directory("."sv);
+		const auto empty = bsa::tes4::hashing::hash_directory(""sv);
+		const auto current = bsa::tes4::hashing::hash_directory("."sv);
 
 		REQUIRE(empty == current);
 	}
@@ -70,9 +53,9 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 	{
 		// archive.exe uses _splitpath_s under the hood
 		const auto gitignore =
-			hash_file(".gitignore"sv);  // stem == "", extension == ".gitignore"
+			bsa::tes4::hashing::hash_file(".gitignore"sv);  // stem == "", extension == ".gitignore"
 		const auto gitmodules =
-			hash_file(".gitmodules"sv);  // stem == "", extension == ".gitmodules"
+			bsa::tes4::hashing::hash_file(".gitmodules"sv);  // stem == "", extension == ".gitmodules"
 
 		REQUIRE(gitignore == gitmodules);
 		REQUIRE(gitignore.first == '\0');
@@ -85,16 +68,16 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 	SECTION("root paths are included in hashes")
 	{
-		const auto h1 = hash_directory("C:\\foo\\bar\\baz"sv);
-		const auto h2 = hash_directory("foo/bar/baz"sv);
+		const auto h1 = bsa::tes4::hashing::hash_directory("C:\\foo\\bar\\baz"sv);
+		const auto h2 = bsa::tes4::hashing::hash_directory("foo/bar/baz"sv);
 
 		REQUIRE(h1 != h2);
 	}
 
 	SECTION("directory names longer than 259 characters are equivalent to the empty path")
 	{
-		const auto looong = hash_directory("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
-		const auto empty = hash_directory(""sv);
+		const auto looong = bsa::tes4::hashing::hash_directory("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+		const auto empty = bsa::tes4::hashing::hash_directory(""sv);
 
 		REQUIRE(looong == empty);
 	}
@@ -103,8 +86,8 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 	{
 		// actually, anything longer than MAX_PATH will crash archive.exe
 
-		const auto good = hash_file("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
-		const auto bad = hash_file("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+		const auto good = bsa::tes4::hashing::hash_file("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
+		const auto bad = bsa::tes4::hashing::hash_file("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"sv);
 
 		REQUIRE(good.numeric() != 0);
 		REQUIRE(bad.numeric() == 0);
@@ -112,8 +95,8 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 	SECTION("file extensions longer than 14 characters will fail")
 	{
-		const auto good = hash_file("test.123456789ABCDE"sv);
-		const auto bad = hash_file("test.123456789ABCDEF"sv);
+		const auto good = bsa::tes4::hashing::hash_file("test.123456789ABCDE"sv);
+		const auto bad = bsa::tes4::hashing::hash_file("test.123456789ABCDEF"sv);
 
 		REQUIRE(good.numeric() != 0);
 		REQUIRE(bad.numeric() == 0);
@@ -121,16 +104,16 @@ TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
 
 	SECTION("root paths are included in directory names")
 	{
-		const auto h1 = hash_directory("C:\\foo\\bar\\baz"sv);
-		const auto h2 = hash_directory("foo\\bar\\baz"sv);
+		const auto h1 = bsa::tes4::hashing::hash_directory("C:\\foo\\bar\\baz"sv);
+		const auto h2 = bsa::tes4::hashing::hash_directory("foo\\bar\\baz"sv);
 
 		REQUIRE(h1 != h2);
 	}
 
 	SECTION("parent directories are not included in file names")
 	{
-		const auto h1 = hash_file("users/john/test.txt"sv);
-		const auto h2 = hash_file("test.txt"sv);
+		const auto h1 = bsa::tes4::hashing::hash_file("users/john/test.txt"sv);
+		const auto h2 = bsa::tes4::hashing::hash_file("test.txt"sv);
 
 		REQUIRE(h1 == h2);
 	}

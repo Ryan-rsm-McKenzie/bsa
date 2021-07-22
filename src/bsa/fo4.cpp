@@ -208,7 +208,7 @@ namespace bsa::fo4
 			       << a_hash.directory;
 		}
 
-		hash hash_file(std::string& a_path) noexcept
+		hash hash_file_in_place(std::string& a_path) noexcept
 		{
 			detail::normalize_path(a_path);
 			const auto pieces = split_path(a_path);

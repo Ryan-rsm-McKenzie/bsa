@@ -67,8 +67,16 @@ namespace bsa::fo4
 #endif
 		};
 
+		/// \copydoc bsa::tes3::hashing::hash_file_in_place()
+		[[nodiscard]] hash hash_file_in_place(std::string& a_path) noexcept;
+
 		/// \copydoc bsa::tes3::hashing::hash_file()
-		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
+		template <concepts::stringable String>
+		[[nodiscard]] hash hash_file(String&& a_path) noexcept
+		{
+			std::string str(std::forward<String>(a_path));
+			return hash_file_in_place(str);
+		}
 	}
 
 	/// \brief	Represents a chunk of a file within the FO:4 virtual filesystem.
@@ -189,7 +197,7 @@ namespace bsa::fo4
 		using const_iterator = container_type::const_iterator;
 
 		/// \brief	The key used to indentify a file.
-		using key = components::key<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
 
 		file() noexcept = default;
 		file(const file&) noexcept = default;

@@ -8,6 +8,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "bsa/detail/common.hpp"
@@ -163,11 +164,27 @@ namespace bsa::tes4
 				std::endian a_endian) const noexcept;
 		};
 
-		/// \copydoc bsa::tes3::hashing::hash_file()
-		[[nodiscard]] hash hash_directory(std::string& a_path) noexcept;
+		/// \copydoc bsa::tes3::hashing::hash_file_in_place()
+		[[nodiscard]] hash hash_directory_in_place(std::string& a_path) noexcept;
 
 		/// \copydoc bsa::tes3::hashing::hash_file()
-		[[nodiscard]] hash hash_file(std::string& a_path) noexcept;
+		template <concepts::stringable String>
+		[[nodiscard]] hash hash_directory(String&& a_path) noexcept
+		{
+			std::string str(std::forward<String>(a_path));
+			return hash_directory_in_place(str);
+		}
+
+		/// \copydoc bsa::tes3::hashing::hash_file_in_place()
+		[[nodiscard]] hash hash_file_in_place(std::string& a_path) noexcept;
+
+		/// \copydoc bsa::tes3::hashing::hash_file()
+		template <concepts::stringable String>
+		[[nodiscard]] hash hash_file(String&& a_path) noexcept
+		{
+			std::string str(std::forward<String>(a_path));
+			return hash_file_in_place(str);
+		}
 	}
 
 	/// \brief	Represents a file within the TES:4 virtual filesystem.
@@ -195,7 +212,7 @@ namespace bsa::tes4
 
 	public:
 		/// \brief	The key used to indentify a file.
-		using key = components::key<hashing::hash, hashing::hash_file>;
+		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
 
 #ifdef DOXYGEN
 		/// \brief	Clears the contents of the file.
@@ -243,7 +260,7 @@ namespace bsa::tes4
 
 	public:
 		/// \brief	The key used to indentify a directory.
-		using key = components::key<hashing::hash, hashing::hash_directory>;
+		using key = components::key<hashing::hash, hashing::hash_directory_in_place>;
 
 #ifdef DOXYGEN
 		/// \brief	Clears the contents of the directory.
