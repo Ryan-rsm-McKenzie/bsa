@@ -17,7 +17,9 @@
 
 static_assert(assert_nothrowable<bsa::tes4::hashing::hash>());
 static_assert(assert_nothrowable<bsa::tes4::file>());
+static_assert(assert_nothrowable<bsa::tes4::file::key, false>());
 static_assert(assert_nothrowable<bsa::tes4::directory>());
+static_assert(assert_nothrowable<bsa::tes4::directory::key, false>());
 static_assert(assert_nothrowable<bsa::tes4::archive>());
 
 TEST_CASE("bsa::tes4::hashing", "[tes4.hashing]")
