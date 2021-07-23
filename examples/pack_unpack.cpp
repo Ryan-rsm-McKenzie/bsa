@@ -119,6 +119,7 @@ namespace
 		const std::filesystem::path& a_input,
 		const std::filesystem::path& a_output)
 	{
+		const auto version = bsa::tes4::version::tes4;
 		bsa::tes4::archive bsa;
 		bsa.archive_flags(
 			bsa::tes4::archive_flag::compressed |
@@ -129,6 +130,7 @@ namespace
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes4::file f;
 				f.set_data(read_file(a_path));
+				f.compress(version);
 
 				const auto d = [&]() {
 					const auto key =
@@ -150,7 +152,7 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		bsa.write(a_output, bsa::tes4::version::tes4);
+		bsa.write(a_output, version);
 	}
 
 	void unpack_fo4(
