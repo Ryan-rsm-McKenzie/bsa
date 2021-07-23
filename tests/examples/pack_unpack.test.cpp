@@ -76,12 +76,12 @@ namespace
 		silence_cout() noexcept
 		{
 			_original = std::cout.rdbuf();
-			std::cout.set_rdbuf(&_null);
+			std::cout.rdbuf(&_null);
 		}
 
 		~silence_cout() noexcept
 		{
-			std::cout.set_rdbuf(_original);
+			std::cout.rdbuf(_original);
 		}
 
 	private:
