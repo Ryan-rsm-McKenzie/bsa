@@ -236,8 +236,18 @@ TEST_CASE("pack_unpack", "[bsa.examples.pack_unpack]")
 
 	SECTION("input validation")
 	{
+		const auto example = (root / "example.txt"sv).string();
+		(void)open_file(example, "wb");
+
+		const auto texture = (root / "fo4_texture.ba2"sv).string();
+		bsa::fo4::archive ba2;
+		ba2.write(texture, bsa::fo4::format::directx);
+
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack"),
+			make_substr_matcher("too few"sv));
+		REQUIRE_THROWS_WITH(
+			invokeMain("pack", "foo", "bar"),
 			make_substr_matcher("too few"sv));
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack", "foo", "bar", "-tes4", "baz"),
@@ -248,5 +258,8 @@ TEST_CASE("pack_unpack", "[bsa.examples.pack_unpack]")
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack", "foo", "bar", "-baz"),
 			make_substr_matcher("unrecognized format"sv));
+		REQUIRE_THROWS_WITH(
+			invokeMain("unpack", texture.c_str(), "fo4_texture"),
+			make_substr_matcher("unsupported"sv));
 	}
 }
