@@ -1,0 +1,30 @@
+name: Apply Formatting
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'examples/**'
+      - 'include/**'
+      - 'src/**'
+      - 'tests/**'
+    pull_request:
+      branches: [ master ]
+    workflow_dispatch:
+
+jobs:
+  clang-format:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Add clang tools to the PATH
+      run: echo "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/Llvm/x64/bin" >> $GITHUB_PATH
+
+    - name: Run clang-format
+      run: Get-ChildItem -Path ${{ github.workspace }} -Include *.cpp, *.hpp -Recurse -File | ForEach-Object { clang-format -style=file -i $_.FullName }
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply formatting
