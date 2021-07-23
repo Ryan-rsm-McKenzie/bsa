@@ -66,7 +66,7 @@ namespace
 		const auto relative = virtual_to_local_path(std::forward<Keys>(a_keys)...);
 		const auto path = a_root / relative;
 		std::filesystem::create_directories(path.parent_path());
-		std::ofstream out{ path, std::ios_base::out | std::ios_base::binary | std::ios_base::app };
+		std::ofstream out{ path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc };
 		out.exceptions(std::ios_base::failbit);
 		return out;
 	}
