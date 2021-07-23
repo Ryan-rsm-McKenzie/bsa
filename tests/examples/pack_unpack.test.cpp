@@ -243,6 +243,7 @@ TEST_CASE("pack_unpack", "[bsa.examples.pack_unpack]")
 		bsa::fo4::archive ba2;
 		ba2.write(texture, bsa::fo4::format::directx);
 
+
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack"),
 			make_substr_matcher("too few"sv));
