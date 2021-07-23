@@ -8,7 +8,9 @@
 #include <compare>
 #include <cstring>
 #include <filesystem>
+#include <iostream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -67,10 +69,31 @@ namespace
 
 		return result;
 	}
+
+	class silence_cout
+	{
+	public:
+		silence_cout() noexcept
+		{
+			_original = std::cout.rdbuf();
+			std::cout.set_rdbuf(&_null);
+		}
+
+		~silence_cout() noexcept
+		{
+			std::cout.set_rdbuf(_original);
+		}
+
+	private:
+		std::stringbuf _null;
+		std::streambuf* _original{ nullptr };
+	};
 }
 
 TEST_CASE("pack_unpack", "[bsa.examples.pack_unpack]")
 {
+	const silence_cout _;
+
 	constexpr char prog[] = "pack_unpack";
 	const std::filesystem::path root{ "examples_pack_unpack_test"sv };
 	const auto datadir = (root / "data"sv).string();
