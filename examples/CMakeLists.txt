@@ -1,3 +1,6 @@
+add_library(examples INTERFACE)
+add_library(bsa::examples ALIAS examples)
+
 macro(add_example NAME)
 	add_executable("example_${NAME}" "${NAME}.cpp")
 	source_group("src" FILES "${NAME}.cpp")
@@ -12,6 +15,7 @@ macro(add_example NAME)
 		"example_${NAME}"
 		PRIVATE
 			bsa::bsa
+			bsa::examples
 	)
 endmacro()
 
