@@ -4,7 +4,6 @@ set(INCLUDE_DIR ${ROOT_DIR}/tests)
 set(HEADER_FILES
 	${INCLUDE_DIR}/utility.hpp
 )
-source_group("include" FILES ${HEADER_FILES})
 
 set(SOURCE_DIR ${ROOT_DIR}/tests)
 set(SOURCE_FILES
@@ -14,6 +13,14 @@ set(SOURCE_FILES
 	${SOURCE_DIR}/tes3.test.cpp
 	${SOURCE_DIR}/tes4.test.cpp
 )
+
+if(BSA_BUILD_EXAMPLES)
+	list(APPEND SOURCE_FILES
+		${SOURCE_DIR}/examples/pack_unpack.test.cpp
+	)
+endif()
+
+source_group("include" FILES ${HEADER_FILES})
 source_group(TREE ${SOURCE_DIR} PREFIX "src" FILES ${SOURCE_FILES})
 
 add_executable(
@@ -27,6 +34,7 @@ target_compile_definitions(
 	tests
 	PRIVATE
 		_CRT_SECURE_NO_WARNINGS
+		TESTING=1
 )
 
 target_include_directories(
@@ -69,3 +77,13 @@ acquire_test("tes4_flags_test")
 acquire_test("tes4_invalid_test")
 acquire_test("tes4_xbox_read_test")
 acquire_test("tes4_xbox_write_test")
+
+if(BSA_BUILD_EXAMPLES)
+	target_include_directories(
+		tests
+		PRIVATE
+			${ROOT_DIR}/examples
+	)
+
+	acquire_test("examples_pack_unpack_test")
+endif()
