@@ -73,11 +73,13 @@ namespace
 		return out;
 	}
 
-	void pack_fo4(const std::filesystem::path& a_root)
+	void pack_fo4(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::fo4::archive ba2;
 		for_each_file(
-			a_root,
+			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::fo4::file f;
 				auto& chunk = f.emplace_back();
@@ -86,34 +88,38 @@ namespace
 
 				ba2.insert(
 					a_path
-						.lexically_relative(a_root)
+						.lexically_relative(a_input)
 						.lexically_normal()
 						.generic_string(),
 					std::move(f));
 			});
-		ba2.write(a_root.stem().concat(".ba2"sv), bsa::fo4::format::general);
+		ba2.write(a_output, bsa::fo4::format::general);
 	}
 
-	void pack_tes3(const std::filesystem::path& a_root)
+	void pack_tes3(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::tes3::archive bsa;
 		for_each_file(
-			a_root,
+			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes3::file f;
 				f.set_data(read_file(a_path));
 
 				bsa.insert(
 					a_path
-						.lexically_relative(a_root)
+						.lexically_relative(a_input)
 						.lexically_normal()
 						.generic_string(),
 					std::move(f));
 			});
-		bsa.write(a_root.stem().concat(".bsa"sv));
+		bsa.write(a_output);
 	}
 
-	void pack_tes4(const std::filesystem::path& a_root)
+	void pack_tes4(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::tes4::archive bsa;
 		bsa.archive_flags(
@@ -121,7 +127,7 @@ namespace
 			bsa::tes4::archive_flag::directory_strings |
 			bsa::tes4::archive_flag::file_strings);
 		for_each_file(
-			a_root,
+			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes4::file f;
 				f.set_data(read_file(a_path));
@@ -130,7 +136,7 @@ namespace
 					const auto key =
 						a_path
 							.parent_path()
-							.lexically_relative(a_root)
+							.lexically_relative(a_input)
 							.lexically_normal()
 							.generic_string();
 					if (bsa.find(key) == bsa.end()) {
@@ -146,18 +152,20 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		bsa.write(a_root.stem().concat(".bsa"sv), bsa::tes4::version::tes4);
+		bsa.write(a_output, bsa::tes4::version::tes4);
 	}
 
-	void unpack_fo4(const std::filesystem::path& a_path)
+	void unpack_fo4(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::fo4::archive ba2;
-		if (ba2.read(a_path) != bsa::fo4::format::general) {
+		if (ba2.read(a_input) != bsa::fo4::format::general) {
 			throw std::runtime_error("unsupported fo4 archive format");
 		}
 
 		for (auto& [key, file] : ba2) {
-			auto out = open_virtual_path(a_path.stem(), key);
+			auto out = open_virtual_path(a_output, key);
 
 			for (auto& chunk : file) {
 				if (chunk.compressed()) {
@@ -172,13 +180,15 @@ namespace
 		}
 	}
 
-	void unpack_tes3(const std::filesystem::path& a_path)
+	void unpack_tes3(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::tes3::archive bsa;
-		bsa.read(a_path);
+		bsa.read(a_input);
 
 		for (const auto& [key, file] : bsa) {
-			auto out = open_virtual_path(a_path.stem(), key);
+			auto out = open_virtual_path(a_output, key);
 			const auto bytes = file.as_bytes();
 			out.write(
 				reinterpret_cast<const char*>(bytes.data()),
@@ -186,14 +196,16 @@ namespace
 		}
 	}
 
-	void unpack_tes4(const std::filesystem::path& a_path)
+	void unpack_tes4(
+		const std::filesystem::path& a_input,
+		const std::filesystem::path& a_output)
 	{
 		bsa::tes4::archive bsa;
-		const auto format = bsa.read(a_path);
+		const auto format = bsa.read(a_input);
 
 		for (auto& dir : bsa) {
 			for (auto& file : dir.second) {
-				auto out = open_virtual_path(a_path.stem(), dir.first, file.first);
+				auto out = open_virtual_path(a_output, dir.first, file.first);
 
 				if (file.second.compressed()) {
 					file.second.decompress(format);
@@ -210,53 +222,16 @@ namespace
 	struct args_t
 	{
 		bool pack{ false };
-		std::filesystem::path path;
+		std::filesystem::path input;
+		std::filesystem::path output;
 		bsa::file_format format{ bsa::file_format::tes4 };
 	};
-
-	void do_main(const args_t& a_args)
-	{
-		if (a_args.pack) {
-			switch (a_args.format) {
-			case bsa::file_format::fo4:
-				pack_fo4(a_args.path);
-				break;
-			case bsa::file_format::tes3:
-				pack_tes3(a_args.path);
-				break;
-			case bsa::file_format::tes4:
-				pack_tes4(a_args.path);
-				break;
-			default:
-				throw std::runtime_error("unhandled format");
-			}
-		} else {
-			const auto format = bsa::guess_file_format(a_args.path);
-			if (!format) {
-				throw std::runtime_error("file is not an archive");
-			}
-
-			switch (*format) {
-			case bsa::file_format::fo4:
-				unpack_fo4(a_args.path);
-				break;
-			case bsa::file_format::tes3:
-				unpack_tes3(a_args.path);
-				break;
-			case bsa::file_format::tes4:
-				unpack_tes4(a_args.path);
-				break;
-			default:
-				throw std::runtime_error("unhandled format");
-			}
-		}
-	}
 
 	void print_usage()
 	{
 		std::cout
-			<< "pack_unpack pack <path-to-root> {-tes3|-tes4|-fo4}\n"
-			<< "pack_unpack unpack <path-to-archive>\n"
+			<< "pack_unpack pack <input-directory> <output-archive> {-tes3|-tes4|-fo4}\n"
+			<< "pack_unpack unpack <input-archive> <output-directory>\n"
 			<< '\n';
 	}
 
@@ -272,12 +247,13 @@ namespace
 		-> args_t
 	{
 		try {
-			if (a_args.size() <= 2) {
+			if (a_args.size() <= 3) {
 				throw std::runtime_error("too few arguments");
 			}
 
 			args_t args;
-			args.path = a_args[2];
+			args.input = a_args[2];
+			args.output = a_args[3];
 			args.pack = [&]() {
 				const auto arg = a_args[1];
 				if (arg == "pack"sv) {
@@ -291,11 +267,11 @@ namespace
 
 			const std::size_t expected = [&]() {
 				if (args.pack) {
-					if (a_args.size() <= 3) {
+					if (a_args.size() <= 4) {
 						throw std::runtime_error("too few arguments");
 					}
 
-					const auto arg = a_args[3];
+					const auto arg = a_args[4];
 					if (arg == "-tes3"sv) {
 						args.format = bsa::file_format::tes3;
 					} else if (arg == "-tes4"sv) {
@@ -306,9 +282,9 @@ namespace
 						concat_and_throw("unrecognized format: "sv, arg);
 					}
 
-					return 3;
+					return 4;
 				} else {
-					return 2;
+					return 3;
 				}
 			}();
 
@@ -322,16 +298,56 @@ namespace
 			throw a_err;
 		}
 	}
+
+	void do_main(int a_argc, const char* a_argv[])
+	{
+		const auto args = parse_arguments({ a_argv, static_cast<std::size_t>(a_argc) });
+		if (args.pack) {
+			switch (args.format) {
+			case bsa::file_format::fo4:
+				pack_fo4(args.input, args.output);
+				break;
+			case bsa::file_format::tes3:
+				pack_tes3(args.input, args.output);
+				break;
+			case bsa::file_format::tes4:
+				pack_tes4(args.input, args.output);
+				break;
+			default:
+				throw std::runtime_error("unhandled format");
+			}
+		} else {
+			const auto format = bsa::guess_file_format(args.input);
+			if (!format) {
+				throw std::runtime_error("file is not an archive");
+			}
+
+			switch (*format) {
+			case bsa::file_format::fo4:
+				unpack_fo4(args.input, args.output);
+				break;
+			case bsa::file_format::tes3:
+				unpack_tes3(args.input, args.output);
+				break;
+			case bsa::file_format::tes4:
+				unpack_tes4(args.input, args.output);
+				break;
+			default:
+				throw std::runtime_error("unhandled format");
+			}
+		}
+	}
 }
 
+#ifndef TESTING
 int main(int a_argc, const char* a_argv[])
 {
 	try {
-		const auto args = parse_arguments({ a_argv, static_cast<std::size_t>(a_argc) });
-		do_main(args);
+		do_main(a_argc, a_argv);
 		return EXIT_SUCCESS;
 	} catch (const std::exception& a_err) {
 		std::cerr << a_err.what() << '\n';
 		return EXIT_FAILURE;
 	}
 }
+#endif
