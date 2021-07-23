@@ -189,6 +189,18 @@ TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 {
 	const std::filesystem::path root{ "common_io_test"sv };
 
+	SECTION("we can report various filesystem errors")
+	{
+		REQUIRE_THROWS_WITH(
+			bsa::detail::istream_t(root / "foo.bar"sv),
+			Catch::Matchers::Matches(R"(.*\bnot found\b.*)"s, Catch::CaseSensitive::No));
+
+		std::filesystem::create_directory("dir"sv);
+		REQUIRE_THROWS_WITH(
+			bsa::detail::istream_t("dir"sv),
+			Catch::Matchers::Matches(R"(.*\bnot a regular file\b.*)"s, Catch::CaseSensitive::No));
+	}
+
 	SECTION("we can read/write binary data")
 	{
 		const char rawData[] =

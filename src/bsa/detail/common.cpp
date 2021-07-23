@@ -384,6 +384,17 @@ namespace bsa::detail
 
 	istream_t::istream_t(std::filesystem::path a_path)
 	{
+		switch (std::filesystem::status(a_path).type()) {
+		case std::filesystem::file_type::regular:
+			break;
+		case std::filesystem::file_type::none:
+			throw std::system_error{ errno, std::generic_category() };
+		case std::filesystem::file_type::not_found:
+			throw std::system_error{ ENOENT, std::generic_category(), "File not found" };
+		default:
+			throw std::system_error{ ENOENT, std::generic_category(), "File is not a regular file" };
+		}
+
 		_file = std::make_shared<stream_type>();
 		_file->open(std::move(a_path));
 		if (!_file->is_open()) {
