@@ -13,9 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <bsa/fo4.hpp>
-#include <bsa/tes3.hpp>
-#include <bsa/tes4.hpp>
+#include <bsa/bsa.hpp>
 
 using namespace std::literals;
 
