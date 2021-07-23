@@ -20,7 +20,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Add clang tools to the PATH
-      run: echo "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/Llvm/x64/bin" >> $GITHUB_PATH
+      run: echo "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/Llvm/x64/bin" >> $env:GITHUB_PATH
 
     - name: Run clang-format
       run: Get-ChildItem -Path ${{ github.workspace }} -Include *.cpp, *.hpp -Recurse -File | ForEach-Object { clang-format -style=file -i $_.FullName }
