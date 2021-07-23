@@ -278,15 +278,15 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 	{
 		const std::filesystem::path root{ "fo4_invalid_test"sv };
 		constexpr std::array types{
-			"format",
-			"magic",
-			"range",
-			"sentinel",
-			"size",
-			"version",
+			"format"sv,
+			"magic"sv,
+			"range"sv,
+			"sentinel"sv,
+			"size"sv,
+			"version"sv,
 		};
 
-		for (const std::string type : types) {
+		for (const auto& type : types) {
 			std::string filename;
 			filename += "invalid_"sv;
 			filename += type;
@@ -295,7 +295,7 @@ TEST_CASE("bsa::fo4::archive", "[fo4.archive]")
 			bsa::fo4::archive ba2;
 			REQUIRE_THROWS_WITH(
 				ba2.read(root / filename),
-				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
+				make_substr_matcher(type));
 		}
 	}
 

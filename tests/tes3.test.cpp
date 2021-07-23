@@ -184,11 +184,11 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 	{
 		const std::filesystem::path root{ "tes3_invalid_test"sv };
 		constexpr std::array types{
-			"magic",
-			"range",
+			"magic"sv,
+			"range"sv,
 		};
 
-		for (const std::string type : types) {
+		for (const auto& type : types) {
 			std::string filename;
 			filename += "invalid_"sv;
 			filename += type;
@@ -197,7 +197,7 @@ TEST_CASE("bsa::tes3::archive", "[tes3.archive]")
 			bsa::tes3::archive bsa;
 			REQUIRE_THROWS_WITH(
 				bsa.read(root / filename),
-				Catch::Matchers::Matches(".*\\b"s + type + "\\b.*"s, Catch::CaseSensitive::No));
+				make_substr_matcher(type));
 		}
 	}
 

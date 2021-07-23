@@ -14,6 +14,8 @@
 
 #include <bsa/detail/common.hpp>
 
+#include <catch2/catch.hpp>
+
 using namespace std::literals;
 
 template <class T, bool DefaultConstructible = true>
@@ -64,4 +66,13 @@ inline auto simple_normalize(std::string_view a_path) noexcept
 		c = c == '/' ? '\\' : static_cast<char>(std::tolower(c));
 	}
 	return result;
+}
+
+inline auto make_substr_matcher(std::string_view a_str) noexcept
+{
+	std::string pattern;
+	pattern += ".*\\b"sv;
+	pattern += a_str;
+	pattern += "\\b.*"sv;
+	return Catch::Matchers::Matches(pattern, Catch::CaseSensitive::No);
 }

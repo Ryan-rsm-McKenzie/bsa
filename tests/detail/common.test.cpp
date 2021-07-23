@@ -193,12 +193,12 @@ TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
 	{
 		REQUIRE_THROWS_WITH(
 			bsa::detail::istream_t(root / "foo.bar"sv),
-			Catch::Matchers::Matches(R"(.*\bnot found\b.*)"s, Catch::CaseSensitive::No));
+			make_substr_matcher("not found"sv));
 
 		std::filesystem::create_directory("dir"sv);
 		REQUIRE_THROWS_WITH(
 			bsa::detail::istream_t("dir"sv),
-			Catch::Matchers::Matches(R"(.*\bnot a regular file\b.*)"s, Catch::CaseSensitive::No));
+			make_substr_matcher("not a regular file"sv));
 	}
 
 	SECTION("we can read/write binary data")
