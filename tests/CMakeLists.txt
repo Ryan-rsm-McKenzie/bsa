@@ -1,27 +1,27 @@
-set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-set(INCLUDE_DIR ${ROOT_DIR}/tests)
+set(INCLUDE_DIR "${ROOT_DIR}/tests")
 set(HEADER_FILES
-	${INCLUDE_DIR}/utility.hpp
+	"${INCLUDE_DIR}/utility.hpp"
 )
 
-set(SOURCE_DIR ${ROOT_DIR}/tests)
+set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-	${SOURCE_DIR}/detail/common.test.cpp
-	${SOURCE_DIR}/fo4.test.cpp
-	${SOURCE_DIR}/main.cpp
-	${SOURCE_DIR}/tes3.test.cpp
-	${SOURCE_DIR}/tes4.test.cpp
+	"${SOURCE_DIR}/detail/common.test.cpp"
+	"${SOURCE_DIR}/fo4.test.cpp"
+	"${SOURCE_DIR}/main.cpp"
+	"${SOURCE_DIR}/tes3.test.cpp"
+	"${SOURCE_DIR}/tes4.test.cpp"
 )
 
-if(BSA_BUILD_EXAMPLES)
+if("${BSA_BUILD_EXAMPLES}")
 	list(APPEND SOURCE_FILES
-		${SOURCE_DIR}/examples/pack_unpack.test.cpp
+		"${SOURCE_DIR}/examples/pack_unpack.test.cpp"
 	)
 endif()
 
 source_group("include" FILES ${HEADER_FILES})
-source_group(TREE ${SOURCE_DIR} PREFIX "src" FILES ${SOURCE_FILES})
+source_group(TREE "${SOURCE_DIR}" PREFIX "src" FILES ${SOURCE_FILES})
 
 add_executable(
 	tests
@@ -40,14 +40,14 @@ target_compile_definitions(
 target_include_directories(
 	tests
 	PRIVATE
-		${INCLUDE_DIR}
-		${SOURCE_DIR}
+		"${INCLUDE_DIR}"
+		"${SOURCE_DIR}"
 )
 
 target_link_libraries(
 	tests
 	PRIVATE
-		bsa::bsa
+		"${PROJECT_NAME}::${PROJECT_NAME}"
 		Catch2::Catch2
 )
 
@@ -77,11 +77,11 @@ acquire_test("tes4_invalid_test")
 acquire_test("tes4_xbox_read_test")
 acquire_test("tes4_xbox_write_test")
 
-if(BSA_BUILD_EXAMPLES)
+if("${BSA_BUILD_EXAMPLES}")
 	target_include_directories(
 		tests
 		PRIVATE
-			${ROOT_DIR}/examples
+			"${ROOT_DIR}/examples"
 	)
 
 	acquire_test("examples_pack_unpack_test")

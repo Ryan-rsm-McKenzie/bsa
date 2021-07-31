@@ -1,5 +1,5 @@
 add_library(examples INTERFACE)
-add_library(bsa::examples ALIAS examples)
+add_library("${PROJECT_NAME}::examples" ALIAS examples)
 
 macro(add_example NAME)
 	add_executable("example_${NAME}" "${NAME}.cpp")
@@ -8,14 +8,14 @@ macro(add_example NAME)
 	set_target_properties(
 		"example_${NAME}"
 		PROPERTIES
-			OUTPUT_NAME ${NAME}
+			OUTPUT_NAME "${NAME}"
 	)
 
 	target_link_libraries(
 		"example_${NAME}"
 		PRIVATE
-			bsa::bsa
-			bsa::examples
+			"${PROJECT_NAME}::${PROJECT_NAME}"
+			"${PROJECT_NAME}::examples"
 	)
 endmacro()
 
