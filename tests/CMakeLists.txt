@@ -48,7 +48,6 @@ target_link_libraries(
 	tests
 	PRIVATE
 		bsa::bsa
-		bsa::common
 		Catch2::Catch2
 )
 

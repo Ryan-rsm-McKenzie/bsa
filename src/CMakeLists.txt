@@ -55,7 +55,13 @@ set_target_properties(
 		DEBUG_POSTFIX "d"
 )
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+target_compile_features(
+	${TARGET_NAME}
+	PUBLIC
+		cxx_std_20
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 	target_compile_options(
 		${TARGET_NAME}
 		PRIVATE
@@ -82,8 +88,6 @@ target_link_libraries(
 	PRIVATE
 		LZ4::LZ4
 		ZLIB::ZLIB
-	PUBLIC
-		bsa::common
 )
 
 install(

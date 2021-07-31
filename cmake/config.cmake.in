@@ -1,4 +1,3 @@
-include("${CMAKE_CURRENT_LIST_DIR}/bsa_common-targets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/@TARGET_NAME@-targets.cmake")
 include(CMakeFindDependencyMacro)
 
