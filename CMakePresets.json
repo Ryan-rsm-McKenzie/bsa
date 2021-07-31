@@ -81,8 +81,8 @@
       "name": "linux"
     },
     {
-      "environment": {
-        "CXXFLAGS": "/MP /W4 /WX /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX /external:anglebrackets /external:W0"
       },
       "generator": "Visual Studio 16 2019",
       "inherits": [
@@ -93,8 +93,8 @@
       "name": "vs2019-windows-vcpkg"
     },
     {
-      "environment": {
-        "CXXFLAGS": "/MP /W4 /WX $penv{CXXFLAGS}"
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX"
       },
       "generator": "Visual Studio 17 2022",
       "inherits": [
