@@ -34,9 +34,8 @@ source_group(
 		${NATVIS_FILES}
 )
 
-set(TARGET_NAME bsa)
 add_library(
-	${TARGET_NAME}
+	${PROJECT_NAME}
 	STATIC
 	${HEADER_FILES}
 	${SOURCE_FILES}
@@ -44,33 +43,33 @@ add_library(
 	${ROOT_DIR}/.clang-format
 	${ROOT_DIR}/.editorconfig
 )
-add_library(bsa::${TARGET_NAME} ALIAS ${TARGET_NAME})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 set_target_properties(
-	${TARGET_NAME}
+	${PROJECT_NAME}
 	PROPERTIES
 		DEBUG_POSTFIX "d"
 )
 
 target_compile_features(
-	${TARGET_NAME}
+	${PROJECT_NAME}
 	PUBLIC
 		cxx_std_20
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 	target_compile_options(
-		${TARGET_NAME}
+		${PROJECT_NAME}
 		PRIVATE
 			"-fvisibility=hidden"
 	)
 endif()
 
 target_include_directories(
-	${TARGET_NAME}
+	${PROJECT_NAME}
 	PUBLIC
 		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
@@ -84,40 +83,40 @@ find_package(LZ4 MODULE REQUIRED)
 find_package(ZLIB MODULE REQUIRED)
 
 target_link_libraries(
-	${TARGET_NAME}
+	${PROJECT_NAME}
 	PRIVATE
 		LZ4::LZ4
 		ZLIB::ZLIB
 )
 
 install(
-	TARGETS ${TARGET_NAME}
-	EXPORT ${TARGET_NAME}-targets
+	TARGETS ${PROJECT_NAME}
+	EXPORT ${PROJECT_NAME}-targets
 )
 
 install(
-	EXPORT ${TARGET_NAME}-targets
+	EXPORT ${PROJECT_NAME}-targets
 	NAMESPACE bsa::
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 configure_file(
 	${ROOT_DIR}/cmake/config.cmake.in
-	${TARGET_NAME}Config.cmake
+	${PROJECT_NAME}Config.cmake
 	@ONLY
 )
 
 write_basic_package_version_file(
-	${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}ConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 	COMPATIBILITY SameMajorVersion
 )
 
 install(
 	FILES
-		${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}Config.cmake
-		${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}ConfigVersion.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 		${ROOT_DIR}/cmake/FindLZ4.cmake
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET_NAME}
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 install(
@@ -127,5 +126,5 @@ install(
 
 install(
 	FILES ${NATVIS_FILES}
-	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TARGET_NAME}
+	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}
 )
