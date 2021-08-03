@@ -3,6 +3,7 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 set(INCLUDE_DIR "${ROOT_DIR}/include")
 set(HEADER_FILES
 	"${INCLUDE_DIR}/bsa/detail/common.hpp"
+        "${INCLUDE_DIR}/bsa/all.hpp"
 	"${INCLUDE_DIR}/bsa/bsa.hpp"
 	"${INCLUDE_DIR}/bsa/fo4.hpp"
 	"${INCLUDE_DIR}/bsa/fwd.hpp"
@@ -13,6 +14,7 @@ set(HEADER_FILES
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/detail/common.cpp"
+        "${SOURCE_DIR}/bsa/all.cpp"
 	"${SOURCE_DIR}/bsa/fo4.cpp"
 	"${SOURCE_DIR}/bsa/tes3.cpp"
 	"${SOURCE_DIR}/bsa/tes4.cpp"
