@@ -1,46 +1,17 @@
 name: Apply Formatting
 
-on:
-  push:
-    branches: [ master ]
-    paths:
-      - '.github/workflows/formatting.yml'
-      - 'examples/**'
-      - 'include/**'
-      - 'src/**'
-      - 'tests/**'
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
+on: [ push, pull_request, pull_request_target ]
 
 jobs:
   clang-format:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        path: bsa
-
-    - name: Cache clang-format
-      uses: actions/cache@v2
-      id: clang-cache
-      env:
-        cache-name: clang-cache
-      with:
-        path: ${{ github.workspace }}/clang-format.exe
-        key: ${{ runner.os }}-build-${{ env.cache-name }}
-
-    - name: Install clang-format
-      if: ${{ steps.clang-cache.outputs.cache-hit != 'true' }}
-      run: |
-        choco install llvm -y
-        cp "C:/Program Files/LLVM/bin/clang-format.exe" ${{ github.workspace }}
 
     - name: Run clang-format
-      run: Get-ChildItem -Path ${{ github.workspace }}/bsa -Include *.cpp, *.hpp -Recurse -File | ForEach-Object { ${{ github.workspace }}/clang-format.exe -style=file -i $_.FullName }
+      run: find -type f \( -name *.hpp -o -name *.cpp \) | xargs clang-format-12 -style=file -i
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: Apply formatting
-        repository: bsa
+        commit_message: apply formatting
