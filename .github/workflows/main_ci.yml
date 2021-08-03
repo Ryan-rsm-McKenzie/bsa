@@ -22,53 +22,81 @@ env:
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  linux:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        config: [ gcc ]
         include:
-          - os: ubuntu-latest
-            cmake-preset: ninja-linux-apt
-          - os: windows-latest
-            cmake-preset: vs2019-windows-vcpkg
+          - config: gcc
+            cc: gcc-10
+            cxx: g++-10
 
     steps:
       - uses: actions/checkout@v2
         with:
           path: bsa
-          submodules: 'true'
 
-      - name: Setup Linux
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: Setup Environment
         run: |
-          echo "CC=gcc-10" >> $GITHUB_ENV
-          echo "CXX=g++-10" >> $GITHUB_ENV
+          echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
           wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
           sudo apt install liblz4-dev zlib1g-dev -y
+          sudo pip install gcovr
 
       - name: Download Catch2
         uses: actions/checkout@v2
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           ref: v2.13.6
           repository: catchorg/Catch2
           path: catch2
 
       - name: Install Catch2
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         working-directory: ${{ github.workspace }}/catch2
         run: |
           cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
-          cmake --build build --parallel
+          cmake --build build
           sudo cmake --install build
 
+      - name: Configure CMake
+        working-directory: ${{ github.workspace }}/bsa
+        run: cmake --preset ninja-linux-apt -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/bsa
+        run: cmake --build build
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/bsa/build/tests
+        run: |
+          ./tests [src]
+          gcovr -r ${{ github.workspace }}/bsa . -f ".*/src/bsa/.*" --xml src.xml
+
+          (cd .. && find -type f -name *.gcda | xargs rm)
+
+          ./tests [examples]
+          gcovr -r ${{ github.workspace }}/bsa . -f ".*/examples/.*" --xml examples.xml
+
+      - name: Collect code coverage
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          files: build/tests/examples.xml,build/tests/src.xml
+          working-directory: ${{ github.workspace }}/bsa/build
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: bsa
+
       - name: Setup vcpkg
-        if: ${{ matrix.os == 'windows-latest' }}
         run: |
           mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
           cd $env:VCPKG_INSTALLATION_ROOT
@@ -76,7 +104,6 @@ jobs:
           ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
 
       - name: Cache vcpkg
-        if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/cache@v2
         id: vcpkg-cache
         env:
@@ -87,20 +114,12 @@ jobs:
 
       - name: Configure CMake
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset ${{ matrix.cmake-preset }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
+        run: cmake --preset vs2019-windows-vcpkg
 
       - name: Build
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --build build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }}
 
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
-
-      - name: Collect code coverage
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@v1.5.2
-        with:
-          fail_ci_if_error: true
-          functionalities: coveragepy
-          working-directory: ${{ github.workspace }}/bsa/build
