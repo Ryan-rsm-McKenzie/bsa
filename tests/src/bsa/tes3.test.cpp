@@ -20,7 +20,7 @@ static_assert(assert_nothrowable<bsa::tes3::file>());
 static_assert(assert_nothrowable<bsa::tes3::file::key, false>());
 static_assert(assert_nothrowable<bsa::tes3::archive>());
 
-TEST_CASE("bsa::tes3::hashing", "[tes3][hashing]")
+TEST_CASE("bsa::tes3::hashing", "[src][tes3][hashing]")
 {
 	SECTION("hashes start empty")
 	{
@@ -68,7 +68,7 @@ TEST_CASE("bsa::tes3::hashing", "[tes3][hashing]")
 	}
 }
 
-TEST_CASE("bsa::tes3::file", "[tes3][vfs]")
+TEST_CASE("bsa::tes3::file", "[src][tes3][vfs]")
 {
 	SECTION("files start empty")
 	{
@@ -79,7 +79,7 @@ TEST_CASE("bsa::tes3::file", "[tes3][vfs]")
 	}
 }
 
-TEST_CASE("bsa::tes3::archive", "[tes3][archive]")
+TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 {
 	SECTION("archives start empty")
 	{

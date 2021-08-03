@@ -22,7 +22,7 @@ static_assert(assert_nothrowable<bsa::tes4::directory>());
 static_assert(assert_nothrowable<bsa::tes4::directory::key, false>());
 static_assert(assert_nothrowable<bsa::tes4::archive>());
 
-TEST_CASE("bsa::tes4::hashing", "[tes4][hashing]")
+TEST_CASE("bsa::tes4::hashing", "[src][tes4][hashing]")
 {
 	SECTION("validate hash values")
 	{
@@ -121,7 +121,7 @@ TEST_CASE("bsa::tes4::hashing", "[tes4][hashing]")
 	}
 }
 
-TEST_CASE("bsa::tes4::directory", "[tes4][vfs]")
+TEST_CASE("bsa::tes4::directory", "[src][tes4][vfs]")
 {
 	SECTION("directories start empty")
 	{
@@ -133,7 +133,7 @@ TEST_CASE("bsa::tes4::directory", "[tes4][vfs]")
 	}
 }
 
-TEST_CASE("bsa::tes4::file", "[tes4][vfs]")
+TEST_CASE("bsa::tes4::file", "[src][tes4][vfs]")
 {
 	SECTION("files start empty")
 	{
@@ -160,7 +160,7 @@ TEST_CASE("bsa::tes4::file", "[tes4][vfs]")
 	}
 }
 
-TEST_CASE("bsa::tes4::archive", "[tes4][archive]")
+TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 {
 	SECTION("archives start empty")
 	{

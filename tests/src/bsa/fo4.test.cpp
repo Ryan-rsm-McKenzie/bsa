@@ -18,7 +18,7 @@ static_assert(assert_nothrowable<bsa::fo4::file>());
 static_assert(assert_nothrowable<bsa::fo4::file::key, false>());
 static_assert(assert_nothrowable<bsa::fo4::archive>());
 
-TEST_CASE("bsa::fo4::hashing", "[fo4][hashing]")
+TEST_CASE("bsa::fo4::hashing", "[src][fo4][hashing]")
 {
 	SECTION("hashes start empty")
 	{
@@ -101,7 +101,7 @@ TEST_CASE("bsa::fo4::hashing", "[fo4][hashing]")
 	}
 }
 
-TEST_CASE("bsa::fo4::chunk", "[fo4][vfs]")
+TEST_CASE("bsa::fo4::chunk", "[src][fo4][vfs]")
 {
 	SECTION("files start empty")
 	{
@@ -114,7 +114,7 @@ TEST_CASE("bsa::fo4::chunk", "[fo4][vfs]")
 	}
 }
 
-TEST_CASE("bsa::fo4::file", "[fo4][vfs]")
+TEST_CASE("bsa::fo4::file", "[src][fo4][vfs]")
 {
 	SECTION("files start empty")
 	{
@@ -131,7 +131,7 @@ TEST_CASE("bsa::fo4::file", "[fo4][vfs]")
 	}
 }
 
-TEST_CASE("bsa::fo4::archive", "[fo4][archive]")
+TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 {
 	SECTION("archives start empty")
 	{
