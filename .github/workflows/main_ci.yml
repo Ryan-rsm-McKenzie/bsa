@@ -85,9 +85,8 @@ jobs:
       - name: Collect code coverage
         uses: codecov/codecov-action@v2
         with:
-          directory: ./bsa/build/tests
           fail_ci_if_error: true
-          files: ./examples.xml,./src.xml
+          files: bsa/build/tests/examples.xml,bsa/build/tests/src.xml
           verbose: true
 
   windows:
