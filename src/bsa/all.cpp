@@ -24,7 +24,6 @@ overload(Ts...) -> overload<Ts...>;
     return data;
 }
 
-
 template<class... Keys>
 [[nodiscard]] auto virtual_to_local_path(Keys &&...a_keys) -> std::string
 {
@@ -123,19 +122,25 @@ auto archive::read(const std::filesystem::path &a_path) -> version
         return static_cast<version>(format);
     };
 
-    switch (format) {
-    case bsa::file_format::fo4:
-        _version = read(bsa::fo4::archive{});
-    case bsa::file_format::tes3: {
-        bsa::tes3::archive archive;
-        archive.read(std::move(a_path));
-        _archive = std::move(archive);
-        _version = version::tes3;
+    _version = [&] {
+        switch (format) {
+        case bsa::file_format::fo4:
+            return read(bsa::fo4::archive{});
+        case bsa::file_format::tes3: {
+            bsa::tes3::archive archive;
+            archive.read(std::move(a_path));
+            _archive = std::move(archive);
+            return version::tes3;
+        }
+        case bsa::file_format::tes4:
+            return read(bsa::tes4::archive{});
+        default:
+            bsa::detail::declare_unreachable();
+        }
+    }();
+    if (_version == version::fo4dx) {
+        throw std::runtime_error("unsupported fo4 archive format");
     }
-    case bsa::file_format::tes4:
-        _version = read(bsa::tes4::archive{});
-    }
-    assert(_version != version::fo4dx && "directx ba2 not supported");
     return _version;
 }
 
@@ -163,19 +168,19 @@ void archive::add_file(const std::filesystem::path &a_root, const std::filesyste
     add_file(relative, data);
 }
 
-void archive::add_file(const std::filesystem::path &a_relative, std::span<const std::byte> a_data)
+void archive::add_file(const std::filesystem::path &a_relative, std::vector<std::byte> a_data)
 {
     const auto adder = detail::overload{
         [&](bsa::tes3::archive &bsa) {
             bsa::tes3::file f;
-            f.set_data(a_data);
+            f.set_data(std::move(a_data));
 
             bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
         },
-        [&, this](bsa::tes4::archive bsa) {
+        [&, this](bsa::tes4::archive &bsa) {
             bsa::tes4::file f;
             const auto version = detail::archive_version<bsa::tes4::version>(_archive, _version);
-            f.set_data(a_data);
+            f.set_data(std::move(a_data));
 
             if (_compressed)
                 f.compress(version);
@@ -190,12 +195,12 @@ void archive::add_file(const std::filesystem::path &a_relative, std::span<const 
 
             d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
         },
-        [&, this](bsa::fo4::archive ba2) {
+        [&, this](bsa::fo4::archive &ba2) {
             const auto version = detail::archive_version<bsa::fo4::format>(_archive, _version);
             assert(version == bsa::fo4::format::general && "directx ba2 not supported");
             bsa::fo4::file f;
             auto &chunk = f.emplace_back();
-            chunk.set_data(a_data);
+            chunk.set_data(std::move(a_data));
 
             if (_compressed)
                 chunk.compress();
@@ -217,7 +222,7 @@ void archive::iterate_files(const iteration_callback &a_callback, bool skip_comp
                 a_callback(relative, bytes);
             }
         },
-        [&](bsa::tes4::archive bsa) {
+        [&](bsa::tes4::archive &bsa) {
             for (auto &dir : bsa) {
                 for (auto &file : dir.second) {
                     const auto relative = detail::virtual_to_local_path(dir.first, file.first);
@@ -233,7 +238,7 @@ void archive::iterate_files(const iteration_callback &a_callback, bool skip_comp
                 }
             }
         },
-        [&](bsa::fo4::archive ba2) {
+        [&](bsa::fo4::archive &ba2) {
             for (auto &[key, file] : ba2) {
                 const auto relative = detail::virtual_to_local_path(key);
 
