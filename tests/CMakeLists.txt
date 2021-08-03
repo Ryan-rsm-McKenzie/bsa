@@ -7,7 +7,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
-	"${SOURCE_DIR}/detail/common.test.cpp"
+	"${SOURCE_DIR}/src/bsa/detail/common.test.cpp"
 	"${SOURCE_DIR}/src/bsa/fo4.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes3.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes4.test.cpp"
