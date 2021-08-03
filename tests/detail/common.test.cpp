@@ -17,7 +17,7 @@
 
 #include "bsa/detail/common.hpp"
 
-TEST_CASE("bsa::functional", "[bsa.functional]")
+TEST_CASE("bsa::functional", "[common]")
 {
 	SECTION("guess_file_format")
 	{
@@ -52,7 +52,7 @@ TEST_CASE("bsa::functional", "[bsa.functional]")
 	}
 }
 
-TEST_CASE("bsa::detail::endian", "[bsa.endian]")
+TEST_CASE("bsa::detail::endian", "[common]")
 {
 	const auto test = []<class T>(std::in_place_type_t<T>, std::size_t a_little, std::size_t a_big) {
 		// test against unaligned memory
@@ -113,7 +113,7 @@ TEST_CASE("bsa::detail::endian", "[bsa.endian]")
 	}
 }
 
-TEST_CASE("bsa::detail::unicode", "[bsa.unicode]")
+TEST_CASE("bsa::detail::unicode", "[common]")
 {
 	SECTION("we can open files with utf-8 characters")
 	{
@@ -137,7 +137,7 @@ TEST_CASE("bsa::detail::unicode", "[bsa.unicode]")
 	}
 }
 
-TEST_CASE("bsa::detail::mmio", "[bsa.mmio]")
+TEST_CASE("bsa::detail::mmio", "[common]")
 {
 	SECTION("we can perform read-only memory-mapped io")
 	{
@@ -185,7 +185,7 @@ TEST_CASE("bsa::detail::mmio", "[bsa.mmio]")
 	}
 }
 
-TEST_CASE("bsa::detail::iostream_t", "[bsa.io]")
+TEST_CASE("bsa::detail::iostream_t", "[common]")
 {
 	const std::filesystem::path root{ "common_io_test"sv };
 

@@ -90,7 +90,7 @@ namespace
 	};
 }
 
-TEST_CASE("pack_unpack", "[bsa.examples.pack_unpack]")
+TEST_CASE("pack_unpack", "[examples]")
 {
 	const silence_cout _;
 
