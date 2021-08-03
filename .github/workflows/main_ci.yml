@@ -72,15 +72,15 @@ jobs:
         run: cmake --build build
 
       - name: Test
-        working-directory: ${{ github.workspace }}/bsa/build/tests
+        working-directory: ${{ github.workspace }}/bsa/build
         run: |
-          ./tests [src]
-          gcovr -r ${{ github.workspace }}/bsa . -f ".*/src/bsa/.*" --xml src.xml
+          (cd tests && ./tests [src])
+          gcovr -r .. . -f ".*/src/bsa/.*" -f ".*/include/bsa/.*" --xml src.xml
 
-          (cd .. && find -type f -name *.gcda | xargs rm)
+          find -type f -name *.gcda | xargs rm
 
-          ./tests [examples]
-          gcovr -r ${{ github.workspace }}/bsa . -f ".*/examples/.*" --xml examples.xml
+          (cd tests && ./tests [examples])
+          gcovr -r .. . -f ".*/examples/.*" --xml examples.xml
 
       - name: Collect code coverage
         uses: codecov/codecov-action@v2
