@@ -12,6 +12,7 @@ on:
       - 'tests/**'
       - 'CMakeLists.txt'
       - 'CMakePresets.json'
+      - 'codecov.yml'
       - 'vcpkg.json'
   pull_request:
     branches: [ master ]
