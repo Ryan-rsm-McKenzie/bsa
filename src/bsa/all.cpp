@@ -6,7 +6,7 @@ namespace bsa::all
 {
 	namespace detail
 	{
-        [[nodiscard]] auto read_file(const std::filesystem::path& a_path) -> std::vector<std::byte>
+		[[nodiscard]] auto read_file(const std::filesystem::path& a_path) -> std::vector<std::byte>
 		{
 			std::vector<std::byte> data;
 			data.resize(std::filesystem::file_size(a_path));
@@ -18,7 +18,7 @@ namespace bsa::all
 			return data;
 		}
 
-        [[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> std::string_view
+		[[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> std::string_view
 		{
 			const auto visiter = detail::overload{
 				[](bsa::tes3::archive) { return "tes3"; },
@@ -29,54 +29,51 @@ namespace bsa::all
 		}
 
 		template <typename Version>
-        [[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version
+		[[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version
 		{
-            // Check that there's no mismatch between version and requested Type
-            const bool correct = [&] {
-                if constexpr (std::is_same_v<Version, std::uint32_t>) {
-                    return std::holds_alternative<bsa::tes3::archive>(archive);
-                } else if constexpr (std::is_same_v<Version, bsa::tes4::version>){
-                    return std::holds_alternative<bsa::tes4::archive>(archive);
-                } else if constexpr (std::is_same_v<Version, bsa::fo4::format>)
-                    return std::holds_alternative<bsa::fo4::archive>(archive);
-                else {
-                    return false;
-                }
-            }();
-            if (!correct){
-                throw exception("Mismatch between requested version and variant type");
-            }
+			// Check that there's no mismatch between version and requested Type
+			const bool correct = [&] {
+				if constexpr (std::is_same_v<Version, std::uint32_t>) {
+					return std::holds_alternative<bsa::tes3::archive>(archive);
+				} else if constexpr (std::is_same_v<Version, bsa::tes4::version>) {
+					return std::holds_alternative<bsa::tes4::archive>(archive);
+				} else if constexpr (std::is_same_v<Version, bsa::fo4::format>)
+					return std::holds_alternative<bsa::fo4::archive>(archive);
+				else {
+					return false;
+				}
+			}();
+			if (!correct) {
+				throw exception("Mismatch between requested version and variant type");
+			}
 
-            // Check that there's no mismatch between archive and version
+			// Check that there's no mismatch between archive and version
 			constexpr auto max_alternative = 4;
-            using Ret = std::array<version, max_alternative>;
-            auto visitor = detail::overload{ [](bsa::tes3::archive) -> Ret { return { version::tes3 }; },
-                [](bsa::tes4::archive) -> Ret {
-                    return { version::tes4, version::tes5, version::fo3, version::sse };
-                },
-                [](bsa::fo4::archive) -> Ret {
-                    return { version::fo4, version::fo4dx };
+			using Ret = std::array<version, max_alternative>;
+			auto visitor = detail::overload{ [](bsa::tes3::archive) -> Ret { return { version::tes3 }; },
+				[](bsa::tes4::archive) -> Ret {
+					return { version::tes4, version::tes5, version::fo3, version::sse };
+				},
+				[](bsa::fo4::archive) -> Ret {
+					return { version::fo4, version::fo4dx };
 				}
 
-            };
+			};
 
 			const auto allowed = std::visit(visitor, archive);
 			const auto value = bsa::detail::to_underlying(a_version);
 
 			if (std::ranges::find(allowed, a_version) == allowed.end()) {
-                const auto type = get_archive_identifier(archive);
-                const auto err = std::to_string(value) + " does not correspond to "s
-                                 + std::string(type) + " archive"s;
-                throw bsa::exception(err.c_str());
-            }
-
-
+				const auto type = get_archive_identifier(archive);
+				const auto err = std::to_string(value) + " does not correspond to "s + std::string(type) + " archive"s;
+				throw bsa::exception(err.c_str());
+			}
 
 			return static_cast<Version>(value);
-        }
+		}
 
-        template std::uint32_t archive_version<std::uint32_t>(underlying_archive, version);
-        template bsa::tes4::version archive_version<bsa::tes4::version>(underlying_archive, version);
+		template std::uint32_t archive_version<std::uint32_t>(underlying_archive, version);
+		template bsa::tes4::version archive_version<bsa::tes4::version>(underlying_archive, version);
 		template bsa::fo4::format archive_version<bsa::fo4::format>(underlying_archive, version);
 
 	}  // namespace detail
@@ -170,15 +167,15 @@ namespace bsa::all
 	}
 
 	void archive::add_file(const std::filesystem::path& a_relative, std::vector<std::byte> a_data)
-    {
-        const auto adder = detail::overload{
-            [&](bsa::tes3::archive &bsa) {
+	{
+		const auto adder = detail::overload{
+			[&](bsa::tes3::archive& bsa) {
 				bsa::tes3::file f;
 				f.set_data(std::move(a_data));
 
-                bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
-            },
-            [&, this](bsa::tes4::archive &bsa) {
+				bsa.insert(a_relative.lexically_normal().generic_string(), std::move(f));
+			},
+			[&, this](bsa::tes4::archive& bsa) {
 				bsa::tes4::file f;
 				const auto version = detail::archive_version<bsa::tes4::version>(_archive, _version);
 				f.set_data(std::move(a_data));
@@ -194,24 +191,22 @@ namespace bsa::all
 					return bsa[key];
 				}();
 
-                d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
-            },
-            [&, this](bsa::fo4::archive &ba2) {
-                assert(detail::archive_version<bsa::fo4::format>(_archive, _version)
-                           == bsa::fo4::format::general
-                       && "directx ba2 not supported");
-                bsa::fo4::file f;
+				d->insert(a_relative.filename().lexically_normal().generic_string(), std::move(f));
+			},
+			[&, this](bsa::fo4::archive& ba2) {
+				assert(detail::archive_version<bsa::fo4::format>(_archive, _version) == bsa::fo4::format::general && "directx ba2 not supported");
+				bsa::fo4::file f;
 				auto& chunk = f.emplace_back();
 				chunk.set_data(std::move(a_data));
 
 				if (_compressed)
 					chunk.compress();
 
-                ba2.insert(a_relative.lexically_normal().generic_string(), std::move(f));
-            },
-        };
+				ba2.insert(a_relative.lexically_normal().generic_string(), std::move(f));
+			},
+		};
 
-        std::visit(adder, _archive);
+		std::visit(adder, _archive);
 	}
 
 	void archive::iterate_files(const iteration_callback& a_callback, bool skip_compressed)

@@ -49,7 +49,7 @@ namespace bsa::all
 			return local;
 		}
 
-        [[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> std::string_view;
+		[[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> std::string_view;
 
 		template <typename Version>
 		[[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version;
