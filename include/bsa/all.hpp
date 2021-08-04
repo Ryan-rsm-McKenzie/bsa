@@ -21,6 +21,40 @@ namespace bsa::all
 
 	using underlying_archive = std::variant<bsa::tes3::archive, bsa::tes4::archive, bsa::fo4::archive>;
 
+	namespace detail
+	{
+		template <class... Ts>
+		struct overload : Ts...
+		{
+			using Ts::operator()...;
+		};
+		template <class... Ts>
+		overload(Ts...) -> overload<Ts...>;
+
+		[[nodiscard]] auto read_file(const std::filesystem::path& a_path) -> std::vector<std::byte>;
+
+		template <class... Keys>
+		[[nodiscard]] auto virtual_to_local_path(Keys&&... a_keys) -> std::string
+		{
+			std::string local;
+			((local += a_keys.name(), local += '/'), ...);
+			local.pop_back();
+
+			for (auto& c : local) {
+				if (c == '\\' || c == '/') {
+					c = std::filesystem::path::preferred_separator;
+				}
+			}
+
+			return local;
+		}
+
+		[[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> const char*;
+
+		template <typename Version>
+		[[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version;
+	}  // namespace detail
+
 	class archive
 	{
 	public:
@@ -35,6 +69,9 @@ namespace bsa::all
 
 		using iteration_callback = std::function<void(const std::filesystem::path&, std::span<const std::byte>)>;
 		void iterate_files(const iteration_callback& a_callback, bool skip_compressed = false);
+
+		version get_version() const noexcept;
+		const underlying_archive& get_archive() const noexcept;
 
 	private:
 		underlying_archive _archive;

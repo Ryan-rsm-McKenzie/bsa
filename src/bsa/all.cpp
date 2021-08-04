@@ -6,15 +6,7 @@ namespace bsa::all
 {
 	namespace detail
 	{
-		template <class... Ts>
-		struct overload : Ts...
-		{
-			using Ts::operator()...;
-		};
-		template <class... Ts>
-		overload(Ts...) -> overload<Ts...>;
-
-		[[nodiscard]] auto read_file(const std::filesystem::path& a_path) -> std::vector<std::byte>
+        [[nodiscard]] auto read_file(const std::filesystem::path& a_path) -> std::vector<std::byte>
 		{
 			std::vector<std::byte> data;
 			data.resize(std::filesystem::file_size(a_path));
@@ -26,23 +18,7 @@ namespace bsa::all
 			return data;
 		}
 
-		template <class... Keys>
-		[[nodiscard]] auto virtual_to_local_path(Keys&&... a_keys) -> std::string
-		{
-			std::string local;
-			((local += a_keys.name(), local += '/'), ...);
-			local.pop_back();
-
-			for (auto& c : local) {
-				if (c == '\\' || c == '/') {
-					c = std::filesystem::path::preferred_separator;
-				}
-			}
-
-			return local;
-		}
-
-		[[nodiscard]] auto get_archive_identifier(underlying_archive archive)
+        [[nodiscard]] auto get_archive_identifier(underlying_archive archive) -> const char*
 		{
 			const auto visiter = detail::overload{
 				[](bsa::tes3::archive) { return "tes3"; },
@@ -53,10 +29,10 @@ namespace bsa::all
 		}
 
 		template <typename Version>
-		[[nodiscard]] auto archive_version(underlying_archive archive, version a_version)
+        [[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version
 		{
 			constexpr auto max_alternative = 4;
-			using Ret = std::array<version, max_alternative>;  // 5 is arbitrary
+			using Ret = std::array<version, max_alternative>;
 			auto visitor = detail::overload{ [](bsa::tes3::archive) -> Ret { return { version::tes3 }; },
 				[](bsa::tes4::archive) -> Ret {
 					return { version::tes4, version::tes5, version::fo3, version::sse };
@@ -70,6 +46,7 @@ namespace bsa::all
 			const auto allowed = std::visit(visitor, archive);
 			const auto value = bsa::detail::to_underlying(a_version);
 
+			// As the user cannot change the version, this should never happen
 			if (std::ranges::find(allowed, a_version) == allowed.end()) {
 				const auto type = get_archive_identifier(archive);
 				const auto err = std::to_string(value) + " does not correspond to " + type + "archive";
@@ -77,7 +54,10 @@ namespace bsa::all
 			}
 
 			return static_cast<Version>(value);
-		}  // namespace bsa::all
+		}
+
+		template bsa::tes4::version archive_version<bsa::tes4::version>(underlying_archive, version);
+		template bsa::fo4::format archive_version<bsa::fo4::format>(underlying_archive, version);
 
 	}  // namespace detail
 
@@ -264,4 +244,13 @@ namespace bsa::all
 		std::visit(visiter, _archive);
 	}
 
+	version archive::get_version() const noexcept
+	{
+		return _version;
+	}
+
+	const underlying_archive& archive::get_archive() const noexcept
+	{
+		return _archive;
+	}
 }  // namespace bsa::all
