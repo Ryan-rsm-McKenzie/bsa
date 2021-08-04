@@ -31,45 +31,36 @@ namespace bsa::all
 		template <typename Version>
 		[[nodiscard]] auto archive_version(underlying_archive archive, version a_version) -> Version
 		{
-			// Check that there's no mismatch between version and requested Type
 			const bool correct = [&] {
-				if constexpr (std::is_same_v<Version, std::uint32_t>) {
-					return std::holds_alternative<bsa::tes3::archive>(archive);
-				} else if constexpr (std::is_same_v<Version, bsa::tes4::version>) {
-					return std::holds_alternative<bsa::tes4::archive>(archive);
-				} else if constexpr (std::is_same_v<Version, bsa::fo4::format>)
-					return std::holds_alternative<bsa::fo4::archive>(archive);
-				else {
+				switch (a_version) {
+				case bsa::all::version::tes3:
+					{
+						const bool same = std::same_as<Version, std::uint32_t>;
+						return same && std::holds_alternative<bsa::tes3::archive>(archive);
+					}
+				case bsa::all::version::tes4:
+				case bsa::all::version::fo3:
+				case bsa::all::version::sse:
+					{
+						const bool same = std::same_as<Version, bsa::tes4::version>;
+						return same && std::holds_alternative<bsa::tes4::archive>(archive);
+					}
+				case bsa::all::version::fo4:
+				case bsa::all::version::fo4dx:
+					{
+						const bool same = std::same_as<Version, bsa::fo4::format>;
+						return same && std::holds_alternative<bsa::fo4::archive>(archive);
+					}
+				default:
 					return false;
 				}
 			}();
+
 			if (!correct) {
 				throw exception("Mismatch between requested version and variant type");
 			}
 
-			// Check that there's no mismatch between archive and version
-			constexpr auto max_alternative = 4;
-			using Ret = std::array<version, max_alternative>;
-			auto visitor = detail::overload{ [](bsa::tes3::archive) -> Ret { return { version::tes3 }; },
-				[](bsa::tes4::archive) -> Ret {
-					return { version::tes4, version::tes5, version::fo3, version::sse };
-				},
-				[](bsa::fo4::archive) -> Ret {
-					return { version::fo4, version::fo4dx };
-				}
-
-			};
-
-			const auto allowed = std::visit(visitor, archive);
-			const auto value = bsa::detail::to_underlying(a_version);
-
-			if (std::ranges::find(allowed, a_version) == allowed.end()) {
-				const auto type = get_archive_identifier(archive);
-				const auto err = std::to_string(value) + " does not correspond to "s + std::string(type) + " archive"s;
-				throw bsa::exception(err.c_str());
-			}
-
-			return static_cast<Version>(value);
+			return static_cast<Version>(bsa::detail::to_underlying(a_version));
 		}
 
 		template std::uint32_t archive_version<std::uint32_t>(underlying_archive, version);
