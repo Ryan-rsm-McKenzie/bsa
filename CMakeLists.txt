@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.21)
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang|GNU")
-	set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
-
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 project(
 	bsa
 	VERSION 2.0.1
 	LANGUAGES CXX
 )
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang|GNU")
+	set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 	message(FATAL_ERROR "in-source builds are not allowed")
