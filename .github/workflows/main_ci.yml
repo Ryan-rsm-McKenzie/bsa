@@ -76,20 +76,22 @@ jobs:
 
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
+        env:
+          gcovr: gcovr -r .. . --coveralls --exclude-unreachable-branches --exclude-function-lines --exclude-throw-branches
         run: |
           (cd tests && ./tests [src])
-          gcovr -r .. . -f ".*/src/bsa/.*" -f ".*/include/bsa/.*" --xml src.xml
+          ${{ env.gcovr }} -f ".*/src/bsa/.*" -f ".*/include/bsa/.*" -o src.json
 
           find -type f -name *.gcda | xargs rm
 
           (cd tests && ./tests [examples])
-          gcovr -r .. . -f ".*/examples/.*" --xml examples.xml
+          ${{ env.gcovr }} -f ".*/examples/.*" -o examples.json
 
       - name: Collect code coverage
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
-          files: bsa/build/examples.xml,bsa/build/src.xml
+          files: bsa/build/examples.json,bsa/build/src.json
           verbose: true
 
   windows:
