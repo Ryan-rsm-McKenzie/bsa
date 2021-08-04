@@ -179,45 +179,51 @@ TEST_CASE("pack_unpack", "[examples]")
 			});
 	}
 
-	SECTION("tes4")
-	{
-		test(
-			"tes4"sv,
-			"bsa"sv,
-			[&](std::string_view a_outfile) {
-				bsa::tes4::archive bsa;
-				bsa.read(a_outfile);
+    SECTION("tes4")
+    {
+    auto check_tes4 = [&](std::string_view type)
+    {
+        test(
+            type,
+            "bsa"sv,
+            [&](std::string_view a_outfile) {
+                bsa::tes4::archive bsa;
+                bsa.read(a_outfile);
 
-				const auto files = get_files_from_directory(datadir);
-				const auto filecount = [&]() {
-					std::size_t result = 0;
-					for (const auto& dir : bsa) {
-						result += dir.second.size();
-					}
-					return result;
-				}();
-				REQUIRE(filecount == files.size());
+                const auto files = get_files_from_directory(datadir);
+                const auto filecount = [&]() {
+                    std::size_t result = 0;
+                    for (const auto& dir : bsa) {
+                        result += dir.second.size();
+                    }
+                    return result;
+                }();
+                REQUIRE(filecount == files.size());
 
-				for (const auto& file : files) {
-					const auto [dir, filename] = [&]() -> std::pair<std::string_view, std::string_view> {
-						const std::string_view view = file;
-						const auto pos = view.find_last_of('/');
-						if (pos != std::string_view::npos) {
-							return {
-								view.substr(0, pos),
-								view.substr(pos + 1)
-							};
-						} else {
-							return { ""sv, view };
-						}
-					}();
+                for (const auto& file : files) {
+                    const auto [dir, filename] = [&]() -> std::pair<std::string_view, std::string_view> {
+                        const std::string_view view = file;
+                        const auto pos = view.find_last_of('/');
+                        if (pos != std::string_view::npos) {
+                            return {
+                                view.substr(0, pos),
+                                view.substr(pos + 1)
+                            };
+                        } else {
+                            return { ""sv, view };
+                        }
+                    }();
 
-					REQUIRE(bsa[dir][filename]);
-				}
-			});
-	}
+                    REQUIRE(bsa[dir][filename]);
+                }
+            });
+    };
+    for (auto type : {"tes4", "tes5", "sse", "fo3"}) {
+        check_tes4(type);
+    }
+    }
 
-	SECTION("fo4")
+    SECTION("fo4")
 	{
 		test(
 			"fo4"sv,
