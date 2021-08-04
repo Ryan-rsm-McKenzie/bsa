@@ -9,6 +9,9 @@ coverage:
 fixes:
   - "bsa/::"
 
+ignore:
+  - "tests/"
+
 parsers:
   gcov:
     branch_detection:
