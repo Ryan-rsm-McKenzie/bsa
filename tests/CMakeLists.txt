@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/fo4.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes3.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes4.test.cpp"
+        "${SOURCE_DIR}/src/bsa/all.test.cpp"
 	"${SOURCE_DIR}/main.cpp"
 )
 
