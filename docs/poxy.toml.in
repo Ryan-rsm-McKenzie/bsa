@@ -10,6 +10,14 @@ name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
 
 [badges]
+'a-architecture' = [
+	'https://img.shields.io/static/v1?label=architecture&message=x64&color=dimgray&style=flat-square',
+	'#'
+]
+'a-platform' = [
+	'https://img.shields.io/static/v1?label=platform&message=windows%20|%20linux&color=dimgray&style=flat-square',
+	'#'
+]
 'build' = [
 	'https://img.shields.io/github/workflow/status/Ryan-rsm-McKenzie/bsa/Main%20CI?logo=github&style=flat-square',
 	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml'
