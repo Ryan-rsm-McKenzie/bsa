@@ -134,7 +134,7 @@ namespace bsa
 			_what(a_what)
 		{}
 
-		/// \brief	Obtains the explanations for why the exception was thrown.
+		/// \brief	Obtains the explanation for why the exception was thrown.
 		const char* what() const noexcept { return _what; }
 
 	private:
