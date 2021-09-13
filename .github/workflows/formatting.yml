@@ -1,6 +1,13 @@
 name: Apply Formatting
 
-on: [ push, pull_request, pull_request_target ]
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/formatting.yml'
+      - '**/*.cpp'
+      - '**/*.hpp'
+  workflow_dispatch:
 
 jobs:
   clang-format:
