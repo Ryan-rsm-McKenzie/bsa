@@ -1,7 +1,7 @@
 {
   "configurePresets": [
     {
-      "binaryDir": "build",
+      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "BSA_BUILD_DOCS": {
           "type": "BOOL",
