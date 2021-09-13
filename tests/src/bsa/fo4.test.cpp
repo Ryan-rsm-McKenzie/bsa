@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include <catch2/catch.hpp>
+#include <mmio/mmio.hpp>
 
 #include "bsa/fo4.hpp"
 
@@ -214,7 +215,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			info_t{ 0x785183FF, "png"sv, 0xDA3773A6, "Tiles/tile_0003.png"sv },
 		};
 
-		std::vector<bsa::detail::istream_t::stream_type> mmapped;
+		std::vector<mmio::mapped_file_source> mmapped;
 		bsa::fo4::archive in;
 		for (const auto& file : index) {
 			const auto& data = mmapped.emplace_back(
@@ -280,7 +281,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		constexpr std::array types{
 			"format"sv,
 			"magic"sv,
-			"range"sv,
+			"exhausted"sv,
 			"sentinel"sv,
 			"size"sv,
 			"version"sv,

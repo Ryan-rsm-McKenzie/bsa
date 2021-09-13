@@ -1,67 +1,17 @@
 #include "bsa/detail/common.hpp"
 
-#include <algorithm>
 #include <array>
-#include <cassert>
-#include <cerrno>
 #include <cstddef>
-#include <cstring>
-#include <exception>
+#include <cstdint>
+#include <filesystem>
 #include <limits>
+#include <optional>
+#include <span>
 #include <string>
-#include <system_error>
+#include <string_view>
+#include <tuple>
 #include <utility>
-
-#if BSA_OS_WINDOWS
-#	define WIN32_LEAN_AND_MEAN
-
-#	define NOGDICAPMASKS
-#	define NOVIRTUALKEYCODES
-#	define NOWINMESSAGES
-#	define NOWINSTYLES
-#	define NOSYSMETRICS
-#	define NOMENUS
-#	define NOICONS
-#	define NOKEYSTATES
-#	define NOSYSCOMMANDS
-#	define NORASTEROPS
-#	define NOSHOWWINDOW
-#	define OEMRESOURCE
-#	define NOATOM
-#	define NOCLIPBOARD
-#	define NOCOLOR
-#	define NOCTLMGR
-#	define NODRAWTEXT
-#	define NOGDI
-#	define NOKERNEL
-#	define NOUSER
-#	define NONLS
-#	define NOMB
-#	define NOMEMMGR
-#	define NOMETAFILE
-#	define NOMINMAX
-#	define NOMSG
-#	define NOOPENFILE
-#	define NOSCROLL
-#	define NOSERVICE
-#	define NOSOUND
-#	define NOTEXTMETRIC
-#	define NOWH
-#	define NOWINOFFSETS
-#	define NOCOMM
-#	define NOKANJI
-#	define NOHELP
-#	define NOPROFILER
-#	define NODEFERWINDOWPOS
-#	define NOMCX
-
-#	include <Windows.h>
-#else
-#	include <fcntl.h>
-#	include <sys/mman.h>
-#	include <sys/stat.h>
-#	include <unistd.h>
-#endif
+#include <variant>
 
 namespace bsa
 {
@@ -69,7 +19,7 @@ namespace bsa
 		-> std::optional<file_format>
 	{
 		detail::istream_t in{ std::move(a_path) };
-		switch (in.read<std::uint32_t>()) {
+		switch (std::get<0>(in->read<std::uint32_t>())) {
 		case 0x100:
 			return file_format::tes3;
 		case make_four_cc("BSA"sv):
@@ -108,196 +58,6 @@ namespace bsa::detail
 		}
 	}
 
-	namespace unicode
-	{
-		auto fopen(std::filesystem::path a_path, const char* a_mode)
-			-> std::FILE*
-		{
-#if BSA_OS_WINDOWS
-			std::FILE* result = nullptr;
-
-			// a_mode is basic ASCII which means it's valid utf-16 with a simple cast
-			std::wstring mode;
-			mode.resize(std::strlen(a_mode));
-			std::copy(a_mode, a_mode + mode.size(), mode.begin());
-
-			(void)::_wfopen_s(&result, a_path.c_str(), mode.c_str());
-			return result;
-#else
-			return std::fopen(a_path.c_str(), a_mode);
-#endif
-		}
-	}
-
-	namespace mmio
-	{
-		file::file() noexcept
-		{
-#if BSA_OS_WINDOWS
-			this->_file = INVALID_HANDLE_VALUE;
-#else
-			this->_mapped = MAP_FAILED;
-#endif
-		}
-
-		void file::close() noexcept
-		{
-#if BSA_OS_WINDOWS
-			if (this->_view != nullptr) {
-				[[maybe_unused]] const auto success = ::UnmapViewOfFile(this->_view);
-				assert(success != 0);
-				this->_view = nullptr;
-			}
-
-			if (this->_mapping != nullptr) {
-				[[maybe_unused]] const auto success = ::CloseHandle(this->_mapping);
-				assert(success != 0);
-				this->_mapping = nullptr;
-			}
-
-			if (this->_file != INVALID_HANDLE_VALUE) {
-				[[maybe_unused]] const auto success = ::CloseHandle(this->_file);
-				assert(success != 0);
-				this->_file = INVALID_HANDLE_VALUE;
-				this->_size = 0;
-			}
-#else
-			if (this->_mapped != MAP_FAILED) {
-				[[maybe_unused]] const auto success = ::munmap(this->_mapped, this->_size);
-				assert(success == 0);
-				this->_mapped = MAP_FAILED;
-			}
-
-			if (this->_file != -1) {
-				[[maybe_unused]] const auto success = ::close(this->_file);
-				assert(success == 0);
-				this->_file = -1;
-				this->_size = 0;
-			}
-#endif
-		}
-
-		auto file::data() const noexcept
-			-> const std::byte*
-		{
-#if BSA_OS_WINDOWS
-			return static_cast<const std::byte*>(this->_view);
-#else
-			return this->_mapped != MAP_FAILED ?
-                       static_cast<const std::byte*>(this->_mapped) :
-                       nullptr;
-#endif
-		}
-
-		bool file::is_open() const noexcept
-		{
-#if BSA_OS_WINDOWS
-			return this->_view != nullptr;
-#else
-			return this->_mapped != MAP_FAILED;
-#endif
-		}
-
-		bool file::open(std::filesystem::path a_path) noexcept
-		{
-			this->close();
-			if (this->do_open(a_path.c_str())) {
-				return true;
-			} else {
-				this->close();
-				return false;
-			}
-		}
-
-		void file::do_move(file&& a_rhs) noexcept
-		{
-#if BSA_OS_WINDOWS
-			this->_file = std::exchange(a_rhs._file, INVALID_HANDLE_VALUE);
-			this->_mapping = std::exchange(a_rhs._mapping, nullptr);
-			this->_view = std::exchange(a_rhs._view, nullptr);
-#else
-			this->_file = std::exchange(a_rhs._file, -1);
-			this->_mapped = std::exchange(a_rhs._mapped, MAP_FAILED);
-#endif
-			this->_size = std::exchange(a_rhs._size, 0);
-		}
-
-#if BSA_OS_WINDOWS
-		bool file::do_open(const wchar_t* a_path) noexcept
-		{
-			this->_file = ::CreateFileW(
-				a_path,
-				GENERIC_READ,
-				FILE_SHARE_READ,
-				nullptr,
-				OPEN_EXISTING,
-				FILE_ATTRIBUTE_READONLY,
-				nullptr);
-			if (this->_file == INVALID_HANDLE_VALUE) {
-				return false;
-			}
-
-			::LARGE_INTEGER size = {};
-			if (::GetFileSizeEx(this->_file, &size) == 0) {
-				return false;
-			}
-			this->_size = static_cast<std::size_t>(size.QuadPart);
-
-			this->_mapping = ::CreateFileMappingW(
-				this->_file,
-				nullptr,
-				PAGE_READONLY,
-				0,
-				0,
-				nullptr);
-			if (this->_mapping == nullptr) {
-				return false;
-			}
-
-			this->_view = ::MapViewOfFile(
-				this->_mapping,
-				FILE_MAP_READ,
-				0,
-				0,
-				0);
-			if (this->_view == nullptr) {
-				return false;
-			}
-
-			return true;
-		}
-#else
-		bool file::do_open(const char* a_path) noexcept
-		{
-			this->_file = ::open(
-				a_path,
-				O_RDONLY);
-			if (this->_file == -1) {
-				return false;
-			}
-
-			struct ::stat s = {};
-			if (::fstat(this->_file, &s) == -1) {
-				return false;
-			}
-			this->_size = static_cast<std::size_t>(s.st_size);
-
-			this->_mapped = ::mmap(
-				nullptr,
-				this->_size,
-				PROT_READ,
-				MAP_SHARED,
-				this->_file,
-				0);
-			if (this->_mapped == MAP_FAILED) {
-				return false;
-			}
-
-			return true;
-		}
-#endif
-	}
-
 	void normalize_path(std::string& a_path) noexcept
 	{
 		for (auto& c : a_path) {
@@ -320,10 +80,9 @@ namespace bsa::detail
 	auto read_bstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
-		std::uint8_t len = 0;
-		a_in >> len;
+		const auto [len] = a_in->read<std::uint8_t>();
 		return {
-			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			reinterpret_cast<const char*>(a_in->read_bytes(len).data()),
 			len
 		};
 	}
@@ -331,10 +90,9 @@ namespace bsa::detail
 	auto read_bzstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
-		std::uint8_t len = 0;
-		a_in >> len;
+		const auto [len] = a_in->read<std::uint8_t>();
 		return {
-			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			reinterpret_cast<const char*>(a_in->read_bytes(len).data()),
 			len - 1u  // skip null terminator
 		};
 	}
@@ -342,10 +100,9 @@ namespace bsa::detail
 	auto read_wstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
-		std::uint16_t len = 0;
-		a_in >> len;
+		const auto [len] = a_in->read<std::uint16_t>();
 		return {
-			reinterpret_cast<const char*>(a_in.read_bytes(len).data()),
+			reinterpret_cast<const char*>(a_in->read_bytes(len).data()),
 			len
 		};
 	}
@@ -354,21 +111,21 @@ namespace bsa::detail
 		-> std::string_view
 	{
 		const std::string_view result{
-			reinterpret_cast<const char*>(a_in.read_bytes(1u).data())
+			reinterpret_cast<const char*>(a_in->read_bytes(1u).data())
 		};
-		a_in.seek_relative(result.length());  // include null terminator
+		a_in->seek_relative(result.length());  // include null terminator
 		return result;
 	}
 
 	void write_bzstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
 	{
-		a_out << static_cast<std::uint8_t>(a_string.length() + 1u);  // include null terminator
+		a_out.write(static_cast<std::uint8_t>(a_string.length() + 1u));  // include null terminator
 		write_zstring(a_out, a_string);
 	}
 
 	void write_wstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
 	{
-		a_out << static_cast<std::uint16_t>(a_string.length());
+		a_out.write(static_cast<std::uint16_t>(a_string.length()));
 		a_out.write_bytes({ //
 			reinterpret_cast<const std::byte*>(a_string.data()),
 			a_string.length() });
@@ -379,67 +136,20 @@ namespace bsa::detail
 		a_out.write_bytes({ //
 			reinterpret_cast<const std::byte*>(a_string.data()),
 			a_string.length() });
-		a_out << std::byte{ '\0' };
+		a_out.write(std::byte{ '\0' });
 	}
 
-	istream_t::istream_t(std::filesystem::path a_path)
+	istream_t::istream_t(std::filesystem::path a_path) :
+		_file(std::make_shared<file_type>(std::move(a_path))),
+		_stream({ _file->data(), _file->size() })
 	{
-		switch (std::filesystem::status(a_path).type()) {
-		case std::filesystem::file_type::regular:
-			break;
-		case std::filesystem::file_type::none:
-			throw std::system_error{ errno, std::generic_category() };
-		case std::filesystem::file_type::not_found:
-			throw std::system_error{ ENOENT, std::generic_category(), "File not found" };
-		default:
-			throw std::system_error{ ENOENT, std::generic_category(), "File is not a regular file" };
-		}
-
-		_file = std::make_shared<stream_type>();
-		_file->open(std::move(a_path));
-		if (!_file->is_open()) {
-			throw std::system_error{
-				std::error_code{ errno, std::generic_category() },
-				"failed to open file"
-			};
-		}
+		_stream.endian(std::endian::little);
 	}
 
-	auto istream_t::read_bytes(std::size_t a_bytes)
-		-> std::span<const std::byte>
+	istream_t::istream_t(std::span<const std::byte> a_bytes) noexcept :
+		_stream(a_bytes)
 	{
-		if (_pos + a_bytes > _file->size()) {
-			throw exception("file read out of range");
-		}
-
-		const auto pos = _pos;
-		_pos += a_bytes;
-		return {
-			reinterpret_cast<const std::byte*>(_file->data()) + pos,
-			a_bytes
-		};
-	}
-
-	ostream_t::ostream_t(std::filesystem::path a_path)
-	{
-		_file = unicode::fopen(
-			reinterpret_cast<const char*>(a_path.u8string().data()),
-			"wb");
-		if (_file == nullptr) {
-			throw std::system_error{
-				std::error_code{ errno, std::generic_category() },
-				"failed to open file"
-			};
-		}
-	}
-
-	ostream_t::~ostream_t() noexcept
-	{
-		if (_file) {
-			[[maybe_unused]] const auto result = std::fclose(_file);
-			assert(result == 0);
-			_file = nullptr;
-		}
+		_stream.endian(std::endian::little);
 	}
 }
 

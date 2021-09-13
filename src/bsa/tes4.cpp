@@ -11,9 +11,11 @@
 #include <optional>
 #include <span>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
+#include <binary_io/common.hpp>
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
@@ -79,19 +81,19 @@ namespace bsa::tes4
 				header_t& a_header)
 				-> istream_t&
 			{
-				std::uint32_t magic;
+				std::uint32_t magic = 0;
 
-				a_in >>
-					magic >>
-					a_header._version >>
-					a_header._directoriesOffset >>
-					a_header._archiveFlags >>
-					a_header._directory.count >>
-					a_header._file.count >>
-					a_header._directory.blobsz >>
-					a_header._file.blobsz >>
-					a_header._archiveTypes;
-				a_in.seek_relative(2);
+				a_in->read(
+					magic,
+					a_header._version,
+					a_header._directoriesOffset,
+					a_header._archiveFlags,
+					a_header._directory.count,
+					a_header._file.count,
+					a_header._directory.blobsz,
+					a_header._file.blobsz,
+					a_header._archiveTypes);
+				a_in->seek_relative(2u);
 
 				a_header.evaluate_endian();
 
@@ -113,20 +115,22 @@ namespace bsa::tes4
 				const header_t& a_header) noexcept
 				-> ostream_t&
 			{
-				return a_out
-				       << constants::bsa
-				       << a_header._version
-				       << a_header._directoriesOffset
-				       << a_header._archiveFlags
-				       << a_header._directory.count
-				       << a_header._file.count
-				       << a_header._directory.blobsz
-				       << a_header._file.blobsz
-				       << a_header._archiveTypes
-				       << std::uint16_t{ 0 };
+				a_out.write(
+					constants::bsa,
+					a_header._version,
+					a_header._directoriesOffset,
+					a_header._archiveFlags,
+					a_header._directory.count,
+					a_header._file.count,
+					a_header._directory.blobsz,
+					a_header._file.blobsz,
+					a_header._archiveTypes,
+					std::uint16_t{ 0 });
+				return a_out;
 			}
 
-			[[nodiscard]] auto archive_version() const noexcept -> std::size_t { return _version; }
+			[[nodiscard]] auto archive_version() const noexcept
+				-> std::size_t { return _version; }
 			[[nodiscard]] auto directories_offset() const noexcept
 				-> std::size_t { return _directoriesOffset; }
 			[[nodiscard]] auto endian() const noexcept -> std::endian { return _endian; }
@@ -256,23 +260,26 @@ namespace bsa::tes4
 			detail::istream_t& a_in,
 			std::endian a_endian)
 		{
-			a_in >>
-				last >>
-				last2 >>
-				length >>
-				first;
-			crc = a_in.read<decltype(crc)>(a_endian);
+			a_in->read(
+				a_endian,
+				last,
+				last2,
+				length,
+				first,
+				crc);
 		}
 
 		void hash::write(
 			detail::ostream_t& a_out,
 			std::endian a_endian) const noexcept
 		{
-			a_out << last
-				  << last2
-				  << length
-				  << first;
-			a_out.write(crc, a_endian);
+			a_out.write(
+				a_endian,
+				last,
+				last2,
+				length,
+				first,
+				crc);
 		}
 
 		hash hash_directory_in_place(std::string& a_path) noexcept
@@ -571,7 +578,7 @@ namespace bsa::tes4
 
 		std::size_t namesOffset = detail::offsetof_file_strings(header);
 		std::size_t filesOffset = detail::offsetof_file_entries(header);
-		in.seek_absolute(header.directories_offset());
+		in->seek_absolute(header.directories_offset());
 		for (std::size_t i = 0; i < header.directory_count(); ++i) {
 			this->read_directory(in, header, filesOffset, namesOffset);
 		}
@@ -634,7 +641,7 @@ namespace bsa::tes4
 			const intermediate_t::value_type& a_value) noexcept
 			-> std::uint64_t
 		{
-			return detail::endian::reverse(
+			return binary_io::endian::reverse(
 				a_value.first->first.hash().numeric());
 		}
 
@@ -642,7 +649,7 @@ namespace bsa::tes4
 			const mapped_type::value_type* a_value) noexcept
 			-> std::uint64_t
 		{
-			return detail::endian::reverse(
+			return binary_io::endian::reverse(
 				a_value->first.hash().numeric());
 		}
 	};
@@ -696,12 +703,10 @@ namespace bsa::tes4
 			hashing::hash hash;
 			hash.read(a_in, a_header.endian());
 
-			std::uint32_t size = 0;
-			std::uint32_t offset = 0;
-			a_in >> size >> offset;
+			auto [size, offset] = a_in->read<std::uint32_t, std::uint32_t>();
 
 			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(offset & ~file::isecondary_archive);
+			a_in->seek_absolute(offset & ~file::isecondary_archive);
 
 			const auto fname = [&]() -> std::string_view {
 				if (a_header.embedded_file_names()) {
@@ -718,9 +723,9 @@ namespace bsa::tes4
 					return name;
 				} else if (a_header.file_strings()) {
 					const detail::restore_point r{ a_in };
-					a_in.seek_absolute(a_namesOffset);
+					a_in->seek_absolute(a_namesOffset);
 					const auto name = detail::read_zstring(a_in);
-					a_namesOffset = a_in.tell();
+					a_namesOffset = a_in->tell();
 					return name;
 				} else {
 					return {};
@@ -751,14 +756,12 @@ namespace bsa::tes4
                 !a_header.compressed() :
                 a_header.compressed();
 		if (compressed) {
-			std::uint32_t size = 0;
-			a_in >> size;
-			decompsz = size;
+			std::tie(decompsz) = a_in->read<std::uint32_t>();
 			a_size -= 4;
 		}
 		a_size &= ~(file::ichecked | file::icompression);
 
-		a_file.set_data(a_in.read_bytes(a_size), a_in, decompsz);
+		a_file.set_data(a_in->read_bytes(a_size), a_in, decompsz);
 	}
 
 	void archive::read_directory(
@@ -770,25 +773,24 @@ namespace bsa::tes4
 		hashing::hash hash;
 		hash.read(a_in, a_header.endian());
 
-		std::uint32_t count = 0;
-		a_in >> count;
+		const auto [count] = a_in->read<std::uint32_t>();
 
 		// bsarch is known to corrupt the file entries offset,
 		// so we have to calculate it by hand instead
 		switch (a_header.archive_version()) {
 		case 103:
 		case 104:
-			a_in.seek_relative(4u);
+			a_in->seek_relative(4u);
 			break;
 		case 105:
-			a_in.seek_relative(4u * 3u);
+			a_in->seek_relative(4u * 3u);
 			break;
 		default:
 			detail::declare_unreachable();
 		}
 
 		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(a_filesOffset);
+		a_in->seek_absolute(a_filesOffset);
 
 		const auto name =
 			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
@@ -801,7 +803,7 @@ namespace bsa::tes4
 				std::move(d));
 		assert(success);
 
-		a_filesOffset = a_in.tell();
+		a_filesOffset = a_in->tell();
 	}
 
 	auto archive::sort_for_write(bool a_xbox) const noexcept
@@ -840,18 +842,18 @@ namespace bsa::tes4
 		for (const auto& elem : a_intermediate) {
 			const auto& [key, dir] = *elem.first;
 			key.hash().write(a_out, a_header.endian());
-			a_out << static_cast<std::uint32_t>(dir.size());
+			a_out.write(static_cast<std::uint32_t>(dir.size()));
 
 			switch (a_header.archive_version()) {
 			case 103:
 			case 104:
-				a_out << offset;
+				a_out.write(offset);
 				break;
 			case 105:
-				a_out
-					<< std::uint32_t{ 0 }
-					<< offset
-					<< std::uint32_t{ 0 };
+				a_out.write(
+					std::uint32_t{ 0 },
+					offset,
+					std::uint32_t{ 0 });
 				break;
 			default:
 				detail::declare_unreachable();
@@ -889,16 +891,16 @@ namespace bsa::tes4
 					const auto len = dirbytes.size() +
 					                 1u +  // directory separator
 					                 fname.size();
-					a_out << static_cast<std::uint8_t>(len);
+					a_out.write(static_cast<std::uint8_t>(len));
 					a_out.write_bytes(dirbytes);
-					a_out << std::byte{ '\\' };
+					a_out.write(std::byte{ '\\' });
 					a_out.write_bytes({ //
 						reinterpret_cast<const std::byte*>(fname.data()),
 						fname.size() });
 				}
 
 				if (file->second.compressed()) {
-					a_out << static_cast<std::uint32_t>(file->second.decompressed_size());
+					a_out.write(static_cast<std::uint32_t>(file->second.decompressed_size()));
 				}
 
 				a_out.write_bytes(file->second.as_bytes());
@@ -938,8 +940,9 @@ namespace bsa::tes4
 					fsize += 4u;
 				}
 
-				a_out << static_cast<std::uint32_t>(fsize);
-				a_out << offset;
+				a_out.write(
+					static_cast<std::uint32_t>(fsize),
+					offset);
 				offset += static_cast<std::uint32_t>(fsize & ~file::icompression);
 			}
 		}

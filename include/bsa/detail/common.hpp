@@ -1,20 +1,15 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <compare>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
 #include <exception>
 #include <filesystem>
-#include <iterator>
 #include <map>
 #include <memory>
-#include <new>
 #include <optional>
 #include <span>
 #include <string>
@@ -23,6 +18,10 @@
 #include <utility>
 #include <variant>
 #include <vector>
+
+#include <binary_io/file_stream.hpp>
+#include <binary_io/span_stream.hpp>
+#include <mmio/mmio.hpp>
 
 #include "bsa/fwd.hpp"
 
@@ -50,16 +49,6 @@
 #		define BSA_COMP_MSVC true
 #	else
 #		define BSA_COMP_MSVC false
-#	endif
-
-#	if defined(_WIN32) ||      \
-		defined(_WIN64) ||      \
-		defined(__WIN32__) ||   \
-		defined(__TOS_WIN__) || \
-		defined(__WINDOWS)
-#		define BSA_OS_WINDOWS true
-#	else
-#		define BSA_OS_WINDOWS false
 #	endif
 
 #	define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
@@ -94,18 +83,6 @@
 #		define BSA_VISIBLE __attribute__((visibility("default")))
 #	else
 #		define BSA_VISIBLE
-#	endif
-
-#	if BSA_COMP_GNUC || BSA_COMP_CLANG
-#		define BSA_BSWAP16 __builtin_bswap16
-#		define BSA_BSWAP32 __builtin_bswap32
-#		define BSA_BSWAP64 __builtin_bswap64
-#	elif BSA_COMP_MSVC || BSA_COMP_EDG
-#		define BSA_BSWAP16 _byteswap_ushort
-#		define BSA_BSWAP32 _byteswap_ulong
-#		define BSA_BSWAP64 _byteswap_uint64
-#	else
-#		error "unsupported"
 #	endif
 
 #endif
@@ -172,127 +149,7 @@ namespace bsa
 #ifndef DOXYGEN
 namespace bsa::detail
 {
-	namespace concepts
-	{
-		template <class T>
-		concept integral =
-			std::is_enum_v<T> ||
-
-			std::same_as<T, char> ||
-
-			std::same_as<T, signed char> ||
-			std::same_as<T, signed short int> ||
-			std::same_as<T, signed int> ||
-			std::same_as<T, signed long int> ||
-			std::same_as<T, signed long long int> ||
-
-			std::same_as<T, unsigned char> ||
-			std::same_as<T, unsigned short int> ||
-			std::same_as<T, unsigned int> ||
-			std::same_as<T, unsigned long int> ||
-			std::same_as<T, unsigned long long int>;
-	}
-
-	namespace type_traits
-	{
-		template <class T>
-		using integral_type_t = typename std::conditional_t<
-			std::is_enum_v<T>,
-			std::underlying_type<T>,
-			std::type_identity<T>>::type;
-	}
-
-	namespace endian
-	{
-		template <concepts::integral T>
-		[[nodiscard]] T reverse(T a_value) noexcept
-		{
-			using integral_t = type_traits::integral_type_t<T>;
-			const auto value = static_cast<integral_t>(a_value);
-			if constexpr (sizeof(T) == 1) {
-				return static_cast<T>(value);
-			} else if constexpr (sizeof(T) == 2) {
-				return static_cast<T>(BSA_BSWAP16(value));
-			} else if constexpr (sizeof(T) == 4) {
-				return static_cast<T>(BSA_BSWAP32(value));
-			} else if constexpr (sizeof(T) == 8) {
-				return static_cast<T>(BSA_BSWAP64(value));
-			} else {
-				static_assert(sizeof(T) && false);
-			}
-		}
-
-		template <std::endian E, concepts::integral T>
-		[[nodiscard]] T load(std::span<const std::byte, sizeof(T)> a_src) noexcept
-		{
-			alignas(T) std::array<std::byte, sizeof(T)> buf{};
-			std::memcpy(buf.data(), a_src.data(), sizeof(T));
-			const auto val = *std::launder(reinterpret_cast<const T*>(buf.data()));
-			if constexpr (std::endian::native != E) {
-				return reverse(val);
-			} else {
-				return val;
-			}
-		}
-
-		template <std::endian E, concepts::integral T>
-		void store(std::span<std::byte, sizeof(T)> a_dst, T a_value) noexcept
-		{
-			if constexpr (std::endian::native != E) {
-				a_value = reverse(a_value);
-			}
-
-			std::memcpy(a_dst.data(), &a_value, sizeof(T));
-		}
-	}
-
-	namespace unicode
-	{
-		[[nodiscard]] auto fopen(std::filesystem::path a_path, const char* a_mode) -> std::FILE*;
-	}
-
-	namespace mmio
-	{
-		class file final :
-			public std::enable_shared_from_this<file>
-		{
-		public:
-			file() noexcept;
-			file(const file&) = delete;
-			file(file&& a_rhs) noexcept { this->do_move(std::move(a_rhs)); }
-
-			~file() noexcept { this->close(); }
-
-			file& operator=(const file&) = delete;
-			file& operator=(file&& a_rhs) noexcept
-			{
-				if (this != &a_rhs) {
-					this->do_move(std::move(a_rhs));
-				}
-				return *this;
-			}
-
-			void close() noexcept;
-			[[nodiscard]] auto data() const noexcept -> const std::byte*;
-			[[nodiscard]] bool is_open() const noexcept;
-			bool open(std::filesystem::path a_path) noexcept;
-			[[nodiscard]] auto size() const noexcept -> std::size_t { return this->_size; }
-
-		private:
-			void do_move(file&& a_rhs) noexcept;
-			[[nodiscard]] bool do_open(const std::filesystem::path::value_type* a_path) noexcept;
-
-#	if BSA_OS_WINDOWS
-			void* _file{ nullptr };
-			void* _mapping{ nullptr };
-			void* _view{ nullptr };
-#	else
-			int _file{ -1 };
-			void* _mapped{ nullptr };
-#	endif
-			std::size_t _size{ 0 };
-		};
-	}
+	using ostream_t = binary_io::file_ostream;
 
 	[[noreturn]] inline void declare_unreachable()
 	{
@@ -328,110 +185,35 @@ namespace bsa::detail
 	class istream_t final
 	{
 	public:
-		using stream_type = mmio::file;
+		using stream_type = binary_io::span_istream;
+		using file_type = mmio::mapped_file_source;
 
 		istream_t(std::filesystem::path a_path);
-		istream_t(const istream_t&) = delete;
-		istream_t(istream_t&&) = delete;
-		~istream_t() noexcept = default;
-		istream_t& operator=(const istream_t&) = delete;
-		istream_t& operator=(istream_t&&) = delete;
+		istream_t(std::span<const std::byte> a_bytes) noexcept;
 
-		template <concepts::integral T>
-		[[nodiscard]] T read(std::endian a_endian = std::endian::little)
-		{
-			const auto bytes = this->read_bytes<sizeof(T)>();
+		[[nodiscard]] auto operator*() noexcept
+			-> stream_type& { return _stream; }
+		[[nodiscard]] auto operator*() const noexcept
+			-> const stream_type& { return _stream; }
 
-			switch (a_endian) {
-			case std::endian::little:
-				return endian::load<std::endian::little, T>(bytes);
-			case std::endian::big:
-				return endian::load<std::endian::big, T>(bytes);
-			default:
-				declare_unreachable();
-			}
-		}
+		[[nodiscard]] auto operator->() noexcept
+			-> stream_type* { return &_stream; }
+		[[nodiscard]] auto operator->() const noexcept
+			-> const stream_type* { return &_stream; }
 
-		[[nodiscard]] auto read_bytes(std::size_t a_bytes)
-			-> std::span<const std::byte>;
-
-		template <std::size_t N>
-		[[nodiscard]] auto read_bytes()
-			-> std::span<const std::byte, N>
-		{
-			return this->read_bytes(N).subspan<0, N>();
-		}
-
-		void seek_absolute(std::size_t a_pos) noexcept { _pos = a_pos; }
-		void seek_relative(std::ptrdiff_t a_off) noexcept { _pos += a_off; }
-
-		[[nodiscard]] auto tell() const noexcept { return _pos; }
-		[[nodiscard]] auto rdbuf() const noexcept -> std::shared_ptr<stream_type> { return _file; }
-
-		template <concepts::integral T>
-		friend istream_t& operator>>(istream_t& a_in, T& a_value)
-		{
-			a_value = a_in.read<T>();
-			return a_in;
-		}
+		[[nodiscard]] auto file() const noexcept { return _file; }
+		[[nodiscard]] bool has_file() const noexcept { return _file != nullptr; }
 
 	private:
-		std::shared_ptr<stream_type>
-			_file;
-		std::size_t _pos{ 0 };
+		std::shared_ptr<file_type> _file;
+		stream_type _stream;
 	};
 
 	template <class T>
 	struct istream_proxy final
 	{
 		T d;
-		std::shared_ptr<istream_t::stream_type> f;
-	};
-
-	class ostream_t final
-	{
-	public:
-		ostream_t(std::filesystem::path a_path);
-		ostream_t(const ostream_t&) = delete;
-		ostream_t(ostream_t&&) = delete;
-		~ostream_t() noexcept;
-		ostream_t& operator=(const ostream_t&) = delete;
-		ostream_t& operator=(ostream_t&&) = delete;
-
-		template <concepts::integral T>
-		void write(T a_value, std::endian a_endian = std::endian::little) noexcept
-		{
-			std::array<std::byte, sizeof(T)> buffer{};
-			const auto bytes = std::span{ buffer };
-
-			switch (a_endian) {
-			case std::endian::little:
-				endian::store<std::endian::little>(bytes, a_value);
-				break;
-			case std::endian::big:
-				endian::store<std::endian::big>(bytes, a_value);
-				break;
-			default:
-				declare_unreachable();
-			}
-
-			this->write_bytes(std::as_bytes(bytes));
-		}
-
-		void write_bytes(std::span<const std::byte> a_bytes) noexcept
-		{
-			std::fwrite(a_bytes.data(), 1, a_bytes.size_bytes(), _file);
-		}
-
-		template <concepts::integral T>
-		friend ostream_t& operator<<(ostream_t& a_out, T a_value) noexcept
-		{
-			a_out.write(a_value);
-			return a_out;
-		}
-
-	private:
-		std::FILE* _file{ nullptr };
+		std::shared_ptr<istream_t::file_type> f;
 	};
 
 	class restore_point final
@@ -441,10 +223,10 @@ namespace bsa::detail
 
 		explicit restore_point(istream_t& a_proxy) noexcept :
 			_proxy(a_proxy),
-			_pos(a_proxy.tell())
+			_pos(a_proxy->tell())
 		{}
 
-		~restore_point() noexcept { _proxy.seek_absolute(_pos); }
+		~restore_point() noexcept { _proxy->seek_absolute(_pos); }
 
 	private:
 		istream_t& _proxy;
@@ -542,7 +324,11 @@ namespace bsa::components
 			std::span<const std::byte> a_data,
 			const detail::istream_t& a_in) noexcept
 		{
-			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+			if (a_in.has_file()) {
+				_data.emplace<data_proxied>(a_data, a_in.file());
+			} else {
+				_data.emplace<data_view>(a_data);
+			}
 		}
 	};
 
@@ -599,7 +385,11 @@ namespace bsa::components
 			const detail::istream_t& a_in,
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
 		{
-			_data.emplace<data_proxied>(a_data, a_in.rdbuf());
+			if (a_in.has_file()) {
+				_data.emplace<data_proxied>(a_data, a_in.file());
+			} else {
+				_data.emplace<data_view>(a_data);
+			}
 			_decompsz = a_decompressedSize;
 		}
 
@@ -815,8 +605,8 @@ namespace bsa::components
 			-> std::string_view
 		{
 			switch (_name.index()) {
-			case name_null:
-				return {};
+			case name_view:
+				return *std::get_if<name_view>(&_name);
 			case name_owner:
 				return *std::get_if<name_owner>(&_name);
 			case name_proxied:
@@ -855,7 +645,7 @@ namespace bsa::components
 
 		enum : std::size_t
 		{
-			name_null,
+			name_view,
 			name_owner,
 			name_proxied,
 
@@ -867,13 +657,18 @@ namespace bsa::components
 		key(hash_type a_hash,
 			std::string_view a_name,
 			const detail::istream_t& a_in) noexcept :
-			_hash(a_hash),
-			_name(std::in_place_index<name_proxied>, a_name, a_in.rdbuf())
-		{}
+			_hash(a_hash)
+		{
+			if (a_in.has_file()) {
+				_name.emplace<name_proxied>(a_name, a_in.file());
+			} else {
+				_name.emplace<name_view>(a_name);
+			}
+		}
 
 		hash_type _hash;
 		std::variant<
-			std::monostate,
+			std::string_view,
 			std::string,
 			name_proxy>
 			_name;

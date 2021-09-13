@@ -29,6 +29,8 @@ namespace bsa::fo4
 
 				constexpr std::size_t chunk_size_gnrl = 0x14;
 				constexpr std::size_t chunk_size_dx10 = 0x18;
+
+				constexpr std::size_t chunk_sentinel = 0xBAADF00D;
 			}
 		}
 
@@ -54,12 +56,12 @@ namespace bsa::fo4
 				std::uint32_t magic = 0;
 				std::uint32_t version = 0;
 
-				a_in >>
-					magic >>
-					version >>
-					a_header._format >>
-					a_header._fileCount >>
-					a_header._stringTableOffset;
+				a_in->read(
+					magic,
+					version,
+					a_header._format,
+					a_header._fileCount,
+					a_header._stringTableOffset);
 
 				if (magic != constants::btdx) {
 					throw exception("invalid magic");
@@ -78,12 +80,13 @@ namespace bsa::fo4
 				const header_t& a_header) noexcept
 				-> ostream_t&
 			{
-				return a_out
-				       << constants::btdx
-				       << std::uint32_t{ 1 }
-				       << a_header._format
-				       << a_header._fileCount
-				       << a_header._stringTableOffset;
+				a_out.write(
+					constants::btdx,
+					std::uint32_t{ 1 },
+					a_header._format,
+					a_header._fileCount,
+					a_header._stringTableOffset);
+				return a_out;
 			}
 
 			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
@@ -191,10 +194,8 @@ namespace bsa::fo4
 			hash& a_hash)
 			-> detail::istream_t&
 		{
-			return a_in >>
-			       a_hash.file >>
-			       a_hash.extension >>
-			       a_hash.directory;
+			a_in->read(a_hash.file, a_hash.extension, a_hash.directory);
+			return a_in;
 		}
 
 		auto operator<<(
@@ -202,10 +203,8 @@ namespace bsa::fo4
 			const hash& a_hash) noexcept
 			-> detail::ostream_t&
 		{
-			return a_out
-			       << a_hash.file
-			       << a_hash.extension
-			       << a_hash.directory;
+			a_out.write(a_hash.file, a_hash.extension, a_hash.directory);
+			return a_out;
 		}
 
 		hash hash_file_in_place(std::string& a_path) noexcept
@@ -219,8 +218,9 @@ namespace bsa::fo4
 
 			const auto len = std::min<std::size_t>(pieces.extension.length(), 4u);
 			for (std::size_t i = 0; i < len; ++i) {
-				h.extension |= std::uint32_t{ static_cast<unsigned char>(pieces.extension[i]) }
-				               << i * 8u;
+				h.extension |=
+					std::uint32_t{ static_cast<unsigned char>(pieces.extension[i]) }
+					<< i * 8u;
 			}
 
 			return h;
@@ -232,9 +232,8 @@ namespace bsa::fo4
 		chunk::mips_t& a_mips)
 		-> detail::istream_t&
 	{
-		return a_in >>
-		       a_mips.first >>
-		       a_mips.last;
+		a_in->read(a_mips.first, a_mips.last);
+		return a_in;
 	}
 
 	auto operator<<(
@@ -242,9 +241,8 @@ namespace bsa::fo4
 		const chunk::mips_t& a_mips) noexcept
 		-> detail::ostream_t&
 	{
-		return a_out
-		       << a_mips.first
-		       << a_mips.last;
+		a_out.write(a_mips.first, a_mips.last);
+		return a_out;
 	}
 
 	bool chunk::compress() noexcept
@@ -334,13 +332,14 @@ namespace bsa::fo4
 		file::header_t& a_header)
 		-> detail::istream_t&
 	{
-		return a_in >>
-		       a_header.height >>
-		       a_header.width >>
-		       a_header.mip_count >>
-		       a_header.format >>
-		       a_header.flags >>
-		       a_header.tile_mode;
+		a_in->read(
+			a_header.height,
+			a_header.width,
+			a_header.mip_count,
+			a_header.format,
+			a_header.flags,
+			a_header.tile_mode);
+		return a_in;
 	}
 
 	auto operator<<(
@@ -348,13 +347,14 @@ namespace bsa::fo4
 		const file::header_t& a_header) noexcept
 		-> detail::ostream_t&
 	{
-		return a_out
-		       << a_header.height
-		       << a_header.width
-		       << a_header.mip_count
-		       << a_header.format
-		       << a_header.flags
-		       << a_header.tile_mode;
+		a_out.write(
+			a_header.height,
+			a_header.width,
+			a_header.mip_count,
+			a_header.format,
+			a_header.flags,
+			a_header.tile_mode);
+		return a_out;
 	}
 
 	auto archive::read(std::filesystem::path a_path)
@@ -379,9 +379,9 @@ namespace bsa::fo4
 			const auto name = [&]() {
 				if (strpos != 0) {
 					const detail::restore_point _{ in };
-					in.seek_absolute(strpos);
+					in->seek_absolute(strpos);
 					const auto name = detail::read_wstring(in);
-					strpos = in.tell();
+					strpos = in->tell();
 					return name;
 				} else {
 					return ""sv;
@@ -475,13 +475,8 @@ namespace bsa::fo4
 		detail::istream_t& a_in,
 		format a_format)
 	{
-		std::uint64_t dataFileOffset = 0;
-		std::uint32_t compressedSize = 0;
-		std::uint32_t decompressedSize = 0;
-		a_in >>
-			dataFileOffset >>
-			compressedSize >>
-			decompressedSize;
+		const auto [dataFileOffset, compressedSize, decompressedSize] =
+			a_in->read<std::uint64_t, std::uint32_t, std::uint32_t>();
 
 		std::size_t size = 0;
 		std::optional<std::size_t> decompsz;
@@ -496,16 +491,15 @@ namespace bsa::fo4
 			a_in >> a_chunk.mips;
 		}
 
-		std::uint32_t sentinel = 0;
-		a_in >> sentinel;
-		if (sentinel != 0xBAADF00D) {
+		const auto [sentinel] = a_in->read<std::uint32_t>();
+		if (sentinel != detail::constants::chunk_sentinel) {
 			throw exception("invalid chunk sentinel");
 		}
 
 		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(dataFileOffset);
+		a_in->seek_absolute(dataFileOffset);
 		a_chunk.set_data(
-			a_in.read_bytes(size),
+			a_in->read_bytes(size),
 			a_in,
 			decompsz);
 	}
@@ -515,13 +509,9 @@ namespace bsa::fo4
 		detail::istream_t& a_in,
 		format a_format)
 	{
-		std::uint8_t count = 0;
+		a_in->seek_relative(1u);  // skip mod index
+		const auto [count, hdrsz] = a_in->read<std::uint8_t, std::uint16_t>();
 
-		a_in.seek_relative(1u);  // skip mod index
-		a_in >> count;
-
-		std::uint16_t hdrsz = 0;
-		a_in >> hdrsz;
 		switch (a_format) {
 		case format::general:
 			if (hdrsz != detail::constants::chunk_header_size_gnrl) {
@@ -554,17 +544,18 @@ namespace bsa::fo4
 		std::uint64_t& a_dataOffset) noexcept
 	{
 		const auto size = a_chunk.size();
-		a_out << a_dataOffset
-			  << static_cast<std::uint32_t>(a_chunk.compressed() ? size : 0u)
-			  << static_cast<std::uint32_t>(
-					 a_chunk.compressed() ? a_chunk.decompressed_size() : size);
+		a_out.write(
+			a_dataOffset,
+			static_cast<std::uint32_t>(a_chunk.compressed() ? size : 0u),
+			static_cast<std::uint32_t>(
+				a_chunk.compressed() ? a_chunk.decompressed_size() : size));
 		a_dataOffset += size;
 
 		if (a_format == format::directx) {
 			a_out << a_chunk.mips;
 		}
 
-		a_out << static_cast<std::uint32_t>(0xBAADF00D);
+		a_out.write<std::uint32_t>(detail::constants::chunk_sentinel);
 	}
 
 	void archive::write_file(
@@ -573,15 +564,16 @@ namespace bsa::fo4
 		format a_format,
 		std::uint64_t& a_dataOffset) noexcept
 	{
-		a_out << std::byte{ 0 }  // skip mod index
-			  << static_cast<std::uint8_t>(a_file.size());
+		a_out.write(
+			std::byte{ 0 },  // skip mod index
+			static_cast<std::uint8_t>(a_file.size()));
 		switch (a_format) {
 		case format::general:
-			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_gnrl);
+			a_out.write<std::uint16_t>(detail::constants::chunk_header_size_gnrl);
 			break;
 		case format::directx:
-			a_out << static_cast<std::uint16_t>(detail::constants::chunk_header_size_dx10)
-				  << a_file.header;
+			a_out.write<std::uint16_t>(detail::constants::chunk_header_size_dx10);
+			a_out << a_file.header;
 			break;
 		default:
 			detail::declare_unreachable();

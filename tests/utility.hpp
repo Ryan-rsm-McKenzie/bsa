@@ -12,9 +12,9 @@
 #include <string_view>
 #include <type_traits>
 
-#include <bsa/detail/common.hpp>
-
+#include <binary_io/common.hpp>
 #include <catch2/catch.hpp>
+#include <mmio/mmio.hpp>
 
 using namespace std::literals;
 
@@ -35,9 +35,9 @@ consteval bool assert_nothrowable() noexcept
 }
 
 [[nodiscard]] inline auto map_file(std::filesystem::path a_path)
-	-> bsa::detail::istream_t::stream_type
+	-> mmio::mapped_file_source
 {
-	bsa::detail::istream_t::stream_type stream;
+	mmio::mapped_file_source stream;
 	stream.open(std::move(a_path));
 	return stream;
 }
@@ -52,7 +52,7 @@ consteval bool assert_nothrowable() noexcept
 
 	std::filesystem::create_directories(a_path.parent_path());
 	auto result = std::unique_ptr<std::FILE, decltype(close)>{
-		bsa::detail::unicode::fopen(a_path, a_mode),
+		std::fopen(a_path.string().c_str(), a_mode),
 		close
 	};
 	return result;

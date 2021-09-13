@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <catch2/catch.hpp>
+#include <mmio/mmio.hpp>
 
 #include "bsa/tes4.hpp"
 
@@ -420,7 +421,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 			info_t{ 0x79CD3FEC630A7273, "Characters"sv, 0xD0E4FC14630E3030, "character_0000.png"sv },
 		};
 
-		std::vector<bsa::detail::istream_t::stream_type> mmapped;
+		std::vector<mmio::mapped_file_source> mmapped;
 		bsa::tes4::archive in;
 		for (const auto& [dir, file] : index) {
 			const auto& data = mmapped.emplace_back(
@@ -509,7 +510,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 			"magic"sv,
 			"version"sv,
 			"size"sv,
-			"range"sv,
+			"exhausted"sv,
 		};
 
 		for (const auto& type : types) {

@@ -12,6 +12,7 @@
 #include <string_view>
 
 #include <catch2/catch.hpp>
+#include <mmio/mmio.hpp>
 
 #include "bsa/tes3.hpp"
 
@@ -146,7 +147,7 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 			info_t{ 0x74491918, 0x2BEBCD0A, "Characters/character_0001.png"sv },
 		};
 
-		std::vector<bsa::detail::istream_t::stream_type> mmapped;
+		std::vector<mmio::mapped_file_source> mmapped;
 		bsa::tes3::archive in;
 		for (const auto& file : index) {
 			const auto& data = mmapped.emplace_back(
@@ -185,7 +186,7 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 		const std::filesystem::path root{ "tes3_invalid_test"sv };
 		constexpr std::array types{
 			"magic"sv,
-			"range"sv,
+			"exhausted"sv,
 		};
 
 		for (const auto& type : types) {

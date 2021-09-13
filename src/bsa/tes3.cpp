@@ -15,6 +15,17 @@ namespace bsa::tes3
 {
 	namespace detail
 	{
+		namespace
+		{
+			namespace constants
+			{
+				constexpr std::size_t file_entry_size = 0x8;
+				constexpr std::size_t hash_size = 0x8;
+				constexpr std::size_t header_magic = 0x100;
+				constexpr std::size_t header_size = 0xC;
+			}
+		}
+
 		class header_t final
 		{
 		public:
@@ -33,12 +44,12 @@ namespace bsa::tes3
 				-> istream_t&
 			{
 				std::uint32_t magic = 0;
-				a_in >>
-					magic >>
-					a_header._hashOffset >>
-					a_header._fileCount;
+				a_in->read(
+					magic,
+					a_header._hashOffset,
+					a_header._fileCount);
 
-				if (magic != 0x100) {
+				if (magic != detail::constants::header_magic) {
 					throw exception("invalid magic");
 				}
 
@@ -50,10 +61,11 @@ namespace bsa::tes3
 				const header_t& a_header) noexcept
 				-> ostream_t&
 			{
-				return a_out
-				       << std::uint32_t{ 0x100 }
-				       << a_header._hashOffset
-				       << a_header._fileCount;
+				a_out.write(
+					std::uint32_t{ detail::constants::header_magic },
+					a_header._hashOffset,
+					a_header._fileCount);
+				return a_out;
 			}
 
 			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
@@ -66,13 +78,6 @@ namespace bsa::tes3
 
 		namespace
 		{
-			namespace constants
-			{
-				constexpr std::size_t file_entry_size = 0x8;
-				constexpr std::size_t hash_size = 0x8;
-				constexpr std::size_t header_size = 0xC;
-			}
-
 			[[nodiscard]] auto offsetof_file_entries(const detail::header_t&) noexcept
 				-> std::size_t { return constants::header_size; }
 
@@ -109,9 +114,8 @@ namespace bsa::tes3
 			hash& a_hash)
 			-> detail::istream_t&
 		{
-			return a_in >>
-			       a_hash.lo >>
-			       a_hash.hi;
+			a_in->read(a_hash.lo, a_hash.hi);
+			return a_in;
 		}
 
 		auto operator<<(
@@ -119,9 +123,8 @@ namespace bsa::tes3
 			const hash& a_hash) noexcept
 			-> detail::ostream_t&
 		{
-			return a_out
-			       << a_hash.lo
-			       << a_hash.hi;
+			a_out.write(a_hash.lo, a_hash.hi);
+			return a_out;
 		}
 
 		hash hash_file_in_place(std::string& a_path) noexcept
@@ -268,19 +271,18 @@ namespace bsa::tes3
 	{
 		const auto hash = [&]() {
 			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_offsets.hashes);
-			a_in.seek_relative(detail::constants::hash_size * a_idx);
+			a_in->seek_absolute(a_offsets.hashes);
+			a_in->seek_relative(detail::constants::hash_size * a_idx);
 			hashing::hash h;
 			a_in >> h;
 			return h;
 		}();
 		const auto name = [&]() {
 			const detail::restore_point _{ a_in };
-			a_in.seek_absolute(a_offsets.nameOffsets);
-			a_in.seek_relative(4u * a_idx);
-			std::uint32_t offset = 0;
-			a_in >> offset;
-			a_in.seek_absolute(a_offsets.names + offset);
+			a_in->seek_absolute(a_offsets.nameOffsets);
+			a_in->seek_relative(4u * a_idx);
+			const auto [offset] = a_in->read<std::uint32_t>();
+			a_in->seek_absolute(a_offsets.names + offset);
 			return detail::read_zstring(a_in);
 		}();
 
@@ -290,13 +292,11 @@ namespace bsa::tes3
 				mapped_type{});
 		assert(success);
 
-		std::uint32_t size = 0;
-		std::uint32_t offset = 0;
-		a_in >> size >> offset;
+		const auto [size, offset] = a_in->read<std::uint32_t, std::uint32_t>();
 
 		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(a_offsets.fileData + offset);
-		it->second.set_data(a_in.read_bytes(size), a_in);
+		a_in->seek_absolute(a_offsets.fileData + offset);
+		it->second.set_data(a_in->read_bytes(size), a_in);
 	}
 
 	void archive::write_file_entries(detail::ostream_t& a_out) const noexcept
@@ -304,7 +304,7 @@ namespace bsa::tes3
 		std::uint32_t offset = 0;
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
 			const auto size = static_cast<std::uint32_t>(file.size());
-			a_out << size << offset;
+			a_out.write(size, offset);
 			offset += size;
 		}
 	}
@@ -313,7 +313,7 @@ namespace bsa::tes3
 	{
 		std::uint32_t offset = 0;
 		for ([[maybe_unused]] const auto& [key, file] : *this) {
-			a_out << offset;
+			a_out.write(offset);
 			offset += static_cast<std::uint32_t>(
 				key.name().length() +
 				1u);  // include null terminator
