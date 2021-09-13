@@ -1,6 +1,6 @@
 {
   "name": "binary-io",
-  "version-semver": "2.0.0",
+  "version-semver": "2.0.1",
   "dependencies": [
     {
       "name": "vcpkg-cmake",
