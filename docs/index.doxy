@@ -91,6 +91,7 @@ int main()
 \section dependencies Dependencies
 
 \subsection dependencies-consumption Consumption
+- [binary_io](https://github.com/Ryan-rsm-McKenzie/binary_io)
 - [LZ4](https://github.com/lz4/lz4)
 - [zlib](https://github.com/madler/zlib)
 

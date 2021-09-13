@@ -2,6 +2,7 @@
   "name": "bsa",
   "version-string": "1",
   "dependencies": [
+    "binary-io",
     "lz4",
     "zlib"
   ],
