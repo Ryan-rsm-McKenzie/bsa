@@ -361,43 +361,14 @@ namespace bsa::fo4
 		-> format
 	{
 		detail::istream_t in{ std::move(a_path) };
-		const auto header = [&]() {
-			detail::header_t result;
-			in >> result;
-			return result;
-		}();
+		return this->do_read(in);
+	}
 
-		this->clear();
-		const auto fmt = static_cast<format>(header.archive_format());
-
-		for (std::size_t i = 0, strpos = header.string_table_offset();
-			 i < header.file_count();
-			 ++i) {
-			hashing::hash hash;
-			in >> hash;
-
-			const auto name = [&]() {
-				if (strpos != 0) {
-					const detail::restore_point _{ in };
-					in->seek_absolute(strpos);
-					const auto name = detail::read_wstring(in);
-					strpos = in->tell();
-					return name;
-				} else {
-					return ""sv;
-				}
-			}();
-
-			[[maybe_unused]] const auto [it, success] =
-				this->insert(
-					key_type{ hash, name, in },
-					mapped_type{});
-			assert(success);
-
-			this->read_file(it->second, in, fmt);
-		}
-
-		return fmt;
+	auto archive::read(std::span<const std::byte> a_src)
+		-> format
+	{
+		detail::istream_t in{ a_src };
+		return this->do_read(in);
 	}
 
 	void archive::write(
@@ -425,6 +396,48 @@ namespace bsa::fo4
 				detail::write_wstring(out, key.name());
 			}
 		}
+	}
+
+	auto archive::do_read(detail::istream_t& a_in)
+		-> format
+	{
+		const auto header = [&]() {
+			detail::header_t result;
+			a_in >> result;
+			return result;
+		}();
+
+		this->clear();
+		const auto fmt = static_cast<format>(header.archive_format());
+
+		for (std::size_t i = 0, strpos = header.string_table_offset();
+			 i < header.file_count();
+			 ++i) {
+			hashing::hash hash;
+			a_in >> hash;
+
+			const auto name = [&]() {
+				if (strpos != 0) {
+					const detail::restore_point _{ a_in };
+					a_in->seek_absolute(strpos);
+					const auto name = detail::read_wstring(a_in);
+					strpos = a_in->tell();
+					return name;
+				} else {
+					return ""sv;
+				}
+			}();
+
+			[[maybe_unused]] const auto [it, success] =
+				this->insert(
+					key_type{ hash, name, a_in },
+					mapped_type{});
+			assert(success);
+
+			this->read_file(it->second, a_in, fmt);
+		}
+
+		return fmt;
 	}
 
 	auto archive::make_header(

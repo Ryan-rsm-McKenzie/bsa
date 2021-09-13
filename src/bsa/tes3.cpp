@@ -184,24 +184,13 @@ namespace bsa::tes3
 	void archive::read(std::filesystem::path a_path)
 	{
 		detail::istream_t in{ std::move(a_path) };
-		const auto header = [&]() {
-			detail::header_t result;
-			in >> result;
-			return result;
-		}();
+		this->do_read(in);
+	}
 
-		this->clear();
-
-		const offsets_t offsets{
-			detail::offsetof_hashes(header),
-			detail::offsetof_name_offsets(header),
-			detail::offsetof_names(header),
-			detail::offsetof_file_data(header)
-		};
-
-		for (std::size_t i = 0; i < header.file_count(); ++i) {
-			this->read_file(in, offsets, i);
-		}
+	void archive::read(std::span<const std::byte> a_src)
+	{
+		detail::istream_t in{ a_src };
+		this->do_read(in);
 	}
 
 	bool archive::verify_offsets() const noexcept
@@ -246,6 +235,28 @@ namespace bsa::tes3
 		this->write_file_names(out);
 		this->write_file_hashes(out);
 		this->write_file_data(out);
+	}
+
+	void archive::do_read(detail::istream_t& a_in)
+	{
+		const auto header = [&]() {
+			detail::header_t result;
+			a_in >> result;
+			return result;
+		}();
+
+		this->clear();
+
+		const offsets_t offsets{
+			detail::offsetof_hashes(header),
+			detail::offsetof_name_offsets(header),
+			detail::offsetof_names(header),
+			detail::offsetof_file_data(header)
+		};
+
+		for (std::size_t i = 0; i < header.file_count(); ++i) {
+			this->read_file(a_in, offsets, i);
+		}
 	}
 
 	auto archive::make_header() const noexcept

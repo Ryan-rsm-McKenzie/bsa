@@ -346,10 +346,15 @@ namespace bsa::tes4
 			_types = archive_type::none;
 		}
 
-		/// \copydoc bsa::tes3::archive::read
+		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
 		///
 		/// \return	The version of the archive that was read.
 		auto read(std::filesystem::path a_path) -> version;
+
+		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
+		///
+		/// \return	The version of the archive that was read.
+		auto read(std::span<const std::byte> a_src) -> version;
 
 		/// \copydoc bsa::tes3::archive::verify_offsets
 		///
@@ -369,6 +374,8 @@ namespace bsa::tes4
 					std::vector<const mapped_type::value_type*>>>;
 
 		struct xbox_sort_t;
+
+		auto do_read(detail::istream_t& a_in) -> version;
 
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
 

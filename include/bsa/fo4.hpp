@@ -294,12 +294,17 @@ namespace bsa::fo4
 		using super::clear;
 #endif
 
-		/// \copydoc bsa::tes3::archive::read
+		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
 		///
 		/// \return	The format of the archive that was read.
 		auto read(std::filesystem::path a_path) -> format;
 
-		/// \copydoc bsa::tes3::archive::write
+		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
+		///
+		/// \return	The format of the archive that was read.
+		auto read(std::span<const std::byte> a_src) -> format;
+
+		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
 		///
 		/// \param	a_format	The format to write the archive in.
 		/// \param	a_strings	Controls whether the string table is written or not.
@@ -309,6 +314,8 @@ namespace bsa::fo4
 			bool a_strings = true);
 
 	private:
+		auto do_read(detail::istream_t& a_in) -> format;
+
 		[[nodiscard]] auto make_header(
 			format a_format,
 			bool a_strings) const noexcept

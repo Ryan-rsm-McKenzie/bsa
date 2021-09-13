@@ -565,25 +565,14 @@ namespace bsa::tes4
 		-> version
 	{
 		detail::istream_t in{ std::move(a_path) };
-		const auto header = [&]() {
-			detail::header_t result;
-			in >> result;
-			return result;
-		}();
+		return this->do_read(in);
+	}
 
-		this->clear();
-
-		_flags = header.archive_flags();
-		_types = header.archive_types();
-
-		std::size_t namesOffset = detail::offsetof_file_strings(header);
-		std::size_t filesOffset = detail::offsetof_file_entries(header);
-		in->seek_absolute(header.directories_offset());
-		for (std::size_t i = 0; i < header.directory_count(); ++i) {
-			this->read_directory(in, header, filesOffset, namesOffset);
-		}
-
-		return static_cast<version>(header.archive_version());
+	auto archive::read(std::span<const std::byte> a_src)
+		-> version
+	{
+		detail::istream_t in{ a_src };
+		return this->do_read(in);
 	}
 
 	bool archive::verify_offsets(version a_version) const noexcept
@@ -653,6 +642,30 @@ namespace bsa::tes4
 				a_value->first.hash().numeric());
 		}
 	};
+
+	auto archive::do_read(detail::istream_t& a_in)
+		-> version
+	{
+		const auto header = [&]() {
+			detail::header_t result;
+			a_in >> result;
+			return result;
+		}();
+
+		this->clear();
+
+		_flags = header.archive_flags();
+		_types = header.archive_types();
+
+		std::size_t namesOffset = detail::offsetof_file_strings(header);
+		std::size_t filesOffset = detail::offsetof_file_entries(header);
+		a_in->seek_absolute(header.directories_offset());
+		for (std::size_t i = 0; i < header.directory_count(); ++i) {
+			this->read_directory(a_in, header, filesOffset, namesOffset);
+		}
+
+		return static_cast<version>(header.archive_version());
+	}
 
 	auto archive::make_header(version a_version) const noexcept
 		-> detail::header_t

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <span>
 #include <string>
 #include <utility>
 
@@ -101,19 +102,19 @@ namespace bsa::tes3
 		using super::clear;
 #endif
 
-		/// \brief	Reads the contents of the archive from disk.
+		/// \copydoc bsa::tes3::archive::read()
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
 		///
 		/// \remark	If `std::system_error` is thrown, the archive is left unmodified.
-		///	\remark	If `bsa::exception` is throw, the archive is left in an unspecified state.
-		///		Use \ref clear to return it to a valid state.
-		/// \remark	If the function returns successfully, the contents of the archived are replaced
-		///		with the contents of the archive on disk.
 		///
 		/// \param	a_path	The path to the given archive on the native filesystem.
 		void read(std::filesystem::path a_path);
+
+		/// \copydoc bsa::tes3::archive::read()
+		///
+		/// \param	a_src	The source to read from.
+		void read(std::span<const std::byte> a_src);
 
 		/// \brief	Verifies that offsets within the archive will be valid when written to disk.
 		///
@@ -125,8 +126,24 @@ namespace bsa::tes3
 		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
 
+#ifdef DOXYGEN
+	protected:
+		/// \brief	Reads the contents of the archive from disk.
+		///
+		/// \exception	binary_io::exception	Thrown when archive reads index out of bounds.
+		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
+		///
+		///	\remark	If `binary_io::exception` or `bsa::exception` is thrown, the archive is
+		///		left in an unspecified state. Use \ref clear to return it to a valid state.
+		/// \remark	If the function returns successfully, the contents of the archived are replaced
+		///		with the contents of the archive on disk.
+		void read();
+#endif
+
 	private:
 		struct offsets_t;
+
+		void do_read(detail::istream_t& a_in);
 
 		[[nodiscard]] auto make_header() const noexcept -> detail::header_t;
 
