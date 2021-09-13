@@ -79,11 +79,16 @@ target_include_directories(
 
 list(APPEND CMAKE_MODULE_PATH "${ROOT_DIR}/cmake")
 
+find_package(binary_io REQUIRED CONFIG)
 find_package(LZ4 MODULE REQUIRED)
+find_package(mmio REQUIRED CONFIG)
 find_package(ZLIB MODULE REQUIRED)
 
 target_link_libraries(
 	"${PROJECT_NAME}"
+	PUBLIC
+		binary_io::binary_io
+		mmio::mmio
 	PRIVATE
 		LZ4::LZ4
 		ZLIB::ZLIB
