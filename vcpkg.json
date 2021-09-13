@@ -4,6 +4,7 @@
   "dependencies": [
     "binary-io",
     "lz4",
+    "mmio",
     "zlib"
   ],
   "features": {
