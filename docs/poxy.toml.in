@@ -31,7 +31,6 @@ navbar = [ 'classes', 'namespaces' ]
 paths = [ '@DOCS_DIR@/images' ]
 
 [macros]
-'protected' = 'private'
 'BSA_VISIBLE' = ''
 
 [sources]

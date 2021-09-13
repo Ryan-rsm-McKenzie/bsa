@@ -317,6 +317,7 @@ namespace bsa::components
 			_data.emplace<data_owner>(std::move(a_data));
 		}
 
+#ifndef DOXYGEN
 	protected:
 		void clear() noexcept { _data.emplace<data_view>(); }
 
@@ -330,6 +331,7 @@ namespace bsa::components
 				_data.emplace<data_view>(a_data);
 			}
 		}
+#endif
 	};
 
 	/// \brief	A byte storage container with compression support.
@@ -373,6 +375,7 @@ namespace bsa::components
 			_decompsz = a_decompressedSize;
 		}
 
+#ifndef DOXYGEN
 	protected:
 		void clear() noexcept
 		{
@@ -392,6 +395,7 @@ namespace bsa::components
 			}
 			_decompsz = a_decompressedSize;
 		}
+#endif
 
 	private:
 		std::optional<std::size_t> _decompsz;
@@ -554,8 +558,10 @@ namespace bsa::components
 		/// \brief	Returns the number of elements in the container.
 		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
 
+#ifndef DOXYGEN
 	protected:
 		void clear() noexcept { _map.clear(); }
+#endif
 
 	private:
 		container_type _map;
