@@ -123,6 +123,9 @@ namespace bsa::tes3
 
 		/// \brief	Writes the contents of the archive to disk.
 		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	binary_io::exception	Thrown when the underlying buffer is exhausted.
+		///
 		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
 

@@ -361,7 +361,7 @@ namespace bsa::tes4
 		/// \param	a_version	The version format to check for.
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
 
-		/// \copydoc bsa::tes3::archive::write
+		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
 		///
 		/// \param	a_version The version format to write the archive in.
 		void write(std::filesystem::path a_path, version a_version) const;
