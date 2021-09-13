@@ -129,13 +129,12 @@ namespace bsa
 	///
 	/// \return	The guessed archive format for the given file, or `std::nullopt` if the file doesn't
 	/// 	match any known format.
-	[[nodiscard]] auto guess_file_format(std::filesystem::path a_path)
-		-> std::optional<file_format>;
+	[[nodiscard]] std::optional<file_format> guess_file_format(std::filesystem::path a_path);
 
 	/// \brief	Converts, at most, the first 4 characters of the given string into a 4 byte integer.
-	[[nodiscard]] constexpr auto make_four_cc(
+	[[nodiscard]] constexpr std::uint32_t make_four_cc(
 		std::string_view a_cc) noexcept
-		-> std::uint32_t
+
 	{
 		std::uint32_t result = 0;
 		for (std::size_t i = 0; i < std::min<std::size_t>(a_cc.size(), 4); ++i) {
@@ -237,10 +236,15 @@ namespace bsa::detail
 
 namespace bsa::concepts
 {
+#ifdef DOXYGEN
 	/// \brief	Defines a type that can be used to construct `std::string`
+	struct stringable
+	{};
+#else
 	template <class T>
 	concept stringable =
 		std::constructible_from<std::string, T>;
+#endif
 }
 
 namespace bsa::components
@@ -259,18 +263,16 @@ namespace bsa::components
 		basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
 
 		/// \brief	Retrieves an immutable view into the underlying bytes.
-		auto as_bytes() const noexcept -> std::span<const std::byte>;
+		std::span<const std::byte> as_bytes() const noexcept;
 
 		/// \brief	Retrieves an immutable pointer to the underlying bytes.
-		[[nodiscard]] auto data() const noexcept
-			-> const std::byte* { return as_bytes().data(); }
+		[[nodiscard]] const std::byte* data() const noexcept { return as_bytes().data(); }
 
 		/// \brief	Checks if the underlying byte container is empty.
 		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
 
 		/// \brief	Returns the size of the underlying byte container.
-		[[nodiscard]] auto size() const noexcept
-			-> std::size_t { return as_bytes().size(); }
+		[[nodiscard]] std::size_t size() const noexcept { return as_bytes().size(); }
 
 	private:
 		friend compressed_byte_container;
@@ -344,8 +346,7 @@ namespace bsa::components
 
 		/// \brief	Retrieves the decompressed size of the compressed storage.
 		/// \details	Only valid if the container *is* compressed.
-		[[nodiscard]] auto decompressed_size() const noexcept
-			-> std::size_t
+		[[nodiscard]] std::size_t decompressed_size() const noexcept
 		{
 			assert(this->compressed());
 			return *_decompsz;
@@ -457,7 +458,7 @@ namespace bsa::components
 
 			/// \brief	Obtains a reference to the currently held index.
 			/// \pre	The current index *must* be valid.
-			[[nodiscard]] auto operator*() const noexcept -> reference
+			[[nodiscard]] reference operator*() const noexcept
 			{
 				assert(*this);
 				return *_proxy;
@@ -465,7 +466,7 @@ namespace bsa::components
 
 			/// \brief	Obtains a pointer to the currently held index.
 			/// \remark	The current index does *not* need to be valid.
-			[[nodiscard]] auto operator->() const noexcept -> pointer { return _proxy; }
+			[[nodiscard]] pointer operator->() const noexcept { return _proxy; }
 
 		private:
 			friend hashmap;
@@ -489,34 +490,32 @@ namespace bsa::components
 
 		/// \brief	Obtains a proxy to the underlying `mapped_type`. The validity of the
 		///		proxy depends on the presence of the key within the container.
-		[[nodiscard]] auto operator[](const key_type& a_key) noexcept
-			-> index
+		[[nodiscard]] index operator[](const key_type& a_key) noexcept
 		{
 			const auto it = _map.find(a_key);
 			return it != _map.end() ? index{ it->second } : index{};
 		}
 
 		/// \copybrief operator[]()
-		[[nodiscard]] auto operator[](const key_type& a_key) const noexcept
-			-> const_index
+		[[nodiscard]] const_index operator[](const key_type& a_key) const noexcept
 		{
 			const auto it = _map.find(a_key);
 			return it != _map.end() ? const_index{ it->second } : const_index{};
 		}
 
 		/// \brief	Obtains an interator to the beginning of the container.
-		[[nodiscard]] auto begin() noexcept -> iterator { return _map.begin(); }
+		[[nodiscard]] iterator begin() noexcept { return _map.begin(); }
 		/// \copybrief begin()
-		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _map.begin(); }
+		[[nodiscard]] const_iterator begin() const noexcept { return _map.begin(); }
 		/// \copybrief begin()
-		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _map.cbegin(); }
+		[[nodiscard]] const_iterator cbegin() const noexcept { return _map.cbegin(); }
 
 		/// \brief	Obtains an iterator to the end of the container.
-		[[nodiscard]] auto end() noexcept -> iterator { return _map.end(); }
+		[[nodiscard]] iterator end() noexcept { return _map.end(); }
 		/// \copybrief end()
-		[[nodiscard]] auto end() const noexcept -> const_iterator { return _map.end(); }
+		[[nodiscard]] const_iterator end() const noexcept { return _map.end(); }
 		/// \copybrief end()
-		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _map.cend(); }
+		[[nodiscard]] const_iterator cend() const noexcept { return _map.cend(); }
 
 		/// \brief	Checks if the container is empty.
 		[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
@@ -536,12 +535,10 @@ namespace bsa::components
 		}
 
 		/// \brief	Finds a `value_type` with the given key within the container.
-		[[nodiscard]] auto find(const key_type& a_key) noexcept
-			-> iterator { return _map.find(a_key); }
+		[[nodiscard]] iterator find(const key_type& a_key) noexcept { return _map.find(a_key); }
 
 		/// \copybrief find()
-		[[nodiscard]] auto find(const key_type& a_key) const noexcept
-			-> const_iterator { return _map.find(a_key); }
+		[[nodiscard]] const_iterator find(const key_type& a_key) const noexcept { return _map.find(a_key); }
 
 		/// \brief	Inserts `a_value` into the container with the given `a_key`.
 		///
@@ -549,14 +546,15 @@ namespace bsa::components
 		/// \param	a_value The value of the `value_type`.
 		/// \return	Returns an `iterator` to the position at which the given `value_type`
 		///		was inserted, and a `bool` to indicate if the insertion was successful.
-		auto insert(key_type a_key, mapped_type a_value) noexcept
-			-> std::pair<iterator, bool>
+		std::pair<iterator, bool> insert(
+			key_type a_key,
+			mapped_type a_value) noexcept
 		{
 			return _map.emplace(std::move(a_key), std::move(a_value));
 		}
 
 		/// \brief	Returns the number of elements in the container.
-		[[nodiscard]] auto size() const noexcept -> std::size_t { return _map.size(); }
+		[[nodiscard]] std::size_t size() const noexcept { return _map.size(); }
 
 #ifndef DOXYGEN
 	protected:
@@ -604,11 +602,10 @@ namespace bsa::components
 		key& operator=(key&&) noexcept = default;
 
 		/// \brief	Retrieve a reference to the underlying hash.
-		[[nodiscard]] auto hash() const noexcept -> const hash_type& { return _hash; }
+		[[nodiscard]] const hash_type& hash() const noexcept { return _hash; }
 
 		/// \brief	Retrieve the name that generated the underlying hash.
-		[[nodiscard]] auto name() const noexcept
-			-> std::string_view
+		[[nodiscard]] std::string_view name() const noexcept
 		{
 			switch (_name.index()) {
 			case name_view:
@@ -622,25 +619,33 @@ namespace bsa::components
 			}
 		}
 
-		[[nodiscard]] friend auto operator==(
+		[[nodiscard]] friend bool operator==(
 			const key& a_lhs,
 			const key& a_rhs) noexcept
-			-> bool { return a_lhs.hash() == a_rhs.hash(); }
+		{
+			return a_lhs.hash() == a_rhs.hash();
+		}
 
-		[[nodiscard]] friend auto operator==(
+		[[nodiscard]] friend bool operator==(
 			const key& a_lhs,
 			const hash_type& a_rhs) noexcept
-			-> bool { return a_lhs.hash() == a_rhs; }
+		{
+			return a_lhs.hash() == a_rhs;
+		}
 
-		[[nodiscard]] friend auto operator<=>(
+		[[nodiscard]] friend std::strong_ordering operator<=>(
 			const key& a_lhs,
 			const key& a_rhs) noexcept
-			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs.hash(); }
+		{
+			return a_lhs.hash() <=> a_rhs.hash();
+		}
 
-		[[nodiscard]] friend auto operator<=>(
+		[[nodiscard]] friend std::strong_ordering operator<=>(
 			const key& a_lhs,
 			const hash_type& a_rhs) noexcept
-			-> std::strong_ordering { return a_lhs.hash() <=> a_rhs; }
+		{
+			return a_lhs.hash() <=> a_rhs;
+		}
 
 	private:
 #ifndef DOXYGEN

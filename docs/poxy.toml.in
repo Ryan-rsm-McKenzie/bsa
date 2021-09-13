@@ -9,6 +9,10 @@ license = [ 'MIT', 'https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE
 name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
 
+[autolinks]
+'binary_io::exception' = 'https://github.com/Ryan-rsm-McKenzie/binary_io'
+'std::strong_ordering' = 'https://en.cppreference.com/w/cpp/utility/compare/strong_ordering'
+
 [badges]
 'a-architecture' = [
 	'https://img.shields.io/static/v1?label=architecture&message=x64&color=dimgray&style=flat-square',

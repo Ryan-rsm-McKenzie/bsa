@@ -30,12 +30,15 @@ namespace bsa::tes3
 
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
-			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
-				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
+			[[nodiscard]] friend std::strong_ordering operator<=>(
+				const hash& a_lhs,
+				const hash& a_rhs) noexcept
+			{
+				return a_lhs.numeric() <=> a_rhs.numeric();
+			}
 
 			/// \brief	Obtains the numeric value of the hash used for comparisons.
-			[[nodiscard]] auto numeric() const noexcept
-				-> std::uint64_t
+			[[nodiscard]] std::uint64_t numeric() const noexcept
 			{
 				return std::uint64_t{
 					std::uint64_t{ hi } << 0u * 8u |
@@ -62,7 +65,7 @@ namespace bsa::tes3
 		[[nodiscard]] hash hash_file_in_place(std::string& a_path) noexcept;
 
 		/// \copybrief	hash_file_in_place()
-		/// \remark	See also \ref concepts::stringable.
+		/// \remark	See also \ref bsa::concepts::stringable.
 		template <concepts::stringable String>
 		[[nodiscard]] hash hash_file(String&& a_path) noexcept
 		{

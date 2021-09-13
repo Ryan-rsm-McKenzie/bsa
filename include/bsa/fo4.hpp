@@ -51,8 +51,7 @@ namespace bsa::fo4
 
 			// archives are sorted in whatever order you add files, i.e. not at all
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
-			[[nodiscard]] friend auto operator<=>(const hash&, const hash&) noexcept
-				-> std::strong_ordering = default;
+			[[nodiscard]] friend std::strong_ordering operator<=>(const hash&, const hash&) noexcept = default;
 
 #ifndef DOXYGEN
 			friend auto operator>>(
@@ -127,7 +126,7 @@ namespace bsa::fo4
 		/// \pre	The file must *not* be \ref compressed() "compressed".
 		///
 		/// \return	Returns the size required to successfully compress the file.
-		[[nodiscard]] auto compress_bound() const noexcept -> std::size_t;
+		[[nodiscard]] std::size_t compress_bound() const noexcept;
 
 		/// \brief	Compresses the file into the given buffer.
 		///
@@ -138,8 +137,7 @@ namespace bsa::fo4
 		/// \param	a_out	The buffer to compress the file into.
 		/// \return	The final size of the compressed buffer, or `std::nullopt` if
 		/// 	compression failed.
-		[[nodiscard]] auto compress_into(std::span<std::byte> a_out) noexcept
-			-> std::optional<std::size_t>;
+		[[nodiscard]] std::optional<std::size_t> compress_into(std::span<std::byte> a_out) noexcept;
 
 		/// \brief	Decompresses the file.
 		///
@@ -177,6 +175,7 @@ namespace bsa::fo4
 			std::uint8_t flags{ 0 };
 			std::uint8_t tile_mode{ 0 };
 
+#ifndef DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
 				header_t& a_header)
@@ -186,6 +185,7 @@ namespace bsa::fo4
 				detail::ostream_t& a_out,
 				const header_t& a_header) noexcept
 				-> detail::ostream_t&;
+#endif
 		} header;
 
 #ifdef DOXYGEN
@@ -209,35 +209,40 @@ namespace bsa::fo4
 		/// \brief	Returns the \ref chunk at the given position.
 		///
 		/// \pre	`a_pos` *must* be less than the current size.
-		[[nodiscard]] auto operator[](std::size_t a_pos) noexcept
-			-> value_type& { return _chunks[a_pos]; }
+		[[nodiscard]] value_type& operator[](std::size_t a_pos) noexcept
+		{
+			return _chunks[a_pos];
+		}
+
 		/// \copydoc file::operator[]
-		[[nodiscard]] auto operator[](std::size_t a_pos) const noexcept
-			-> const value_type& { return _chunks[a_pos]; }
+		[[nodiscard]] const value_type& operator[](std::size_t a_pos) const noexcept
+		{
+			return _chunks[a_pos];
+		}
 
 		/// \brief	Returns an iterator to the beginning of the file.
-		[[nodiscard]] auto begin() noexcept -> iterator { return _chunks.begin(); }
+		[[nodiscard]] iterator begin() noexcept { return _chunks.begin(); }
 		/// \copybrief file::begin
-		[[nodiscard]] auto begin() const noexcept -> const_iterator { return _chunks.begin(); }
+		[[nodiscard]] const_iterator begin() const noexcept { return _chunks.begin(); }
 		/// \copybrief file::begin
-		[[nodiscard]] auto cbegin() const noexcept -> const_iterator { return _chunks.cbegin(); }
+		[[nodiscard]] const_iterator cbegin() const noexcept { return _chunks.cbegin(); }
 
 		/// \brief	Returns an iterator to the end of the file.
-		[[nodiscard]] auto end() noexcept -> iterator { return _chunks.end(); }
+		[[nodiscard]] iterator end() noexcept { return _chunks.end(); }
 		/// \copybrief file::end
-		[[nodiscard]] auto end() const noexcept -> const_iterator { return _chunks.end(); }
+		[[nodiscard]] const_iterator end() const noexcept { return _chunks.end(); }
 		/// \copybrief file::end
-		[[nodiscard]] auto cend() const noexcept -> const_iterator { return _chunks.cend(); }
+		[[nodiscard]] const_iterator cend() const noexcept { return _chunks.cend(); }
 
 		/// \brief	Returns a reference to the \ref chunk at the back of the file.
 		///
 		/// \pre	The container must *not* be empty.
-		[[nodiscard]] auto back() noexcept -> value_type& { return _chunks.back(); }
+		[[nodiscard]] value_type& back() noexcept { return _chunks.back(); }
 		/// \copydoc file::back
-		[[nodiscard]] auto back() const noexcept -> const value_type& { return _chunks.back(); }
+		[[nodiscard]] const value_type& back() const noexcept { return _chunks.back(); }
 
 		/// \brief	Returns the number of chunks the file can store without reallocating.
-		[[nodiscard]] auto capacity() const noexcept -> std::size_t { return _chunks.capacity(); }
+		[[nodiscard]] std::size_t capacity() const noexcept { return _chunks.capacity(); }
 
 		/// \brief	Clears the chunks and header of the file.
 		void clear() noexcept
@@ -259,9 +264,9 @@ namespace bsa::fo4
 		/// \brief	Returns a reference to the \ref chunk at the front of the file.
 		///
 		/// \pre	The file must *not* be empty.
-		[[nodiscard]] auto front() noexcept -> value_type& { return _chunks.front(); }
+		[[nodiscard]] value_type& front() noexcept { return _chunks.front(); }
 		/// \copydoc file::front
-		[[nodiscard]] auto front() const noexcept -> const value_type& { return _chunks.front(); }
+		[[nodiscard]] const value_type& front() const noexcept { return _chunks.front(); }
 
 		/// \brief	Removes a \ref chunk from the file.
 		void pop_back() noexcept { _chunks.pop_back(); }
@@ -273,7 +278,7 @@ namespace bsa::fo4
 		/// \brief	Shrinks the file's capacity to its size.
 		void shrink_to_fit() noexcept { _chunks.shrink_to_fit(); }
 		/// \brief	Returns the number of chunks in the file.
-		[[nodiscard]] auto size() const noexcept -> std::size_t { return _chunks.size(); }
+		[[nodiscard]] std::size_t size() const noexcept { return _chunks.size(); }
 
 	private:
 		container_type _chunks;
@@ -297,12 +302,12 @@ namespace bsa::fo4
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
 		///
 		/// \return	The format of the archive that was read.
-		auto read(std::filesystem::path a_path) -> format;
+		format read(std::filesystem::path a_path);
 
 		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
 		///
 		/// \return	The format of the archive that was read.
-		auto read(std::span<const std::byte> a_src) -> format;
+		format read(std::span<const std::byte> a_src);
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
 		///

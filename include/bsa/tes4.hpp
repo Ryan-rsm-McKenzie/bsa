@@ -133,12 +133,15 @@ namespace bsa::tes4
 
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
-			[[nodiscard]] friend auto operator<=>(const hash& a_lhs, const hash& a_rhs) noexcept
-				-> std::strong_ordering { return a_lhs.numeric() <=> a_rhs.numeric(); }
+			[[nodiscard]] friend std::strong_ordering operator<=>(
+				const hash& a_lhs,
+				const hash& a_rhs) noexcept
+			{
+				return a_lhs.numeric() <=> a_rhs.numeric();
+			}
 
 			/// \copybrief bsa::tes3::hashing::hash
-			[[nodiscard]] auto numeric() const noexcept
-				-> std::uint64_t
+			[[nodiscard]] std::uint64_t numeric() const noexcept
 			{
 				return std::uint64_t{
 					std::uint64_t{ last } << 0u * 8u |
@@ -203,10 +206,10 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
-		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) noexcept
-			-> std::optional<std::size_t>;
-		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) noexcept
-			-> std::optional<std::size_t>;
+		[[nodiscard]] std::optional<std::size_t> compress_into_lz4(
+			std::span<std::byte> a_out) noexcept;
+		[[nodiscard]] std::optional<std::size_t> compress_into_zlib(
+			std::span<std::byte> a_out) noexcept;
 		[[nodiscard]] bool decompress_into_lz4(std::span<std::byte> a_out) noexcept;
 		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
 
@@ -229,15 +232,14 @@ namespace bsa::tes4
 		/// \copydoc bsa::fo4::chunk::compress_bound
 		///
 		/// \param	a_version	The version the file would be compressed for.
-		[[nodiscard]] auto compress_bound(version a_version) const noexcept -> std::size_t;
+		[[nodiscard]] std::size_t compress_bound(version a_version) const noexcept;
 
 		/// \copydoc bsa::fo4::chunk::compress_into
 		///
 		/// \param	a_version	The version to compress the file for.
-		[[nodiscard]] auto compress_into(
+		[[nodiscard]] std::optional<std::size_t> compress_into(
 			version a_version,
-			std::span<std::byte> a_out) noexcept
-			-> std::optional<std::size_t>;
+			std::span<std::byte> a_out) noexcept;
 
 		/// \copydoc bsa::fo4::chunk::decompress
 		///
@@ -279,45 +281,35 @@ namespace bsa::tes4
 
 	public:
 		/// \brief	Retrieves the current archive flags.
-		[[nodiscard]] auto archive_flags() const noexcept -> archive_flag { return _flags; }
+		[[nodiscard]] archive_flag archive_flags() const noexcept { return _flags; }
 		/// \brief	Sets the current archive flags.
 		void archive_flags(archive_flag a_flags) noexcept { _flags = a_flags; }
 
 		/// \brief	Retrieves the current archive types.
-		[[nodiscard]] auto archive_types() const noexcept -> archive_type { return _types; }
+		[[nodiscard]] archive_type archive_types() const noexcept { return _types; }
 		/// \brief	Sets the current archive types.
 		void archive_types(archive_type a_types) noexcept { _types = a_types; }
 
 		/// \brief	Checks if \ref archive_flag::compressed is set.
-		[[nodiscard]] auto compressed() const noexcept
-			-> bool { return test_flag(archive_flag::compressed); }
+		[[nodiscard]] bool compressed() const noexcept { return test_flag(archive_flag::compressed); }
 		/// \brief	Checks if \ref archive_flag::directory_strings is set.
-		[[nodiscard]] auto directory_strings() const noexcept
-			-> bool { return test_flag(archive_flag::directory_strings); }
+		[[nodiscard]] bool directory_strings() const noexcept { return test_flag(archive_flag::directory_strings); }
 		/// \brief	Checks if \ref archive_flag::embedded_file_names is set.
-		[[nodiscard]] auto embedded_file_names() const noexcept
-			-> bool { return test_flag(archive_flag::embedded_file_names); }
+		[[nodiscard]] bool embedded_file_names() const noexcept { return test_flag(archive_flag::embedded_file_names); }
 		/// \brief	Checks if \ref archive_flag::file_strings is set.
-		[[nodiscard]] auto file_strings() const noexcept
-			-> bool { return test_flag(archive_flag::file_strings); }
+		[[nodiscard]] bool file_strings() const noexcept { return test_flag(archive_flag::file_strings); }
 		/// \brief	Checks if \ref archive_flag::retain_directory_names is set.
-		[[nodiscard]] auto retain_directory_names() const noexcept
-			-> bool { return test_flag(archive_flag::retain_directory_names); }
+		[[nodiscard]] bool retain_directory_names() const noexcept { return test_flag(archive_flag::retain_directory_names); }
 		/// \brief	Checks if \ref archive_flag::retain_file_name_offsets is set.
-		[[nodiscard]] auto retain_file_name_offsets() const noexcept
-			-> bool { return test_flag(archive_flag::retain_file_name_offsets); }
+		[[nodiscard]] bool retain_file_name_offsets() const noexcept { return test_flag(archive_flag::retain_file_name_offsets); }
 		/// \brief	Checks if \ref archive_flag::retain_file_names is set.
-		[[nodiscard]] auto retain_file_names() const noexcept
-			-> bool { return test_flag(archive_flag::retain_file_names); }
+		[[nodiscard]] bool retain_file_names() const noexcept { return test_flag(archive_flag::retain_file_names); }
 		/// \brief	Checks if \ref archive_flag::retain_strings_during_startup is set.
-		[[nodiscard]] auto retain_strings_during_startup() const noexcept
-			-> bool { return test_flag(archive_flag::retain_strings_during_startup); }
+		[[nodiscard]] bool retain_strings_during_startup() const noexcept { return test_flag(archive_flag::retain_strings_during_startup); }
 		/// \brief	Checks if \ref archive_flag::xbox_archive is set.
-		[[nodiscard]] auto xbox_archive() const noexcept
-			-> bool { return test_flag(archive_flag::xbox_archive); }
+		[[nodiscard]] bool xbox_archive() const noexcept { return test_flag(archive_flag::xbox_archive); }
 		/// \brief	Checks if \ref archive_flag::xbox_compressed is set.
-		[[nodiscard]] auto xbox_compressed() const noexcept
-			-> bool { return test_flag(archive_flag::xbox_compressed); }
+		[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
 
 		/// \brief	Checks if \ref archive_type::fonts is set.
 		[[nodiscard]] bool fonts() const noexcept { return test_type(archive_type::fonts); }
@@ -349,12 +341,12 @@ namespace bsa::tes4
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
 		///
 		/// \return	The version of the archive that was read.
-		auto read(std::filesystem::path a_path) -> version;
+		version read(std::filesystem::path a_path);
 
 		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
 		///
 		/// \return	The version of the archive that was read.
-		auto read(std::span<const std::byte> a_src) -> version;
+		version read(std::span<const std::byte> a_src);
 
 		/// \copydoc bsa::tes3::archive::verify_offsets
 		///
