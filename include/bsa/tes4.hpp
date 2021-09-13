@@ -388,6 +388,7 @@ namespace bsa::tes4
 		void read_directory(
 			detail::istream_t& a_in,
 			const detail::header_t& a_header,
+			std::size_t& a_filesOffset,
 			std::size_t& a_namesOffset);
 
 		[[nodiscard]] auto sort_for_write(bool a_xbox) const noexcept -> intermediate_t;

@@ -570,9 +570,10 @@ namespace bsa::tes4
 		_types = header.archive_types();
 
 		std::size_t namesOffset = detail::offsetof_file_strings(header);
+		std::size_t filesOffset = detail::offsetof_file_entries(header);
 		in.seek_absolute(header.directories_offset());
 		for (std::size_t i = 0; i < header.directory_count(); ++i) {
-			this->read_directory(in, header, namesOffset);
+			this->read_directory(in, header, filesOffset, namesOffset);
 		}
 
 		return static_cast<version>(header.archive_version());
@@ -763,6 +764,7 @@ namespace bsa::tes4
 	void archive::read_directory(
 		detail::istream_t& a_in,
 		const detail::header_t& a_header,
+		std::size_t& a_filesOffset,
 		std::size_t& a_namesOffset)
 	{
 		hashing::hash hash;
@@ -771,27 +773,22 @@ namespace bsa::tes4
 		std::uint32_t count = 0;
 		a_in >> count;
 
-		std::uint32_t offset = 0;
+		// bsarch is known to corrupt the file entries offset,
+		// so we have to calculate it by hand instead
 		switch (a_header.archive_version()) {
 		case 103:
 		case 104:
-			a_in >> offset;
+			a_in.seek_relative(4u);
 			break;
 		case 105:
-			a_in.seek_relative(4u);
-			a_in >> offset;
-			a_in.seek_relative(4u);
+			a_in.seek_relative(4u * 3u);
 			break;
 		default:
 			detail::declare_unreachable();
 		}
 
-		if (a_header.file_strings()) {
-			offset -= static_cast<std::uint32_t>(a_header.file_names_length());
-		}
-
 		const detail::restore_point _{ a_in };
-		a_in.seek_absolute(offset);
+		a_in.seek_absolute(a_filesOffset);
 
 		const auto name =
 			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
@@ -803,6 +800,8 @@ namespace bsa::tes4
 				key_type{ hash, backup.value_or(name), a_in },
 				std::move(d));
 		assert(success);
+
+		a_filesOffset = a_in.tell();
 	}
 
 	auto archive::sort_for_write(bool a_xbox) const noexcept
