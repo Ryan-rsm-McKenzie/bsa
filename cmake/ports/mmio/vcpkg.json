@@ -1,6 +1,6 @@
 {
   "name": "mmio",
-  "version-semver": "1.0.0",
+  "version-semver": "1.1.0",
   "dependencies": [
     {
       "name": "vcpkg-cmake",
