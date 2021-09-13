@@ -12,7 +12,10 @@ vcpkg_cmake_configure(
 		-DBUILD_TESTING=OFF
 )
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(CONFIG_PATH "lib/cmake/binary_io")
+vcpkg_cmake_config_fixup(
+	PACKAGE_NAME binary_io
+	CONFIG_PATH "lib/cmake/binary_io"
+)
 
 file(REMOVE_RECURSE
 	"${CURRENT_PACKAGES_DIR}/debug/include"
