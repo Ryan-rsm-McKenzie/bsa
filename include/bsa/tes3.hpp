@@ -127,7 +127,7 @@ namespace bsa::tes3
 		/// \brief	Writes the contents of the archive to disk.
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	binary_io::exception	Thrown when the underlying buffer is exhausted.
+		/// \exception	binary_io::buffer_exhausted	Thrown when the underlying buffer is exhausted.
 		///
 		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
@@ -136,10 +136,10 @@ namespace bsa::tes3
 	protected:
 		/// \brief	Reads the contents of the archive from disk.
 		///
-		/// \exception	binary_io::exception	Thrown when archive reads index out of bounds.
+		/// \exception	binary_io::buffer_exhausted	Thrown when archive reads index out of bounds.
 		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
 		///
-		///	\remark	If `binary_io::exception` or `bsa::exception` is thrown, the archive is
+		///	\remark	If `binary_io::buffer_exhausted` or `bsa::exception` is thrown, the archive is
 		///		left in an unspecified state. Use \ref clear to return it to a valid state.
 		/// \remark	If the function returns successfully, the contents of the archived are replaced
 		///		with the contents of the archive on disk.
