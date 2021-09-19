@@ -341,11 +341,11 @@ namespace bsa::tes4
 		}
 
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
-		/// \copydoc bsa::tes4::archive::read()
+		/// \copydoc bsa::tes4::archive::doxygen_read
 		version read(std::filesystem::path a_path);
 
 		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
-		/// \copydoc bsa::tes4::archive::read()
+		/// \copydoc bsa::tes4::archive::doxygen_read
 		version read(
 			std::span<const std::byte> a_src,
 			copy_type a_copy = copy_type::deep);
@@ -356,20 +356,20 @@ namespace bsa::tes4
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		/// \copydoc bsa::tes4::archive::write(version) const
+		/// \copydoc bsa::tes4::archive::doxygen_write
 		void write(std::filesystem::path a_path, version a_version) const;
 
 		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::tes4::archive::write(version) const
+		/// \copydoc bsa::tes4::archive::doxygen_write
 		void write(binary_io::any_ostream& a_dst, version a_version) const;
 
 #ifdef DOXYGEN
 	protected:
 		/// \return	The version of the archive that was read.
-		version read();
+		version doxygen_read();
 
 		/// \param	a_version The version format to write the archive in.
-		void write(version a_version) const;
+		void doxygen_write(version a_version) const;
 #endif
 
 	private:

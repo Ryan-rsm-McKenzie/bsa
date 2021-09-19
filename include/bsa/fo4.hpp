@@ -302,26 +302,24 @@ namespace bsa::fo4
 #endif
 
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
-		///
-		/// \return	The format of the archive that was read.
+		/// \copydoc bsa::fo4::archive::doxygen_read
 		format read(std::filesystem::path a_path);
 
 		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
-		///
-		/// \return	The format of the archive that was read.
+		/// \copydoc bsa::fo4::archive::doxygen_read
 		format read(
 			std::span<const std::byte> a_src,
 			copy_type a_copy = copy_type::deep);
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		/// \copydoc bsa::fo4::archive::write(format, bool) const
+		/// \copydoc bsa::fo4::archive::doxygen_write
 		void write(
 			std::filesystem::path a_path,
 			format a_format,
 			bool a_strings = true) const;
 
 		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::fo4::archive::write(format, bool) const
+		/// \copydoc bsa::fo4::archive::doxygen_write
 		void write(
 			binary_io::any_ostream& a_dst,
 			format a_format,
@@ -329,9 +327,12 @@ namespace bsa::fo4
 
 #ifdef DOXYGEN
 	protected:
+		/// \return	The format of the archive that was read.
+		format doxygen_read();
+
 		/// \param	a_format	The format to write the archive in.
 		/// \param	a_strings	Controls whether the string table is written or not.
-		void write(format a_format, bool a_strings) const;
+		void doxygen_write(format a_format, bool a_strings) const;
 #endif
 
 	private:

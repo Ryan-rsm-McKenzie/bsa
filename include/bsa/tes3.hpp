@@ -107,7 +107,7 @@ namespace bsa::tes3
 		using super::clear;
 #endif
 
-		/// \copydoc bsa::tes3::archive::read()
+		/// \copydoc bsa::tes3::archive::doxygen_read
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
 		///
@@ -116,7 +116,7 @@ namespace bsa::tes3
 		/// \param	a_path	The path to the given archive on the native filesystem.
 		void read(std::filesystem::path a_path);
 
-		/// \copydoc bsa::tes3::archive::read()
+		/// \copydoc bsa::tes3::archive::doxygen_read
 		///
 		/// \param	a_src	The source to read from.
 		/// \param	a_copy	The method to use when copying data from `a_src`.
@@ -129,12 +129,12 @@ namespace bsa::tes3
 		/// \return	Returns `true` is the archive passes validation, `false` otherwise.
 		[[nodiscard]] bool verify_offsets() const noexcept;
 
-		/// \copydoc bsa::tes3::archive::write() const
+		/// \copydoc bsa::tes3::archive::doxygen_write
 		///
 		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
 
-		/// \copydoc bsa::tes3::archive::write() const
+		/// \copydoc bsa::tes3::archive::doxygen_write
 		///
 		/// \param	a_dst	The stream to write the archive to.
 		void write(binary_io::any_ostream& a_dst) const;
@@ -150,13 +150,13 @@ namespace bsa::tes3
 		///		left in an unspecified state. Use \ref clear to return it to a valid state.
 		/// \remark	If the function returns successfully, the contents of the archived are replaced
 		///		with the contents of the archive on disk.
-		void read();
+		void doxygen_read();
 
 		/// \brief	Writes the contents of the archive to disk.
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
 		/// \exception	binary_io::buffer_exhausted	Thrown when the underlying buffer is exhausted.
-		void write() const;
+		void doxygen_write() const;
 #endif
 
 	private:
