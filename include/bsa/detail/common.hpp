@@ -212,6 +212,9 @@ namespace bsa::detail
 		istream_t(std::filesystem::path a_path);
 		istream_t(std::span<const std::byte> a_bytes) noexcept;
 
+		istream_t(const volatile istream_t&) = delete;
+		istream_t& operator=(const volatile istream_t&) = delete;
+
 		[[nodiscard]] auto operator*() noexcept
 			-> stream_type& { return _stream; }
 		[[nodiscard]] auto operator*() const noexcept
