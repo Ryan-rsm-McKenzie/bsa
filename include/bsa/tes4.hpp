@@ -379,7 +379,7 @@ namespace bsa::tes4
 
 		struct xbox_sort_t;
 
-		auto do_read(detail::istream_t& a_in) -> version;
+		[[nodiscard]] auto do_read(detail::istream_t& a_in) -> version;
 
 		void do_write(detail::ostream_t& a_out, version a_version) const;
 

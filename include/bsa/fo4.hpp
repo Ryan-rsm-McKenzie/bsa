@@ -333,7 +333,7 @@ namespace bsa::fo4
 #endif
 
 	private:
-		auto do_read(detail::istream_t& a_in) -> format;
+		[[nodiscard]] auto do_read(detail::istream_t& a_in) -> format;
 
 		void do_write(
 			detail::ostream_t& a_out,
