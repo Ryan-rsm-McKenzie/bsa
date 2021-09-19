@@ -118,18 +118,40 @@ namespace bsa
 		const char* _what{ nullptr };
 	};
 
-	/// \brief	Guesses the archive format for a given file.
+#ifdef DOXYGEN
+	/// \brief	A doxygen only, detail class.
+	/// \details	This is a class that exists solely to de-duplicate documentation.
+	///		Do not attempt to use this.
+	struct doxygen_detail
+	{
+	protected:
+		/// \brief	Guesses the archive format for a given file.
+		///
+		/// \exception	binary_io::buffer_exhausted	Thrown when reads index out of bounds.
+		/// \exception	bsa::exception	Thrown when parsing errors are encountered.
+		///
+		/// \remark	This function does not guarantee that the given file constitutes a well-formed
+		///		archive of the deduced format. It merely remarks that if the file *were* a
+		///		well-formed archive, it would be of the deduced format.
+		///
+		/// \return	The guessed archive format for the given file, or `std::nullopt` if the file
+		///		doesn't match any known format.
+		static std::optional<file_format> guess_file_format(
+			std::filesystem::path a_path);
+	};
+#endif
+
+	/// \copydoc bsa::doxygen_detail::guess_file_format()
 	///
-	/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-	/// \exception	bsa::exception	Thrown when parsing errors are encountered.
+	/// \param	a_path	The file to guess.
+	[[nodiscard]] std::optional<file_format> guess_file_format(
+		std::filesystem::path a_path);
+
+	/// \copydoc bsa::doxygen_detail::guess_file_format()
 	///
-	/// \remark	This function does not guarantee that the given file constitutes a well-formed archive
-	/// 	of the deduced format. It merely remarks that if the file *were* a well-formed archive, it
-	/// 	would be of the deduced format.
-	///
-	/// \return	The guessed archive format for the given file, or `std::nullopt` if the file doesn't
-	/// 	match any known format.
-	[[nodiscard]] std::optional<file_format> guess_file_format(std::filesystem::path a_path);
+	/// \param	a_src	The buffer to guess.
+	[[nodiscard]] std::optional<file_format> guess_file_format(
+		std::span<const std::byte> a_src);
 
 	/// \brief	Converts, at most, the first 4 characters of the given string into a 4 byte integer.
 	[[nodiscard]] constexpr std::uint32_t make_four_cc(

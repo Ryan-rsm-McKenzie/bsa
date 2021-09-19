@@ -15,20 +15,36 @@
 
 namespace bsa
 {
+	namespace
+	{
+		[[nodiscard]] auto guess_file_format(detail::istream_t& a_in)
+			-> std::optional<file_format>
+		{
+			switch (std::get<0>(a_in->read<std::uint32_t>())) {
+			case 0x100:
+				return file_format::tes3;
+			case make_four_cc("BSA"sv):
+				return file_format::tes4;
+			case make_four_cc("BTDX"sv):
+				return file_format::fo4;
+			default:
+				return std::nullopt;
+			}
+		}
+	}
+
 	auto guess_file_format(std::filesystem::path a_path)
 		-> std::optional<file_format>
 	{
 		detail::istream_t in{ std::move(a_path) };
-		switch (std::get<0>(in->read<std::uint32_t>())) {
-		case 0x100:
-			return file_format::tes3;
-		case make_four_cc("BSA"sv):
-			return file_format::tes4;
-		case make_four_cc("BTDX"sv):
-			return file_format::fo4;
-		default:
-			return std::nullopt;
-		}
+		return guess_file_format(in);
+	}
+
+	auto guess_file_format(std::span<const std::byte> a_src)
+		-> std::optional<file_format>
+	{
+		detail::istream_t in{ a_src };
+		return guess_file_format(in);
 	}
 }
 
