@@ -306,10 +306,12 @@ namespace bsa::fo4
 		/// \return	The format of the archive that was read.
 		format read(std::filesystem::path a_path);
 
-		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
+		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
 		///
 		/// \return	The format of the archive that was read.
-		format read(std::span<const std::byte> a_src);
+		format read(
+			std::span<const std::byte> a_src,
+			copy_type a_copy = copy_type::deep);
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
 		/// \copydoc bsa::fo4::archive::write(format, bool) const

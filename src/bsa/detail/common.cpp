@@ -43,7 +43,7 @@ namespace bsa
 	auto guess_file_format(std::span<const std::byte> a_src)
 		-> std::optional<file_format>
 	{
-		detail::istream_t in{ a_src };
+		detail::istream_t in{ a_src, copy_type::shallow };
 		return guess_file_format(in);
 	}
 }
@@ -157,13 +157,15 @@ namespace bsa::detail
 
 	istream_t::istream_t(std::filesystem::path a_path) :
 		_file(std::make_shared<file_type>(std::move(a_path))),
-		_stream({ _file->data(), _file->size() })
+		_stream({ _file->data(), _file->size() }),
+		_copy(copy_type::shallow)
 	{
 		_stream.endian(std::endian::little);
 	}
 
-	istream_t::istream_t(std::span<const std::byte> a_bytes) noexcept :
-		_stream(a_bytes)
+	istream_t::istream_t(std::span<const std::byte> a_bytes, copy_type a_copy) noexcept :
+		_stream(a_bytes),
+		_copy(a_copy)
 	{
 		_stream.endian(std::endian::little);
 	}

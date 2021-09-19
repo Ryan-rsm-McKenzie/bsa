@@ -190,9 +190,11 @@ namespace bsa::tes3
 		this->do_read(in);
 	}
 
-	void archive::read(std::span<const std::byte> a_src)
+	void archive::read(
+		std::span<const std::byte> a_src,
+		copy_type a_copy)
 	{
-		detail::istream_t in{ a_src };
+		detail::istream_t in{ a_src, a_copy };
 		this->do_read(in);
 	}
 

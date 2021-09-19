@@ -344,9 +344,11 @@ namespace bsa::tes4
 		/// \copydoc bsa::tes4::archive::read()
 		version read(std::filesystem::path a_path);
 
-		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
+		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
 		/// \copydoc bsa::tes4::archive::read()
-		version read(std::span<const std::byte> a_src);
+		version read(
+			std::span<const std::byte> a_src,
+			copy_type a_copy = copy_type::deep);
 
 		/// \copydoc bsa::tes3::archive::verify_offsets
 		///

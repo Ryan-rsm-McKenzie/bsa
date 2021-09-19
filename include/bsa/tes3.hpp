@@ -119,7 +119,10 @@ namespace bsa::tes3
 		/// \copydoc bsa::tes3::archive::read()
 		///
 		/// \param	a_src	The source to read from.
-		void read(std::span<const std::byte> a_src);
+		/// \param	a_copy	The method to use when copying data from `a_src`.
+		void read(
+			std::span<const std::byte> a_src,
+			copy_type a_copy = copy_type::deep);
 
 		/// \brief	Verifies that offsets within the archive will be valid when written to disk.
 		///

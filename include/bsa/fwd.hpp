@@ -95,5 +95,6 @@ namespace bsa
 
 	class exception;
 
+	enum class copy_type;
 	enum class file_format;
 }

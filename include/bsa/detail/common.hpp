@@ -93,6 +93,18 @@ namespace bsa
 	using namespace std::literals;
 #endif
 
+	/// \brief	The copy method to use when reading from in-memory buffers.
+	enum class copy_type
+	{
+		/// Makes a deep copy of the given data (i.e. uses an allocating `std::vector` instead of
+		///		a lightweight `std::span`).
+		deep,
+
+		/// Make a shallow copy of the given data (i.e. uses a lightweight `std::span` instead of
+		///		an allocating `std::vector`).
+		shallow
+	};
+
 	/// \brief	The file format for a given archive.
 	enum class file_format
 	{
@@ -210,7 +222,7 @@ namespace bsa::detail
 		using file_type = mmio::mapped_file_source;
 
 		istream_t(std::filesystem::path a_path);
-		istream_t(std::span<const std::byte> a_bytes) noexcept;
+		istream_t(std::span<const std::byte> a_bytes, copy_type a_copy) noexcept;
 
 		istream_t(const volatile istream_t&) = delete;
 		istream_t& operator=(const volatile istream_t&) = delete;
@@ -225,12 +237,15 @@ namespace bsa::detail
 		[[nodiscard]] auto operator->() const noexcept
 			-> const stream_type* { return &_stream; }
 
+		[[nodiscard]] bool deep_copy() const noexcept { return _copy == copy_type::deep; }
 		[[nodiscard]] auto file() const noexcept { return _file; }
 		[[nodiscard]] bool has_file() const noexcept { return _file != nullptr; }
+		[[nodiscard]] bool shallow_copy() const noexcept { return _copy == copy_type::shallow; }
 
 	private:
 		std::shared_ptr<file_type> _file;
 		stream_type _stream;
+		copy_type _copy{ copy_type::deep };
 	};
 
 	template <class T>
@@ -352,10 +367,14 @@ namespace bsa::components
 			std::span<const std::byte> a_data,
 			const detail::istream_t& a_in) noexcept
 		{
-			if (a_in.has_file()) {
+			if (a_in.has_file() && a_in.shallow_copy()) {
 				_data.emplace<data_proxied>(a_data, a_in.file());
 			} else {
-				_data.emplace<data_view>(a_data);
+				if (a_in.deep_copy()) {
+					_data.emplace<data_owner>(a_data.begin(), a_data.end());
+				} else {
+					_data.emplace<data_view>(a_data);
+				}
 			}
 		}
 #endif
@@ -414,10 +433,14 @@ namespace bsa::components
 			const detail::istream_t& a_in,
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
 		{
-			if (a_in.has_file()) {
+			if (a_in.has_file() && a_in.shallow_copy()) {
 				_data.emplace<data_proxied>(a_data, a_in.file());
 			} else {
-				_data.emplace<data_view>(a_data);
+				if (a_in.deep_copy()) {
+					_data.emplace<data_owner>(a_data.begin(), a_data.end());
+				} else {
+					_data.emplace<data_view>(a_data);
+				}
 			}
 			_decompsz = a_decompressedSize;
 		}
@@ -695,10 +718,14 @@ namespace bsa::components
 			const detail::istream_t& a_in) noexcept :
 			_hash(a_hash)
 		{
-			if (a_in.has_file()) {
+			if (a_in.has_file() && a_in.shallow_copy()) {
 				_name.emplace<name_proxied>(a_name, a_in.file());
 			} else {
-				_name.emplace<name_view>(a_name);
+				if (a_in.deep_copy()) {
+					_name.emplace<name_owner>(a_name);
+				} else {
+					_name.emplace<name_view>(a_name);
+				}
 			}
 		}
 

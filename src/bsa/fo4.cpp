@@ -366,10 +366,12 @@ namespace bsa::fo4
 		return this->do_read(in);
 	}
 
-	auto archive::read(std::span<const std::byte> a_src)
+	auto archive::read(
+		std::span<const std::byte> a_src,
+		copy_type a_copy)
 		-> format
 	{
-		detail::istream_t in{ a_src };
+		detail::istream_t in{ a_src, a_copy };
 		return this->do_read(in);
 	}
 
