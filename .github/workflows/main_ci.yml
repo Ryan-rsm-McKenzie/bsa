@@ -52,6 +52,20 @@ jobs:
           sudo apt install liblz4-dev zlib1g-dev -y
           sudo pip install gcovr
 
+      - name: Download binary_io
+        uses: actions/checkout@v2
+        with:
+          ref: '2.0.1'
+          repository: Ryan-rsm-McKenzie/binary_io
+          path: binary_io
+
+      - name: Install binary_io
+        working-directory: ${{ github.workspace }}/binary_io
+        run: |
+          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=OFF
+          cmake --build build
+          sudo cmake --install build
+
       - name: Download Catch2
         uses: actions/checkout@v2
         with:
@@ -63,6 +77,20 @@ jobs:
         working-directory: ${{ github.workspace }}/catch2
         run: |
           cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Download mmio
+        uses: actions/checkout@v2
+        with:
+          ref: '1.1.0'
+          repository: Ryan-rsm-McKenzie/mmio
+          path: mmio
+
+      - name: Install mmio
+        working-directory: ${{ github.workspace }}/mmio
+        run: |
+          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=OFF
           cmake --build build
           sudo cmake --install build
 
