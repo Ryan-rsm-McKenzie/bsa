@@ -312,24 +312,24 @@ namespace bsa::fo4
 		format read(std::span<const std::byte> a_src);
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		/// \copydoc bsa::fo4::archive::write(format, bool)
+		/// \copydoc bsa::fo4::archive::write(format, bool) const
 		void write(
 			std::filesystem::path a_path,
 			format a_format,
-			bool a_strings = true);
+			bool a_strings = true) const;
 
 		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::fo4::archive::write(format, bool)
+		/// \copydoc bsa::fo4::archive::write(format, bool) const
 		void write(
 			binary_io::any_ostream& a_dst,
 			format a_format,
-			bool a_strings = true);
+			bool a_strings = true) const;
 
 #ifdef DOXYGEN
 	protected:
 		/// \param	a_format	The format to write the archive in.
 		/// \param	a_strings	Controls whether the string table is written or not.
-		void write(format a_format, bool a_strings);
+		void write(format a_format, bool a_strings) const;
 #endif
 
 	private:
@@ -338,7 +338,7 @@ namespace bsa::fo4
 		void do_write(
 			detail::ostream_t& a_out,
 			format a_format,
-			bool a_strings);
+			bool a_strings) const;
 
 		[[nodiscard]] auto make_header(
 			format a_format,
@@ -359,12 +359,12 @@ namespace bsa::fo4
 			const chunk& a_chunk,
 			detail::ostream_t& a_out,
 			format a_format,
-			std::uint64_t& a_dataOffset) noexcept;
+			std::uint64_t& a_dataOffset) const noexcept;
 
 		void write_file(
 			const file& a_file,
 			detail::ostream_t& a_out,
 			format a_format,
-			std::uint64_t& a_dataOffset) noexcept;
+			std::uint64_t& a_dataOffset) const noexcept;
 	};
 }

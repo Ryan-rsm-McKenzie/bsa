@@ -376,7 +376,7 @@ namespace bsa::fo4
 	void archive::write(
 		std::filesystem::path a_path,
 		format a_format,
-		bool a_strings)
+		bool a_strings) const
 	{
 		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
 		this->do_write(out, a_format, a_strings);
@@ -385,7 +385,7 @@ namespace bsa::fo4
 	void archive::write(
 		binary_io::any_ostream& a_dst,
 		format a_format,
-		bool a_strings)
+		bool a_strings) const
 	{
 		this->do_write(a_dst, a_format, a_strings);
 	}
@@ -435,7 +435,7 @@ namespace bsa::fo4
 	void archive::do_write(
 		detail::ostream_t& a_out,
 		format a_format,
-		bool a_strings)
+		bool a_strings) const
 	{
 		auto [header, dataOffset] = make_header(a_format, a_strings);
 		a_out << header;
@@ -572,7 +572,7 @@ namespace bsa::fo4
 		const chunk& a_chunk,
 		detail::ostream_t& a_out,
 		format a_format,
-		std::uint64_t& a_dataOffset) noexcept
+		std::uint64_t& a_dataOffset) const noexcept
 	{
 		const auto size = a_chunk.size();
 		a_out.write(
@@ -593,7 +593,7 @@ namespace bsa::fo4
 		const file& a_file,
 		detail::ostream_t& a_out,
 		format a_format,
-		std::uint64_t& a_dataOffset) noexcept
+		std::uint64_t& a_dataOffset) const noexcept
 	{
 		a_out.write(
 			std::byte{ 0 },  // skip mod index
