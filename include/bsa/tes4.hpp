@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include <binary_io/any_stream.hpp>
+
 #include "bsa/detail/common.hpp"
 
 namespace bsa::tes4
@@ -339,13 +341,11 @@ namespace bsa::tes4
 		}
 
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
-		///
-		/// \return	The version of the archive that was read.
+		/// \copydoc bsa::tes4::archive::read()
 		version read(std::filesystem::path a_path);
 
 		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>)
-		///
-		/// \return	The version of the archive that was read.
+		/// \copydoc bsa::tes4::archive::read()
 		version read(std::span<const std::byte> a_src);
 
 		/// \copydoc bsa::tes3::archive::verify_offsets
@@ -354,9 +354,21 @@ namespace bsa::tes4
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		///
-		/// \param	a_version The version format to write the archive in.
+		/// \copydoc bsa::tes4::archive::write(version) const
 		void write(std::filesystem::path a_path, version a_version) const;
+
+		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
+		/// \copydoc bsa::tes4::archive::write(version) const
+		void write(binary_io::any_ostream& a_dst, version a_version) const;
+
+#ifdef DOXYGEN
+	protected:
+		/// \return	The version of the archive that was read.
+		version read();
+
+		/// \param	a_version The version format to write the archive in.
+		void write(version a_version) const;
+#endif
 
 	private:
 		using intermediate_t =
@@ -368,6 +380,8 @@ namespace bsa::tes4
 		struct xbox_sort_t;
 
 		auto do_read(detail::istream_t& a_in) -> version;
+
+		void do_write(detail::ostream_t& a_out, version a_version) const;
 
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
 

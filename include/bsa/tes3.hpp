@@ -8,6 +8,8 @@
 #include <string>
 #include <utility>
 
+#include <binary_io/any_stream.hpp>
+
 #include "bsa/detail/common.hpp"
 
 namespace bsa::tes3
@@ -124,13 +126,15 @@ namespace bsa::tes3
 		/// \return	Returns `true` is the archive passes validation, `false` otherwise.
 		[[nodiscard]] bool verify_offsets() const noexcept;
 
-		/// \brief	Writes the contents of the archive to disk.
-		///
-		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	binary_io::buffer_exhausted	Thrown when the underlying buffer is exhausted.
+		/// \copydoc bsa::tes3::archive::write() const
 		///
 		/// \param	a_path	The path to write the archive to on the native filesystem.
 		void write(std::filesystem::path a_path) const;
+
+		/// \copydoc bsa::tes3::archive::write() const
+		///
+		/// \param	a_dst	The stream to write the archive to.
+		void write(binary_io::any_ostream& a_dst) const;
 
 #ifdef DOXYGEN
 	protected:
@@ -144,12 +148,19 @@ namespace bsa::tes3
 		/// \remark	If the function returns successfully, the contents of the archived are replaced
 		///		with the contents of the archive on disk.
 		void read();
+
+		/// \brief	Writes the contents of the archive to disk.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	binary_io::buffer_exhausted	Thrown when the underlying buffer is exhausted.
+		void write() const;
 #endif
 
 	private:
 		struct offsets_t;
 
 		void do_read(detail::istream_t& a_in);
+		void do_write(detail::ostream_t& a_out) const;
 
 		[[nodiscard]] auto make_header() const noexcept -> detail::header_t;
 

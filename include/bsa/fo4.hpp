@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <binary_io/any_stream.hpp>
+
 #include "bsa/detail/common.hpp"
 
 namespace bsa::fo4
@@ -310,16 +312,33 @@ namespace bsa::fo4
 		format read(std::span<const std::byte> a_src);
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		///
-		/// \param	a_format	The format to write the archive in.
-		/// \param	a_strings	Controls whether the string table is written or not.
+		/// \copydoc bsa::fo4::archive::write(format, bool)
 		void write(
 			std::filesystem::path a_path,
 			format a_format,
 			bool a_strings = true);
 
+		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
+		/// \copydoc bsa::fo4::archive::write(format, bool)
+		void write(
+			binary_io::any_ostream& a_dst,
+			format a_format,
+			bool a_strings = true);
+
+#ifdef DOXYGEN
+	protected:
+		/// \param	a_format	The format to write the archive in.
+		/// \param	a_strings	Controls whether the string table is written or not.
+		void write(format a_format, bool a_strings);
+#endif
+
 	private:
 		auto do_read(detail::istream_t& a_in) -> format;
+
+		void do_write(
+			detail::ostream_t& a_out,
+			format a_format,
+			bool a_strings);
 
 		[[nodiscard]] auto make_header(
 			format a_format,

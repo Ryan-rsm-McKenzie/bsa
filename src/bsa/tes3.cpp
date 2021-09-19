@@ -11,6 +11,9 @@
 #include <string_view>
 #include <utility>
 
+#include <binary_io/any_stream.hpp>
+#include <binary_io/file_stream.hpp>
+
 namespace bsa::tes3
 {
 	namespace detail
@@ -227,14 +230,13 @@ namespace bsa::tes3
 
 	void archive::write(std::filesystem::path a_path) const
 	{
-		detail::ostream_t out{ std::move(a_path) };
-		out << this->make_header();
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out);
+	}
 
-		this->write_file_entries(out);
-		this->write_file_name_offsets(out);
-		this->write_file_names(out);
-		this->write_file_hashes(out);
-		this->write_file_data(out);
+	void archive::write(binary_io::any_ostream& a_dst) const
+	{
+		this->do_write(a_dst);
 	}
 
 	void archive::do_read(detail::istream_t& a_in)
@@ -257,6 +259,17 @@ namespace bsa::tes3
 		for (std::size_t i = 0; i < header.file_count(); ++i) {
 			this->read_file(a_in, offsets, i);
 		}
+	}
+
+	void archive::do_write(detail::ostream_t& a_out) const
+	{
+		a_out << this->make_header();
+
+		this->write_file_entries(a_out);
+		this->write_file_name_offsets(a_out);
+		this->write_file_names(a_out);
+		this->write_file_hashes(a_out);
+		this->write_file_data(a_out);
 	}
 
 	auto archive::make_header() const noexcept

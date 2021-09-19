@@ -10,6 +10,8 @@
 #include <string_view>
 #include <vector>
 
+#include <binary_io/any_stream.hpp>
+#include <binary_io/file_stream.hpp>
 #include <zlib.h>
 
 namespace bsa::fo4
@@ -376,26 +378,16 @@ namespace bsa::fo4
 		format a_format,
 		bool a_strings)
 	{
-		detail::ostream_t out{ std::move(a_path) };
-		auto [header, dataOffset] = make_header(a_format, a_strings);
-		out << header;
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out, a_format, a_strings);
+	}
 
-		for (const auto& [key, file] : *this) {
-			out << key.hash();
-			this->write_file(file, out, a_format, dataOffset);
-		}
-
-		for (const auto& file : *this) {
-			for (const auto& chunk : file.second) {
-				out.write_bytes(chunk.as_bytes());
-			}
-		}
-
-		if (a_strings) {
-			for ([[maybe_unused]] const auto& [key, file] : *this) {
-				detail::write_wstring(out, key.name());
-			}
-		}
+	void archive::write(
+		binary_io::any_ostream& a_dst,
+		format a_format,
+		bool a_strings)
+	{
+		this->do_write(a_dst, a_format, a_strings);
 	}
 
 	auto archive::do_read(detail::istream_t& a_in)
@@ -438,6 +430,32 @@ namespace bsa::fo4
 		}
 
 		return fmt;
+	}
+
+	void archive::do_write(
+		detail::ostream_t& a_out,
+		format a_format,
+		bool a_strings)
+	{
+		auto [header, dataOffset] = make_header(a_format, a_strings);
+		a_out << header;
+
+		for (const auto& [key, file] : *this) {
+			a_out << key.hash();
+			this->write_file(file, a_out, a_format, dataOffset);
+		}
+
+		for (const auto& file : *this) {
+			for (const auto& chunk : file.second) {
+				a_out.write_bytes(chunk.as_bytes());
+			}
+		}
+
+		if (a_strings) {
+			for ([[maybe_unused]] const auto& [key, file] : *this) {
+				detail::write_wstring(a_out, key.name());
+			}
+		}
 	}
 
 	auto archive::make_header(

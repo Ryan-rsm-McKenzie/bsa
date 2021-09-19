@@ -15,7 +15,9 @@
 #include <utility>
 #include <vector>
 
+#include <binary_io/any_stream.hpp>
 #include <binary_io/common.hpp>
+#include <binary_io/file_stream.hpp>
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
@@ -599,18 +601,13 @@ namespace bsa::tes4
 
 	void archive::write(std::filesystem::path a_path, version a_version) const
 	{
-		detail::ostream_t out{ std::move(a_path) };
-		const auto header = this->make_header(a_version);
-		out << header;
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out, a_version);
+	}
 
-		const auto intermediate = sort_for_write(header.xbox_archive());
-
-		this->write_directory_entries(intermediate, out, header);
-		this->write_file_entries(intermediate, out, header);
-		if (header.file_strings()) {
-			this->write_file_names(intermediate, out);
-		}
-		this->write_file_data(intermediate, out, header);
+	void archive::write(binary_io::any_ostream& a_dst, version a_version) const
+	{
+		this->do_write(a_dst, a_version);
 	}
 
 	struct archive::xbox_sort_t final
@@ -665,6 +662,21 @@ namespace bsa::tes4
 		}
 
 		return static_cast<version>(header.archive_version());
+	}
+
+	void archive::do_write(detail::ostream_t& a_out, version a_version) const
+	{
+		const auto header = this->make_header(a_version);
+		a_out << header;
+
+		const auto intermediate = sort_for_write(header.xbox_archive());
+
+		this->write_directory_entries(intermediate, a_out, header);
+		this->write_file_entries(intermediate, a_out, header);
+		if (header.file_strings()) {
+			this->write_file_names(intermediate, a_out);
+		}
+		this->write_file_data(intermediate, a_out, header);
 	}
 
 	auto archive::make_header(version a_version) const noexcept

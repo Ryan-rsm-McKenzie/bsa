@@ -10,6 +10,7 @@ name = 'bsa'
 navbar = [ 'classes', 'namespaces' ]
 
 [autolinks]
+'binary_io::any_ostream' = 'https://github.com/Ryan-rsm-McKenzie/binary_io'
 'binary_io::buffer_exhausted' = 'https://github.com/Ryan-rsm-McKenzie/binary_io'
 'std::strong_ordering' = 'https://en.cppreference.com/w/cpp/utility/compare/strong_ordering'
 

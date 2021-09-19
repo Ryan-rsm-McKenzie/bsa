@@ -19,7 +19,7 @@
 #include <variant>
 #include <vector>
 
-#include <binary_io/file_stream.hpp>
+#include <binary_io/any_stream.hpp>
 #include <binary_io/span_stream.hpp>
 #include <mmio/mmio.hpp>
 
@@ -148,7 +148,7 @@ namespace bsa
 #ifndef DOXYGEN
 namespace bsa::detail
 {
-	using ostream_t = binary_io::file_ostream;
+	using ostream_t = binary_io::any_ostream;
 
 	[[noreturn]] inline void declare_unreachable()
 	{
