@@ -30,20 +30,21 @@ jobs:
         config: [ gcc ]
         include:
           - config: gcc
-            cc: gcc-10
-            cxx: g++-10
-            gcov: gcov-10
+            version: '10'
 
     steps:
       - uses: actions/checkout@v2
         with:
           path: bsa
 
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: ${{ matrix.version }}
+
       - name: Setup Environment
         run: |
-          echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
-          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
-          echo "GCOV=${{ matrix.gcov }}" >> $GITHUB_ENV
+          echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
 
           wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
           unzip ninja-linux.zip
