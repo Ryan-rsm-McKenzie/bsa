@@ -7,8 +7,10 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch.hpp>
@@ -531,5 +533,38 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 		bsa::tes4::archive bsa;
 		REQUIRE(!bsa["foo"sv]);
 		REQUIRE(!bsa["foo"sv]["bar"sv]);
+	}
+
+	SECTION("we can read/write archives without touching the disk")
+	{
+		test_in_memory_buffer<bsa::tes4::archive>(
+			"tes4.bsa"sv,
+			[](
+				bsa::tes4::archive& a_archive,
+				std::span<const std::pair<std::string_view, mmio::mapped_file_source>> a_files) {
+				for (const auto& [path, file] : a_files) {
+					const auto [dirname, filename] = split_string(path, '/');
+
+					bsa::tes4::file f;
+					f.set_data(std::span{ file.data(), file.size() });
+
+					if (const auto it = a_archive.find(dirname); it != a_archive.end()) {
+						REQUIRE(it->second.insert(filename, std::move(f)).second);
+					} else {
+						bsa::tes4::directory d;
+						REQUIRE(d.insert(filename, std::move(f)).second);
+						REQUIRE(a_archive.insert(dirname, std::move(d)).second);
+					}
+				}
+			},
+			[](bsa::tes4::archive& a_archive, std::filesystem::path a_dst) {
+				a_archive.write(a_dst, bsa::tes4::version::tes4);
+			},
+			[](bsa::tes4::archive& a_archive, binary_io::any_ostream& a_dst) {
+				a_archive.write(a_dst, bsa::tes4::version::tes4);
+			},
+			[](bsa::tes4::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
+				REQUIRE(a_archive.read(a_src, a_type) == bsa::tes4::version::tes4);
+			});
 	}
 }

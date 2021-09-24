@@ -77,6 +77,8 @@ acquire_test("tes4_invalid_test")
 acquire_test("tes4_xbox_read_test")
 acquire_test("tes4_xbox_write_test")
 
+acquire_test("in_memory_test")
+
 if("${BSA_BUILD_EXAMPLES}")
 	target_include_directories(
 		tests

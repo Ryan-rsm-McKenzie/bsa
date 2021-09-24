@@ -10,6 +10,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
@@ -238,5 +239,29 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 
 		add({ 1 }, little);
 		REQUIRE(!verify());
+	}
+
+	SECTION("we can read/write archives without touching the disk")
+	{
+		test_in_memory_buffer<bsa::tes3::archive>(
+			"tes3.bsa"sv,
+			[](
+				bsa::tes3::archive& a_archive,
+				std::span<const std::pair<std::string_view, mmio::mapped_file_source>> a_files) {
+				for (const auto& [path, file] : a_files) {
+					bsa::tes3::file f;
+					f.set_data(std::span{ file.data(), file.size() });
+					a_archive.insert(path, std::move(f));
+				}
+			},
+			[](bsa::tes3::archive& a_archive, std::filesystem::path a_dst) {
+				a_archive.write(a_dst);
+			},
+			[](bsa::tes3::archive& a_archive, binary_io::any_ostream& a_dst) {
+				a_archive.write(a_dst);
+			},
+			[](bsa::tes3::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
+				a_archive.read(a_src, a_type);
+			});
 	}
 }

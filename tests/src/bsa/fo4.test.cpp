@@ -5,8 +5,10 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
+#include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
@@ -360,5 +362,30 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);
 			}
 		}
+	}
+
+	SECTION("we can read/write archives without touching the disk")
+	{
+		test_in_memory_buffer<bsa::fo4::archive>(
+			"fo4.ba2"sv,
+			[](
+				bsa::fo4::archive& a_archive,
+				std::span<const std::pair<std::string_view, mmio::mapped_file_source>> a_files) {
+				for (const auto& [path, file] : a_files) {
+					bsa::fo4::file f;
+					f.emplace_back()
+						.set_data(std::span{ file.data(), file.size() });
+					a_archive.insert(path, std::move(f));
+				}
+			},
+			[](bsa::fo4::archive& a_archive, std::filesystem::path a_dst) {
+				a_archive.write(a_dst, bsa::fo4::format::general);
+			},
+			[](bsa::fo4::archive& a_archive, binary_io::any_ostream& a_dst) {
+				a_archive.write(a_dst, bsa::fo4::format::general);
+			},
+			[](bsa::fo4::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
+				REQUIRE(a_archive.read(a_src, a_type) == bsa::fo4::format::general);
+			});
 	}
 }
