@@ -40,7 +40,7 @@ namespace bsa::tes4
 
 			constexpr auto lz4f_decompress_options = []() {
 				::LZ4F_decompressOptions_t options = {};
-				options.stableDst = true;
+				options.stableDst = 7;
 				return options;
 			}();
 
