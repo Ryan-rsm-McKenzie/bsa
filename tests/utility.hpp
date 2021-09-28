@@ -74,7 +74,10 @@ consteval bool assert_nothrowable() noexcept
 		std::fclose(a_file);
 	};
 
-	std::filesystem::create_directories(a_path.parent_path());
+	if (a_path.has_parent_path()) {
+		std::filesystem::create_directories(a_path.parent_path());
+	}
+
 	auto result = std::unique_ptr<std::FILE, decltype(close)>{
 		std::fopen(a_path.string().c_str(), a_mode),
 		close
