@@ -2,8 +2,8 @@
   "name": "bsa",
   "version-string": "1",
   "dependencies": [
-    "binary-io",
-    "mmio"
+    "rsm-binary-io",
+    "rsm-mmio"
   ],
   "default-features": [
     "compression"
