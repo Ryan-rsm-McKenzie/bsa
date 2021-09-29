@@ -5,6 +5,7 @@
     "reproc",
     "rsm-binary-io",
     "rsm-mmio",
+    "tl-expected",
     "xbyak"
   ],
   "features": {

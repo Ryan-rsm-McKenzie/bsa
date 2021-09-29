@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <variant>
 
 #include <Windows.h>
+
+#include "bsa/xmem/xmem.hpp"
 
 namespace bsa::xmem::xcompress
 {
@@ -66,5 +69,5 @@ namespace bsa::xmem::xcompress
 	void WINAPI destroy_decompression_context(
 		xcompress::decompression_context a_context) noexcept;
 
-	void initialize();
+	[[nodiscard]] auto initialize() noexcept -> xmem::expected<std::monostate>;
 }

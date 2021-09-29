@@ -9,6 +9,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/xmem/winapi.hpp"
 	"${SOURCE_DIR}/bsa/xmem/xcompress.cpp"
 	"${SOURCE_DIR}/bsa/xmem/xcompress.hpp"
+	"${SOURCE_DIR}/bsa/xmem/xmem.hpp"
 	"${SOURCE_DIR}/main.cpp"
 )
 
@@ -47,6 +48,7 @@ find_package(binary_io REQUIRED CONFIG)
 find_package(xbyak REQUIRED CONFIG)
 find_package(mmio REQUIRED CONFIG)
 find_package(reproc++ REQUIRED CONFIG)
+find_package(tl-expected REQUIRED CONFIG)
 
 target_link_libraries(
 	"${PROJECT_NAME}_common"
@@ -56,6 +58,7 @@ target_link_libraries(
 		xbyak::xbyak
 		mmio::mmio
 		reproc++
+		tl::expected
 )
 
 # ---- executable ----

@@ -1,44 +1,20 @@
 #pragma once
 
 #include <cassert>
-#include <exception>
 #include <utility>
 
 #include <Windows.h>
 
 namespace bsa::xmem::winapi
 {
-	template <class T>
-	class win32_error :
-		public std::exception
-	{
-	public:
-		using value_type = T;
-
-		win32_error(
-			const char* a_what,
-			value_type a_error) noexcept :
-			_what(a_what),
-			_error(a_error)
-		{}
-
-		const char* what() const noexcept override { return _what; }
-
-		[[nodiscard]] value_type error_code() const noexcept { return _error; }
-
-	private:
-		const char* _what = nullptr;
-		value_type _error = {};
-	};
-
-	using hresult_error = win32_error<::HRESULT>;
-	using lstatus_error = win32_error<::LSTATUS>;
-	using nt_error = win32_error<::NTSTATUS>;
-
 	class hmodule_wrapper
 	{
 	public:
 		using value_type = ::HMODULE;
+
+		hmodule_wrapper() noexcept :
+			hmodule_wrapper(nullptr)
+		{}
 
 		explicit hmodule_wrapper(value_type a_module) noexcept :
 			_module(a_module)
@@ -67,8 +43,9 @@ namespace bsa::xmem::winapi
 			return *this;
 		}
 
-		[[nodiscard]] explicit operator bool() const noexcept { return _module != nullptr; }
+		[[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
 		[[nodiscard]] value_type get() const noexcept { return _module; }
+		[[nodiscard]] bool has_value() const noexcept { return _module != nullptr; }
 
 	private:
 		value_type _module{ nullptr };

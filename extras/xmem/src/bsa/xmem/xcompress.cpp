@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include <Windows.h>
@@ -20,6 +21,7 @@
 #include "bsa/xmem/hashing.hpp"
 #include "bsa/xmem/util.hpp"
 #include "bsa/xmem/winapi.hpp"
+#include "bsa/xmem/xmem.hpp"
 
 namespace bsa::xmem::xcompress
 {
@@ -50,7 +52,7 @@ namespace bsa::xmem::xcompress
 			struct s_do_compress :
 				Xbyak::CodeGenerator
 			{
-				s_do_compress()
+				s_do_compress() noexcept
 				{
 					assert(relocatable::do_reset_compression_context != nullptr);
 					assert(relocatable::compress_internals[0] != nullptr);
@@ -178,9 +180,11 @@ namespace bsa::xmem::xcompress
 			}
 		}
 
-		[[nodiscard]] auto find_xcompress_proxy()
-			-> std::pair<::HMODULE, std::wstring_view>
+		[[nodiscard]] auto find_xcompress_proxy() noexcept
+			-> xmem::expected<std::pair<::HMODULE, std::wstring_view>>
 		{
+			using enum xmem::error_code;
+
 			constexpr std::array frameworks = {
 				std::make_pair(L"v3.0"sv, "31B27A5924FE35A11ADDCBFC97C30E074A20966CE9E7D4031165CCD6CA5A75254CB1E76F830921FCAD6D07473214F9D75B555C689EBC0A196E9CF948CAB4E37F"sv),  // 3.0
 				std::make_pair(L"v3.1"sv, "001F7B6AC90344405D04361AC699F1C13706587352BA7CBD9FB08F1803AD3EFD99E615863E6E27B5429B784FE1B4FF93E34BB184FB568B093B0C3108D8C88EE3"sv),  // 3.1
@@ -209,7 +213,7 @@ namespace bsa::xmem::xcompress
 					std::vector<wchar_t> dst(size / sizeof(wchar_t));
 					status = getValue(dst.data(), size);
 					if (status != ERROR_SUCCESS) {
-						throw winapi::lstatus_error("failed to get registry value", status);
+						return xmem::unexpected(reg_get_value_failure);
 					}
 
 					std::filesystem::path path{ dst.data(), dst.data() + (size / sizeof(wchar_t)) - 1 };
@@ -219,15 +223,15 @@ namespace bsa::xmem::xcompress
 					if (readSHA == expectedSHA) {
 						const auto lib = ::LoadLibraryW(path.c_str());
 						if (lib != nullptr) {
-							return { lib, version };
+							return std::make_pair(lib, version);
 						}
 					}
 				} else if (status != ERROR_FILE_NOT_FOUND) {
-					throw winapi::lstatus_error("failed to get registry value", status);
+					return xmem::unexpected(reg_get_value_failure);
 				}
 			}
 
-			throw std::runtime_error("could not locate acceptable proxy"s);
+			return xmem::unexpected(xcompress_no_proxy_found);
 		}
 	}
 
@@ -338,10 +342,16 @@ namespace bsa::xmem::xcompress
 			a_context);
 	}
 
-	void initialize()
+	auto initialize() noexcept
+		-> xmem::expected<std::monostate>
 	{
-		static const auto holder = []() {
-			const auto [lib, version] = detail::find_xcompress_proxy();
+		static const auto holder = []() -> xmem::expected<winapi::hmodule_wrapper> {
+			const auto found = detail::find_xcompress_proxy();
+			if (!found) {
+				return xmem::unexpected(found.error());
+			}
+
+			const auto [lib, version] = *found;
 			assert(lib != nullptr);
 			const auto getProc = [&](void*& a_dst, std::uintptr_t a_offset) {
 				a_dst = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(lib) + a_offset);
@@ -391,10 +401,16 @@ namespace bsa::xmem::xcompress
 				getProc(relocatable::compress_internals[1], 0x00198603);
 				getProc(relocatable::compress_internals[2], 0x00198653);
 			} else {
-				throw std::runtime_error("unhandled proxy version"s);
+				return xmem::unexpected(xmem::error_code::xcompress_unhandled_version);
 			}
 
 			return winapi::hmodule_wrapper{ lib };
 		}();
+
+		if (holder) {
+			return std::monostate{};
+		} else {
+			return xmem::unexpected(holder.error());
+		}
 	}
 }

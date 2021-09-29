@@ -4,7 +4,11 @@
 #include <span>
 #include <string>
 
+#include "bsa/xmem/xmem.hpp"
+
 namespace bsa::xmem::hashing
 {
-	[[nodiscard]] std::string sha512(std::span<const std::byte> a_data);
+	[[nodiscard]] auto sha512(
+		std::span<const std::byte> a_data) noexcept
+		-> xmem::expected<std::string>;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdio>
 #include <span>
@@ -14,11 +15,15 @@
 
 #include "bsa/xmem/util.hpp"
 #include "bsa/xmem/winapi.hpp"
+#include "bsa/xmem/xmem.hpp"
 
 namespace bsa::xmem::hashing
 {
-	[[nodiscard]] std::string sha512(std::span<const std::byte> a_data)
+	[[nodiscard]] auto sha512(std::span<const std::byte> a_data)
+		-> xmem::expected<std::string>
 	{
+		using enum xmem::error_code;
+
 		::BCRYPT_ALG_HANDLE algorithm;
 		if (const auto status = ::BCryptOpenAlgorithmProvider(
 				&algorithm,
@@ -26,7 +31,7 @@ namespace bsa::xmem::hashing
 				nullptr,
 				0);
 			!winapi::nt_success(status)) {
-			throw winapi::nt_error("failed to open algorithm provider", status);
+			return xmem::unexpected(hashing_open_algorithm_provider_failure);
 		}
 		const util::scope_exit delAlgorithm([&]() {
 			[[maybe_unused]] const auto success =
@@ -44,7 +49,7 @@ namespace bsa::xmem::hashing
 				0,
 				0);
 			!winapi::nt_success(status)) {
-			throw winapi::nt_error("failed to create hash", status);
+			return xmem::unexpected(hashing_create_hash_failure);
 		}
 		const util::scope_exit delHash([&]() {
 			[[maybe_unused]] const auto success =
@@ -58,7 +63,7 @@ namespace bsa::xmem::hashing
 				static_cast<::ULONG>(a_data.size()),
 				0);
 			!winapi::nt_success(status)) {
-			throw winapi::nt_error("failed to hash data", status);
+			return xmem::unexpected(hashing_hash_data_failure);
 		}
 
 		::DWORD hashLen = 0;
@@ -71,7 +76,7 @@ namespace bsa::xmem::hashing
 				&discard,
 				0);
 			!winapi::nt_success(status)) {
-			throw winapi::nt_error("failed to get property", status);
+			return xmem::unexpected(hashing_get_property_failure);
 		}
 		std::vector<::UCHAR> buffer(static_cast<std::size_t>(hashLen));
 
@@ -81,7 +86,7 @@ namespace bsa::xmem::hashing
 				static_cast<::ULONG>(buffer.size()),
 				0);
 			!winapi::nt_success(status)) {
-			throw winapi::nt_error("failed to finish hash", status);
+			return xmem::unexpected(hashing_finish_hash_failure);
 		}
 
 		std::array<char, 3> buf{};
