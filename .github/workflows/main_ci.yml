@@ -130,6 +130,9 @@ jobs:
         with:
           path: bsa
 
+      - name: Set up MSVC
+        uses: egor-tensin/vs-shell@v2
+
       - name: Setup vcpkg
         run: |
           mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
@@ -148,11 +151,11 @@ jobs:
 
       - name: Configure CMake
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset vs2019-windows-vcpkg
+        run: cmake --preset ninja-windows-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+        run: cmake --build build
 
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
