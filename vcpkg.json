@@ -3,11 +3,19 @@
   "version-string": "1",
   "dependencies": [
     "binary-io",
-    "lz4",
-    "mmio",
-    "zlib"
+    "mmio"
+  ],
+  "default-features": [
+    "compression"
   ],
   "features": {
+    "compression": {
+      "description": "Build compression libraries with vcpkg",
+      "dependencies": [
+        "lz4",
+        "zlib"
+      ]
+    },
     "tests": {
       "description": "Build tests",
       "dependencies": [

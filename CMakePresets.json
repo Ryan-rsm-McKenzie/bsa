@@ -32,9 +32,9 @@
           "type": "STRING",
           "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
         },
-        "VCPKG_MANIFEST_FEATURES": {
-          "type": "STRING",
-          "value": "tests"
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": {
+          "type": "BOOL",
+          "value": "ON"
         },
         "VCPKG_OVERLAY_PORTS": {
           "type": "STRING",
@@ -53,6 +53,10 @@
         "CMAKE_MSVC_RUNTIME_LIBRARY": {
           "type": "STRING",
           "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+        },
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "compression;tests"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
@@ -76,6 +80,10 @@
           "type": "BOOL",
           "value": "ON"
         },
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "tests"
+        },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
           "value": "x64-linux"
@@ -94,7 +102,7 @@
         "vcpkg",
         "windows"
       ],
-      "name": "vs2022-windows-vcpkg",
+      "name": "vs2022-windows",
       "toolset": "v143"
     },
     {
@@ -107,15 +115,16 @@
         "vcpkg",
         "windows"
       ],
-      "name": "ninja-windows-vcpkg"
+      "name": "ninja-windows"
     },
     {
       "generator": "Ninja",
       "inherits": [
         "cmake-dev",
-        "linux"
+        "linux",
+        "vcpkg"
       ],
-      "name": "ninja-linux-apt"
+      "name": "ninja-linux"
     }
   ],
   "version": 2

@@ -42,6 +42,22 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
+      - name: Setup vcpkg
+        run: |
+          mkdir ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          cd $VCPKG_INSTALLATION_ROOT
+          ./bootstrap-vcpkg.sh
+          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
+
+      - name: Cache vcpkg
+        uses: actions/cache@v2
+        id: vcpkg-cache
+        env:
+          cache-name: vcpkg-cache
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
+
       - name: Setup Environment
         run: |
           echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
@@ -53,51 +69,9 @@ jobs:
           sudo apt install liblz4-dev zlib1g-dev -y
           sudo pip install gcovr
 
-      - name: Download binary_io
-        uses: actions/checkout@v2
-        with:
-          ref: '2.0.1'
-          repository: Ryan-rsm-McKenzie/binary_io
-          path: binary_io
-
-      - name: Install binary_io
-        working-directory: ${{ github.workspace }}/binary_io
-        run: |
-          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=OFF
-          cmake --build build
-          sudo cmake --install build
-
-      - name: Download Catch2
-        uses: actions/checkout@v2
-        with:
-          ref: v2.13.7
-          repository: catchorg/Catch2
-          path: catch2
-
-      - name: Install Catch2
-        working-directory: ${{ github.workspace }}/catch2
-        run: |
-          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCATCH_BUILD_TESTING=OFF -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF
-          cmake --build build
-          sudo cmake --install build
-
-      - name: Download mmio
-        uses: actions/checkout@v2
-        with:
-          ref: '1.1.0'
-          repository: Ryan-rsm-McKenzie/mmio
-          path: mmio
-
-      - name: Install mmio
-        working-directory: ${{ github.workspace }}/mmio
-        run: |
-          cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTING=OFF
-          cmake --build build
-          sudo cmake --install build
-
       - name: Configure CMake
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset ninja-linux-apt -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        run: cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
         working-directory: ${{ github.workspace }}/bsa
@@ -151,7 +125,7 @@ jobs:
 
       - name: Configure CMake
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset ninja-windows-vcpkg -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        run: cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
         working-directory: ${{ github.workspace }}/bsa
