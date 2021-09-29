@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
+include("../../cmake/version.cmake")
 project(
 	xmem
+	VERSION "${BSA_VERSION_MAJOR}.${BSA_VERSION_MINOR}.${BSA_VERSION_PATCH}"
 	LANGUAGES CXX
 )
 

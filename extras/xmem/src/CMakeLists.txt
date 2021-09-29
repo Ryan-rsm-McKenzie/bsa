@@ -10,16 +10,25 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/xmem/xcompress.cpp"
 	"${SOURCE_DIR}/bsa/xmem/xcompress.hpp"
 	"${SOURCE_DIR}/bsa/xmem/xmem.hpp"
-	"${SOURCE_DIR}/main.cpp"
 )
 
 source_group(TREE "${SOURCE_DIR}" PREFIX "src" FILES ${SOURCE_FILES})
+
+set(VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/src/bsa/xmem/version.hpp")
+configure_file(
+	"${ROOT_DIR}/extras/xmem/cmake/version.hpp.in"
+	"${VERSION_HEADER}"
+	@ONLY
+)
+
+source_group("src/bsa/xmem" FILES "${VERSION_HEADER}")
 
 # ---- support library ----
 
 add_library(
 	"${PROJECT_NAME}_common"
 	STATIC
+	"${VERSION_HEADER}"
 	${SOURCE_FILES}
 )
 add_library("${PROJECT_NAME}_common::${PROJECT_NAME}_common" ALIAS "${PROJECT_NAME}_common")
@@ -41,6 +50,7 @@ endif()
 target_include_directories(
 	"${PROJECT_NAME}_common"
 	PUBLIC
+		"${CMAKE_CURRENT_BINARY_DIR}/src"
 		"${SOURCE_DIR}"
 )
 
@@ -63,9 +73,19 @@ target_link_libraries(
 
 # ---- executable ----
 
+configure_file(
+	"${ROOT_DIR}/extras/xmem/cmake/version.rc.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/version.rc"
+	@ONLY
+)
+
+source_group("res" FILES "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
+source_group("src" FILES "${SOURCE_DIR}/main.cpp")
+
 add_executable(
 	"${PROJECT_NAME}"
-	${SOURCE_FILES}
+	"${CMAKE_CURRENT_BINARY_DIR}/version.rc"
+	"${SOURCE_DIR}/main.cpp"
 )
 
 target_link_libraries(
