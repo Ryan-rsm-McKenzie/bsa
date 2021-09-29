@@ -70,6 +70,15 @@ int main()
 }
 \ecpp
 
+\section cmake-options CMake Options
+
+| Option | Default Value | Description |
+| --- | --- | --- |
+| `BSA_BUILD_SRC` | `ON` ✔️ | Set to `ON` to build the main library. |
+| `BSA_BUILD_EXAMPLES` | `OFF` ❌ | Set to `ON` to build the examples. |
+| `BSA_BUILD_DOCS` | `OFF` ❌ | Set to `ON` to build the documentation. |
+| `BUILD_TESTING` | `ON` ✔️ | Set to `ON` to build the tests. See also the CMake [documentation](https://cmake.org/cmake/help/latest/module/CTest.html) for this option. |
+
 \section integration Integration
 
 `bsa` uses [CMake](https://cmake.org/) as its primary build system. Assuming that `bsa` and its dependencies have been installed to a place where CMake can find it, then using it in your project is as simple as:
