@@ -2,6 +2,7 @@
   "name": "xmem",
   "version-string": "1",
   "dependencies": [
+    "args",
     "reproc",
     "rsm-binary-io",
     "rsm-mmio",

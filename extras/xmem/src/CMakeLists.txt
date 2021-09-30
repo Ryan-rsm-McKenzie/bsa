@@ -88,8 +88,13 @@ add_executable(
 	"${SOURCE_DIR}/main.cpp"
 )
 
+find_package(args REQUIRED CONFIG)
+find_package(mmio REQUIRED CONFIG)
+
 target_link_libraries(
 	"${PROJECT_NAME}"
 	PRIVATE
 		"${PROJECT_NAME}_common::${PROJECT_NAME}_common"
+		mmio::mmio
+		taywee::args
 )

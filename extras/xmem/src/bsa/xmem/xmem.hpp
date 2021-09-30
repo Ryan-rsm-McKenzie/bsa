@@ -17,6 +17,8 @@ namespace bsa::xmem
 		xcompress_no_proxy_found,
 		xcompress_unhandled_version,
 
+		api_create_compression_context_failure,
+		api_create_decompression_context_failure,
 		api_compress_failure,
 		api_compress_bound_failure,
 		api_decompress_failure,

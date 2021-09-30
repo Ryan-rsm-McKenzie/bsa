@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include <utility>
 
 #include <Windows.h>
 
@@ -13,6 +14,68 @@
 
 namespace bsa::xmem::api
 {
+	template <
+		class T,
+		auto Destroyer>
+	class context_wrapper
+	{
+	public:
+		using value_type = T;
+
+		context_wrapper(value_type a_context) noexcept :
+			_context(a_context)
+		{}
+
+		~context_wrapper() noexcept
+		{
+			if (_context) {
+				Destroyer(std::exchange(_context, nullptr));
+			}
+		}
+
+		[[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
+		[[nodiscard]] value_type get() const noexcept { return _context; }
+		[[nodiscard]] bool has_value() const noexcept { return static_cast<bool>(_context); }
+
+	private:
+		value_type _context = {};
+	};
+
+	using compression_context = context_wrapper<xcompress::compression_context, &xcompress::destroy_compression_context>;
+	using decompression_context = context_wrapper<xcompress::decompression_context, &xcompress::destroy_decompression_context>;
+
+	[[nodiscard]] inline auto create_compression_context() noexcept
+		-> xmem::expected<api::compression_context>
+	{
+		xcompress::compression_context compressor = {};
+		const auto result = xcompress::create_compression_context(
+			xcompress::codec_type::codec_default,
+			nullptr,
+			xcompress::flags::none,
+			&compressor);
+		if (winapi::hresult_success(result)) {
+			return compressor;
+		} else {
+			return xmem::unexpected(xmem::error_code::api_create_compression_context_failure);
+		}
+	}
+
+	[[nodiscard]] inline auto create_decompression_context() noexcept
+		-> xmem::expected<api::decompression_context>
+	{
+		xcompress::decompression_context decompressor = {};
+		const auto result = xcompress::create_decompression_context(
+			xcompress::codec_type::codec_default,
+			nullptr,
+			xcompress::flags::compress_stream,
+			&decompressor);
+		if (winapi::hresult_success(result)) {
+			return decompressor;
+		} else {
+			return xmem::unexpected(xmem::error_code::api_create_decompression_context_failure);
+		}
+	}
+
 	[[nodiscard]] inline auto compress(
 		xcompress::compression_context a_context,
 		std::span<const std::byte> a_in,
