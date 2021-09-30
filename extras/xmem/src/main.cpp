@@ -238,7 +238,7 @@ int do_main(std::span<const std::string> a_args)
 			if (!result) {                                                          \
 				std::cout                                                           \
 					<< "failed to " #a_method " file with error: "                  \
-					<< static_cast<std::size_t>(result.error())                     \
+					<< xmem::to_string(result.error())                              \
 					<< '\n';                                                        \
 				return EXIT_FAILURE;                                                \
 			}                                                                       \
