@@ -6,6 +6,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/xmem/hashing.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/util.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/winapi.test.cpp"
+	"${SOURCE_DIR}/src/bsa/xmem/xmem.test.cpp"
 	"${SOURCE_DIR}/src/main.test.cpp"
 	"${SOURCE_DIR}/main.cpp"
 )
