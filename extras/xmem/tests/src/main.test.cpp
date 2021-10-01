@@ -10,6 +10,8 @@
 #include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
 
+#include "bsa/xmem/xmem.hpp"
+
 using namespace std::literals;
 
 TEST_CASE("assert cli commands work", "[src]")
@@ -39,7 +41,7 @@ TEST_CASE("assert cli commands work", "[src]")
 			outfile.string()
 		};
 
-		REQUIRE(do_main(args) == EXIT_SUCCESS);
+		REQUIRE(do_main(args) == bsa::xmem::error_code::ok);
 		validate(wantfile, outfile);
 	}
 
@@ -59,7 +61,7 @@ TEST_CASE("assert cli commands work", "[src]")
 			outfile.string()
 		};
 
-		REQUIRE(do_main(args) == EXIT_SUCCESS);
+		REQUIRE(do_main(args) == bsa::xmem::error_code::ok);
 		validate(wantfile, outfile);
 	}
 }

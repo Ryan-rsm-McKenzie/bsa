@@ -12,18 +12,21 @@
 #include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
 
+#include "bsa/xmem/api.hpp"
 #include "bsa/xmem/winapi.hpp"
 #include "bsa/xmem/xcompress.hpp"
+#include "bsa/xmem/xmem.hpp"
 
 using namespace std::literals;
 
 namespace api = bsa::xmem::api;
 namespace winapi = bsa::xmem::winapi;
 namespace xcompress = bsa::xmem::xcompress;
+namespace xmem = bsa::xmem;
 
 TEST_CASE("assert roundtrip compression works", "[src]")
 {
-	REQUIRE(xcompress::initialize());
+	REQUIRE(xcompress::initialize() == xmem::error_code::ok);
 
 	const std::filesystem::path root{ "roundtrip_test"sv };
 	const auto validate = [](std::filesystem::path a_expected, std::span<const std::byte> a_got) {
@@ -43,10 +46,10 @@ TEST_CASE("assert roundtrip compression works", "[src]")
 
 		const mmio::mapped_file_source in{ infile };
 		REQUIRE(in.is_open());
-		auto bound = api::compress_bound(compressor->get(), std::span{ in.data(), in.size() });
+		auto bound = api::compress_bound(*compressor, std::span{ in.data(), in.size() });
 		REQUIRE(bound.has_value());
 		std::vector<std::byte> out(*bound);
-		const auto realsz = api::compress(compressor->get(), std::span{ in.data(), in.size() }, out);
+		const auto realsz = api::compress(*compressor, std::span{ in.data(), in.size() }, out);
 		REQUIRE(realsz.has_value());
 		out.resize(*realsz);
 
@@ -64,7 +67,7 @@ TEST_CASE("assert roundtrip compression works", "[src]")
 		const mmio::mapped_file_source in{ infile };
 		REQUIRE(in.is_open());
 		std::vector<std::byte> out(in.size() * 2);
-		const auto outsz = api::decompress(decompressor->get(), std::span{ in.data(), in.size() }, out);
+		const auto outsz = api::decompress(*decompressor, std::span{ in.data(), in.size() }, out);
 		REQUIRE(outsz.has_value());
 		out.resize(*outsz);
 

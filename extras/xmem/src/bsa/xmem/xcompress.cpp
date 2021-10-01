@@ -343,7 +343,7 @@ namespace bsa::xmem::xcompress
 	}
 
 	auto initialize() noexcept
-		-> xmem::expected<std::monostate>
+		-> xmem::error_code
 	{
 		static const auto holder = []() -> xmem::expected<winapi::hmodule_wrapper> {
 			const auto found = detail::find_xcompress_proxy();
@@ -354,7 +354,7 @@ namespace bsa::xmem::xcompress
 			const auto [lib, version] = *found;
 			assert(lib != nullptr);
 			const auto getProc = [&](void*& a_dst, std::uintptr_t a_offset) {
-				a_dst = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(lib) + a_offset);
+				a_dst = util::adjust_pointer<void>(lib, a_offset);
 				assert(a_dst != nullptr);
 			};
 
@@ -407,10 +407,6 @@ namespace bsa::xmem::xcompress
 			return winapi::hmodule_wrapper{ lib };
 		}();
 
-		if (holder) {
-			return std::monostate{};
-		} else {
-			return xmem::unexpected(holder.error());
-		}
+		return holder ? xmem::error_code::ok : holder.error();
 	}
 }

@@ -69,5 +69,5 @@ namespace bsa::xmem::xcompress
 	void WINAPI destroy_decompression_context(
 		xcompress::decompression_context a_context) noexcept;
 
-	[[nodiscard]] auto initialize() noexcept -> xmem::expected<std::monostate>;
+	[[nodiscard]] auto initialize() noexcept -> xmem::error_code;
 }

@@ -3,6 +3,7 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../..")
 set(SOURCE_DIR "${ROOT_DIR}/extras/xmem/src")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/xmem/api.hpp"
+	"${SOURCE_DIR}/bsa/xmem/binary_stdio.hpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.cpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.hpp"
 	"${SOURCE_DIR}/bsa/xmem/util.hpp"

@@ -22,7 +22,12 @@ namespace bsa::xmem::api
 	public:
 		using value_type = T;
 
-		context_wrapper(value_type a_context) noexcept :
+		context_wrapper(const volatile context_wrapper&) = delete;
+		context_wrapper(context_wrapper&& a_rhs) noexcept :
+			_context(std::exchange(a_rhs._context, nullptr))
+		{}
+
+		explicit context_wrapper(value_type a_context) noexcept :
 			_context(a_context)
 		{}
 
@@ -31,6 +36,15 @@ namespace bsa::xmem::api
 			if (_context) {
 				Destroyer(std::exchange(_context, nullptr));
 			}
+		}
+
+		context_wrapper& operator=(const volatile context_wrapper&) = delete;
+		context_wrapper& operator=(context_wrapper&& a_rhs) noexcept
+		{
+			if (this != &a_rhs) {
+				_context = std::exchange(a_rhs._context, nullptr);
+			}
+			return *this;
 		}
 
 		[[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
@@ -54,7 +68,7 @@ namespace bsa::xmem::api
 			xcompress::flags::none,
 			&compressor);
 		if (winapi::hresult_success(result)) {
-			return compressor;
+			return api::compression_context{ compressor };
 		} else {
 			return xmem::unexpected(xmem::error_code::api_create_compression_context_failure);
 		}
@@ -70,21 +84,23 @@ namespace bsa::xmem::api
 			xcompress::flags::compress_stream,
 			&decompressor);
 		if (winapi::hresult_success(result)) {
-			return decompressor;
+			return api::decompression_context{ decompressor };
 		} else {
 			return xmem::unexpected(xmem::error_code::api_create_decompression_context_failure);
 		}
 	}
 
 	[[nodiscard]] inline auto compress(
-		xcompress::compression_context a_context,
+		const api::compression_context& a_context,
 		std::span<const std::byte> a_in,
 		std::span<std::byte> a_out) noexcept
 		-> xmem::expected<std::size_t>
 	{
+		assert(a_context);
+
 		std::uint32_t outsz = a_out.size_bytes();
 		const auto result = xcompress::compress(
-			a_context,
+			a_context.get(),
 			a_out.data(),
 			&outsz,
 			a_in.data(),
@@ -97,13 +113,15 @@ namespace bsa::xmem::api
 	}
 
 	[[nodiscard]] inline auto compress_bound(
-		xcompress::compression_context a_context,
+		const api::compression_context& a_context,
 		std::span<const std::byte> a_data) noexcept
 		-> xmem::expected<std::size_t>
 	{
+		assert(a_context);
+
 		std::uint32_t outsz = 0;
 		const auto result = xcompress::compress(
-			a_context,
+			a_context.get(),
 			nullptr,
 			&outsz,
 			a_data.data(),
@@ -116,11 +134,13 @@ namespace bsa::xmem::api
 	}
 
 	[[nodiscard]] inline auto decompress(
-		xcompress::decompression_context a_context,
+		const api::decompression_context& a_context,
 		std::span<const std::byte> a_in,
 		std::span<std::byte> a_out) noexcept
 		-> xmem::expected<std::size_t>
 	{
+		assert(a_context);
+
 		std::uint32_t insz = 0;
 		const std::byte* inptr = a_in.data();
 		std::uint32_t outsz = 0;
@@ -136,7 +156,7 @@ namespace bsa::xmem::api
 			outptr += outsz;
 			outsz = static_cast<std::size_t>(std::to_address(a_out.end()) - outptr);
 			result = xcompress::decompress_stream(
-				a_context,
+				a_context.get(),
 				outptr,
 				&outsz,
 				inptr,
