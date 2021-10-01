@@ -38,6 +38,23 @@ TEST_CASE("validate xmem ipc protocols", "[src]")
 		a_validator(copy);
 	};
 
+	SECTION("headers")
+	{
+		const auto request = xmem::request_type::exit;
+		validate(
+			xmem::request_header{ request },
+			[&](const xmem::request_header& a_request) {
+				REQUIRE(a_request.type == request);
+			});
+
+		const auto response = xmem::error_code::serve_unhandled_request;
+		validate(
+			xmem::response_header{ response },
+			[&](const xmem::response_header& a_response) {
+				REQUIRE(a_response.error == response);
+			});
+	}
+
 	SECTION("compress")
 	{
 		validate(
