@@ -375,7 +375,7 @@ namespace
 					<< "failed to " #a_method " file with error: "                  \
 					<< xmem::to_string(result)                                      \
 					<< '\n';                                                        \
-				return xmem::error_code::exit_failure;                              \
+				return result;                                                      \
 			}                                                                       \
 		}                                                                           \
 		break
