@@ -56,20 +56,20 @@ target_include_directories(
 )
 
 find_package(binary_io REQUIRED CONFIG)
-find_package(xbyak REQUIRED CONFIG)
 find_package(mmio REQUIRED CONFIG)
 find_package(reproc++ REQUIRED CONFIG)
 find_package(tl-expected REQUIRED CONFIG)
+find_package(xbyak REQUIRED CONFIG)
 
 target_link_libraries(
 	"${PROJECT_NAME}_common"
 	PUBLIC
 		Bcrypt.lib
 		binary_io::binary_io
-		xbyak::xbyak
 		mmio::mmio
 		reproc++
 		tl::expected
+		xbyak::xbyak
 )
 
 # ---- executable ----
