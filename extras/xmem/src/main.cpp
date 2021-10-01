@@ -352,8 +352,9 @@ namespace
 	}
 }
 
-xmem::error_code do_main(
+[[nodiscard]] auto do_main(
 	std::span<const std::string> a_args) noexcept
+	-> xmem::error_code
 {
 	const auto options = parse_commands(a_args);
 	CHECK_EXPECTED(options);
