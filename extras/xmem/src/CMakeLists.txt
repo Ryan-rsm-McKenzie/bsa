@@ -46,6 +46,12 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang|GNU")
 		PUBLIC
 			"-fvisibility=hidden"
 	)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	target_compile_options(
+		"${PROJECT_NAME}_common"
+		PUBLIC
+			"/Zc:__cplusplus"
+	)
 endif()
 
 target_include_directories(
@@ -56,9 +62,9 @@ target_include_directories(
 )
 
 find_package(binary_io REQUIRED CONFIG)
+find_package(expected-lite REQUIRED CONFIG)
 find_package(mmio REQUIRED CONFIG)
 find_package(reproc++ REQUIRED CONFIG)
-find_package(tl-expected REQUIRED CONFIG)
 find_package(xbyak REQUIRED CONFIG)
 
 target_link_libraries(
@@ -67,8 +73,8 @@ target_link_libraries(
 		Bcrypt.lib
 		binary_io::binary_io
 		mmio::mmio
+		nonstd::expected-lite
 		reproc++
-		tl::expected
 		xbyak::xbyak
 )
 

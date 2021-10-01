@@ -3,10 +3,10 @@
   "version-string": "1",
   "dependencies": [
     "args",
+    "expected-lite",
     "reproc",
     "rsm-binary-io",
     "rsm-mmio",
-    "tl-expected",
     "xbyak"
   ],
   "features": {
