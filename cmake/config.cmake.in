@@ -7,3 +7,7 @@ find_dependency(binary_io CONFIG)
 find_dependency(LZ4 MODULE)
 find_dependency(mmio CONFIG)
 find_dependency(ZLIB MODULE)
+
+if("@BSA_SUPPORT_XMEM@")
+	find_dependency(reproc++ CONFIG)
+endif()

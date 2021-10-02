@@ -65,7 +65,6 @@ target_include_directories(
 find_package(binary_io REQUIRED CONFIG)
 find_package(expected-lite REQUIRED CONFIG)
 find_package(mmio REQUIRED CONFIG)
-find_package(reproc++ REQUIRED CONFIG)
 find_package(xbyak REQUIRED CONFIG)
 
 target_link_libraries(
@@ -75,7 +74,6 @@ target_link_libraries(
 		binary_io::binary_io
 		mmio::mmio
 		nonstd::expected-lite
-		reproc++
 		xbyak::xbyak
 )
 

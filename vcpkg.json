@@ -21,6 +21,12 @@
       "dependencies": [
         "catch2"
       ]
+    },
+    "xmem": {
+      "description": "Build support for xmem proxy",
+      "dependencies": [
+        "reproc"
+      ]
     }
   }
 }

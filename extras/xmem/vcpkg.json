@@ -4,7 +4,6 @@
   "dependencies": [
     "args",
     "expected-lite",
-    "reproc",
     "rsm-binary-io",
     "rsm-mmio",
     "xbyak"

@@ -94,6 +94,28 @@ target_link_libraries(
 		ZLIB::ZLIB
 )
 
+option(BSA_SUPPORT_XMEM "build support for the xmem codec proxy" OFF)
+if("${BSA_SUPPORT_XMEM}")
+	target_compile_definitions(
+		"${PROJECT_NAME}"
+		PRIVATE
+			BSA_SUPPORT_XMEM=1
+	)
+
+	target_include_directories(
+		"${PROJECT_NAME}"
+		PRIVATE
+			"${ROOT_DIR}/extras/xmem/src"
+	)
+
+	find_package(reproc++ REQUIRED CONFIG)
+	target_link_libraries(
+		"${PROJECT_NAME}"
+		PRIVATE
+			reproc++
+	)
+endif()
+
 install(
 	TARGETS "${PROJECT_NAME}"
 	EXPORT "${PROJECT_NAME}-targets"
