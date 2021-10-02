@@ -18,6 +18,7 @@
 #include <mmio/mmio.hpp>
 #include <xbyak/xbyak.h>
 
+#include "bsa/xmem/expected.hpp"
 #include "bsa/xmem/hashing.hpp"
 #include "bsa/xmem/util.hpp"
 #include "bsa/xmem/winapi.hpp"

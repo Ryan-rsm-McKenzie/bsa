@@ -8,6 +8,7 @@
 
 #include <Windows.h>
 
+#include "bsa/xmem/expected.hpp"
 #include "bsa/xmem/winapi.hpp"
 #include "bsa/xmem/xcompress.hpp"
 #include "bsa/xmem/xmem.hpp"

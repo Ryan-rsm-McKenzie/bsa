@@ -4,6 +4,7 @@ set(SOURCE_DIR "${ROOT_DIR}/extras/xmem/src")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/xmem/api.hpp"
 	"${SOURCE_DIR}/bsa/xmem/binary_stdio.hpp"
+	"${SOURCE_DIR}/bsa/xmem/expected.hpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.cpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.hpp"
 	"${SOURCE_DIR}/bsa/xmem/util.hpp"

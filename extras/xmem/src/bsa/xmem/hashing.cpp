@@ -13,6 +13,7 @@
 
 #include <bcrypt.h>
 
+#include "bsa/xmem/expected.hpp"
 #include "bsa/xmem/util.hpp"
 #include "bsa/xmem/winapi.hpp"
 #include "bsa/xmem/xmem.hpp"

@@ -4,7 +4,7 @@
 #include <span>
 #include <string>
 
-#include "bsa/xmem/xmem.hpp"
+#include "bsa/xmem/expected.hpp"
 
 namespace bsa::xmem::hashing
 {

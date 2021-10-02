@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <binary_io/common.hpp>
-#include <nonstd/expected.hpp>
 
 namespace bsa::xmem
 {
@@ -66,11 +65,6 @@ namespace bsa::xmem
 	}
 
 #undef ENUMERATE
-
-	template <class T>
-	using expected = nonstd::expected<T, xmem::error_code>;
-
-	using nonstd::unexpected;
 
 	struct byte_container
 	{

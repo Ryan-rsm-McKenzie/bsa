@@ -5,6 +5,7 @@
 
 #include <Windows.h>
 
+#include "bsa/xmem/expected.hpp"
 #include "bsa/xmem/xmem.hpp"
 
 namespace bsa::xmem::xcompress
