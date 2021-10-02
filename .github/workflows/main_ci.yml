@@ -104,7 +104,7 @@ jobs:
         with:
           path: bsa
 
-      - name: Set up MSVC
+      - name: Setup MSVC
         uses: egor-tensin/vs-shell@v2
 
       - name: Setup vcpkg
