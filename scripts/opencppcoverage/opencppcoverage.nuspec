@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>opencppcoverage</id>
+    <version>0.9.9.0</version>
+    <title>opencppcoverage (Install)</title>
+    <authors>OpenCppCoverage</authors>
+    <projectUrl>https://github.com/OpenCppCoverage/OpenCppCoverage</projectUrl>
+    <tags>opencppcoverage</tags>
+    <summary>OpenCppCoverage is an open source code coverage tool for C++ under Windows.</summary>
+    <description>OpenCppCoverage is an open source code coverage tool for C++ under Windows.</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
