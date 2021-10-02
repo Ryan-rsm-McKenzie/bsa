@@ -21,7 +21,7 @@ env:
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 
 jobs:
-  linux:
+  main-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -95,7 +95,7 @@ jobs:
           files: bsa/build/examples.json,bsa/build/src.json
           verbose: true
 
-  windows:
+  main-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -133,7 +133,7 @@ jobs:
         working-directory: ${{ github.workspace }}/bsa/build
         run: ctest -C ${{ env.BUILD_TYPE }} -V
 
-  xmem:
+  xmem-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
