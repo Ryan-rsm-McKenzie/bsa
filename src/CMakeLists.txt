@@ -12,6 +12,7 @@ set(HEADER_FILES
 
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
+	"${SOURCE_DIR}/bsa/detail/binary_reproc.hpp"
 	"${SOURCE_DIR}/bsa/detail/common.cpp"
 	"${SOURCE_DIR}/bsa/fo4.cpp"
 	"${SOURCE_DIR}/bsa/tes3.cpp"
