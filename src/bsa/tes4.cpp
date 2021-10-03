@@ -476,7 +476,8 @@ namespace bsa::tes4
 	}
 #endif
 
-	auto file::compress_into_xmem(std::span<std::byte> a_out) noexcept
+	auto file::compress_into_xmem(
+		[[maybe_unused]] std::span<std::byte> a_out) noexcept
 		-> std::optional<std::size_t>
 	{
 #ifdef BSA_SUPPORT_XMEM
@@ -581,7 +582,8 @@ namespace bsa::tes4
 		}
 	}
 
-	bool file::decompress_into_xmem(std::span<std::byte> a_out) noexcept
+	bool file::decompress_into_xmem(
+		[[maybe_unused]] std::span<std::byte> a_out) noexcept
 	{
 #ifdef BSA_SUPPORT_XMEM
 		assert(this->compressed());
