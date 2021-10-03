@@ -1,8 +1,8 @@
 /.cache
 /.vscode
 /build
-/extras/xmem/build
 /extras/xmem/CMakeUserPresets.json
+/extras/xmem/build
 /extras/xmem/compile_commands.json
-compile_commands.json
 CMakeUserPresets.json
+compile_commands.json
