@@ -401,7 +401,7 @@ namespace
 #ifndef TESTING
 int main(int a_argc, char* a_argv[])
 {
-	const std::vector<std::string> args(a_argv, a_argv + a_argc);
+	const std::vector<std::string> args(a_argv + 1, a_argv + a_argc);
 	return static_cast<int>(do_main(args));
 }
 #endif
