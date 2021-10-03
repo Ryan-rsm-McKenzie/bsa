@@ -16,6 +16,7 @@
 #include <Windows.h>
 
 #include <args.hxx>
+#include <binary_io/common.hpp>
 #include <mmio/mmio.hpp>
 
 #include "bsa/xmem/api.hpp"
@@ -248,7 +249,7 @@ namespace
 		return xmem::error_code::ok;
 	}
 
-	[[nodiscard]] auto serve_compress() noexcept
+	[[nodiscard]] auto serve_compress()
 		-> xmem::error_code
 	{
 		binary_stdio::bin in;
@@ -270,7 +271,7 @@ namespace
 		return xmem::error_code::ok;
 	}
 
-	[[nodiscard]] auto serve_compress_bound() noexcept
+	[[nodiscard]] auto serve_compress_bound()
 		-> xmem::error_code
 	{
 		binary_stdio::bin in;
@@ -290,7 +291,7 @@ namespace
 		return xmem::error_code::ok;
 	}
 
-	[[nodiscard]] auto serve_decompress() noexcept
+	[[nodiscard]] auto serve_decompress()
 	{
 		binary_stdio::bin in;
 		xmem::decompress_request request;
@@ -321,34 +322,38 @@ namespace
 			return init;
 		}
 
-		xmem::request_header header;
-		binary_stdio::bin in;
-		auto ec = xmem::error_code::ok;
+		try {
+			xmem::request_header header;
+			binary_stdio::bin in;
+			auto ec = xmem::error_code::ok;
 
-		for (;;) {
-			in >> header;
-			switch (header.type) {
-			case xmem::request_type::exit:
-				return xmem::error_code::ok;
-			case xmem::request_type::compress:
-				ec = serve_compress();
-				break;
-			case xmem::request_type::compress_bound:
-				ec = serve_compress_bound();
-				break;
-			case xmem::request_type::decompress:
-				ec = serve_decompress();
-				break;
-			default:
-				ec = xmem::error_code::serve_unhandled_request;
-				break;
-			}
+			for (;;) {
+				in >> header;
+				switch (header.type) {
+				case xmem::request_type::exit:
+					return xmem::error_code::ok;
+				case xmem::request_type::compress:
+					ec = serve_compress();
+					break;
+				case xmem::request_type::compress_bound:
+					ec = serve_compress_bound();
+					break;
+				case xmem::request_type::decompress:
+					ec = serve_decompress();
+					break;
+				default:
+					ec = xmem::error_code::serve_unhandled_request;
+					break;
+				}
 
-			if (ec != xmem::error_code::ok) {
-				binary_stdio::bout out;
-				out << xmem::response_header{ ec };
-				ec = xmem::error_code::ok;
+				if (ec != xmem::error_code::ok) {
+					binary_stdio::bout out;
+					out << xmem::response_header{ ec };
+					ec = xmem::error_code::ok;
+				}
 			}
+		} catch (const binary_io::exception&) {
+			return xmem::error_code::serve_io_failure;
 		}
 	}
 }

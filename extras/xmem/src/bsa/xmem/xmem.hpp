@@ -38,6 +38,7 @@ namespace bsa::xmem
 	F(api_compress_bound_failure)               \
 	F(api_decompress_failure)                   \
                                                 \
+	F(serve_io_failure)                         \
 	F(serve_unhandled_request)                  \
 	F(serve_decompress_size_mismatch)
 
