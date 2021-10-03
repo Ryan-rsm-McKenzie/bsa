@@ -128,7 +128,7 @@ jobs:
       - name: Setup MSVC (x86)
         uses: egor-tensin/vs-shell@v2
         with:
-          arch: x64
+          arch: x86
 
       - name: (xmem) Configure & Build
         working-directory: ${{ github.workspace }}/bsa/extras/xmem
