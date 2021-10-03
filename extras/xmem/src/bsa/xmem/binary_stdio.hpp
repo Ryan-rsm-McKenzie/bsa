@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstdio>
 #include <memory>
+
+#include <Windows.h>
 
 #include <binary_io/common.hpp>
 
@@ -11,35 +12,27 @@ namespace bsa::xmem::binary_stdio
 		public binary_io::istream_interface<bin>
 	{
 	public:
-		void seek_absolute(binary_io::streamoff a_pos) noexcept
-		{
-			std::fseek(stdout, static_cast<long>(a_pos), SEEK_SET);
-		}
-
-		void seek_relative(binary_io::streamoff a_pos) noexcept
-		{
-			std::fseek(stdout, static_cast<long>(a_pos), SEEK_CUR);
-		}
-
-		binary_io::streamoff tell() const noexcept
-		{
-			return std::ftell(stdout);
-		}
+		void seek_absolute(binary_io::streamoff) noexcept { return; }
+		void seek_relative(binary_io::streamoff) noexcept { return; }
+		binary_io::streamoff tell() const noexcept { return -1; }
 
 		void read_bytes(std::span<std::byte> a_dst)
 		{
-			std::size_t read = 0;
+			::BOOL success = TRUE;
+			::DWORD read = 0;
 			auto pos = std::to_address(a_dst.begin());
 			const auto end = std::to_address(a_dst.end());
+			const auto handle = ::GetStdHandle(STD_INPUT_HANDLE);
 
 			do {
-				read = std::fread(
+				success = ::ReadFile(
+					handle,
 					pos,
-					1,
-					static_cast<std::size_t>(end - pos),
-					stdin);
+					static_cast<::DWORD>(end - pos),
+					&read,
+					nullptr);
 				pos += read;
-			} while (read != 0 && pos != end);
+			} while (success && read != 0 && pos != end);
 
 			if (pos != end) {
 				throw binary_io::buffer_exhausted();
@@ -51,35 +44,27 @@ namespace bsa::xmem::binary_stdio
 		public binary_io::ostream_interface<bout>
 	{
 	public:
-		void seek_absolute(binary_io::streamoff a_pos) noexcept
-		{
-			std::fseek(stdout, static_cast<long>(a_pos), SEEK_SET);
-		}
-
-		void seek_relative(binary_io::streamoff a_pos) noexcept
-		{
-			std::fseek(stdout, static_cast<long>(a_pos), SEEK_CUR);
-		}
-
-		binary_io::streamoff tell() const noexcept
-		{
-			return std::ftell(stdout);
-		}
+		void seek_absolute(binary_io::streamoff) noexcept { return; }
+		void seek_relative(binary_io::streamoff) noexcept { return; }
+		binary_io::streamoff tell() const noexcept { return -1; }
 
 		void write_bytes(std::span<const std::byte> a_src)
 		{
-			std::size_t wrote = 0;
+			::BOOL success = TRUE;
+			::DWORD written = 0;
 			auto pos = std::to_address(a_src.begin());
 			const auto end = std::to_address(a_src.end());
+			const auto handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
 
 			do {
-				wrote = std::fwrite(
+				success = ::WriteFile(
+					handle,
 					pos,
-					1,
-					static_cast<std::size_t>(end - pos),
-					stdout);
-				pos += wrote;
-			} while (wrote != 0 && pos != end);
+					static_cast<::DWORD>(end - pos),
+					&written,
+					nullptr);
+				pos += written;
+			} while (success && written != 0 && pos != end);
 
 			if (pos != end) {
 				throw binary_io::buffer_exhausted();
