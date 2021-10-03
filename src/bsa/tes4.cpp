@@ -410,6 +410,7 @@ namespace bsa::tes4
 		}
 	}
 
+#ifdef BSA_SUPPORT_XMEM
 	namespace
 	{
 		class xmem_proxy final
@@ -473,10 +474,12 @@ namespace bsa::tes4
 			return proxy.get();
 		}
 	}
+#endif
 
 	auto file::compress_into_xmem(std::span<std::byte> a_out) noexcept
 		-> std::optional<std::size_t>
 	{
+#ifdef BSA_SUPPORT_XMEM
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::tes5, compression_codec::xmem));
 
@@ -508,6 +511,9 @@ namespace bsa::tes4
 		} catch (const binary_io::exception&) {
 			return std::nullopt;
 		}
+#else
+		return std::nullopt;
+#endif
 	}
 
 	auto file::compress_into_zlib(std::span<std::byte> a_out) noexcept
@@ -577,6 +583,7 @@ namespace bsa::tes4
 
 	bool file::decompress_into_xmem(std::span<std::byte> a_out) noexcept
 	{
+#ifdef BSA_SUPPORT_XMEM
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
@@ -611,6 +618,9 @@ namespace bsa::tes4
 		} catch (const binary_io::exception&) {
 			return false;
 		}
+#else
+		return false;
+#endif
 	}
 
 	bool file::decompress_into_zlib(std::span<std::byte> a_out) noexcept
@@ -636,6 +646,7 @@ namespace bsa::tes4
 	auto file::compress_bound_xmem() const noexcept
 		-> std::optional<std::size_t>
 	{
+#ifdef BSA_SUPPORT_XMEM
 		try {
 			const auto proxy = get_xmem_proxy();
 			if (!proxy) {
@@ -659,6 +670,9 @@ namespace bsa::tes4
 		} catch (const binary_io::exception&) {
 			return std::nullopt;
 		}
+#else
+		return std::nullopt;
+#endif
 	}
 
 	bool file::compress(
