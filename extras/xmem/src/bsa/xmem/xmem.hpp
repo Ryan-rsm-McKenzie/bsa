@@ -130,7 +130,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		byte_container& a_container) noexcept
+		byte_container& a_container)
 	{
 		auto& stream = static_cast<T&>(a_stream);
 
@@ -145,7 +145,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const byte_container& a_container) noexcept
+		const byte_container& a_container)
 	{
 		auto& stream = static_cast<T&>(a_stream);
 
@@ -174,7 +174,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		request_header& a_request) noexcept
+		request_header& a_request)
 	{
 		return static_cast<T&>(a_stream) >> a_request.type;
 	}
@@ -182,7 +182,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const request_header& a_request) noexcept
+		const request_header& a_request)
 	{
 		return static_cast<T&>(a_stream) << a_request.type;
 	}
@@ -195,7 +195,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		response_header& a_response) noexcept
+		response_header& a_response)
 	{
 		return static_cast<T&>(a_stream) >> a_response.error;
 	}
@@ -203,7 +203,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const response_header& a_response) noexcept
+		const response_header& a_response)
 	{
 		return static_cast<T&>(a_stream) << a_response.error;
 	}
@@ -219,7 +219,7 @@ namespace bsa::xmem
 	template <class T, request_type E>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		generic_request<E>& a_request) noexcept
+		generic_request<E>& a_request)
 	{
 		return static_cast<T&>(a_stream) >> a_request.data;
 	}
@@ -227,7 +227,7 @@ namespace bsa::xmem
 	template <class T, request_type E>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const generic_request<E>& a_request) noexcept
+		const generic_request<E>& a_request)
 	{
 		return static_cast<T&>(a_stream) << a_request.data;
 	}
@@ -241,7 +241,7 @@ namespace bsa::xmem
 	template <class T, request_type E>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		generic_response<E>& a_response) noexcept
+		generic_response<E>& a_response)
 	{
 		return static_cast<T&>(a_stream) >> a_response.data;
 	}
@@ -249,7 +249,7 @@ namespace bsa::xmem
 	template <class T, request_type E>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const generic_response<E>& a_response) noexcept
+		const generic_response<E>& a_response)
 	{
 		return static_cast<T&>(a_stream) << a_response.data;
 	}
@@ -270,7 +270,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		compress_request& a_request) noexcept
+		compress_request& a_request)
 	{
 		return static_cast<T&>(a_stream) >>
 		       a_request.bound >>
@@ -280,7 +280,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const compress_request& a_request) noexcept
+		const compress_request& a_request)
 	{
 		return static_cast<T&>(a_stream)
 		       << a_request.bound
@@ -298,7 +298,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		decompress_request& a_request) noexcept
+		decompress_request& a_request)
 	{
 		return static_cast<T&>(a_stream) >>
 		       a_request.original_size >>
@@ -308,7 +308,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const decompress_request& a_request) noexcept
+		const decompress_request& a_request)
 	{
 		return static_cast<T&>(a_stream)
 		       << a_request.original_size
@@ -323,7 +323,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator>>(
 		binary_io::istream_interface<T>& a_stream,
-		compress_bound_response& a_response) noexcept
+		compress_bound_response& a_response)
 	{
 		return static_cast<T&>(a_stream) >> a_response.bound;
 	}
@@ -331,7 +331,7 @@ namespace bsa::xmem
 	template <class T>
 	decltype(auto) operator<<(
 		binary_io::ostream_interface<T>& a_stream,
-		const compress_bound_response& a_response) noexcept
+		const compress_bound_response& a_response)
 	{
 		return static_cast<T&>(a_stream) << a_response.bound;
 	}
