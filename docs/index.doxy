@@ -87,6 +87,10 @@ int main()
 	find_package(bsa REQUIRED CONFIG)
 	target_link_libraries(${PROJECT_NAME} PUBLIC bsa::bsa)
 
+\section xmem-codec XMem Codec
+
+The xmem codec is a compression format available as part of the xbox development kit (XDK). This compression format is utilized only in TESV. `archive.exe` for TESV:SSE has this compression flag available, however it is unimplemented, and the game will simply use LZ4 instead. Support for this format is very difficult due to its proprietary nature, however there exists an implementation of the format as part of the XNA framework, which is freely available, albeit as a 32-bit binary. Thus, Support for this format only available on Windows, and requires users to opt into it via the `BSA_SUPPORT_XMEM` cmake option. Additionally, users must build the xmem support proxy separately, and bundle the resulting binary with their own.
+
 \section important-notes Important Notes
 
 - If the `hash` of one `file` compares equal to the `hash` of another `file`, then they _are_ equal. It doesn't matter if they have different file names, or if they store different data blobs. The game engine uniquely identifies `file`'s based on their `hash` alone.
