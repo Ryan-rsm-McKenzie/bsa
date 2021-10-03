@@ -389,27 +389,6 @@ namespace bsa::tes4
 		}
 	}
 
-	auto file::compress_into_lz4(std::span<std::byte> a_out) noexcept
-		-> std::optional<std::size_t>
-	{
-		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
-
-		const auto in = this->as_bytes();
-
-		const auto result = ::LZ4F_compressFrame(
-			a_out.data(),
-			a_out.size_bytes(),
-			in.data(),
-			in.size_bytes(),
-			&detail::lz4f_preferences);
-		if (!::LZ4F_isError(result)) {
-			return result;
-		} else {
-			return std::nullopt;
-		}
-	}
-
 #ifdef BSA_SUPPORT_XMEM
 	namespace
 	{
@@ -475,6 +454,27 @@ namespace bsa::tes4
 		}
 	}
 #endif
+
+	auto file::compress_into_lz4(std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
+
+		const auto in = this->as_bytes();
+
+		const auto result = ::LZ4F_compressFrame(
+			a_out.data(),
+			a_out.size_bytes(),
+			in.data(),
+			in.size_bytes(),
+			&detail::lz4f_preferences);
+		if (!::LZ4F_isError(result)) {
+			return result;
+		} else {
+			return std::nullopt;
+		}
+	}
 
 	auto file::compress_into_xmem(
 		[[maybe_unused]] std::span<std::byte> a_out) noexcept
