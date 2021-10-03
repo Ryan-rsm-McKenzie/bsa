@@ -148,6 +148,10 @@ jobs:
           files: build/ctestCoverage.xml
           working-directory: ${{ github.workspace }}/bsa/extras/xmem/build
 
+      - name: (xmem) Install
+        working-directory: ${{ github.workspace }}/bsa/extras/xmem
+        run: cmake --install build --config ${{ env.BUILD_TYPE }}
+
       - name: (main) Setup MSVC (x64)
         uses: egor-tensin/vs-shell@v2
         with:
