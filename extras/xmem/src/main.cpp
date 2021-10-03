@@ -96,6 +96,7 @@ namespace
 		args::ArgumentParser p{ "xmem v"s.append(version::full) };
 		p.helpParams.descriptionindent = 0;
 		p.helpParams.helpindent = 30;
+		p.helpParams.optionsString = "ARGUMENTS:"s;
 		p.helpParams.progindent = 0;
 		p.helpParams.proglineCommand = "[subcommand]"s;
 		p.helpParams.proglineOptions = "[options]"s;
