@@ -4,5 +4,6 @@
 /extras/xmem/CMakeUserPresets.json
 /extras/xmem/build
 /extras/xmem/compile_commands.json
+/installed
 CMakeUserPresets.json
 compile_commands.json

@@ -567,4 +567,44 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				REQUIRE(a_archive.read(a_src, a_type) == bsa::tes4::version::tes4);
 			});
 	}
+
+#ifdef BSA_SUPPORT_XMEM
+	SECTION("we can utilize the xmem compression codec")
+	{
+		const std::filesystem::path root{ "tes4_xmem_test"sv };
+		constexpr std::array paths{
+			std::make_pair("Background"sv, "background_middle.png"sv),
+			std::make_pair("Characters"sv, "character_0012.png"sv),
+			std::make_pair("Construct 3"sv, "Pixel Platformer.c3p"sv),
+			std::make_pair("Share"sv, "License.txt"sv),
+			std::make_pair("Tilemap"sv, "tiles.png"sv),
+			std::make_pair("Tiles"sv, "tile_0013.png"sv),
+		};
+
+		bsa::tes4::archive bsa;
+		REQUIRE(bsa.read(root / "xmem.bsa"sv) == bsa::tes4::version::tes5);
+		for (const auto& [dirname, filename] : paths) {
+			const auto disk = map_file(root / "data"sv / dirname / filename);
+			const auto memory = bsa[dirname][filename];
+			REQUIRE(memory);
+			REQUIRE(memory->compressed());
+
+			const auto compressed = [&]() {
+				const auto bytes = memory->as_bytes();
+				return std::vector(bytes.begin(), bytes.end());
+			}();
+
+			REQUIRE(memory->decompressed_size() == disk.size());
+			REQUIRE(memory->decompress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem));
+			REQUIRE(!memory->compressed());
+			REQUIRE(memory->size() == disk.size());
+			REQUIRE(std::memcmp(memory->data(), disk.data(), disk.size()) == 0);
+
+			REQUIRE(memory->compress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem));
+			REQUIRE(memory->compressed());
+			REQUIRE(memory->size() == compressed.size());
+			REQUIRE(std::memcmp(memory->data(), compressed.data(), compressed.size()) == 0);
+		}
+	}
+#endif
 }

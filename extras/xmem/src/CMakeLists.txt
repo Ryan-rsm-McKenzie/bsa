@@ -104,3 +104,13 @@ target_link_libraries(
 		mmio::mmio
 		taywee::args
 )
+
+install(
+	PROGRAMS "$<TARGET_FILE:${PROJECT_NAME}>"
+	TYPE "BIN"
+)
+
+install(
+	FILES "$<TARGET_PDB_FILE:${PROJECT_NAME}>"
+	TYPE "BIN"
+)

@@ -99,7 +99,7 @@ option(BSA_SUPPORT_XMEM "build support for the xmem codec proxy" OFF)
 if("${BSA_SUPPORT_XMEM}")
 	target_compile_definitions(
 		"${PROJECT_NAME}"
-		PRIVATE
+		PUBLIC
 			BSA_SUPPORT_XMEM=1
 	)
 

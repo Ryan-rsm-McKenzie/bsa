@@ -30,6 +30,8 @@ add_executable(
 )
 catch_discover_tests(tests)
 
+include(GNUInstallDirs)
+
 target_compile_definitions(
 	tests
 	PRIVATE
@@ -76,6 +78,7 @@ acquire_test("tes4_flags_test")
 acquire_test("tes4_invalid_test")
 acquire_test("tes4_xbox_read_test")
 acquire_test("tes4_xbox_write_test")
+acquire_test("tes4_xmem_test")
 
 acquire_test("in_memory_test")
 
@@ -87,4 +90,33 @@ if("${BSA_BUILD_EXAMPLES}")
 	)
 
 	acquire_test("examples_pack_unpack_test")
+endif()
+
+if("${BSA_SUPPORT_XMEM}")
+	find_program(
+		XMEM_EXE
+		NAMES "xmem" "xmem.exe"
+		HINTS
+			"${ROOT_DIR}/installed"
+		PATH_SUFFIXES
+			"${CMAKE_INSTALL_BINDIR}"
+		REQUIRED
+	)
+
+	find_file(
+		XMEM_PDB
+		NAMES "xmem.pdb"
+		HINTS
+			"${ROOT_DIR}/installed"
+		PATH_SUFFIXES
+			"${CMAKE_INSTALL_BINDIR}"
+		REQUIRED
+	)
+
+	file(
+		COPY
+			"${XMEM_EXE}"
+			"${XMEM_PDB}"
+		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+	)
 endif()

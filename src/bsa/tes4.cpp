@@ -3,13 +3,16 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <span>
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -18,9 +21,17 @@
 #include <binary_io/any_stream.hpp>
 #include <binary_io/common.hpp>
 #include <binary_io/file_stream.hpp>
+#include <binary_io/memory_stream.hpp>
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <zlib.h>
+
+#ifdef BSA_SUPPORT_XMEM
+#	include "bsa/xmem/xmem.hpp"
+#	include "bsa/detail/binary_reproc.hpp"
+
+#	include <reproc++/reproc.hpp>
+#endif
 
 namespace bsa::tes4
 {
@@ -399,6 +410,106 @@ namespace bsa::tes4
 		}
 	}
 
+	namespace
+	{
+		class xmem_proxy final
+		{
+		public:
+			xmem_proxy() noexcept
+			{
+				const std::array argv{
+					(std::filesystem::current_path() / "xmem.exe"sv).string(),
+					"serve"s,
+				};
+
+				const auto o = []() noexcept {
+					reproc::options result;
+					result.redirect.in.type = reproc::redirect::pipe;
+					result.redirect.out.type = reproc::redirect::pipe;
+					return result;
+				}();
+
+				reproc::process p;
+				if (const auto err = p.start({ argv }, o); !err) {
+					_proxy = std::move(p);
+				}
+			}
+
+			~xmem_proxy() noexcept
+			{
+				if (_proxy) {
+					try {
+						detail::process_out os{ *_proxy };
+						os << xmem::request_header{ xmem::request_type::exit };
+					} catch (const binary_io::exception&) {}
+
+					const auto actions = []() {
+						reproc::stop_actions result;
+						result.first.action = reproc::stop::wait;
+						result.first.timeout = 1000ms;
+						result.second.action = reproc::stop::terminate;
+						result.second.timeout = reproc::infinite;
+						return result;
+					}();
+
+					_proxy->stop(actions);
+				}
+			}
+
+			[[nodiscard]] auto get() noexcept
+				-> reproc::process*
+			{
+				return _proxy ? &*_proxy : nullptr;
+			}
+
+		private:
+			std::optional<reproc::process> _proxy;
+		};
+
+		[[nodiscard]] auto get_xmem_proxy() noexcept
+			-> reproc::process*
+		{
+			thread_local xmem_proxy proxy;
+			return proxy.get();
+		}
+	}
+
+	auto file::compress_into_xmem(std::span<std::byte> a_out) noexcept
+		-> std::optional<std::size_t>
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound(version::tes5, compression_codec::xmem));
+
+		try {
+			const auto proxy = get_xmem_proxy();
+			if (!proxy) {
+				return std::nullopt;
+			}
+
+			detail::process_out os{ *proxy };
+			os << xmem::request_header{ xmem::request_type::compress }
+			   << xmem::compress_request(
+					  static_cast<std::uint32_t>(a_out.size_bytes()),
+					  this->as_bytes());
+
+			detail::process_in is{ *proxy };
+			xmem::response_header header;
+			is >> header;
+			if (header.error != xmem::error_code::ok) {
+				return std::nullopt;
+			}
+
+			xmem::compress_response response;
+			is >> response;
+			const auto out = response.data.as_bytes();
+			assert(a_out.size_bytes() >= out.size_bytes());
+			std::memcpy(a_out.data(), out.data(), out.size_bytes());
+			return out.size_bytes();
+		} catch (const binary_io::exception&) {
+			return std::nullopt;
+		}
+	}
+
 	auto file::compress_into_zlib(std::span<std::byte> a_out) noexcept
 		-> std::optional<std::size_t>
 	{
@@ -464,6 +575,44 @@ namespace bsa::tes4
 		}
 	}
 
+	bool file::decompress_into_xmem(std::span<std::byte> a_out) noexcept
+	{
+		assert(this->compressed());
+		assert(a_out.size_bytes() >= this->decompressed_size());
+
+		try {
+			const auto proxy = get_xmem_proxy();
+			if (!proxy) {
+				return false;
+			}
+
+			detail::process_out os{ *proxy };
+			os << xmem::request_header{ xmem::request_type::decompress }
+			   << xmem::decompress_request(
+					  static_cast<std::uint32_t>(this->decompressed_size()),
+					  this->as_bytes());
+
+			detail::process_in is{ *proxy };
+			xmem::response_header header;
+			is >> header;
+			if (header.error != xmem::error_code::ok) {
+				return false;
+			}
+
+			xmem::decompress_response response;
+			is >> response;
+			const auto out = response.data.as_bytes();
+			if (out.size_bytes() == this->decompressed_size()) {
+				std::memcpy(a_out.data(), out.data(), this->decompressed_size());
+				return true;
+			} else {
+				return false;
+			}
+		} catch (const binary_io::exception&) {
+			return false;
+		}
+	}
+
 	bool file::decompress_into_zlib(std::span<std::byte> a_out) noexcept
 	{
 		assert(this->compressed());
@@ -484,12 +633,42 @@ namespace bsa::tes4
 		}
 	}
 
-	bool file::compress(version a_version) noexcept
+	auto file::compress_bound_xmem() const noexcept
+		-> std::optional<std::size_t>
+	{
+		try {
+			const auto proxy = get_xmem_proxy();
+			if (!proxy) {
+				return std::nullopt;
+			}
+
+			detail::process_out os{ *proxy };
+			os << xmem::request_header{ xmem::request_type::compress_bound }
+			   << xmem::compress_bound_request{ this->as_bytes() };
+
+			detail::process_in is{ *proxy };
+			xmem::response_header header;
+			is >> header;
+			if (header.error != xmem::error_code::ok) {
+				return std::nullopt;
+			}
+
+			xmem::compress_bound_response response;
+			is >> response;
+			return response.bound;
+		} catch (const binary_io::exception&) {
+			return std::nullopt;
+		}
+	}
+
+	bool file::compress(
+		version a_version,
+		compression_codec a_codec) noexcept
 	{
 		std::vector<std::byte> out;
-		out.resize(this->compress_bound(a_version));
+		out.resize(this->compress_bound(a_version, a_codec));
 
-		const auto outsz = this->compress_into(a_version, { out.data(), out.size() });
+		const auto outsz = this->compress_into(a_version, { out.data(), out.size() }, a_codec);
 		if (outsz) {
 			out.resize(*outsz);
 			out.shrink_to_fit();
@@ -503,13 +682,18 @@ namespace bsa::tes4
 		}
 	}
 
-	auto file::compress_bound(version a_version) const noexcept
+	auto file::compress_bound(
+		version a_version,
+		compression_codec a_codec) const noexcept
 		-> std::size_t
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
-		case 104:
 			return ::compressBound(static_cast<::uLong>(this->size()));
+		case 104:
+			return a_codec == compression_codec::xmem ?
+                       this->compress_bound_xmem().value_or(0) :
+                       ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
@@ -519,13 +703,17 @@ namespace bsa::tes4
 
 	auto file::compress_into(
 		version a_version,
-		std::span<std::byte> a_out) noexcept
+		std::span<std::byte> a_out,
+		compression_codec a_codec) noexcept
 		-> std::optional<std::size_t>
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
-		case 104:
 			return this->compress_into_zlib(a_out);
+		case 104:
+			return a_codec == compression_codec::xmem ?
+                       this->compress_into_xmem(a_out) :
+                       this->compress_into_zlib(a_out);
 		case 105:
 			return this->compress_into_lz4(a_out);
 		default:
@@ -533,11 +721,13 @@ namespace bsa::tes4
 		}
 	}
 
-	bool file::decompress(version a_version) noexcept
+	bool file::decompress(
+		version a_version,
+		compression_codec a_codec) noexcept
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
-		if (this->decompress_into(a_version, { out.data(), out.size() })) {
+		if (this->decompress_into(a_version, { out.data(), out.size() }, a_codec)) {
 			this->set_data(std::move(out));
 
 			assert(!this->compressed());
@@ -550,12 +740,16 @@ namespace bsa::tes4
 
 	bool file::decompress_into(
 		version a_version,
-		std::span<std::byte> a_out) noexcept
+		std::span<std::byte> a_out,
+		compression_codec a_codec) noexcept
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
-		case 104:
 			return this->decompress_into_zlib(a_out);
+		case 104:
+			return a_codec == compression_codec::xmem ?
+                       this->decompress_into_xmem(a_out) :
+                       this->decompress_into_zlib(a_out);
 		case 105:
 			return this->decompress_into_lz4(a_out);
 		default:

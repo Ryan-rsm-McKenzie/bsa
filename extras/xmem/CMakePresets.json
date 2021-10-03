@@ -12,6 +12,7 @@
         "deprecated": true
       },
       "hidden": true,
+      "installDir": "${sourceDir}/../../installed",
       "name": "cmake-dev",
       "warnings": {
         "deprecated": true,
@@ -84,5 +85,5 @@
       "name": "ninja-windows"
     }
   ],
-  "version": 2
+  "version": 3
 }

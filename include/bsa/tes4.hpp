@@ -86,6 +86,16 @@ namespace bsa::tes4
 		misc = 1u << 8u
 	};
 
+	/// \brief	Specifies the codec to use when performing compression/decompression actions on files.
+	enum class compression_codec
+	{
+		/// \brief	The default compression codec.
+		normal,
+
+		/// \brief	Compression codec used for xbox archives.
+		xmem
+	};
+
 #ifndef DOXYGEN
 	BSA_MAKE_ALL_ENUM_OPERATORS(archive_type)
 #endif
@@ -211,10 +221,14 @@ namespace bsa::tes4
 
 		[[nodiscard]] std::optional<std::size_t> compress_into_lz4(
 			std::span<std::byte> a_out) noexcept;
+		[[nodiscard]] std::optional<std::size_t> compress_into_xmem(
+			std::span<std::byte> a_out) noexcept;
 		[[nodiscard]] std::optional<std::size_t> compress_into_zlib(
 			std::span<std::byte> a_out) noexcept;
 		[[nodiscard]] bool decompress_into_lz4(std::span<std::byte> a_out) noexcept;
+		[[nodiscard]] bool decompress_into_xmem(std::span<std::byte> a_out) noexcept;
 		[[nodiscard]] bool decompress_into_zlib(std::span<std::byte> a_out) noexcept;
+		[[nodiscard]] std::optional<std::size_t> compress_bound_xmem() const noexcept;
 
 	public:
 		/// \brief	The key used to indentify a file.
@@ -230,29 +244,44 @@ namespace bsa::tes4
 		/// \copydoc bsa::fo4::chunk::compress
 		///
 		/// \param	a_version	The version to compress the file for.
-		bool compress(version a_version) noexcept;
+		/// \param	a_codec	The codec to use.
+		bool compress(
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) noexcept;
 
 		/// \copydoc bsa::fo4::chunk::compress_bound
 		///
 		/// \param	a_version	The version the file would be compressed for.
-		[[nodiscard]] std::size_t compress_bound(version a_version) const noexcept;
+		/// \param	a_codec	The codec to use.
+		[[nodiscard]] std::size_t compress_bound(
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) const noexcept;
 
 		/// \copydoc bsa::fo4::chunk::compress_into
 		///
 		/// \param	a_version	The version to compress the file for.
+		/// \param	a_codec	The codec to use.
 		[[nodiscard]] std::optional<std::size_t> compress_into(
 			version a_version,
-			std::span<std::byte> a_out) noexcept;
+			std::span<std::byte> a_out,
+			compression_codec a_codec = compression_codec::normal) noexcept;
 
 		/// \copydoc bsa::fo4::chunk::decompress
 		///
 		/// \param	a_version	The version to decompress the file for.
-		bool decompress(version a_version) noexcept;
+		/// \param	a_codec	The codec to use.
+		bool decompress(
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) noexcept;
 
 		/// \copydoc bsa::fo4::chunk::decompress_into
 		///
 		/// \param	a_version	The version to decompress the file for.
-		bool decompress_into(version a_version, std::span<std::byte> a_out) noexcept;
+		/// \param	a_codec	The codec to use.
+		bool decompress_into(
+			version a_version,
+			std::span<std::byte> a_out,
+			compression_codec a_codec = compression_codec::normal) noexcept;
 	};
 
 	/// \brief	Represents a directory within the TES:4 virtual filesystem.

@@ -21,7 +21,7 @@ env:
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 
 jobs:
-  main-linux:
+  linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -67,13 +67,11 @@ jobs:
           sudo apt install liblz4-dev zlib1g-dev -y
           sudo pip install gcovr
 
-      - name: Configure CMake
+      - name: Configure & Build
         working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-
-      - name: Build
-        working-directory: ${{ github.workspace }}/bsa
-        run: cmake --build build
+        run: |
+          cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          cmake --build build
 
       - name: Test
         working-directory: ${{ github.workspace }}/bsa/build
@@ -95,55 +93,12 @@ jobs:
           files: bsa/build/examples.json,bsa/build/src.json
           verbose: true
 
-  main-windows:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           path: bsa
-
-      - name: Setup MSVC
-        uses: egor-tensin/vs-shell@v2
-
-      - name: Setup vcpkg
-        run: |
-          mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          cd $env:VCPKG_INSTALLATION_ROOT
-          ./bootstrap-vcpkg.bat
-          ./vcpkg --version > ${{ github.workspace }}/vcpkg-version.txt
-
-      - name: Cache vcpkg
-        uses: actions/cache@v2
-        id: vcpkg-cache
-        env:
-          cache-name: vcpkg-cache
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
-
-      - name: Configure CMake
-        working-directory: ${{ github.workspace }}/bsa
-        run: cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-
-      - name: Build
-        working-directory: ${{ github.workspace }}/bsa
-        run: cmake --build build
-
-      - name: Test
-        working-directory: ${{ github.workspace }}/bsa/build
-        run: ctest -C ${{ env.BUILD_TYPE }} -V
-
-  xmem-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          path: bsa
-
-      - name: Setup MSVC
-        uses: egor-tensin/vs-shell@v2
-        with:
-          arch: x86
 
       - name: Install OpenCPPCoverage
         working-directory: ${{ github.workspace }}/bsa/scripts/opencppcoverage
@@ -163,29 +118,55 @@ jobs:
 
       - name: Cache vcpkg
         uses: actions/cache@v2
-        id: vcpkg-cache-x86
+        id: vcpkg-cache
         env:
-          cache-name: vcpkg-cache-x86
+          cache-name: vcpkg-cache
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
 
-      - name: Configure CMake
-        working-directory: ${{ github.workspace }}/bsa/extras/xmem
-        run: cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+      - name: Setup MSVC (x86)
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
 
-      - name: Build
+      - name: (xmem) Configure & Build
         working-directory: ${{ github.workspace }}/bsa/extras/xmem
-        run: cmake --build build
+        run: |
+          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          cmake --build build
 
-      - name: Test
+      - name: (xmem) Test
         working-directory: ${{ github.workspace }}/bsa/extras/xmem/build
         run: |
           & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" --sources bsa\extras\xmem\src --sources bsa\extras\xmem\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V
 
-      - name: Collect code coverage
+      - name: (xmem) Collect code coverage
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
           files: build/ctestCoverage.xml
           working-directory: ${{ github.workspace }}/bsa/extras/xmem/build
+
+      - name: (main) Setup MSVC (x64)
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+
+      - name: (main) Configure & Build
+        working-directory: ${{ github.workspace }}/bsa
+        run: |
+          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          cmake --build build
+
+      - name: (main) Test
+        working-directory: ${{ github.workspace }}/bsa/build
+        run: |
+          & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" --sources bsa\examples --sources bsa\src --sources bsa\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V
+
+      - name: (main) Collect code coverage
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          files: build/ctestCoverage.xml
+          working-directory: ${{ github.workspace }}/bsa/build
