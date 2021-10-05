@@ -95,7 +95,7 @@ endif()
 if("${BSA_SUPPORT_XMEM}")
 	find_program(
 		XMEM_EXE
-		NAMES "xmem" "xmem.exe"
+		NAMES "xmem.exe"
 		HINTS
 			"${ROOT_DIR}/installed"
 		PATH_SUFFIXES
