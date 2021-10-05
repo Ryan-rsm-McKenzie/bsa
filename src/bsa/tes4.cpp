@@ -705,12 +705,14 @@ namespace bsa::tes4
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
+			assert(a_codec == compression_codec::normal);
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
 			return a_codec == compression_codec::xmem ?
                        this->compress_bound_xmem().value_or(0) :
                        ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
+			assert(a_codec == compression_codec::normal);
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
 			detail::declare_unreachable();
@@ -725,12 +727,14 @@ namespace bsa::tes4
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
+			assert(a_codec == compression_codec::normal);
 			return this->compress_into_zlib(a_out);
 		case 104:
 			return a_codec == compression_codec::xmem ?
                        this->compress_into_xmem(a_out) :
                        this->compress_into_zlib(a_out);
 		case 105:
+			assert(a_codec == compression_codec::normal);
 			return this->compress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
@@ -761,12 +765,14 @@ namespace bsa::tes4
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
+			assert(a_codec == compression_codec::normal);
 			return this->decompress_into_zlib(a_out);
 		case 104:
 			return a_codec == compression_codec::xmem ?
                        this->decompress_into_xmem(a_out) :
                        this->decompress_into_zlib(a_out);
 		case 105:
+			assert(a_codec == compression_codec::normal);
 			return this->decompress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
