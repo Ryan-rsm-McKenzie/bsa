@@ -108,6 +108,12 @@ The xmem codec is a compression format available as part of the xbox development
 - [mmio](https://github.com/Ryan-rsm-McKenzie/mmio)
 - [zlib](https://github.com/madler/zlib)
 
+\subsection dependencies-xmem XMem Codec Support
+- [args](https://github.com/Taywee/args)
+- [expected lite](https://github.com/martinmoene/expected-lite)
+- [reproc](https://github.com/DaanDeMeyer/reproc)
+- [Xbyak](https://github.com/herumi/xbyak)
+
 \subsection dependencies-development Development
 - [Catch2](https://github.com/catchorg/Catch2)
 - [poxy](https://github.com/marzer/poxy)
