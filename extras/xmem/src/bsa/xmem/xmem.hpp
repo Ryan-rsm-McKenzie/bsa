@@ -3,10 +3,15 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
+#include <limits>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <variant>
 #include <vector>
+
+#include <Windows.h>
 
 #include <binary_io/common.hpp>
 
@@ -335,5 +340,32 @@ namespace bsa::xmem
 		const compress_bound_response& a_response)
 	{
 		return static_cast<T&>(a_stream) << a_response.bound;
+	}
+
+	[[nodiscard]] inline auto current_executable_directory()
+		-> std::optional<std::filesystem::path>
+	{
+		const auto handle = ::GetModuleHandleW(nullptr);
+		if (!handle) {
+			return std::nullopt;
+		}
+
+		std::vector<wchar_t> buf;
+		buf.reserve(MAX_PATH);
+		buf.resize(MAX_PATH / 2);
+		::DWORD length = 0;
+		do {
+			buf.resize(buf.size() * 2);
+			length = ::GetModuleFileNameW(
+				handle,
+				buf.data(),
+				static_cast<::DWORD>(buf.size()));
+		} while (length && length == buf.size() && buf.size() <= (std::numeric_limits<::DWORD>::max)());
+
+		if (length && length != buf.size()) {
+			return std::filesystem::path{ buf.begin(), buf.begin() + length }.parent_path();
+		} else {
+			return std::nullopt;
+		}
 	}
 }

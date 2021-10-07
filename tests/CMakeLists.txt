@@ -113,10 +113,10 @@ if("${BSA_SUPPORT_XMEM}")
 		REQUIRED
 	)
 
-	file(
-		COPY
-			"${XMEM_EXE}"
-			"${XMEM_PDB}"
-		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+	add_custom_command(
+		TARGET tests
+		PRE_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${XMEM_EXE}" "$<TARGET_FILE_DIR:tests>"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${XMEM_PDB}" "$<TARGET_FILE_DIR:tests>"
 	)
 endif()

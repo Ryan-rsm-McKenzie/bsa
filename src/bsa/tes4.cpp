@@ -397,21 +397,24 @@ namespace bsa::tes4
 		public:
 			xmem_proxy() noexcept
 			{
-				const std::array argv{
-					(std::filesystem::current_path() / "xmem.exe"sv).string(),
-					"serve"s,
-				};
+				const auto cwd = xmem::current_executable_directory();
+				if (cwd) {
+					const std::array argv{
+						(*cwd / u8"xmem.exe"sv).u8string(),
+						u8"serve"s,
+					};
 
-				const auto o = []() noexcept {
-					reproc::options result;
-					result.redirect.in.type = reproc::redirect::pipe;
-					result.redirect.out.type = reproc::redirect::pipe;
-					return result;
-				}();
+					const auto o = []() noexcept {
+						reproc::options result;
+						result.redirect.in.type = reproc::redirect::pipe;
+						result.redirect.out.type = reproc::redirect::pipe;
+						return result;
+					}();
 
-				reproc::process p;
-				if (const auto err = p.start({ argv }, o); !err) {
-					_proxy = std::move(p);
+					reproc::process p;
+					if (const auto err = p.start({ argv }, o); !err) {
+						_proxy = std::move(p);
+					}
 				}
 			}
 
