@@ -1,10 +1,5 @@
 set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-set(INCLUDE_DIR "${ROOT_DIR}/tests")
-set(HEADER_FILES
-	"${INCLUDE_DIR}/utility.hpp"
-)
-
 set(SOURCE_DIR "${ROOT_DIR}/tests")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/detail/common.test.cpp"
@@ -12,6 +7,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/tes3.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes4.test.cpp"
 	"${SOURCE_DIR}/main.cpp"
+	"${SOURCE_DIR}/utility.hpp"
 )
 
 if("${BSA_BUILD_EXAMPLES}")
@@ -20,12 +16,10 @@ if("${BSA_BUILD_EXAMPLES}")
 	)
 endif()
 
-source_group("include" FILES ${HEADER_FILES})
 source_group(TREE "${SOURCE_DIR}" PREFIX "src" FILES ${SOURCE_FILES})
 
 add_executable(
 	tests
-	${HEADER_FILES}
 	${SOURCE_FILES}
 )
 catch_discover_tests(tests)
@@ -42,7 +36,6 @@ target_compile_definitions(
 target_include_directories(
 	tests
 	PRIVATE
-		"${INCLUDE_DIR}"
 		"${SOURCE_DIR}"
 )
 
