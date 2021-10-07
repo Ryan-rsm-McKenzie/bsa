@@ -814,7 +814,7 @@ namespace bsa::tes4
 		}
 
 		offset -= last;
-		return offset <= std::numeric_limits<std::int32_t>::max();
+		return offset <= (std::numeric_limits<std::int32_t>::max)();
 	}
 
 	void archive::write(std::filesystem::path a_path, version a_version) const
