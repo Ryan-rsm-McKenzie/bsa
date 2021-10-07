@@ -24,15 +24,15 @@ namespace bsa::xmem
                                                 \
 	F(ok, = 0)                                  \
                                                 \
+	F(load_library_failure)                     \
 	F(open_file_failure)                        \
+	F(reg_get_value_failure)                    \
                                                 \
 	F(hashing_open_algorithm_provider_failure)  \
 	F(hashing_create_hash_failure)              \
 	F(hashing_hash_data_failure)                \
 	F(hashing_get_property_failure)             \
 	F(hashing_finish_hash_failure)              \
-                                                \
-	F(reg_get_value_failure)                    \
                                                 \
 	F(xcompress_no_proxy_found)                 \
 	F(xcompress_unhandled_version)              \

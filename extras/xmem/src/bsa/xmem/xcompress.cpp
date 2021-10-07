@@ -1,5 +1,6 @@
 #include "xcompress.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -181,20 +182,57 @@ namespace bsa::xmem::xcompress
 			}
 		}
 
-		[[nodiscard]] auto find_xcompress_proxy() noexcept
-			-> xmem::expected<std::pair<::HMODULE, std::wstring_view>>
+		struct xna_candidate_t final
 		{
-			using enum xmem::error_code;
+			std::wstring_view version;
+			std::string_view hash;
+		};
 
-			constexpr std::array frameworks = {
-				std::make_pair(L"v3.0"sv, "31B27A5924FE35A11ADDCBFC97C30E074A20966CE9E7D4031165CCD6CA5A75254CB1E76F830921FCAD6D07473214F9D75B555C689EBC0A196E9CF948CAB4E37F"sv),  // 3.0
-				std::make_pair(L"v3.1"sv, "001F7B6AC90344405D04361AC699F1C13706587352BA7CBD9FB08F1803AD3EFD99E615863E6E27B5429B784FE1B4FF93E34BB184FB568B093B0C3108D8C88EE3"sv),  // 3.1
-				std::make_pair(L"v4.0"sv, "A53443BE19E7DC52B0E7AE8FEF2E00967E4FF9207D2813D559ED65F5F1E7A59AF878D45C68C21CAEB898F220CF3C211489CB4BAD9F3455557B3408F0F3FF9454"sv),  // 4.0
-				std::make_pair(L"v4.0"sv, "014E1C057F17BC625FEB4EAC03C17508C36836EF8C5C09E48D67ECEBA8614A6B36743AF9D281B999F4768D75BAAF1B5FEFCB5F0B1E0519E708F732F9E68C972D"sv),  // 4.0 Refresh
-			};
+		struct xna_result_t final
+		{
+			::HMODULE dll{ nullptr };
+			std::wstring_view version;
+		};
 
-			for (const auto& [version, expectedSHA] : frameworks) {
-				std::wstring subkey = LR"(SOFTWARE\WOW6432Node\Microsoft\XNA\Framework\)";
+		[[nodiscard]] auto find_bundled_xna(
+			std::span<const xna_candidate_t> a_frameworks) noexcept
+			-> xmem::expected<xna_result_t>
+		{
+			const auto cwd = xmem::current_executable_directory();
+			if (cwd) {
+				try {
+					const auto path = *cwd / u8"XnaNative.dll"sv;
+					const mmio::mapped_file_source dll{ path };
+					const auto hash = hashing::sha512(std::span{ dll.data(), dll.size() });
+					WRAP_EXPECTED(hash);
+
+					const auto it =
+						std::find_if(
+							a_frameworks.begin(),
+							a_frameworks.end(),
+							[&](const auto& a_elem) noexcept {
+								return a_elem.hash == *hash;
+							});
+					if (it != a_frameworks.end()) {
+						const auto handle = ::LoadLibraryW(path.c_str());
+						if (handle) {
+							return xna_result_t{ handle, it->version };
+						} else {
+							return xmem::unexpected(xmem::error_code::load_library_failure);
+						}
+					}
+				} catch (const std::system_error&) {}
+			}
+
+			return xmem::unexpected(xmem::error_code::ok);
+		}
+
+		[[nodiscard]] auto find_installed_xna(
+			std::span<const xna_candidate_t> a_frameworks) noexcept
+			-> xmem::expected<xna_result_t>
+		{
+			for (const auto& [version, expectedSHA] : a_frameworks) {
+				std::wstring subkey(LR"(SOFTWARE\WOW6432Node\Microsoft\XNA\Framework\)"sv);
 				subkey += version;
 
 				const auto getValue = [&](void* a_dst, ::DWORD& a_dstSz) noexcept {
@@ -214,25 +252,52 @@ namespace bsa::xmem::xcompress
 					std::vector<wchar_t> dst(size / sizeof(wchar_t));
 					status = getValue(dst.data(), size);
 					if (status != ERROR_SUCCESS) {
-						return xmem::unexpected(reg_get_value_failure);
+						return xmem::unexpected(xmem::error_code::reg_get_value_failure);
 					}
 
 					std::filesystem::path path{ dst.data(), dst.data() + (size / sizeof(wchar_t)) - 1 };
 					path /= L"XnaNative.dll"sv;
 					mmio::mapped_file_source file{ path };
 					const auto readSHA = hashing::sha512(std::span{ file.data(), file.size() });
-					if (readSHA == expectedSHA) {
+					WRAP_EXPECTED(readSHA);
+
+					if (*readSHA == expectedSHA) {
 						const auto lib = ::LoadLibraryW(path.c_str());
 						if (lib != nullptr) {
-							return std::make_pair(lib, version);
+							return xna_result_t{ lib, version };
+						} else {
+							return xmem::unexpected(xmem::error_code::load_library_failure);
 						}
 					}
 				} else if (status != ERROR_FILE_NOT_FOUND) {
-					return xmem::unexpected(reg_get_value_failure);
+					return xmem::unexpected(xmem::error_code::reg_get_value_failure);
 				}
 			}
 
-			return xmem::unexpected(xcompress_no_proxy_found);
+			return xmem::unexpected(xmem::error_code::ok);
+		}
+
+		[[nodiscard]] auto find_xcompress_proxy() noexcept
+			-> xmem::expected<xna_result_t>
+		{
+			constexpr std::array frameworks = {
+				xna_candidate_t{ L"v3.0"sv, "31B27A5924FE35A11ADDCBFC97C30E074A20966CE9E7D4031165CCD6CA5A75254CB1E76F830921FCAD6D07473214F9D75B555C689EBC0A196E9CF948CAB4E37F"sv },  // 3.0
+				xna_candidate_t{ L"v3.1"sv, "001F7B6AC90344405D04361AC699F1C13706587352BA7CBD9FB08F1803AD3EFD99E615863E6E27B5429B784FE1B4FF93E34BB184FB568B093B0C3108D8C88EE3"sv },  // 3.1
+				xna_candidate_t{ L"v4.0"sv, "A53443BE19E7DC52B0E7AE8FEF2E00967E4FF9207D2813D559ED65F5F1E7A59AF878D45C68C21CAEB898F220CF3C211489CB4BAD9F3455557B3408F0F3FF9454"sv },  // 4.0
+				xna_candidate_t{ L"v4.0"sv, "014E1C057F17BC625FEB4EAC03C17508C36836EF8C5C09E48D67ECEBA8614A6B36743AF9D281B999F4768D75BAAF1B5FEFCB5F0B1E0519E708F732F9E68C972D"sv },  // 4.0 Refresh
+			};
+
+			auto bundled = find_bundled_xna(frameworks);
+			if (bundled.has_value() || bundled.error() != xmem::error_code::ok) {
+				return bundled;
+			}
+
+			auto installed = find_installed_xna(frameworks);
+			if (installed.has_value() || installed.error() != xmem::error_code::ok) {
+				return installed;
+			}
+
+			return xmem::unexpected(xmem::error_code::xcompress_no_proxy_found);
 		}
 	}
 

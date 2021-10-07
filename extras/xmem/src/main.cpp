@@ -195,30 +195,23 @@ namespace
 		}
 	}
 
-#define CHECK_EXPECTED(a_value)       \
-	do {                              \
-		if (!a_value) {               \
-			return a_value##.error(); \
-		}                             \
-	} while (false)
-
 	[[nodiscard]] auto do_compress(
 		std::filesystem::path a_src,
 		std::filesystem::path a_dst) noexcept
 		-> xmem::error_code
 	{
 		const auto context = api::create_compression_context();
-		CHECK_EXPECTED(context);
+		UNWRAP_EXPECTED(context);
 
 		const auto in = map_file(std::move(a_src));
-		CHECK_EXPECTED(in);
+		UNWRAP_EXPECTED(in);
 
 		const auto size = api::compress_bound(*context, std::span{ in->data(), in->size() });
-		CHECK_EXPECTED(size);
+		UNWRAP_EXPECTED(size);
 
 		std::vector<std::byte> dst(*size);
 		const auto realsz = api::compress(*context, std::span{ in->data(), in->size() }, dst);
-		CHECK_EXPECTED(realsz);
+		UNWRAP_EXPECTED(realsz);
 
 		dst.resize(*realsz);
 		const auto out = open_file(a_dst.c_str(), L"wb");
@@ -233,14 +226,14 @@ namespace
 		-> xmem::error_code
 	{
 		const auto context = api::create_decompression_context();
-		CHECK_EXPECTED(context);
+		UNWRAP_EXPECTED(context);
 
 		const auto in = map_file(std::move(a_src));
-		CHECK_EXPECTED(in);
+		UNWRAP_EXPECTED(in);
 
 		std::vector<std::byte> dst(in->size() * 2);
 		const auto realsz = api::decompress(*context, std::span{ in->data(), in->size() }, dst);
-		CHECK_EXPECTED(realsz);
+		UNWRAP_EXPECTED(realsz);
 
 		dst.resize(*realsz);
 		const auto out = open_file(a_dst.c_str(), L"wb");
@@ -257,11 +250,11 @@ namespace
 		in >> request;
 
 		const auto context = api::create_compression_context();
-		CHECK_EXPECTED(context);
+		UNWRAP_EXPECTED(context);
 
 		std::vector<std::byte> bytes(request.bound);
 		const auto realsz = api::compress(*context, request.data.as_bytes(), bytes);
-		CHECK_EXPECTED(realsz);
+		UNWRAP_EXPECTED(realsz);
 		bytes.resize(*realsz);
 
 		binary_stdio::bout out;
@@ -279,10 +272,10 @@ namespace
 		in >> request;
 
 		const auto context = api::create_compression_context();
-		CHECK_EXPECTED(context);
+		UNWRAP_EXPECTED(context);
 
 		const auto bound = api::compress_bound(*context, request.data.as_bytes());
-		CHECK_EXPECTED(bound);
+		UNWRAP_EXPECTED(bound);
 
 		binary_stdio::bout out;
 		out << xmem::response_header{};
@@ -298,11 +291,11 @@ namespace
 		in >> request;
 
 		const auto context = api::create_decompression_context();
-		CHECK_EXPECTED(context);
+		UNWRAP_EXPECTED(context);
 
 		std::vector<std::byte> bytes(request.original_size);
 		const auto size = api::decompress(*context, request.data.as_bytes(), bytes);
-		CHECK_EXPECTED(size);
+		UNWRAP_EXPECTED(size);
 
 		if (*size != request.original_size) {
 			return xmem::error_code::serve_decompress_size_mismatch;
@@ -363,7 +356,7 @@ namespace
 	-> xmem::error_code
 {
 	const auto options = parse_commands(a_args);
-	CHECK_EXPECTED(options);
+	UNWRAP_EXPECTED(options);
 
 	if (const auto init = xcompress::initialize(); init != xmem::error_code::ok) {
 		return init;
