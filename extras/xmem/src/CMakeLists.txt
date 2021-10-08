@@ -16,14 +16,14 @@ set(SOURCE_FILES
 
 source_group(TREE "${SOURCE_DIR}" PREFIX "src" FILES ${SOURCE_FILES})
 
-set(VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/src/bsa/xmem/version.hpp")
+set(VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/src/bsa/project_version.hpp")
 configure_file(
-	"${ROOT_DIR}/extras/xmem/cmake/version.hpp.in"
+	"${ROOT_DIR}/cmake/project_version.hpp.in"
 	"${VERSION_HEADER}"
 	@ONLY
 )
 
-source_group("src/bsa/xmem" FILES "${VERSION_HEADER}")
+source_group("src/bsa" FILES "${VERSION_HEADER}")
 
 # ---- support library ----
 

@@ -1,0 +1,16 @@
+#pragma once
+
+#include <string_view>
+
+namespace bsa::project_version
+{
+	using namespace std::literals;
+
+	// clang-format off
+	inline constexpr auto major = @PROJECT_VERSION_MAJOR@u;
+	inline constexpr auto minor = @PROJECT_VERSION_MINOR@u;
+	inline constexpr auto patch = @PROJECT_VERSION_PATCH@u;
+	// clang-format on
+
+	inline constexpr auto full = "@PROJECT_VERSION@"sv;
+}

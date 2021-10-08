@@ -24,6 +24,7 @@
 #include <mmio/mmio.hpp>
 
 #include "bsa/fwd.hpp"
+#include "bsa/project_version.hpp"
 
 #ifndef DOXYGEN
 

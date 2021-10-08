@@ -19,9 +19,9 @@
 #include <binary_io/common.hpp>
 #include <mmio/mmio.hpp>
 
+#include "bsa/project_version.hpp"
 #include "bsa/xmem/api.hpp"
 #include "bsa/xmem/binary_stdio.hpp"
-#include "bsa/xmem/version.hpp"
 #include "bsa/xmem/xcompress.hpp"
 #include "bsa/xmem/xmem.hpp"
 
@@ -29,7 +29,7 @@ using namespace std::literals;
 
 namespace api = bsa::xmem::api;
 namespace binary_stdio = bsa::xmem::binary_stdio;
-namespace version = bsa::xmem::version;
+namespace project_version = bsa::project_version;
 namespace xcompress = bsa::xmem::xcompress;
 namespace xmem = bsa::xmem;
 
@@ -94,7 +94,7 @@ namespace
 		std::span<const std::string> a_args) noexcept
 		-> xmem::expected<options>
 	{
-		args::ArgumentParser p{ "xmem v"s.append(version::full) };
+		args::ArgumentParser p{ "xmem v"s.append(project_version::full) };
 		p.helpParams.descriptionindent = 0;
 		p.helpParams.helpindent = 30;
 		p.helpParams.optionsString = "ARGUMENTS:"s;
@@ -135,7 +135,7 @@ namespace
 			std::cout << p << '\n';
 			return xmem::unexpected(xmem::error_code::ok);
 		} catch (const version_signal&) {
-			std::cout << "xmem v"sv << version::full << '\n';
+			std::cout << "xmem v"sv << project_version::full << '\n';
 			return xmem::unexpected(xmem::error_code::ok);
 		} catch (const std::exception& a_err) {
 			std::cout << a_err.what() << '\n';

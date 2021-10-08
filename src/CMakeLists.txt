@@ -35,12 +35,22 @@ source_group(
 		${NATVIS_FILES}
 )
 
+set(VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/include/bsa/project_version.hpp")
+configure_file(
+	"${ROOT_DIR}/cmake/project_version.hpp.in"
+	"${VERSION_HEADER}"
+	@ONLY
+)
+
+source_group("include/bsa" FILES "${VERSION_HEADER}")
+
 add_library(
 	"${PROJECT_NAME}"
 	STATIC
 	${HEADER_FILES}
 	${SOURCE_FILES}
 	${NATVIS_FILES}
+	"${VERSION_HEADER}"
 	"${ROOT_DIR}/.clang-format"
 	"${ROOT_DIR}/.editorconfig"
 )
@@ -72,7 +82,7 @@ endif()
 target_include_directories(
 	"${PROJECT_NAME}"
 	PUBLIC
-		"$<BUILD_INTERFACE:${INCLUDE_DIR}>"
+		"$<BUILD_INTERFACE:${INCLUDE_DIR};${CMAKE_CURRENT_BINARY_DIR}/include>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 	PRIVATE
 		"${SOURCE_DIR}"
@@ -114,6 +124,7 @@ if("${BSA_SUPPORT_XMEM}")
 		"${PROJECT_NAME}"
 		PRIVATE
 			reproc++
+			Version.lib
 	)
 endif()
 
@@ -150,6 +161,11 @@ install(
 install(
 	DIRECTORY "${INCLUDE_DIR}/bsa"
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+install(
+	FILES "${VERSION_HEADER}"
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bsa"
 )
 
 install(

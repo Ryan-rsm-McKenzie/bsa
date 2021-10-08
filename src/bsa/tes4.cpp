@@ -27,6 +27,8 @@
 #include <zlib.h>
 
 #ifdef BSA_SUPPORT_XMEM
+#	include <Windows.h>
+
 #	include <reproc++/reproc.hpp>
 
 #	include "bsa/xmem/xmem.hpp"
@@ -392,6 +394,67 @@ namespace bsa::tes4
 #ifdef BSA_SUPPORT_XMEM
 	namespace
 	{
+		template <class CharT>
+		[[nodiscard]] auto string_split(
+			std::basic_string_view<CharT> a_string,
+			CharT a_separator) noexcept
+			-> std::vector<std::basic_string_view<CharT>>
+		{
+			std::vector<std::basic_string_view<CharT>> result;
+			if (a_string.empty()) {
+				return result;
+			}
+
+			std::size_t lpos = 0;
+			std::size_t rpos = static_cast<std::size_t>(-1);
+			do {
+				lpos = rpos + 1;
+				rpos = a_string.find_first_of(a_separator, lpos);
+				result.push_back(a_string.substr(lpos, rpos - lpos));
+			} while (rpos != std::basic_string_view<CharT>::npos);
+
+			return result;
+		}
+
+		[[nodiscard]] auto get_file_version(
+			std::filesystem::path a_file) noexcept
+			-> std::optional<std::array<std::uint16_t, 4>>
+		{
+			::DWORD dummy = 0;
+			std::vector<std::byte> buf(::GetFileVersionInfoSizeW(a_file.c_str(), &dummy));
+			if (buf.empty()) {
+				return std::nullopt;
+			}
+
+			if (::GetFileVersionInfoW(
+					a_file.c_str(),
+					0,
+					static_cast<::DWORD>(buf.size()),
+					buf.data()) == FALSE) {
+				return std::nullopt;
+			}
+
+			void* verBuf = nullptr;
+			::UINT verLen = 0;
+			if (!::VerQueryValueW(
+					buf.data(),
+					LR"(\StringFileInfo\040904B0\ProductVersion)",
+					&verBuf,
+					&verLen)) {
+				return std::nullopt;
+			}
+
+			std::array<std::uint16_t, 4> version;
+			const auto tokens = string_split({ static_cast<const wchar_t*>(verBuf), verLen }, L'.');
+			std::wstring token;
+			for (std::size_t i = 0; i < std::min<std::size_t>(tokens.size(), 4); ++i) {
+				token = tokens[i];
+				version[i] = static_cast<std::uint16_t>(std::stoul(token));
+			}
+
+			return version;
+		}
+
 		class xmem_proxy final
 		{
 		public:
@@ -399,21 +462,29 @@ namespace bsa::tes4
 			{
 				const auto cwd = xmem::current_executable_directory();
 				if (cwd) {
-					const std::array argv{
-						(*cwd / u8"xmem.exe"sv).u8string(),
-						u8"serve"s,
-					};
+					const auto path = *cwd / u8"xmem.exe"sv;
+					const auto version = get_file_version(path);
+					if (version &&
+						(*version)[0] == project_version::major &&
+						(*version)[1] == project_version::minor &&
+						(*version)[2] == project_version::patch &&
+						(*version)[3] == 0) {
+						const std::array argv{
+							path.u8string(),
+							u8"serve"s,
+						};
 
-					const auto o = []() noexcept {
-						reproc::options result;
-						result.redirect.in.type = reproc::redirect::pipe;
-						result.redirect.out.type = reproc::redirect::pipe;
-						return result;
-					}();
+						const auto o = []() noexcept {
+							reproc::options result;
+							result.redirect.in.type = reproc::redirect::pipe;
+							result.redirect.out.type = reproc::redirect::pipe;
+							return result;
+						}();
 
-					reproc::process p;
-					if (const auto err = p.start({ argv }, o); !err) {
-						_proxy = std::move(p);
+						reproc::process p;
+						if (const auto err = p.start({ argv }, o); !err) {
+							_proxy = std::move(p);
+						}
 					}
 				}
 			}
