@@ -51,6 +51,16 @@
 #		define BSA_COMP_MSVC false
 #	endif
 
+#	if defined(_WIN32) ||      \
+		defined(_WIN64) ||      \
+		defined(__WIN32__) ||   \
+		defined(__TOS_WIN__) || \
+		defined(__WINDOWS__)
+#		define BSA_OS_WINDOWS true
+#	else
+#		define BSA_OS_WINDOWS false
+#	endif
+
 #	define BSA_MAKE_ENUM_OPERATOR_PAIR(a_type, a_op)                                     \
 		[[nodiscard]] constexpr a_type operator a_op(a_type a_lhs, a_type a_rhs) noexcept \
 		{                                                                                 \
@@ -85,6 +95,10 @@
 #		define BSA_VISIBLE
 #	endif
 
+#endif
+
+#ifdef BSA_SUPPORT_XMEM
+static_assert(BSA_OS_WINDOWS, "xmem support is only available for windows");
 #endif
 
 namespace bsa
