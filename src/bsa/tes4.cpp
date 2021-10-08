@@ -27,10 +27,10 @@
 #include <zlib.h>
 
 #ifdef BSA_SUPPORT_XMEM
+#	include <reproc++/reproc.hpp>
+
 #	include "bsa/xmem/xmem.hpp"
 #	include "bsa/detail/binary_reproc.hpp"
-
-#	include <reproc++/reproc.hpp>
 #endif
 
 namespace bsa::tes4
