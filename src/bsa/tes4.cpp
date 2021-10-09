@@ -458,70 +458,75 @@ namespace bsa::tes4
 		class xmem_proxy final
 		{
 		public:
-			xmem_proxy() noexcept
+			xmem_proxy()
 			{
 				const auto cwd = xmem::current_executable_directory();
-				if (cwd) {
-					const auto path = *cwd / u8"xmem.exe"sv;
-					const auto version = get_file_version(path);
-					if (version &&
-						(*version)[0] == project_version::major &&
-						(*version)[1] == project_version::minor &&
-						(*version)[2] == project_version::patch &&
-						(*version)[3] == 0) {
-						const std::array argv{
-							path.u8string(),
-							u8"serve"s,
-						};
+				if (!cwd) {
+					throw bsa::compression_error(detail::error_code::current_executable_directory_failure);
+				}
 
-						const auto o = []() noexcept {
-							reproc::options result;
-							result.redirect.in.type = reproc::redirect::pipe;
-							result.redirect.out.type = reproc::redirect::pipe;
-							return result;
-						}();
+				const auto path = *cwd / u8"xmem.exe"sv;
+				const auto version = get_file_version(path);
+				if (!version ||
+					(*version)[0] != project_version::major ||
+					(*version)[1] != project_version::minor ||
+					(*version)[2] != project_version::patch ||
+					(*version)[3] != 0) {
+					throw bsa::compression_error(detail::error_code::xmem_version_mismatch);
+				}
 
-						reproc::process p;
-						if (const auto err = p.start({ argv }, o); !err) {
-							_proxy = std::move(p);
-						}
-					}
+				const std::array argv{
+					path.u8string(),
+					u8"serve"s,
+				};
+
+				const auto o = []() noexcept {
+					reproc::options result;
+					result.redirect.in.type = reproc::redirect::pipe;
+					result.redirect.out.type = reproc::redirect::pipe;
+					return result;
+				}();
+
+				const auto err = _proxy.start({ argv }, o);
+				if (err) {
+					throw bsa::compression_error(detail::error_code::xmem_start_failure);
 				}
 			}
 
 			~xmem_proxy() noexcept
 			{
-				if (_proxy) {
-					try {
-						detail::process_out os{ *_proxy };
-						os << xmem::request_header{ xmem::request_type::exit };
-					} catch (const binary_io::exception&) {}
+				try {
+					detail::process_out os{ _proxy };
+					os << xmem::request_header{ xmem::request_type::exit };
+				} catch (const binary_io::exception&) {}
 
-					const auto actions = []() {
-						reproc::stop_actions result;
-						result.first.action = reproc::stop::wait;
-						result.first.timeout = 1000ms;
-						result.second.action = reproc::stop::terminate;
-						result.second.timeout = reproc::infinite;
-						return result;
-					}();
+				const auto actions = []() {
+					reproc::stop_actions result;
+					result.first.action = reproc::stop::wait;
+					result.first.timeout = 1000ms;
+					result.second.action = reproc::stop::terminate;
+					result.second.timeout = reproc::infinite;
+					return result;
+				}();
 
-					_proxy->stop(actions);
-				}
+				_proxy.stop(actions);
 			}
 
+			xmem_proxy(const volatile xmem_proxy&) = delete;
+			xmem_proxy& operator=(const volatile xmem_proxy&) = delete;
+
 			[[nodiscard]] auto get() noexcept
-				-> reproc::process*
+				-> reproc::process&
 			{
-				return _proxy ? &*_proxy : nullptr;
+				return _proxy;
 			}
 
 		private:
-			std::optional<reproc::process> _proxy;
+			reproc::process _proxy;
 		};
 
 		[[nodiscard]] auto get_xmem_proxy() noexcept
-			-> reproc::process*
+			-> reproc::process&
 		{
 			thread_local xmem_proxy proxy;
 			return proxy.get();
@@ -529,9 +534,10 @@ namespace bsa::tes4
 	}
 #endif
 
-	auto file::compress_into_lz4(std::span<std::byte> a_out) noexcept
-		-> std::optional<std::size_t>
+	auto file::compress_into_lz4(std::span<std::byte> a_out)
+		-> std::size_t
 	{
+		using bsa::compression_error::library::lz4;
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
 
@@ -543,38 +549,34 @@ namespace bsa::tes4
 			in.data(),
 			in.size_bytes(),
 			&detail::lz4f_preferences);
-		if (!::LZ4F_isError(result)) {
-			return result;
-		} else {
-			return std::nullopt;
+		if (::LZ4F_isError(result)) {
+			throw bsa::compression_error(lz4, result);
 		}
+
+		return result;
 	}
 
 	auto file::compress_into_xmem(
-		[[maybe_unused]] std::span<std::byte> a_out) noexcept
-		-> std::optional<std::size_t>
+		[[maybe_unused]] std::span<std::byte> a_out)
+		-> std::size_t
 	{
 #ifdef BSA_SUPPORT_XMEM
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::tes5, compression_codec::xmem));
 
 		try {
-			const auto proxy = get_xmem_proxy();
-			if (!proxy) {
-				return std::nullopt;
-			}
-
-			detail::process_out os{ *proxy };
+			auto& proxy = get_xmem_proxy();
+			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::compress }
 			   << xmem::compress_request(
 					  static_cast<std::uint32_t>(a_out.size_bytes()),
 					  this->as_bytes());
 
-			detail::process_in is{ *proxy };
+			detail::process_in is{ proxy };
 			xmem::response_header header;
 			is >> header;
 			if (header.error != xmem::error_code::ok) {
-				return std::nullopt;
+				throw bsa::compression_error(header.error);
 			}
 
 			xmem::compress_response response;
@@ -584,16 +586,17 @@ namespace bsa::tes4
 			std::memcpy(a_out.data(), out.data(), out.size_bytes());
 			return out.size_bytes();
 		} catch (const binary_io::exception&) {
-			return std::nullopt;
+			throw bsa::compression_error(detail::error_code::xmem_communication_failure);
 		}
 #else
-		return std::nullopt;
+		throw bsa::compression_error(detail::error_code::xmem_unavailable);
 #endif
 	}
 
-	auto file::compress_into_zlib(std::span<std::byte> a_out) noexcept
-		-> std::optional<std::size_t>
+	auto file::compress_into_zlib(std::span<std::byte> a_out)
+		-> std::size_t
 	{
+		using bsa::compression_error::library::zlib;
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::tes4));
 
@@ -605,21 +608,23 @@ namespace bsa::tes4
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
-		if (result == Z_OK) {
-			return static_cast<std::size_t>(outsz);
-		} else {
-			return std::nullopt;
+		if (result != Z_OK) {
+			throw bsa::compression_error(zlib, result);
 		}
+
+		return static_cast<std::size_t>(outsz);
 	}
 
-	bool file::decompress_into_lz4(std::span<std::byte> a_out) noexcept
+	void file::decompress_into_lz4(std::span<std::byte> a_out)
 	{
+		using bsa::compression_error::library::lz4;
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
 		::LZ4F_dctx* pdctx = nullptr;
-		if (::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION) != 0) {
-			return false;
+		if (const auto result = ::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION);
+			::LZ4F_isError(result)) {
+			throw bsa::compression_error(lz4, result);
 		}
 		std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
 			pdctx,
@@ -647,60 +652,58 @@ namespace bsa::tes4
 				&detail::lz4f_decompress_options);
 		} while (result != 0 && !::LZ4F_isError(result));
 
+		if (::LZ4F_isError(result)) {
+			throw bsa::compression_error(lz4, result);
+		}
+
 		const auto totalsz = static_cast<std::size_t>(
 			(outptr + outsz) - std::to_address(a_out.begin()));
-		if (!::LZ4F_isError(result) && totalsz == this->decompressed_size()) {
-			return true;
-		} else {
-			return false;
+		if (totalsz != this->decompressed_size()) {
+			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 		}
 	}
 
-	bool file::decompress_into_xmem(
-		[[maybe_unused]] std::span<std::byte> a_out) noexcept
+	void file::decompress_into_xmem(
+		[[maybe_unused]] std::span<std::byte> a_out)
 	{
 #ifdef BSA_SUPPORT_XMEM
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
 		try {
-			const auto proxy = get_xmem_proxy();
-			if (!proxy) {
-				return false;
-			}
-
-			detail::process_out os{ *proxy };
+			auto& proxy = get_xmem_proxy();
+			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::decompress }
 			   << xmem::decompress_request(
 					  static_cast<std::uint32_t>(this->decompressed_size()),
 					  this->as_bytes());
 
-			detail::process_in is{ *proxy };
+			detail::process_in is{ proxy };
 			xmem::response_header header;
 			is >> header;
 			if (header.error != xmem::error_code::ok) {
-				return false;
+				throw bsa::compression_error(header.error);
 			}
 
 			xmem::decompress_response response;
 			is >> response;
 			const auto out = response.data.as_bytes();
-			if (out.size_bytes() == this->decompressed_size()) {
-				std::memcpy(a_out.data(), out.data(), this->decompressed_size());
-				return true;
-			} else {
-				return false;
+			if (out.size_bytes() != this->decompressed_size()) {
+				throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 			}
+
+			std::memcpy(a_out.data(), out.data(), this->decompressed_size());
 		} catch (const binary_io::exception&) {
-			return false;
+			throw bsa::compression_error(detail::error_code::xmem_communication_failure);
 		}
 #else
-		return false;
+		throw bsa::compression_error(detail::error_code::xmem_unavailable);
 #endif
 	}
 
-	bool file::decompress_into_zlib(std::span<std::byte> a_out) noexcept
+	void file::decompress_into_zlib(std::span<std::byte> a_out)
 	{
+		using bsa::compression_error::library::zlib;
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
@@ -712,69 +715,61 @@ namespace bsa::tes4
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
-		if (result == Z_OK && outsz == this->decompressed_size()) {
-			return true;
-		} else {
-			return false;
+		if (result != Z_OK) {
+			throw bsa::compression_error(zlib, result);
+		}
+
+		if (outsz != this->decompressed_size()) {
+			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 		}
 	}
 
-	auto file::compress_bound_xmem() const noexcept
-		-> std::optional<std::size_t>
+	auto file::compress_bound_xmem() const
+		-> std::size_t
 	{
 #ifdef BSA_SUPPORT_XMEM
 		try {
-			const auto proxy = get_xmem_proxy();
-			if (!proxy) {
-				return std::nullopt;
-			}
-
-			detail::process_out os{ *proxy };
+			auto& proxy = get_xmem_proxy();
+			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::compress_bound }
 			   << xmem::compress_bound_request{ this->as_bytes() };
 
-			detail::process_in is{ *proxy };
+			detail::process_in is{ proxy };
 			xmem::response_header header;
 			is >> header;
 			if (header.error != xmem::error_code::ok) {
-				return std::nullopt;
+				throw bsa::compression_error(header.error);
 			}
 
 			xmem::compress_bound_response response;
 			is >> response;
 			return response.bound;
 		} catch (const binary_io::exception&) {
-			return std::nullopt;
+			throw bsa::compression_error(detail::error_code::xmem_communication_failure);
 		}
 #else
-		return std::nullopt;
+		throw bsa::compression_error(detail::error_code::xmem_unavailable);
 #endif
 	}
 
-	bool file::compress(
+	void file::compress(
 		version a_version,
-		compression_codec a_codec) noexcept
+		compression_codec a_codec)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->compress_bound(a_version, a_codec));
 
 		const auto outsz = this->compress_into(a_version, { out.data(), out.size() }, a_codec);
-		if (outsz) {
-			out.resize(*outsz);
-			out.shrink_to_fit();
-			this->set_data(std::move(out), this->size());
+		out.resize(outsz);
+		out.shrink_to_fit();
+		this->set_data(std::move(out), this->size());
 
-			assert(this->compressed());
-			return true;
-		} else {
-			assert(!this->compressed());
-			return false;
-		}
+		assert(this->compressed());
 	}
 
 	auto file::compress_bound(
 		version a_version,
-		compression_codec a_codec) const noexcept
+		compression_codec a_codec) const
 		-> std::size_t
 	{
 		switch (detail::to_underlying(a_version)) {
@@ -783,7 +778,7 @@ namespace bsa::tes4
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
 			return a_codec == compression_codec::xmem ?
-                       this->compress_bound_xmem().value_or(0) :
+                       this->compress_bound_xmem() :
                        ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
 			assert(a_codec == compression_codec::normal);
@@ -796,8 +791,8 @@ namespace bsa::tes4
 	auto file::compress_into(
 		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec) noexcept
-		-> std::optional<std::size_t>
+		compression_codec a_codec)
+		-> std::size_t
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
@@ -815,39 +810,39 @@ namespace bsa::tes4
 		}
 	}
 
-	bool file::decompress(
+	void file::decompress(
 		version a_version,
-		compression_codec a_codec) noexcept
+		compression_codec a_codec)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
-		if (this->decompress_into(a_version, { out.data(), out.size() }, a_codec)) {
-			this->set_data(std::move(out));
+		this->decompress_into(a_version, { out.data(), out.size() }, a_codec);
+		this->set_data(std::move(out));
 
-			assert(!this->compressed());
-			return true;
-		} else {
-			assert(this->compressed());
-			return false;
-		}
+		assert(!this->compressed());
 	}
 
-	bool file::decompress_into(
+	void file::decompress_into(
 		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec) noexcept
+		compression_codec a_codec)
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:
 			assert(a_codec == compression_codec::normal);
-			return this->decompress_into_zlib(a_out);
+			this->decompress_into_zlib(a_out);
+			break;
 		case 104:
-			return a_codec == compression_codec::xmem ?
-                       this->decompress_into_xmem(a_out) :
-                       this->decompress_into_zlib(a_out);
+			if (a_codec == compression_codec::xmem) {
+				this->decompress_into_xmem(a_out);
+			} else {
+				this->decompress_into_zlib(a_out);
+			}
+			break;
 		case 105:
 			assert(a_codec == compression_codec::normal);
-			return this->decompress_into_lz4(a_out);
+			this->decompress_into_lz4(a_out);
+			break;
 		default:
 			detail::declare_unreachable();
 		}

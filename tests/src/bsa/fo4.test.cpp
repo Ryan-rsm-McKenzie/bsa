@@ -257,7 +257,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				auto& c = f->second.front();
 				if (c.compressed()) {
 					REQUIRE(c.decompressed_size() == mapped.size());
-					REQUIRE(c.decompress());
+					c.decompress();
 				}
 				REQUIRE(c.size() == mapped.size());
 				REQUIRE(std::memcmp(c.data(), mapped.data(), mapped.size()) == 0);
@@ -352,11 +352,11 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				diskC.set_data({ //
 					reinterpret_cast<const std::byte*>(disk.data()),
 					disk.size() });
-				REQUIRE(diskC.compress());
+				diskC.compress();
 				REQUIRE(archC.size() == diskC.size());
 				REQUIRE(std::memcmp(archC.data(), diskC.data(), archC.size()) == 0);
 
-				REQUIRE(archC.decompress());
+				archC.decompress();
 				REQUIRE(!archC.compressed());
 				REQUIRE(archC.size() == disk.size());
 				REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);

@@ -128,23 +128,6 @@ namespace bsa
 		fo4
 	};
 
-	/// \brief	The base exception type for all `bsa` exceptions.
-	class BSA_VISIBLE exception :
-		public std::exception
-	{
-	public:
-		/// \brief	Constructs an exception with the given message.
-		exception(const char* a_what) noexcept :
-			_what(a_what)
-		{}
-
-		/// \brief	Obtains the explanation for why the exception was thrown.
-		const char* what() const noexcept { return _what; }
-
-	private:
-		const char* _what{ nullptr };
-	};
-
 #ifdef DOXYGEN
 	/// \brief	A doxygen only, detail class.
 	/// \details	This is a class that exists solely to de-duplicate documentation.
@@ -198,6 +181,42 @@ namespace bsa
 namespace bsa::detail
 {
 	using ostream_t = binary_io::any_ostream;
+
+#	define BSA_ENUMERATE(F)                                                                         \
+		F(none, "dummy error")                                                                       \
+                                                                                                     \
+		F(current_executable_directory_failure, "failed to locate the current executable directory") \
+		F(decompress_size_mismatch, "actual decompressed size does not match the expected size")     \
+                                                                                                     \
+		F(xmem_unavailable, "support for the xmem proxy has not been enabled")                       \
+		F(xmem_version_mismatch, "the xmem proxy does not match the expected version")               \
+		F(xmem_start_failure, "failed to start the xmem proxy")                                      \
+		F(xmem_communication_failure, "failed to read/write data from/to the xmem proxy")
+
+	enum class error_code
+	{
+#	define BSA_AS_ENUM(a_enum, a_what) a_enum,
+		BSA_ENUMERATE(BSA_AS_ENUM)
+#	undef BSA_AS_ENUM
+	};
+
+	[[nodiscard]] constexpr auto to_string(error_code a_code) noexcept
+		-> std::string_view
+	{
+#	define BSA_AS_STRING(a_enum, a_what) \
+	case error_code::##a_enum:            \
+		return a_what##sv;
+
+		switch (a_code) {
+			BSA_ENUMERATE(BSA_AS_STRING)
+		default:
+			return "unknown"sv;
+		}
+
+#	undef BSA_AS_STRING
+	}
+
+#	undef BSA_ENUMERATE
 
 	[[noreturn]] inline void declare_unreachable()
 	{
@@ -288,6 +307,86 @@ namespace bsa::detail
 	};
 }
 #endif
+
+namespace bsa
+{
+#if defined(BSA_SUPPORT_XMEM) && !defined(DOXYGEN)
+	namespace xmem
+	{
+		enum class error_code : std::int8_t;
+	}
+#endif
+
+	/// \brief	The base exception type for all `bsa` exceptions.
+	class BSA_VISIBLE exception :
+		public std::exception
+	{
+	public:
+		/// \brief	Constructs an exception with no message.
+		exception() noexcept = default;
+
+		/// \brief	Constructs an exception with the given message.
+		exception(const char* a_what) noexcept :
+			_what(a_what)
+		{}
+
+		/// \brief	Obtains the explanation for why the exception was thrown.
+		const char* what() const noexcept override { return _what; }
+
+	private:
+		const char* _what{ "" };
+	};
+
+	/// \brief	Classifies errors generated during compression library operations.
+	class BSA_VISIBLE compression_error :
+		public bsa::exception
+	{
+	public:
+		/// \brief	A list of back end libraries used for compression.
+		enum class library
+		{
+			/// \brief	An internal error.
+			/// \details	Likely caused by some failure to validate an invariant, or a failure to
+			///		open a compression library.
+			internal,
+
+			/// \brief	[zlib](https://github.com/madler/zlib) - A massively spiffy yet delicately unobtrusive compression library.
+			zlib,
+
+			/// \brief	[LZ4](https://github.com/lz4/lz4) - Extremely Fast Compression algorithm.
+			lz4,
+
+			/// \brief	XMem codec - xcompress from the Xbox SDK.
+			xmem
+		};
+
+#ifndef DOXYGEN
+		compression_error(library a_library, std::size_t a_code) noexcept;
+
+#	ifdef BSA_SUPPORT_XMEM
+		compression_error(xmem::error_code a_code) noexcept :
+			compression_error(library::xmem, detail::to_underlying(a_code))
+		{}
+#	endif
+
+		compression_error(detail::error_code a_code) noexcept :
+			compression_error(library::internal, detail::to_underlying(a_code))
+		{}
+
+		const char* what() const noexcept override { return _what.c_str(); }
+#endif
+
+		/// \brief	Returns the library which was the origin of this error.
+		[[nodiscard]] library source_library() const noexcept
+		{
+			return _lib;
+		}
+
+	private:
+		std::string _what;
+		library _lib{ library::internal };
+	};
+}
 
 namespace bsa::concepts
 {

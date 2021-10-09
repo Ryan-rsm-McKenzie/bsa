@@ -247,35 +247,30 @@ namespace bsa::fo4
 		return a_out;
 	}
 
-	bool chunk::compress() noexcept
+	void chunk::compress()
 	{
 		std::vector<std::byte> out;
 		out.resize(this->compress_bound());
 
 		const auto outsz = this->compress_into({ out.data(), out.size() });
-		if (outsz) {
-			out.resize(*outsz);
-			out.shrink_to_fit();
-			this->set_data(std::move(out), this->size());
+		out.resize(outsz);
+		out.shrink_to_fit();
+		this->set_data(std::move(out), this->size());
 
-			assert(this->compressed());
-			return true;
-		} else {
-			assert(!this->compressed());
-			return false;
-		}
+		assert(this->compressed());
 	}
 
-	auto chunk::compress_bound() const noexcept
+	auto chunk::compress_bound() const
 		-> std::size_t
 	{
 		assert(!this->compressed());
 		return ::compressBound(static_cast<::uLong>(this->size()));
 	}
 
-	auto chunk::compress_into(std::span<std::byte> a_out) noexcept
-		-> std::optional<std::size_t>
+	auto chunk::compress_into(std::span<std::byte> a_out)
+		-> std::size_t
 	{
+		using bsa::compression_error::library::zlib;
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound());
 
@@ -287,30 +282,26 @@ namespace bsa::fo4
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
-		if (result == Z_OK) {
-			return static_cast<std::size_t>(outsz);
-		} else {
-			return std::nullopt;
+		if (result != Z_OK) {
+			throw bsa::compression_error(zlib, result);
 		}
+
+		return static_cast<std::size_t>(outsz);
 	}
 
-	bool chunk::decompress() noexcept
+	void chunk::decompress()
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
-		if (this->decompress_into({ out.data(), out.size() })) {
-			this->set_data(std::move(out));
+		this->decompress_into({ out.data(), out.size() });
+		this->set_data(std::move(out));
 
-			assert(!this->compressed());
-			return true;
-		} else {
-			assert(this->compressed());
-			return false;
-		}
+		assert(!this->compressed());
 	}
 
-	bool chunk::decompress_into(std::span<std::byte> a_out) noexcept
+	void chunk::decompress_into(std::span<std::byte> a_out)
 	{
+		using bsa::compression_error::library::zlib;
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
@@ -322,10 +313,12 @@ namespace bsa::fo4
 			&outsz,
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
-		if (result == Z_OK && outsz == this->decompressed_size()) {
-			return true;
-		} else {
-			return false;
+		if (result != Z_OK) {
+			throw bsa::compression_error(zlib, result);
+		}
+
+		if (outsz != this->decompressed_size()) {
+			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 		}
 	}
 

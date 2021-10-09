@@ -120,15 +120,21 @@ namespace bsa::fo4
 		/// \pre	The file must *not* be \ref compressed() "compressed".
 		/// \post	The file will be \ref compressed() "compressed".
 		///
-		/// \return	Returns `true` if compression succeeded, `false` otherwise.
-		bool compress() noexcept;
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \remark	If a compression error is thrown, then the contents are left unchanged.
+		void compress();
 
 		/// \brief	Returns an upper bound on the storage size required to compress the file.
 		///
 		/// \pre	The file must *not* be \ref compressed() "compressed".
 		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
 		/// \return	Returns the size required to successfully compress the file.
-		[[nodiscard]] std::size_t compress_bound() const noexcept;
+		[[nodiscard]] std::size_t compress_bound() const;
 
 		/// \brief	Compresses the file into the given buffer.
 		///
@@ -136,18 +142,26 @@ namespace bsa::fo4
 		/// \pre	`a_out` must be \ref compress_bound() "large enough" to compress the
 		/// 	file into.
 		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
 		/// \param	a_out	The buffer to compress the file into.
-		/// \return	The final size of the compressed buffer, or `std::nullopt` if
-		/// 	compression failed.
-		[[nodiscard]] std::optional<std::size_t> compress_into(std::span<std::byte> a_out) noexcept;
+		/// \return	The final size of the compressed buffer.
+		///
+		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
+		///		in an unspecified state.
+		[[nodiscard]] std::size_t compress_into(std::span<std::byte> a_out);
 
 		/// \brief	Decompresses the file.
 		///
 		/// \pre	The file *must* be \ref compressed() "compressed".
 		/// \post	The file will be \ref compressed() "decompressed".
 		///
-		/// \return Returns `true` if decompression succeeded, `false` otherwise.
-		bool decompress() noexcept;
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \remark	If a compression error is thrown, then the contents are left unchanged.
+		void decompress();
 
 		/// \brief	Decompresses the file into the given buffer.
 		///
@@ -155,9 +169,14 @@ namespace bsa::fo4
 		/// \pre	`a_out` must be \ref decompressed_size() "large enough" to
 		/// 	decompress the file into.
 		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
 		/// \param	a_out	The buffer to decompress the file into.
-		/// \return	Returns `true` if decompression succeeded, `false` otherwise.
-		bool decompress_into(std::span<std::byte> a_out) noexcept;
+		///
+		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
+		///		in an unspecified state.
+		void decompress_into(std::span<std::byte> a_out);
 	};
 
 	/// \brief	Represents a file within the FO:4 virtual filesystem.

@@ -235,13 +235,13 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				bsa::tes4::file original;
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
-				REQUIRE(original.compress(version));
+				original.compress(version);
 
 				REQUIRE(read->size() == original.size());
 				REQUIRE(read->decompressed_size() == original.decompressed_size());
 				REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
 
-				REQUIRE(read->decompress(version));
+				read->decompress(version);
 				REQUIRE(read->size() == origsrc.size());
 				REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
 			}
@@ -355,7 +355,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				f.set_data(a_data);
 				auto it = bsa.find(dir);
 				if (it == bsa.end()) {
-					it = bsa.insert(dir, bsa::tes4::directory{}).first;
+					it = bsa.insert(dir, bsa::tes4::directory()).first;
 				}
 				REQUIRE(it != bsa.end());
 				it->second.insert(a_hash, std::move(f));
@@ -484,7 +484,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 					REQUIRE(f->first.name() == simple_normalize(file.name));
 				}
 				if (f->second.compressed()) {
-					REQUIRE(f->second.decompress(a_version));
+					f->second.decompress(a_version);
 				}
 				REQUIRE(f->second.size() == mapped.size());
 				REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
@@ -595,12 +595,12 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 			}();
 
 			REQUIRE(memory->decompressed_size() == disk.size());
-			REQUIRE(memory->decompress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem));
+			memory->decompress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
 			REQUIRE(!memory->compressed());
 			REQUIRE(memory->size() == disk.size());
 			REQUIRE(std::memcmp(memory->data(), disk.data(), disk.size()) == 0);
 
-			REQUIRE(memory->compress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem));
+			memory->compress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
 			REQUIRE(memory->compressed());
 			REQUIRE(memory->size() == compressed.size());
 			REQUIRE(std::memcmp(memory->data(), compressed.data(), compressed.size()) == 0);

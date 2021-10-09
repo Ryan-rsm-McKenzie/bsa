@@ -13,6 +13,13 @@
 #include <utility>
 #include <variant>
 
+#include <lz4frame.h>
+#include <zlib.h>
+
+#ifdef BSA_SUPPORT_XMEM
+#	include "bsa/xmem/xmem.hpp"
+#endif
+
 namespace bsa
 {
 	namespace
@@ -55,7 +62,7 @@ namespace bsa::detail
 		[[nodiscard]] char mapchar(char a_ch) noexcept
 		{
 			constexpr auto lut = []() noexcept {
-				std::array<char, std::numeric_limits<unsigned char>::max() + 1> map{};
+				std::array<char, (std::numeric_limits<unsigned char>::max)() + 1> map{};
 				for (std::size_t i = 0; i < map.size(); ++i) {
 					map[i] = static_cast<char>(i);
 				}
@@ -168,6 +175,36 @@ namespace bsa::detail
 		_copy(a_copy)
 	{
 		_stream.endian(std::endian::little);
+	}
+}
+
+namespace bsa
+{
+	compression_error::compression_error(
+		library a_library,
+		std::size_t a_code) noexcept :
+		_lib(a_library)
+	{
+		switch (_lib) {
+		case library::internal:
+			_what = detail::to_string(static_cast<detail::error_code>(a_code));
+			break;
+		case library::zlib:
+			_what = ::zError(static_cast<int>(a_code));
+			break;
+		case library::lz4:
+			_what = ::LZ4F_getErrorName(static_cast<::LZ4F_errorCode_t>(a_code));
+			break;
+		case library::xmem:
+#ifdef BSA_SUPPORT_XMEM
+			_what = xmem::to_string(static_cast<xmem::error_code>(a_code));
+#else
+			_what = "undecoded xmem error"sv;
+#endif
+			break;
+		default:
+			detail::declare_unreachable();
+		}
 	}
 }
 
