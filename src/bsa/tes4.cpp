@@ -537,7 +537,6 @@ namespace bsa::tes4
 	auto file::compress_into_lz4(std::span<std::byte> a_out)
 		-> std::size_t
 	{
-		using bsa::compression_error::library::lz4;
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
 
@@ -550,7 +549,7 @@ namespace bsa::tes4
 			in.size_bytes(),
 			&detail::lz4f_preferences);
 		if (::LZ4F_isError(result)) {
-			throw bsa::compression_error(lz4, result);
+			throw bsa::compression_error(bsa::compression_error::library::lz4, result);
 		}
 
 		return result;
@@ -596,7 +595,6 @@ namespace bsa::tes4
 	auto file::compress_into_zlib(std::span<std::byte> a_out)
 		-> std::size_t
 	{
-		using bsa::compression_error::library::zlib;
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound(version::tes4));
 
@@ -609,7 +607,7 @@ namespace bsa::tes4
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
 		if (result != Z_OK) {
-			throw bsa::compression_error(zlib, result);
+			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
 		}
 
 		return static_cast<std::size_t>(outsz);
@@ -617,14 +615,13 @@ namespace bsa::tes4
 
 	void file::decompress_into_lz4(std::span<std::byte> a_out)
 	{
-		using bsa::compression_error::library::lz4;
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
 		::LZ4F_dctx* pdctx = nullptr;
 		if (const auto result = ::LZ4F_createDecompressionContext(&pdctx, LZ4F_VERSION);
 			::LZ4F_isError(result)) {
-			throw bsa::compression_error(lz4, result);
+			throw bsa::compression_error(bsa::compression_error::library::lz4, result);
 		}
 		std::unique_ptr<::LZ4F_dctx, decltype(&::LZ4F_freeDecompressionContext)> dctx{
 			pdctx,
@@ -653,7 +650,7 @@ namespace bsa::tes4
 		} while (result != 0 && !::LZ4F_isError(result));
 
 		if (::LZ4F_isError(result)) {
-			throw bsa::compression_error(lz4, result);
+			throw bsa::compression_error(bsa::compression_error::library::lz4, result);
 		}
 
 		const auto totalsz = static_cast<std::size_t>(
@@ -703,7 +700,6 @@ namespace bsa::tes4
 
 	void file::decompress_into_zlib(std::span<std::byte> a_out)
 	{
-		using bsa::compression_error::library::zlib;
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
@@ -716,7 +712,7 @@ namespace bsa::tes4
 			reinterpret_cast<const ::Byte*>(in.data()),
 			static_cast<::uLong>(in.size_bytes()));
 		if (result != Z_OK) {
-			throw bsa::compression_error(zlib, result);
+			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
 		}
 
 		if (outsz != this->decompressed_size()) {

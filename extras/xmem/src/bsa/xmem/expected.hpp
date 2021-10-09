@@ -16,17 +16,17 @@ namespace bsa::xmem
 	using nonstd::unexpected;
 #endif
 
-#define WRAP_EXPECTED(a_value)                          \
-	do {                                                \
-		if (!a_value) {                                 \
-			return xmem::unexpected(a_value##.error()); \
-		}                                               \
+#define WRAP_EXPECTED(a_value)                        \
+	do {                                              \
+		if (!a_value) {                               \
+			return xmem::unexpected(a_value.error()); \
+		}                                             \
 	} while (false)
 
-#define UNWRAP_EXPECTED(a_value)      \
-	do {                              \
-		if (!a_value) {               \
-			return a_value##.error(); \
-		}                             \
+#define UNWRAP_EXPECTED(a_value)    \
+	do {                            \
+		if (!a_value) {             \
+			return a_value.error(); \
+		}                           \
 	} while (false)
 }

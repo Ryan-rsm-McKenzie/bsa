@@ -58,7 +58,7 @@ namespace bsa::xmem
 		-> std::string_view
 	{
 #define AS_STRING(a_enum, ...) \
-	case error_code::##a_enum: \
+	case error_code::a_enum:   \
 		return #a_enum##sv;
 
 		switch (a_code) {

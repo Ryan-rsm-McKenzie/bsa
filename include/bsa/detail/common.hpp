@@ -204,7 +204,7 @@ namespace bsa::detail
 		-> std::string_view
 	{
 #	define BSA_AS_STRING(a_enum, a_what) \
-	case error_code::##a_enum:            \
+	case error_code::a_enum:              \
 		return a_what##sv;
 
 		switch (a_code) {
