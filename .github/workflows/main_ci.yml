@@ -70,7 +70,7 @@ jobs:
       - name: Configure & Build
         working-directory: ${{ github.workspace }}/bsa
         run: |
-          cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
           cmake --build build
 
       - name: Test
@@ -160,7 +160,7 @@ jobs:
       - name: (main) Configure & Build
         working-directory: ${{ github.workspace }}/bsa
         run: |
-          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
           cmake --build build
 
       - name: (main) Test
