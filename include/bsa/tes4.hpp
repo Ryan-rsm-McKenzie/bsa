@@ -222,9 +222,9 @@ namespace bsa::tes4
 		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) -> std::size_t;
 		[[nodiscard]] auto compress_into_xmem(std::span<std::byte> a_out) -> std::size_t;
 		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) -> std::size_t;
-		[[nodiscard]] void decompress_into_lz4(std::span<std::byte> a_out);
-		[[nodiscard]] void decompress_into_xmem(std::span<std::byte> a_out);
-		[[nodiscard]] void decompress_into_zlib(std::span<std::byte> a_out);
+		void decompress_into_lz4(std::span<std::byte> a_out);
+		void decompress_into_xmem(std::span<std::byte> a_out);
+		void decompress_into_zlib(std::span<std::byte> a_out);
 		[[nodiscard]] auto compress_bound_xmem() const -> std::size_t;
 
 	public:
