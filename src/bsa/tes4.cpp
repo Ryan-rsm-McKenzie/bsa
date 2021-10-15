@@ -525,7 +525,7 @@ namespace bsa::tes4
 			reproc::process _proxy;
 		};
 
-		[[nodiscard]] auto get_xmem_proxy() noexcept
+		[[nodiscard]] auto get_xmem_proxy()
 			-> reproc::process&
 		{
 			thread_local xmem_proxy proxy;
