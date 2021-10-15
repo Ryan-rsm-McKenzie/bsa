@@ -210,7 +210,7 @@ namespace bsa::detail
 		switch (a_code) {
 			BSA_ENUMERATE(BSA_AS_STRING)
 		default:
-			return "unknown"sv;
+			return "unknown internal bsa error code"sv;
 		}
 
 #	undef BSA_AS_STRING

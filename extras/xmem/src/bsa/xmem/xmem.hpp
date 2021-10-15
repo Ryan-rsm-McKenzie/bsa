@@ -65,7 +65,7 @@ namespace bsa::xmem
 		switch (a_code) {
 			ENUMERATE(AS_STRING)
 		default:
-			return "unknown"sv;
+			return "unknown xmem error code"sv;
 		}
 
 #undef AS_STRING
