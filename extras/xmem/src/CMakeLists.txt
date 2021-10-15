@@ -7,6 +7,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/bsa/xmem/expected.hpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.cpp"
 	"${SOURCE_DIR}/bsa/xmem/hashing.hpp"
+	"${SOURCE_DIR}/bsa/xmem/unicode.hpp"
 	"${SOURCE_DIR}/bsa/xmem/util.hpp"
 	"${SOURCE_DIR}/bsa/xmem/winapi.hpp"
 	"${SOURCE_DIR}/bsa/xmem/xcompress.cpp"

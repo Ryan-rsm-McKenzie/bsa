@@ -4,6 +4,7 @@ set(SOURCE_DIR "${ROOT_DIR}/extras/xmem/tests")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/xmem/api.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/hashing.test.cpp"
+	"${SOURCE_DIR}/src/bsa/xmem/unicode.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/util.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/winapi.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/xmem.test.cpp"
@@ -44,6 +45,14 @@ target_link_libraries(
 	PRIVATE
 		"${PROJECT_NAME}_common"
 )
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	target_compile_options(
+		"tests"
+		PRIVATE
+			"/utf-8"
+	)
+endif()
 
 macro(acquire_test NAME)
 	file(ARCHIVE_EXTRACT

@@ -27,6 +27,7 @@ namespace bsa::xmem
 	F(load_library_failure)                     \
 	F(open_file_failure)                        \
 	F(reg_get_value_failure)                    \
+	F(unicode_conversion_failure)               \
                                                 \
 	F(hashing_open_algorithm_provider_failure)  \
 	F(hashing_create_hash_failure)              \

@@ -22,6 +22,7 @@
 #include "bsa/project_version.hpp"
 #include "bsa/xmem/api.hpp"
 #include "bsa/xmem/binary_stdio.hpp"
+#include "bsa/xmem/unicode.hpp"
 #include "bsa/xmem/xcompress.hpp"
 #include "bsa/xmem/xmem.hpp"
 
@@ -30,6 +31,7 @@ using namespace std::literals;
 namespace api = bsa::xmem::api;
 namespace binary_stdio = bsa::xmem::binary_stdio;
 namespace project_version = bsa::project_version;
+namespace unicode = bsa::xmem::unicode;
 namespace xcompress = bsa::xmem::xcompress;
 namespace xmem = bsa::xmem;
 
@@ -397,9 +399,18 @@ namespace
 }
 
 #ifndef TESTING
-int main(int a_argc, char* a_argv[])
+int wmain(int a_argc, wchar_t* a_argv[])
 {
-	const std::vector<std::string> args(a_argv + 1, a_argv + a_argc);
+	std::vector<std::string> args(static_cast<std::size_t>(a_argc - 1));
+	for (int i = 1; i < a_argc; ++i) {
+		auto cvt = unicode::utf16_to_utf8(a_argv[i]);
+		if (!cvt) {
+			return static_cast<int>(cvt.error());
+		}
+
+		args.push_back(*std::move(cvt));
+	}
+
 	return static_cast<int>(do_main(args));
 }
 #endif
