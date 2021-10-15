@@ -401,7 +401,8 @@ namespace
 #ifndef TESTING
 int wmain(int a_argc, wchar_t* a_argv[])
 {
-	std::vector<std::string> args(static_cast<std::size_t>(a_argc - 1));
+	std::vector<std::string> args;
+	args.reserve(static_cast<std::size_t>(a_argc - 1));
 	for (int i = 1; i < a_argc; ++i) {
 		auto cvt = unicode::utf16_to_utf8(a_argv[i]);
 		if (!cvt) {
