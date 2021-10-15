@@ -30,6 +30,7 @@ namespace bsa::detail
 			const auto end = reinterpret_cast<const std::uint8_t*>(std::to_address(a_dst.end()));
 
 			do {
+				_proc.poll(reproc::event::out);
 				std::tie(read, error) = _proc.read(
 					reproc::stream::out,
 					pos,
@@ -67,6 +68,7 @@ namespace bsa::detail
 			const auto end = reinterpret_cast<const std::uint8_t*>(std::to_address(a_src.end()));
 
 			do {
+				_proc.poll(reproc::event::in);
 				std::tie(written, error) = _proc.write(pos, static_cast<std::size_t>(end - pos));
 				pos += written;
 			} while (!error && pos != end);
