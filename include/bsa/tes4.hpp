@@ -91,7 +91,7 @@ namespace bsa::tes4
 		/// \brief	The default compression codec.
 		normal,
 
-		/// \brief	Compression codec used for xbox archives.
+		/// \brief	The compression codec used for xbox archives.
 		xmem
 	};
 
