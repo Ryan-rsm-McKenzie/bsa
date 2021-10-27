@@ -482,7 +482,7 @@ namespace bsa::components
 			const detail::istream_t& a_in) noexcept
 		{
 			if (a_in.has_file() && a_in.shallow_copy()) {
-				_data.emplace<data_proxied>(a_data, a_in.file());
+				_data.emplace<data_proxied>(data_proxy{a_data, a_in.file()});
 			} else {
 				if (a_in.deep_copy()) {
 					_data.emplace<data_owner>(a_data.begin(), a_data.end());
@@ -548,7 +548,7 @@ namespace bsa::components
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
 		{
 			if (a_in.has_file() && a_in.shallow_copy()) {
-				_data.emplace<data_proxied>(a_data, a_in.file());
+				_data.emplace<data_proxied>(data_proxy{a_data, a_in.file()});
 			} else {
 				if (a_in.deep_copy()) {
 					_data.emplace<data_owner>(a_data.begin(), a_data.end());
