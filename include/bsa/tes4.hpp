@@ -59,7 +59,6 @@ namespace bsa::tes4
 		embedded_file_names = 1u << 8u,
 
 		/// \brief	Uses the xmem codec from XNA 4.0 to compress the archive.
-		/// \remark	This flag is unsupported by `bsa`.
 		/// \remark	This flag requires \ref archive_flag::compressed to be set as well.
 		/// \remark	This flag is unused in SSE.
 		xbox_compressed = 1u << 9u
