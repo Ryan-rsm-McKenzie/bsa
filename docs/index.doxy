@@ -97,7 +97,7 @@ The xmem codec is a compression format available as part of the xbox development
 - UTF-8 inputs are not well formed. The game engine has a crippling bug where extended ascii characters can index out-of-bounds, producing unreproducible hashes. It is the user's job to ensure they aren't attempting to store paths which contain such characters. The game engine will accept them, but it will never be able to reproducibly locate them.
 - The game engine normalizes paths to use the `\` character instead of the standard `/`. As such, users should be aware that file paths retrieved from the virtual file system may not constitute valid paths on their native file system.
 - Avoid writing file paths which are close to the limit of `MAX_PATH`. Bethesda uses fixed buffers everywhere with no input validation, so they will most likely crash the game.
-- Make sure to lexically normalize your paths before you pass them. Bethesda uses *really* basic file extension detection methods, and `bsa` replicates those methods.
+- Make sure to lexically normalize your paths before you pass them. Bethesda uses *really* basic path splitting methods, and `bsa` replicates them.
 - Files can not be split into more than 4 chunks inside a ba2. Bethesda uses a fixed buffer to store the chunks, and exceeding that limit will likely crash the game.
 
 \section dependencies Dependencies
