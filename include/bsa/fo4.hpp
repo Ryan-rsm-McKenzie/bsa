@@ -150,7 +150,7 @@ namespace bsa::fo4
 		///
 		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
 		///		in an unspecified state.
-		[[nodiscard]] std::size_t compress_into(std::span<std::byte> a_out);
+		[[nodiscard]] std::size_t compress_into(std::span<std::byte> a_out) const;
 
 		/// \brief	Decompresses the file.
 		///
@@ -176,7 +176,7 @@ namespace bsa::fo4
 		///
 		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
 		///		in an unspecified state.
-		void decompress_into(std::span<std::byte> a_out);
+		void decompress_into(std::span<std::byte> a_out) const;
 	};
 
 	/// \brief	Represents a file within the FO:4 virtual filesystem.

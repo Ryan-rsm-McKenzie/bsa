@@ -298,7 +298,7 @@ namespace bsa::fo4
 		assert(!this->compressed());
 	}
 
-	void chunk::decompress_into(std::span<std::byte> a_out)
+	void chunk::decompress_into(std::span<std::byte> a_out) const
 	{
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());

@@ -534,7 +534,7 @@ namespace bsa::tes4
 	}
 #endif
 
-	auto file::compress_into_lz4(std::span<std::byte> a_out)
+	auto file::compress_into_lz4(std::span<std::byte> a_out) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
@@ -556,7 +556,7 @@ namespace bsa::tes4
 	}
 
 	auto file::compress_into_xmem(
-		[[maybe_unused]] std::span<std::byte> a_out)
+		[[maybe_unused]] std::span<std::byte> a_out) const
 		-> std::size_t
 	{
 #ifdef BSA_SUPPORT_XMEM
@@ -592,7 +592,7 @@ namespace bsa::tes4
 #endif
 	}
 
-	auto file::compress_into_zlib(std::span<std::byte> a_out)
+	auto file::compress_into_zlib(std::span<std::byte> a_out) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
@@ -613,7 +613,7 @@ namespace bsa::tes4
 		return static_cast<std::size_t>(outsz);
 	}
 
-	void file::decompress_into_lz4(std::span<std::byte> a_out)
+	void file::decompress_into_lz4(std::span<std::byte> a_out) const
 	{
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
@@ -661,7 +661,7 @@ namespace bsa::tes4
 	}
 
 	void file::decompress_into_xmem(
-		[[maybe_unused]] std::span<std::byte> a_out)
+		[[maybe_unused]] std::span<std::byte> a_out) const
 	{
 #ifdef BSA_SUPPORT_XMEM
 		assert(this->compressed());
@@ -698,7 +698,7 @@ namespace bsa::tes4
 #endif
 	}
 
-	void file::decompress_into_zlib(std::span<std::byte> a_out)
+	void file::decompress_into_zlib(std::span<std::byte> a_out) const
 	{
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
@@ -787,7 +787,7 @@ namespace bsa::tes4
 	auto file::compress_into(
 		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec)
+		compression_codec a_codec) const
 		-> std::size_t
 	{
 		switch (detail::to_underlying(a_version)) {
@@ -821,7 +821,7 @@ namespace bsa::tes4
 	void file::decompress_into(
 		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec)
+		compression_codec a_codec) const
 	{
 		switch (detail::to_underlying(a_version)) {
 		case 103:

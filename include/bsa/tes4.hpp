@@ -219,12 +219,12 @@ namespace bsa::tes4
 			isecondary_archive = 1u << 31u
 		};
 
-		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) -> std::size_t;
-		[[nodiscard]] auto compress_into_xmem(std::span<std::byte> a_out) -> std::size_t;
-		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) -> std::size_t;
-		void decompress_into_lz4(std::span<std::byte> a_out);
-		void decompress_into_xmem(std::span<std::byte> a_out);
-		void decompress_into_zlib(std::span<std::byte> a_out);
+		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) const -> std::size_t;
+		[[nodiscard]] auto compress_into_xmem(std::span<std::byte> a_out) const -> std::size_t;
+		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) const -> std::size_t;
+		void decompress_into_lz4(std::span<std::byte> a_out) const;
+		void decompress_into_xmem(std::span<std::byte> a_out) const;
+		void decompress_into_zlib(std::span<std::byte> a_out) const;
 		[[nodiscard]] auto compress_bound_xmem() const -> std::size_t;
 
 	public:
@@ -261,7 +261,7 @@ namespace bsa::tes4
 		[[nodiscard]] std::size_t compress_into(
 			version a_version,
 			std::span<std::byte> a_out,
-			compression_codec a_codec = compression_codec::normal);
+			compression_codec a_codec = compression_codec::normal) const;
 
 		/// \copydoc bsa::fo4::chunk::decompress
 		///
@@ -278,7 +278,7 @@ namespace bsa::tes4
 		void decompress_into(
 			version a_version,
 			std::span<std::byte> a_out,
-			compression_codec a_codec = compression_codec::normal);
+			compression_codec a_codec = compression_codec::normal) const;
 	};
 
 	/// \brief	Represents a directory within the TES:4 virtual filesystem.
