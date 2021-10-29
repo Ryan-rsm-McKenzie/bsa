@@ -628,7 +628,7 @@ namespace bsa::components
 			{
 				using result_t = decltype((**this)[std::forward<K>(a_key)]);
 				return (*this) ?
-				           (**this)[std::forward<K>(a_key)] :
+                           (**this)[std::forward<K>(a_key)] :
                            result_t{};
 			}
 
