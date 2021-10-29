@@ -230,6 +230,23 @@ namespace bsa::detail
 #	endif
 	}
 
+	template <
+		std::size_t I,
+		class... Variants,
+		class... Args>
+	decltype(auto) variant_emplace(
+		std::variant<Variants...>& a_variant,
+		Args&&... a_args)
+	{
+		using T = std::variant_alternative_t<I, std::variant<Variants...>>;
+		if constexpr (std::constructible_from<T, Args...>) {
+			return a_variant.template emplace<I>(std::forward<Args>(a_args)...);
+		} else {
+			// WORKAROUND: clang-13 is missing P0960R3
+			return a_variant.template emplace<I>(T{ std::forward<Args>(a_args)... });
+		}
+	}
+
 	void normalize_path(std::string& a_path) noexcept;
 
 	[[nodiscard]] auto read_bstring(detail::istream_t& a_in) -> std::string_view;
@@ -482,7 +499,7 @@ namespace bsa::components
 			const detail::istream_t& a_in) noexcept
 		{
 			if (a_in.has_file() && a_in.shallow_copy()) {
-				_data.emplace<data_proxied>(a_data, a_in.file());
+				detail::variant_emplace<data_proxied>(_data, a_data, a_in.file());
 			} else {
 				if (a_in.deep_copy()) {
 					_data.emplace<data_owner>(a_data.begin(), a_data.end());
@@ -548,7 +565,7 @@ namespace bsa::components
 			std::optional<std::size_t> a_decompressedSize = std::nullopt) noexcept
 		{
 			if (a_in.has_file() && a_in.shallow_copy()) {
-				_data.emplace<data_proxied>(a_data, a_in.file());
+				detail::variant_emplace<data_proxied>(_data, a_data, a_in.file());
 			} else {
 				if (a_in.deep_copy()) {
 					_data.emplace<data_owner>(a_data.begin(), a_data.end());
@@ -611,7 +628,7 @@ namespace bsa::components
 			{
 				using result_t = decltype((**this)[std::forward<K>(a_key)]);
 				return (*this) ?
-                           (**this)[std::forward<K>(a_key)] :
+				           (**this)[std::forward<K>(a_key)] :
                            result_t{};
 			}
 
