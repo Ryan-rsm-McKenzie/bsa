@@ -141,21 +141,21 @@ namespace bsa::tes3
 
 #ifdef DOXYGEN
 	protected:
-		/// \brief	Reads the contents of the archive from disk.
+		/// \brief	Reads the contents of the archive from the source.
 		///
 		/// \exception	binary_io::buffer_exhausted	Thrown when archive reads index out of bounds.
 		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
 		///
-		///	\remark	If `binary_io::buffer_exhausted` or `bsa::exception` is thrown, the archive is
-		///		left in an unspecified state. Use \ref clear to return it to a valid state.
-		/// \remark	If the function returns successfully, the contents of the archived are replaced
-		///		with the contents of the archive on disk.
+		///	\remark	If any exception is thrown, the archive is left in an unspecified state.
+		///		Use \ref clear to return it to a valid state.
+		/// \remark	If the function returns successfully, the contents of the current archived are
+		///		*replaced* with the contents of the input archive.
 		void doxygen_read();
 
-		/// \brief	Writes the contents of the archive to disk.
+		/// \brief	Writes the contents of the archive to the destination.
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	binary_io::buffer_exhausted	Thrown when the underlying buffer is exhausted.
+		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
 		void doxygen_write() const;
 #endif
 
