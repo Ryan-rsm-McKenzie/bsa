@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <optional>
 #include <span>
 #include <string>
@@ -290,6 +291,79 @@ namespace bsa::fo4
 		}
 	}
 
+	std::size_t chunk::compress_into_default(std::span<std::byte> a_out) const
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound());
+
+		const auto in = this->as_bytes();
+		auto outsz = static_cast<::uLong>(a_out.size());
+
+		const auto result = ::compress(
+			reinterpret_cast<::Byte*>(a_out.data()),
+			&outsz,
+			reinterpret_cast<const ::Byte*>(in.data()),
+			static_cast<::uLong>(in.size_bytes()));
+		if (result != Z_OK) {
+			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
+		}
+
+		return static_cast<std::size_t>(outsz);
+	}
+
+	std::size_t chunk::compress_into_xbox(std::span<std::byte> a_out) const
+	{
+		assert(!this->compressed());
+		assert(a_out.size_bytes() >= this->compress_bound());
+
+		::z_stream stream = {};
+		if (const auto result = deflateInit2(
+				&stream,
+				Z_BEST_COMPRESSION,
+				Z_DEFLATED,
+				12,
+				8,
+				Z_DEFAULT_STRATEGY);
+			result != Z_OK) {
+			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
+		}
+
+		const auto in = this->as_bytes();
+
+		stream.next_out = reinterpret_cast<::Bytef*>(a_out.data());
+		stream.avail_out = 0;
+		stream.next_in = (z_const ::Bytef*)in.data();
+		stream.avail_in = 0;
+
+		auto insz = in.size_bytes();
+		auto outsz = a_out.size_bytes();
+		int error = Z_OK;
+		do {
+			if (stream.avail_out == 0) {
+				stream.avail_out = static_cast<::uInt>(
+					std::min<std::size_t>((std::numeric_limits<::uInt>::max)(), outsz));
+				outsz -= stream.avail_out;
+			}
+
+			if (stream.avail_in == 0) {
+				stream.avail_in = static_cast<::uInt>(
+					std::min<std::size_t>((std::numeric_limits<::uInt>::max)(), insz));
+				insz -= stream.avail_in;
+			}
+
+			error = ::deflate(&stream, insz > 0 ? Z_NO_FLUSH : Z_FINISH);
+		} while (error == Z_OK);
+
+		const auto finalsz = stream.total_out;
+		::deflateEnd(&stream);
+
+		if (error != Z_STREAM_END) {
+			throw bsa::compression_error(bsa::compression_error::library::zlib, error);
+		}
+
+		return finalsz;
+	}
+
 	auto operator>>(
 		detail::istream_t& a_in,
 		chunk::mips_t& a_mips)
@@ -308,12 +382,13 @@ namespace bsa::fo4
 		return a_out;
 	}
 
-	void chunk::compress()
+	void chunk::compress(
+		compression_level a_level)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->compress_bound());
 
-		const auto outsz = this->compress_into({ out.data(), out.size() });
+		const auto outsz = this->compress_into({ out.data(), out.size() }, a_level);
 		out.resize(outsz);
 		out.shrink_to_fit();
 		this->set_data(std::move(out), this->size());
@@ -328,25 +403,19 @@ namespace bsa::fo4
 		return ::compressBound(static_cast<::uLong>(this->size()));
 	}
 
-	auto chunk::compress_into(std::span<std::byte> a_out) const
+	auto chunk::compress_into(
+		std::span<std::byte> a_out,
+		compression_level a_level) const
 		-> std::size_t
 	{
-		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound());
-
-		const auto in = this->as_bytes();
-		auto outsz = static_cast<::uLong>(a_out.size());
-
-		const auto result = ::compress(
-			reinterpret_cast<::Byte*>(a_out.data()),
-			&outsz,
-			reinterpret_cast<const ::Byte*>(in.data()),
-			static_cast<::uLong>(in.size_bytes()));
-		if (result != Z_OK) {
-			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
+		switch (a_level) {
+		case compression_level::normal:
+			return this->compress_into_default(a_out);
+		case compression_level::xbox:
+			return this->compress_into_xbox(a_out);
+		default:
+			detail::declare_unreachable();
 		}
-
-		return static_cast<std::size_t>(outsz);
 	}
 
 	void chunk::decompress()
@@ -415,21 +484,23 @@ namespace bsa::fo4
 		std::filesystem::path a_path,
 		format a_format,
 		std::size_t a_mipChunkMax,
+		compression_level a_level,
 		compression_type a_compression)
 	{
 		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_format, a_mipChunkMax, a_compression);
+		this->do_read(in, a_format, a_mipChunkMax, a_level, a_compression);
 	}
 
 	void file::read(
 		std::span<const std::byte> a_src,
 		format a_format,
 		std::size_t a_mipChunkMax,
+		compression_level a_level,
 		compression_type a_compression,
 		copy_type a_copy)
 	{
 		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_format, a_mipChunkMax, a_compression);
+		this->do_read(in, a_format, a_mipChunkMax, a_level, a_compression);
 	}
 
 	void file::write(
@@ -451,14 +522,15 @@ namespace bsa::fo4
 		detail::istream_t& a_in,
 		format a_format,
 		std::size_t a_mipChunkMax,
+		compression_level a_level,
 		compression_type a_compression)
 	{
 		switch (a_format) {
 		case format::general:
-			this->read_general(a_in, a_compression);
+			this->read_general(a_in, a_level, a_compression);
 			break;
 		case format::directx:
-			this->read_directx(a_in, a_mipChunkMax, a_compression);
+			this->read_directx(a_in, a_mipChunkMax, a_level, a_compression);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -484,6 +556,7 @@ namespace bsa::fo4
 	void file::read_directx(
 		[[maybe_unused]] detail::istream_t& a_in,
 		[[maybe_unused]] std::size_t a_mipChunkMax,
+		[[maybe_unused]] compression_level a_level,
 		[[maybe_unused]] compression_type a_compression)
 	{
 #if BSA_OS_WINDOWS
@@ -529,7 +602,7 @@ namespace bsa::fo4
 			chunk.mips.last = static_cast<std::uint16_t>(&splice.back() - scratch.GetImages());
 			chunk.set_data(std::move(bytes));
 			if (a_compression == compression_type::compressed) {
-				chunk.compress();
+				chunk.compress(a_level);
 			}
 		}
 #else
@@ -539,6 +612,7 @@ namespace bsa::fo4
 
 	void file::read_general(
 		detail::istream_t& a_in,
+		compression_level a_level,
 		compression_type a_compression)
 	{
 		this->clear();
@@ -546,7 +620,7 @@ namespace bsa::fo4
 		auto& chunk = this->emplace_back();
 		chunk.set_data(a_in->rdbuf(), a_in);
 		if (a_compression == compression_type::compressed) {
-			chunk.compress();
+			chunk.compress(a_level);
 		}
 	}
 

@@ -38,6 +38,17 @@ namespace bsa::fo4
 		directx = detail::constants::dx10,
 	};
 
+	/// \brief	Specifies the compression level to use when compressing data.
+	enum class compression_level
+	{
+		/// \brief	The default compression level.
+		normal,
+
+		/// \brief	Uses a smaller windows size, but higher a compression level
+		///		to yield a higher compression ratio.
+		xbox
+	};
+
 	namespace hashing
 	{
 		struct hash final
@@ -94,6 +105,9 @@ namespace bsa::fo4
 		friend file;
 		using super = components::compressed_byte_container;
 
+		[[nodiscard]] std::size_t compress_into_default(std::span<std::byte> a_out) const;
+		[[nodiscard]] std::size_t compress_into_xbox(std::span<std::byte> a_out) const;
+
 	public:
 		/// \brief	Unique to \ref format::directx.
 		struct mips_t final
@@ -132,8 +146,11 @@ namespace bsa::fo4
 		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
 		///		are encountered.
 		///
+		/// \param	a_level	The level to compress the data at.
+		///
 		/// \remark	If a compression error is thrown, then the contents are left unchanged.
-		void compress();
+		void compress(
+			compression_level a_level = compression_level::normal);
 
 		/// \brief	Returns an upper bound on the storage size required to compress the file.
 		///
@@ -155,11 +172,14 @@ namespace bsa::fo4
 		///		are encountered.
 		///
 		/// \param	a_out	The buffer to compress the file into.
+		/// \param	a_level	The level to compress the data at.
 		/// \return	The final size of the compressed buffer.
 		///
 		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
 		///		in an unspecified state.
-		[[nodiscard]] std::size_t compress_into(std::span<std::byte> a_out) const;
+		[[nodiscard]] std::size_t compress_into(
+			std::span<std::byte> a_out,
+			compression_level a_level = compression_level::normal) const;
 
 		/// @}
 
@@ -389,6 +409,7 @@ namespace bsa::fo4
 			std::filesystem::path a_path,
 			format a_format,
 			std::size_t a_mipChunkMax = 512u * 512u,
+			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed);
 
 		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
@@ -397,6 +418,7 @@ namespace bsa::fo4
 			std::span<const std::byte> a_src,
 			format a_format,
 			std::size_t a_mipChunkMax = 512u * 512u,
+			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed,
 			copy_type a_copy = copy_type::deep);
 
@@ -426,10 +448,12 @@ namespace bsa::fo4
 
 		/// \param	a_format	The format to read the file as.
 		/// \param	a_mipChunkMax	The maxiumum size to restrict a single mip chunk to.
+		/// \param	a_level	The level to compress the data at.
 		/// \param	a_compression	The resulting compression of the file read.
 		void doxygen_read(
 			format a_format,
 			std::size_t a_mipChunkMax = 512u * 512u,
+			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed);
 
 		/// \param	a_format	The format to write the file as.
@@ -443,6 +467,7 @@ namespace bsa::fo4
 			detail::istream_t& a_in,
 			format a_format,
 			std::size_t a_mipChunkMax,
+			compression_level a_level,
 			compression_type a_compression);
 		void do_write(
 			detail::ostream_t& a_out,
@@ -451,9 +476,11 @@ namespace bsa::fo4
 		void read_directx(
 			detail::istream_t& a_in,
 			std::size_t a_mipChunkMax,
+			compression_level a_level,
 			compression_type a_compression);
 		void read_general(
 			detail::istream_t& a_in,
+			compression_level a_level,
 			compression_type a_compression);
 
 		void write_directx(detail::ostream_t& a_out) const;

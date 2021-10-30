@@ -429,31 +429,38 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 	SECTION("archives can contain compressed files")
 	{
 		const std::filesystem::path root{ "fo4_compression_test"sv };
-		bsa::fo4::archive ba2;
-		REQUIRE(ba2.read(root / "test.ba2"sv) == bsa::fo4::format::general);
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(root / "data"sv)) {
-			if (entry.is_regular_file()) {
-				const auto p = std::filesystem::relative(entry.path(), root / "data"sv);
-				const auto arch = ba2[p.string()];
-				REQUIRE(arch);
-				REQUIRE(arch->size() == 1);
-				auto archC = arch->front();
-				REQUIRE(archC.compressed());
+		const std::array archives{
+			std::make_pair("normal.ba2"sv, bsa::fo4::compression_level::normal),
+			std::make_pair("xbox.ba2"sv, bsa::fo4::compression_level::xbox),
+		};
 
-				const auto disk = map_file(entry.path());
+		for (const auto& [archive, compression] : archives) {
+			bsa::fo4::archive ba2;
+			REQUIRE(ba2.read(root / archive) == bsa::fo4::format::general);
+			for (const auto& entry : std::filesystem::recursive_directory_iterator(root / "data"sv)) {
+				if (entry.is_regular_file()) {
+					const auto p = std::filesystem::relative(entry.path(), root / "data"sv);
+					const auto arch = ba2[p.string()];
+					REQUIRE(arch);
+					REQUIRE(arch->size() == 1);
+					auto archC = arch->front();
+					REQUIRE(archC.compressed());
 
-				bsa::fo4::chunk diskC;
-				diskC.set_data({ //
-					reinterpret_cast<const std::byte*>(disk.data()),
-					disk.size() });
-				diskC.compress();
-				REQUIRE(archC.size() == diskC.size());
-				REQUIRE(std::memcmp(archC.data(), diskC.data(), archC.size()) == 0);
+					const auto disk = map_file(entry.path());
 
-				archC.decompress();
-				REQUIRE(!archC.compressed());
-				REQUIRE(archC.size() == disk.size());
-				REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);
+					bsa::fo4::chunk diskC;
+					diskC.set_data({ //
+						reinterpret_cast<const std::byte*>(disk.data()),
+						disk.size() });
+					diskC.compress(compression);
+					REQUIRE(archC.size() == diskC.size());
+					REQUIRE(std::memcmp(archC.data(), diskC.data(), archC.size()) == 0);
+
+					archC.decompress();
+					REQUIRE(!archC.compressed());
+					REQUIRE(archC.size() == disk.size());
+					REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);
+				}
 			}
 		}
 	}
