@@ -53,8 +53,7 @@ namespace
 		const auto relative = virtual_to_local_path(std::forward<Keys>(a_keys)...);
 		const auto path = a_root / relative;
 		std::filesystem::create_directories(path.parent_path());
-		binary_io::file_ostream out{ std::move(path) };
-		return binary_io::any_ostream{ std::move(out) };
+		return binary_io::any_ostream{ std::in_place_type<binary_io::file_ostream>, std::move(path) };
 	}
 
 	void pack_fo4(
