@@ -258,8 +258,5 @@ TEST_CASE("pack_unpack", "[examples]")
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack", "foo", "bar", "-baz"),
 			make_substr_matcher("unrecognized format"sv));
-		REQUIRE_THROWS_WITH(
-			invokeMain("unpack", texture.c_str(), "fo4_texture"),
-			make_substr_matcher("unsupported"sv));
 	}
 }

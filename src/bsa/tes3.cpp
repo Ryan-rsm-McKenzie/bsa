@@ -154,6 +154,42 @@ namespace bsa::tes3
 		}
 	}
 
+	void file::read(std::filesystem::path a_path)
+	{
+		detail::istream_t in{ std::move(a_path) };
+		this->do_read(in);
+	}
+
+	void file::read(
+		std::span<const std::byte> a_src,
+		copy_type a_copy)
+	{
+		detail::istream_t in{ a_src, a_copy };
+		this->do_read(in);
+	}
+
+	void file::write(std::filesystem::path a_path) const
+	{
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out);
+	}
+
+	void file::write(binary_io::any_ostream& a_dst) const
+	{
+		this->do_write(a_dst);
+	}
+
+	void file::do_read(detail::istream_t& a_in)
+	{
+		this->clear();
+		this->set_data(a_in->rdbuf(), a_in);
+	}
+
+	void file::do_write(detail::ostream_t& a_out) const
+	{
+		a_out.write_bytes(this->as_bytes());
+	}
+
 	struct archive::offsets_t final
 	{
 		std::size_t hashes{ 0 };

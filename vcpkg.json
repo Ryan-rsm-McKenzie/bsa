@@ -16,6 +16,12 @@
         "zlib"
       ]
     },
+    "dds": {
+      "description": "Build support for dds files in ba2 archives",
+      "dependencies": [
+        "directxtex"
+      ]
+    },
     "tests": {
       "description": "Build tests",
       "dependencies": [

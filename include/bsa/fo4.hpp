@@ -86,6 +86,7 @@ namespace bsa::fo4
 	{
 	private:
 		friend archive;
+		friend file;
 		using super = components::compressed_byte_container;
 
 	public:
@@ -305,7 +306,64 @@ namespace bsa::fo4
 		/// \brief	Returns the number of chunks in the file.
 		[[nodiscard]] std::size_t size() const noexcept { return _chunks.size(); }
 
+		/// \copydoc bsa::tes3::file::read(std::filesystem::path)
+		/// \copydoc bsa::fo4::file::doxygen_read
+		void read(
+			std::filesystem::path a_path,
+			format a_format,
+			compression_type a_compression = compression_type::decompressed);
+
+		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
+		/// \copydoc bsa::fo4::file::doxygen_read
+		void read(
+			std::span<const std::byte> a_src,
+			format a_format,
+			compression_type a_compression = compression_type::decompressed,
+			copy_type a_copy = copy_type::deep);
+
+		/// \copydoc bsa::tes3::file::write(std::filesystem::path) const
+		/// \copydoc bsa::fo4::file::doxygen_write
+		void write(
+			std::filesystem::path a_path,
+			format a_format) const;
+
+		/// \copydoc bsa::tes3::file::write(binary_io::any_ostream&) const
+		/// \copydoc bsa::fo4::file::doxygen_write
+		void write(
+			binary_io::any_ostream& a_dst,
+			format a_format) const;
+
+#ifdef DOXYGEN
+	protected:
+		/// \param	a_format	The format to read the file as.
+		/// \param	a_compression	The resulting compression of the file read.
+		void doxygen_read(
+			format a_format,
+			compression_type a_compression = compression_type::decompressed);
+
+		/// \param	a_format	The format to write the file as.
+		void doxygen_write(format a_format) const;
+#endif
+
 	private:
+		void do_read(
+			detail::istream_t& a_in,
+			format a_format,
+			compression_type a_compression);
+		void do_write(
+			detail::ostream_t& a_out,
+			format a_format) const;
+
+		void read_directx(
+			detail::istream_t& a_in,
+			compression_type a_compression);
+		void read_general(
+			detail::istream_t& a_in,
+			compression_type a_compression);
+
+		void write_directx(detail::ostream_t& a_out) const;
+		void write_general(detail::ostream_t& a_out) const;
+
 		container_type _chunks;
 	};
 

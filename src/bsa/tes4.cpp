@@ -844,6 +844,72 @@ namespace bsa::tes4
 		}
 	}
 
+	void file::read(
+		std::filesystem::path a_path,
+		version a_version,
+		compression_codec a_codec,
+		compression_type a_compression)
+	{
+		detail::istream_t in{ std::move(a_path) };
+		this->do_read(in, a_version, a_codec, a_compression);
+	}
+
+	void file::read(
+		std::span<const std::byte> a_src,
+		version a_version,
+		compression_codec a_codec,
+		compression_type a_compression,
+		copy_type a_copy)
+	{
+		detail::istream_t in{ a_src, a_copy };
+		this->do_read(in, a_version, a_codec, a_compression);
+	}
+
+	void file::write(
+		std::filesystem::path a_path,
+		version a_version,
+		compression_codec a_codec) const
+	{
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out, a_version, a_codec);
+	}
+
+	void file::write(
+		binary_io::any_ostream& a_dst,
+		version a_version,
+		compression_codec a_codec) const
+	{
+		this->do_write(a_dst, a_version, a_codec);
+	}
+
+	void file::do_read(
+		detail::istream_t& a_in,
+		version a_version,
+		compression_codec a_codec,
+		compression_type a_compression)
+	{
+		this->clear();
+		this->set_data(a_in->rdbuf(), a_in);
+		if (a_compression == compression_type::compressed) {
+			this->compress(a_version, a_codec);
+		}
+	}
+
+	void file::do_write(
+		detail::ostream_t& a_out,
+		version a_version,
+		compression_codec a_codec) const
+	{
+		if (this->compressed()) {
+			std::vector<std::byte> buffer;
+			buffer.resize(this->decompressed_size());
+			this->decompress_into(a_version, buffer, a_codec);
+			a_out.write_bytes(buffer);
+		} else {
+			a_out.write_bytes(this->as_bytes());
+		}
+	}
+
 	auto archive::read(std::filesystem::path a_path)
 		-> version
 	{

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -13,6 +14,23 @@
 #include <binary_io/any_stream.hpp>
 #include <binary_io/file_stream.hpp>
 #include <zlib.h>
+
+#if BSA_OS_WINDOWS
+#	include <DirectXTex.h>
+
+namespace DirectX
+{
+	// dxtex hides these as implementation details, but we need to use them
+	::HRESULT __cdecl _EncodeDDSHeader(
+		const DirectX::TexMetadata& a_metadata,
+		DirectX::DDS_FLAGS a_flags,
+		void* a_destination,
+		::size_t a_maxsize,
+		::size_t& a_required) noexcept;
+	[[nodiscard]] ::size_t __cdecl BitsPerPixel(
+		::DXGI_FORMAT a_fmt) noexcept;
+}
+#endif
 
 namespace bsa::fo4
 {
@@ -35,6 +53,49 @@ namespace bsa::fo4
 				constexpr std::size_t chunk_sentinel = 0xBAADF00D;
 			}
 		}
+
+#if BSA_OS_WINDOWS
+		namespace
+		{
+			template <std::size_t MAX_COUNT>
+			[[nodiscard]] auto chunk(
+				std::span<const DirectX::Image> a_range,
+				std::size_t a_chunksz) noexcept
+			{
+				static_assert(MAX_COUNT > 0);
+
+				std::vector<std::span<const DirectX::Image>> result;
+				if (a_range.empty()) {
+					return result;
+				}
+
+				result.reserve(MAX_COUNT);
+				std::size_t start = 0;
+				std::size_t size = 0;
+				std::size_t i = 0;
+
+				for (; i < a_range.size(); ++i) {
+					const auto& image = a_range[i];
+					if (size == 0 || size + image.slicePitch < a_chunksz) {
+						size += image.slicePitch;
+					} else {
+						result.push_back(a_range.subspan(start, i - start));
+						start = i;
+						size = image.slicePitch;
+					}
+				}
+
+				result.push_back(a_range.subspan(start, i - start));
+				if (result.size() > MAX_COUNT) {
+					result.erase(result.begin() + MAX_COUNT, result.end());
+					const auto pos = static_cast<std::size_t>(result.back().data() - a_range.data());
+					result.back() = a_range.subspan(pos);
+				}
+
+				return result;
+			}
+		}
+#endif
 
 		class header_t final
 		{
@@ -267,7 +328,7 @@ namespace bsa::fo4
 		return ::compressBound(static_cast<::uLong>(this->size()));
 	}
 
-	auto chunk::compress_into(std::span<std::byte> a_out)
+	auto chunk::compress_into(std::span<std::byte> a_out) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
@@ -348,6 +409,205 @@ namespace bsa::fo4
 			a_header.flags,
 			a_header.tile_mode);
 		return a_out;
+	}
+
+	void file::read(
+		std::filesystem::path a_path,
+		format a_format,
+		compression_type a_compression)
+	{
+		detail::istream_t in{ std::move(a_path) };
+		this->do_read(in, a_format, a_compression);
+	}
+
+	void file::read(
+		std::span<const std::byte> a_src,
+		format a_format,
+		compression_type a_compression,
+		copy_type a_copy)
+	{
+		detail::istream_t in{ a_src, a_copy };
+		this->do_read(in, a_format, a_compression);
+	}
+
+	void file::write(
+		std::filesystem::path a_path,
+		format a_format) const
+	{
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out, a_format);
+	}
+
+	void file::write(
+		binary_io::any_ostream& a_dst,
+		format a_format) const
+	{
+		this->do_write(a_dst, a_format);
+	}
+
+	void file::do_read(
+		detail::istream_t& a_in,
+		format a_format,
+		compression_type a_compression)
+	{
+		switch (a_format) {
+		case format::general:
+			this->read_general(a_in, a_compression);
+			break;
+		case format::directx:
+			this->read_directx(a_in, a_compression);
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	void file::do_write(
+		detail::ostream_t& a_out,
+		format a_format) const
+	{
+		switch (a_format) {
+		case format::general:
+			this->write_general(a_out);
+			break;
+		case format::directx:
+			this->write_directx(a_out);
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	void file::read_directx(
+		[[maybe_unused]] detail::istream_t& a_in,
+		[[maybe_unused]] compression_type a_compression)
+	{
+#if BSA_OS_WINDOWS
+		DirectX::ScratchImage scratch;
+		const auto in = a_in->rdbuf();
+		if (const auto result = DirectX::LoadFromDDSMemory(
+				in.data(),
+				in.size_bytes(),
+				DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
+				nullptr,
+				scratch);
+			FAILED(result)) {
+			throw bsa::exception("failed to load dds from memory");
+		}
+
+		this->clear();
+		this->reserve(4);
+
+		auto& meta = scratch.GetMetadata();
+		this->header.height = static_cast<std::uint16_t>(meta.height);
+		this->header.width = static_cast<std::uint16_t>(meta.width);
+		this->header.mip_count = static_cast<std::uint8_t>(meta.mipLevels);
+		this->header.format = static_cast<std::uint8_t>(meta.format);
+		this->header.flags = static_cast<std::uint8_t>(meta.miscFlags);
+		this->header.tile_mode = static_cast<std::uint8_t>(DirectX::BitsPerPixel(meta.format));
+
+		const auto splices = detail::chunk<4>(
+			std::span{ scratch.GetImages(), scratch.GetImageCount() },
+			512u * 512u);
+		for (const auto& splice : splices) {
+			assert(!splice.empty());
+
+			std::vector<std::byte> bytes;
+			for (const auto& image : splice) {
+				// dxtex always allocates internally, so we're forced to allocate,
+				//	even for mmapped files
+				const auto pixels = reinterpret_cast<std::byte*>(image.pixels);
+				bytes.insert(bytes.end(), pixels, pixels + image.slicePitch);
+			}
+
+			auto& chunk = this->emplace_back();
+			chunk.mips.first = static_cast<std::uint16_t>(&splice.front() - scratch.GetImages());
+			chunk.mips.last = static_cast<std::uint16_t>(&splice.back() - scratch.GetImages());
+			chunk.set_data(std::move(bytes));
+			if (a_compression == compression_type::compressed) {
+				chunk.compress();
+			}
+		}
+#else
+		throw bsa::exception("dds file support is only available on windows");
+#endif
+	}
+
+	void file::read_general(
+		detail::istream_t& a_in,
+		compression_type a_compression)
+	{
+		this->clear();
+
+		auto& chunk = this->emplace_back();
+		chunk.set_data(a_in->rdbuf(), a_in);
+		if (a_compression == compression_type::compressed) {
+			chunk.compress();
+		}
+	}
+
+	void file::write_directx(
+		[[maybe_unused]] detail::ostream_t& a_out) const
+	{
+#if BSA_OS_WINDOWS
+		const DirectX::TexMetadata meta{
+			.width = this->header.width,
+			.height = this->header.height,
+			.depth = 1,
+			.arraySize = 1,
+			.mipLevels = this->header.mip_count,
+			.miscFlags = this->header.flags,
+			.format = static_cast<::DXGI_FORMAT>(this->header.format),
+			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
+		};
+
+		DirectX::Blob blob;
+		blob.Initialize(
+			4u +    // dwMagic
+			124u +  // header
+			20u);   // header10
+
+		std::size_t required = 0;
+		if (const auto result = DirectX::_EncodeDDSHeader(
+				meta,
+				DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
+				blob.GetBufferPointer(),
+				blob.GetBufferSize(),
+				required);
+			FAILED(result)) {
+			throw bsa::exception("failed to encode dds header");
+		}
+
+		a_out.write_bytes({ //
+			static_cast<const std::byte*>(blob.GetBufferPointer()),
+			blob.GetBufferSize() });
+		std::vector<std::byte> buffer;
+		for (const auto& chunk : *this) {
+			if (chunk.compressed()) {
+				buffer.resize(chunk.decompressed_size());
+				chunk.decompress_into(buffer);
+				a_out.write_bytes(buffer);
+			} else {
+				a_out.write_bytes(chunk.as_bytes());
+			}
+		}
+#else
+		throw bsa::exception("dds file support is only available on windows");
+#endif
+	}
+
+	void file::write_general(detail::ostream_t& a_out) const
+	{
+		std::vector<std::byte> buffer;
+		for (const auto& chunk : *this) {
+			if (chunk.compressed()) {
+				buffer.resize(chunk.decompressed_size());
+				chunk.decompress_into(buffer);
+				a_out.write_bytes(buffer);
+			} else {
+				a_out.write_bytes(chunk.as_bytes());
+			}
+		}
 	}
 
 	auto archive::read(std::filesystem::path a_path)

@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
-#include <fstream>
-#include <ios>
 #include <iostream>
 #include <span>
 #include <stdexcept>
@@ -13,25 +11,14 @@
 #include <utility>
 #include <vector>
 
+#include <binary_io/any_stream.hpp>
+#include <binary_io/file_stream.hpp>
 #include <bsa/bsa.hpp>
 
 using namespace std::literals;
 
 namespace
 {
-	[[nodiscard]] auto read_file(const std::filesystem::path& a_path)
-		-> std::vector<std::byte>
-	{
-		std::vector<std::byte> data;
-		data.resize(std::filesystem::file_size(a_path));
-
-		std::ifstream in{ a_path, std::ios_base::in | std::ios_base::binary };
-		in.exceptions(std::ios_base::failbit);
-		in.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size()));
-
-		return data;
-	}
-
 	template <class UnaryFunction>
 	void for_each_file(const std::filesystem::path& a_root, UnaryFunction a_func)
 	{
@@ -61,14 +48,13 @@ namespace
 
 	template <class... Keys>
 	[[nodiscard]] auto open_virtual_path(const std::filesystem::path& a_root, Keys&&... a_keys)
-		-> std::ofstream
+		-> binary_io::any_ostream
 	{
 		const auto relative = virtual_to_local_path(std::forward<Keys>(a_keys)...);
 		const auto path = a_root / relative;
 		std::filesystem::create_directories(path.parent_path());
-		std::ofstream out{ path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc };
-		out.exceptions(std::ios_base::failbit);
-		return out;
+		binary_io::file_ostream out{ std::move(path) };
+		return binary_io::any_ostream{ std::move(out) };
 	}
 
 	void pack_fo4(
@@ -80,9 +66,7 @@ namespace
 			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::fo4::file f;
-				auto& chunk = f.emplace_back();
-				chunk.set_data(read_file(a_path));
-				chunk.compress();
+				f.read(a_path, bsa::fo4::format::general, bsa::compression_type::compressed);
 
 				ba2.insert(
 					a_path
@@ -103,7 +87,7 @@ namespace
 			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes3::file f;
-				f.set_data(read_file(a_path));
+				f.read(a_path);
 
 				bsa.insert(
 					a_path
@@ -129,8 +113,7 @@ namespace
 			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes4::file f;
-				f.set_data(read_file(a_path));
-				f.compress(version);
+				f.read(a_path, version, bsa::tes4::compression_codec::normal, bsa::compression_type::compressed);
 
 				const auto d = [&]() {
 					const auto key =
@@ -140,7 +123,7 @@ namespace
 							.lexically_normal()
 							.generic_string();
 					if (bsa.find(key) == bsa.end()) {
-						bsa.insert(key, bsa::tes4::directory{});
+						bsa.insert(key, bsa::tes4::directory());
 					}
 					return bsa[key];
 				}();
@@ -160,23 +143,11 @@ namespace
 		const std::filesystem::path& a_output)
 	{
 		bsa::fo4::archive ba2;
-		if (ba2.read(a_input) != bsa::fo4::format::general) {
-			throw std::runtime_error("unsupported fo4 archive format");
-		}
+		const auto format = ba2.read(a_input);
 
 		for (auto& [key, file] : ba2) {
 			auto out = open_virtual_path(a_output, key);
-
-			for (auto& chunk : file) {
-				if (chunk.compressed()) {
-					chunk.decompress();
-				}
-
-				const auto bytes = chunk.as_bytes();
-				out.write(
-					reinterpret_cast<const char*>(bytes.data()),
-					static_cast<std::streamsize>(bytes.size_bytes()));
-			}
+			file.write(out, format);
 		}
 	}
 
@@ -189,10 +160,7 @@ namespace
 
 		for (const auto& [key, file] : bsa) {
 			auto out = open_virtual_path(a_output, key);
-			const auto bytes = file.as_bytes();
-			out.write(
-				reinterpret_cast<const char*>(bytes.data()),
-				static_cast<std::streamsize>(bytes.size_bytes()));
+			file.write(out);
 		}
 	}
 
@@ -206,15 +174,7 @@ namespace
 		for (auto& dir : bsa) {
 			for (auto& file : dir.second) {
 				auto out = open_virtual_path(a_output, dir.first, file.first);
-
-				if (file.second.compressed()) {
-					file.second.decompress(format);
-				}
-
-				const auto bytes = file.second.as_bytes();
-				out.write(
-					reinterpret_cast<const char*>(bytes.data()),
-					static_cast<std::streamsize>(bytes.size_bytes()));
+				file.second.write(out, format);
 			}
 		}
 	}

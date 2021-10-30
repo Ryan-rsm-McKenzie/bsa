@@ -120,6 +120,16 @@ namespace bsa
 		shallow
 	};
 
+	/// \brief	Indicates whether the operation should finish by compressing the data or not.
+	enum class compression_type
+	{
+		/// \brief	The data will finish in an uncompressed state.
+		decompressed,
+
+		/// \brief	The data will finish in a compressed state.
+		compressed
+	};
+
 	/// \brief	The file format for a given archive.
 	enum class file_format
 	{

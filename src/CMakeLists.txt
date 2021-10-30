@@ -90,6 +90,13 @@ target_include_directories(
 
 list(APPEND CMAKE_MODULE_PATH "${ROOT_DIR}/cmake")
 
+if(WIN32)
+	# WORKAROUND: directxtex has a misconfigured config file
+	find_package(directx-headers REQUIRED CONFIG)
+	find_package(directxmath REQUIRED CONFIG)
+	find_package(directxtex REQUIRED CONFIG)
+endif()
+
 find_package(binary_io REQUIRED CONFIG)
 find_package(LZ4 MODULE REQUIRED)
 find_package(mmio REQUIRED CONFIG)
@@ -102,6 +109,7 @@ target_link_libraries(
 		mmio::mmio
 	PRIVATE
 		LZ4::LZ4
+		Microsoft::DirectXTex
 		ZLIB::ZLIB
 )
 

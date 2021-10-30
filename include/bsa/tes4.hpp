@@ -279,6 +279,65 @@ namespace bsa::tes4
 			version a_version,
 			std::span<std::byte> a_out,
 			compression_codec a_codec = compression_codec::normal) const;
+
+		/// \copydoc bsa::tes3::file::read(std::filesystem::path)
+		/// \copydoc bsa::tes4::file::doxygen_read
+		void read(
+			std::filesystem::path a_path,
+			version a_version,
+			compression_codec a_codec = compression_codec::normal,
+			compression_type a_compression = compression_type::decompressed);
+
+		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
+		/// \copydoc bsa::tes4::file::doxygen_read
+		void read(
+			std::span<const std::byte> a_src,
+			version a_version,
+			compression_codec a_codec = compression_codec::normal,
+			compression_type a_compression = compression_type::decompressed,
+			copy_type a_copy = copy_type::deep);
+
+		/// \copydoc bsa::tes3::file::write(std::filesystem::path) const
+		/// \copydoc bsa::tes4::file::doxygen_write
+		void write(
+			std::filesystem::path a_path,
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) const;
+
+		/// \copydoc bsa::tes3::file::write(binary_io::any_ostream&) const
+		/// \copydoc bsa::tes4::file::doxygen_write
+		void write(
+			binary_io::any_ostream& a_dst,
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) const;
+
+#ifdef DOXYGEN
+	protected:
+		/// \param	a_version	The version to compress the file for.
+		/// \param	a_codec	The codec to use.
+		/// \param	a_compression	The resulting compression of the file read.
+		void doxygen_read(
+			version a_version,
+			compression_codec a_codec = compression_codec::normal,
+			compression_type a_compression = compression_type::decompressed);
+
+		/// \param	a_version	The version to decompress the file for.
+		/// \param	a_codec	The codec to use.
+		void doxygen_write(
+			version a_version,
+			compression_codec a_codec = compression_codec::normal) const;
+#endif
+
+	private:
+		void do_read(
+			detail::istream_t& a_in,
+			version a_version,
+			compression_codec a_codec,
+			compression_type a_compression);
+		void do_write(
+			detail::ostream_t& a_out,
+			version a_version,
+			compression_codec a_codec) const;
 	};
 
 	/// \brief	Represents a directory within the TES:4 virtual filesystem.

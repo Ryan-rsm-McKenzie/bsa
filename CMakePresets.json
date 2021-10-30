@@ -56,7 +56,7 @@
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
-          "value": "compression;tests;xmem"
+          "value": "compression;dds;tests;xmem"
         },
         "VCPKG_OVERLAY_PORTS": {
           "type": "STRING",

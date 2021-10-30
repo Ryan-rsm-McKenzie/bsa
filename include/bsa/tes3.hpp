@@ -88,8 +88,62 @@ namespace bsa::tes3
 		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
 
+#ifdef DOXYGEN
 		/// \brief	Clears the contents of the file.
+		void clear() noexcept;
+#else
 		using super::clear;
+#endif
+
+		/// \copydoc bsa::tes3::file::doxygen_read
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		///
+		/// \remark	If `std::system_error` is thrown, the archive is left unmodified.
+		///
+		/// \param	a_path	The path to the given archive on the native filesystem.
+		void read(std::filesystem::path a_path);
+
+		/// \copydoc bsa::tes3::file::doxygen_read
+		///
+		/// \param	a_src	The source to read from.
+		/// \param	a_copy	The method to use when copying data from `a_src`.
+		void read(
+			std::span<const std::byte> a_src,
+			copy_type a_copy = copy_type::deep);
+
+		/// \copydoc bsa::tes3::file::doxygen_write
+		///
+		/// \param	a_path	The path to write the archive to on the native filesystem.
+		void write(std::filesystem::path a_path) const;
+
+		/// \copydoc bsa::tes3::file::doxygen_write
+		///
+		/// \param	a_dst	The stream to write the archive to.
+		void write(binary_io::any_ostream& a_dst) const;
+
+#ifdef DOXYGEN
+	protected:
+		/// \brief	Reads the contents of the file from the source.
+		///
+		/// \exception	binary_io::buffer_exhausted	Thrown when the input buffer is exhausted.
+		///
+		///	\remark	If any exception is thrown, the file is left in an unspecified state.
+		///		Use \ref clear to return it to a valid state.
+		/// \remark	If the function returns successfully, the contents of the file are *replaced*
+		///		with the contents of the input file.
+		void doxygen_read();
+
+		/// \brief	Writes the contents of the file to the destination.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
+		void doxygen_write() const;
+#endif
+
+	private:
+		void do_read(detail::istream_t& a_in);
+		void do_write(detail::ostream_t& a_out) const;
 	};
 
 	/// \brief	Represents the TES:3 revision of the bsa format.

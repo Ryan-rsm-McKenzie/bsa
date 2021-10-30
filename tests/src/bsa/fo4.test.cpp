@@ -10,10 +10,104 @@
 #include <string_view>
 #include <utility>
 
+#if BSA_OS_WINDOWS
+#	include <dxgiformat.h>
+#	include <d3d10.h>
+#endif
+
+#include <binary_io/any_stream.hpp>
+#include <binary_io/memory_stream.hpp>
 #include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
 
 #include "bsa/fo4.hpp"
+
+#if BSA_OS_WINDOWS
+namespace
+{
+#	define COMPARE(a_field) a_lhs.a_field == a_rhs.a_field
+
+	struct DDS_PIXELFORMAT
+	{
+		DWORD dwSize;
+		DWORD dwFlags;
+		DWORD dwFourCC;
+		DWORD dwRGBBitCount;
+		DWORD dwRBitMask;
+		DWORD dwGBitMask;
+		DWORD dwBBitMask;
+		DWORD dwABitMask;
+
+		[[nodiscard]] friend bool operator==(DDS_PIXELFORMAT, DDS_PIXELFORMAT) noexcept = default;
+	};
+
+	struct DDS_HEADER
+	{
+		DWORD dwSize;
+		DWORD dwFlags;
+		DWORD dwHeight;
+		DWORD dwWidth;
+		DWORD dwPitchOrLinearSize;
+		DWORD dwDepth;
+		DWORD dwMipMapCount;
+		DWORD dwReserved1[11];
+		DDS_PIXELFORMAT ddspf;
+		DWORD dwCaps;
+		DWORD dwCaps2;
+		DWORD dwCaps3;
+		DWORD dwCaps4;
+		DWORD dwReserved2;
+
+		[[nodiscard]] friend bool operator==(
+			DDS_HEADER a_lhs,
+			DDS_HEADER a_rhs) noexcept
+		{
+			return COMPARE(dwSize) &&
+			       COMPARE(dwFlags) &&
+			       COMPARE(dwHeight) &&
+			       COMPARE(dwWidth) &&
+			       COMPARE(dwPitchOrLinearSize) &&
+			       COMPARE(dwDepth) &&
+			       COMPARE(dwMipMapCount) &&
+			       COMPARE(ddspf) &&
+			       COMPARE(dwCaps) &&
+			       COMPARE(dwCaps2) &&
+			       COMPARE(dwCaps3) &&
+			       COMPARE(dwCaps4);
+		}
+	};
+
+	struct DDS_HEADER_DXT10
+	{
+		DXGI_FORMAT dxgiFormat;
+		D3D10_RESOURCE_DIMENSION resourceDimension;
+		UINT miscFlag;
+		UINT arraySize;
+		UINT miscFlags2;  // formerly reserved
+
+		[[nodiscard]] friend bool operator==(
+			DDS_HEADER_DXT10 a_lhs,
+			DDS_HEADER_DXT10 a_rhs) noexcept
+		{
+			return COMPARE(dxgiFormat) &&
+			       COMPARE(resourceDimension) &&
+			       COMPARE(miscFlag) &&
+			       COMPARE(arraySize);
+		}
+	};
+
+	struct dds_header_t
+	{
+		DWORD dwMagic;
+		DDS_HEADER header;
+		DDS_HEADER_DXT10 header10;
+
+		[[nodiscard]] friend bool operator==(dds_header_t, dds_header_t) noexcept = default;
+	};
+
+#	undef COMPARE
+}
+#endif
 
 static_assert(assert_nothrowable<bsa::fo4::hashing::hash>());
 static_assert(assert_nothrowable<bsa::fo4::chunk>());
@@ -388,4 +482,50 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				REQUIRE(a_archive.read(a_src, a_type) == bsa::fo4::format::general);
 			});
 	}
+
+#if BSA_OS_WINDOWS
+	SECTION("we can pack/unpack archives written in the directx format")
+	{
+		const std::filesystem::path root{ "fo4_dds_test"sv };
+		const auto filename = "Fence006_1K_Roughness.dds"sv;
+
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.read(root / "in.ba2"sv) == bsa::fo4::format::directx);
+
+		const auto archived = ba2[filename];
+		REQUIRE(archived);
+		REQUIRE(!archived->empty());
+		for (const auto& chunk : *archived) {
+			REQUIRE(!chunk.compressed());
+		}
+
+		{
+			bsa::fo4::file copy;
+			copy.read(root / filename, bsa::fo4::format::directx);
+			REQUIRE(copy.header == archived->header);
+			REQUIRE(copy.size() == archived->size());
+			for (std::size_t i = 0; i < copy.size(); ++i) {
+				const auto& chunk1 = copy[i];
+				const auto& chunk2 = (*archived)[i];
+				REQUIRE(chunk1.mips == chunk2.mips);
+				REQUIRE(chunk1.size() == chunk2.size());
+				REQUIRE(std::memcmp(chunk1.data(), chunk2.data(), chunk1.size()) == 0);
+			}
+		}
+
+		{
+			const auto original = map_file(root / filename);
+
+			binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
+			archived->write(buffer, bsa::fo4::format::directx);
+			const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
+
+			REQUIRE(copy.size() == original.size());
+			const auto lhs = reinterpret_cast<const dds_header_t*>(copy.data());
+			const auto rhs = reinterpret_cast<const dds_header_t*>(original.data());
+			REQUIRE(*lhs == *rhs);
+			REQUIRE(std::memcmp(lhs + 1, rhs + 1, copy.size() - sizeof(dds_header_t)) == 0);
+		}
+	}
+#endif
 }
