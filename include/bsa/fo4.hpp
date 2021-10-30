@@ -388,6 +388,7 @@ namespace bsa::fo4
 		void read(
 			std::filesystem::path a_path,
 			format a_format,
+			std::size_t a_mipChunkMax = 512u * 512u,
 			compression_type a_compression = compression_type::decompressed);
 
 		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
@@ -395,6 +396,7 @@ namespace bsa::fo4
 		void read(
 			std::span<const std::byte> a_src,
 			format a_format,
+			std::size_t a_mipChunkMax = 512u * 512u,
 			compression_type a_compression = compression_type::decompressed,
 			copy_type a_copy = copy_type::deep);
 
@@ -423,9 +425,11 @@ namespace bsa::fo4
 		/// @{
 
 		/// \param	a_format	The format to read the file as.
+		/// \param	a_mipChunkMax	The maxiumum size to restrict a single mip chunk to.
 		/// \param	a_compression	The resulting compression of the file read.
 		void doxygen_read(
 			format a_format,
+			std::size_t a_mipChunkMax = 512u * 512u,
 			compression_type a_compression = compression_type::decompressed);
 
 		/// \param	a_format	The format to write the file as.
@@ -438,6 +442,7 @@ namespace bsa::fo4
 		void do_read(
 			detail::istream_t& a_in,
 			format a_format,
+			std::size_t a_mipChunkMax,
 			compression_type a_compression);
 		void do_write(
 			detail::ostream_t& a_out,
@@ -445,6 +450,7 @@ namespace bsa::fo4
 
 		void read_directx(
 			detail::istream_t& a_in,
+			std::size_t a_mipChunkMax,
 			compression_type a_compression);
 		void read_general(
 			detail::istream_t& a_in,

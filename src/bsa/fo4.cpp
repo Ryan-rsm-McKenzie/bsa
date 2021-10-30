@@ -414,20 +414,22 @@ namespace bsa::fo4
 	void file::read(
 		std::filesystem::path a_path,
 		format a_format,
+		std::size_t a_mipChunkMax,
 		compression_type a_compression)
 	{
 		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_format, a_compression);
+		this->do_read(in, a_format, a_mipChunkMax, a_compression);
 	}
 
 	void file::read(
 		std::span<const std::byte> a_src,
 		format a_format,
+		std::size_t a_mipChunkMax,
 		compression_type a_compression,
 		copy_type a_copy)
 	{
 		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_format, a_compression);
+		this->do_read(in, a_format, a_mipChunkMax, a_compression);
 	}
 
 	void file::write(
@@ -448,6 +450,7 @@ namespace bsa::fo4
 	void file::do_read(
 		detail::istream_t& a_in,
 		format a_format,
+		std::size_t a_mipChunkMax,
 		compression_type a_compression)
 	{
 		switch (a_format) {
@@ -455,7 +458,7 @@ namespace bsa::fo4
 			this->read_general(a_in, a_compression);
 			break;
 		case format::directx:
-			this->read_directx(a_in, a_compression);
+			this->read_directx(a_in, a_mipChunkMax, a_compression);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -480,6 +483,7 @@ namespace bsa::fo4
 
 	void file::read_directx(
 		[[maybe_unused]] detail::istream_t& a_in,
+		[[maybe_unused]] std::size_t a_mipChunkMax,
 		[[maybe_unused]] compression_type a_compression)
 	{
 #if BSA_OS_WINDOWS
@@ -508,7 +512,7 @@ namespace bsa::fo4
 
 		const auto splices = detail::chunk<4>(
 			std::span{ scratch.GetImages(), scratch.GetImageCount() },
-			512u * 512u);
+			a_mipChunkMax);
 		for (const auto& splice : splices) {
 			assert(!splice.empty());
 

@@ -65,7 +65,11 @@ namespace
 			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::fo4::file f;
-				f.read(a_path, bsa::fo4::format::general, bsa::compression_type::compressed);
+				f.read(
+					a_path,
+					bsa::fo4::format::general,
+					512u * 512u,
+					bsa::compression_type::compressed);
 
 				ba2.insert(
 					a_path
