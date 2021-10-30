@@ -233,7 +233,7 @@ namespace bsa::tes4
 		/// \name Compression
 		/// @{
 
-		/// \copydoc bsa::fo4::chunk::compress
+		/// \copydoc bsa::doxygen_detail::compress
 		///
 		/// \param	a_version	The version to compress the file for.
 		/// \param	a_codec	The codec to use.
@@ -241,7 +241,7 @@ namespace bsa::tes4
 			version a_version,
 			compression_codec a_codec = compression_codec::normal);
 
-		/// \copydoc bsa::fo4::chunk::compress_bound
+		/// \copydoc bsa::doxygen_detail::compress_bound
 		///
 		/// \param	a_version	The version the file would be compressed for.
 		/// \param	a_codec	The codec to use.
@@ -249,7 +249,7 @@ namespace bsa::tes4
 			version a_version,
 			compression_codec a_codec = compression_codec::normal) const;
 
-		/// \copydoc bsa::fo4::chunk::compress_into
+		/// \copydoc bsa::doxygen_detail::compress_into
 		///
 		/// \param	a_version	The version to compress the file for.
 		/// \param	a_codec	The codec to use.

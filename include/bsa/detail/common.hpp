@@ -158,6 +158,44 @@ namespace bsa
 		///		doesn't match any known format.
 		static std::optional<file_format> guess_file_format(
 			std::filesystem::path a_path);
+
+		/// \brief	Compresses the file.
+		///
+		/// \pre	The file must *not* be compressed.
+		/// \post	The file will be compressed.
+		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \remark	If a compression error is thrown, then the contents are left unchanged.
+		static void compress();
+
+		/// \brief	Returns an upper bound on the storage size required to compress the file.
+		///
+		/// \pre	The file must *not* be compressed.
+		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \return	Returns the size required to successfully compress the file.
+		static std::size_t compress_bound();
+
+		/// \brief	Compresses the file into the given buffer.
+		///
+		/// \pre	The file must *not* be compressed.
+		/// \pre	`a_out` must be \ref compress_bound() "large enough" to compress the
+		/// 	file into.
+		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \param	a_out	The buffer to compress the file into.
+		/// \return	The final size of the compressed buffer.
+		///
+		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
+		///		in an unspecified state.
+		static std::size_t compress_into(
+			std::span<std::byte> a_out);
 	};
 #endif
 

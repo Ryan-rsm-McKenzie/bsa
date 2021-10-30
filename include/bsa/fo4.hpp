@@ -138,45 +138,18 @@ namespace bsa::fo4
 		/// \name Compression
 		/// @{
 
-		/// \brief	Compresses the file.
-		///
-		/// \pre	The file must *not* be \ref compressed() "compressed".
-		/// \post	The file will be \ref compressed() "compressed".
-		///
-		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
-		///		are encountered.
+		/// \copydoc bsa::doxygen_detail::compress
 		///
 		/// \param	a_level	The level to compress the data at.
-		///
-		/// \remark	If a compression error is thrown, then the contents are left unchanged.
 		void compress(
 			compression_level a_level = compression_level::normal);
 
-		/// \brief	Returns an upper bound on the storage size required to compress the file.
-		///
-		/// \pre	The file must *not* be \ref compressed() "compressed".
-		///
-		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
-		///		are encountered.
-		///
-		/// \return	Returns the size required to successfully compress the file.
+		/// \copydoc bsa::doxygen_detail::compress_bound
 		[[nodiscard]] std::size_t compress_bound() const;
 
-		/// \brief	Compresses the file into the given buffer.
+		/// \copydoc bsa::doxygen_detail::compress_into
 		///
-		/// \pre	The file must *not* be \ref compressed() "compressed".
-		/// \pre	`a_out` must be \ref compress_bound() "large enough" to compress the
-		/// 	file into.
-		///
-		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
-		///		are encountered.
-		///
-		/// \param	a_out	The buffer to compress the file into.
 		/// \param	a_level	The level to compress the data at.
-		/// \return	The final size of the compressed buffer.
-		///
-		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
-		///		in an unspecified state.
 		[[nodiscard]] std::size_t compress_into(
 			std::span<std::byte> a_out,
 			compression_level a_level = compression_level::normal) const;
