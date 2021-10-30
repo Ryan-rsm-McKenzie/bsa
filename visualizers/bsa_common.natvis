@@ -18,7 +18,7 @@
 	<Type Name="bsa::components::compressed_byte_container">
 		<Expand>
 			<Item Name="[decompressed size]">_decompsz</Item>
-			<ExpandedItem>(bsa::detail::components::detail::basic_byte_container*)this,nd</ExpandedItem>
+			<ExpandedItem>(bsa::components::basic_byte_container*)this,nd</ExpandedItem>
 		</Expand>
 	</Type>
 

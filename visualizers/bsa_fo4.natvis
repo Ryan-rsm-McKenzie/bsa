@@ -13,6 +13,7 @@
 	<Type Name="bsa::fo4::chunk">
 		<Expand>
 			<Item Name="[mips]">mips</Item>
+			<ExpandedItem>(bsa::components::compressed_byte_container*)this,nd</ExpandedItem>
 		</Expand>
 	</Type>
 
