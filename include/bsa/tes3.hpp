@@ -122,7 +122,7 @@ namespace bsa::tes3
 		///
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
 		///
-		/// \remark	If `std::system_error` is thrown, the archive is left unmodified.
+		/// \remark	If `std::system_error` is thrown, the file is left unmodified.
 		///
 		/// \param	a_path	The path to the given archive on the native filesystem.
 		void read(std::filesystem::path a_path);
