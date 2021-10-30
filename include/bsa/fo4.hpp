@@ -95,6 +95,8 @@ namespace bsa::fo4
 			std::uint16_t first{ 0 };
 			std::uint16_t last{ 0 };
 
+			[[nodiscard]] friend constexpr bool operator==(mips_t, mips_t) noexcept = default;
+
 #ifndef DOXYGEN
 			friend auto operator>>(
 				detail::istream_t& a_in,
@@ -195,6 +197,8 @@ namespace bsa::fo4
 			std::uint8_t format{ 0 };
 			std::uint8_t flags{ 0 };
 			std::uint8_t tile_mode{ 0 };
+
+			[[nodiscard]] friend constexpr bool operator==(header_t, header_t) noexcept = default;
 
 #ifndef DOXYGEN
 			friend auto operator>>(
