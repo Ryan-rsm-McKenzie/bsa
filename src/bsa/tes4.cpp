@@ -534,6 +534,168 @@ namespace bsa::tes4
 	}
 #endif
 
+	void file::compress(
+		version a_version,
+		compression_codec a_codec)
+	{
+		std::vector<std::byte> out;
+		out.resize(this->compress_bound(a_version, a_codec));
+
+		const auto outsz = this->compress_into(a_version, { out.data(), out.size() }, a_codec);
+		out.resize(outsz);
+		out.shrink_to_fit();
+		this->set_data(std::move(out), this->size());
+
+		assert(this->compressed());
+	}
+
+	auto file::compress_bound(
+		version a_version,
+		compression_codec a_codec) const
+		-> std::size_t
+	{
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+			assert(a_codec == compression_codec::normal);
+			return ::compressBound(static_cast<::uLong>(this->size()));
+		case 104:
+			return a_codec == compression_codec::xmem ?
+                       this->compress_bound_xmem() :
+                       ::compressBound(static_cast<::uLong>(this->size()));
+		case 105:
+			assert(a_codec == compression_codec::normal);
+			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	auto file::compress_into(
+		version a_version,
+		std::span<std::byte> a_out,
+		compression_codec a_codec) const
+		-> std::size_t
+	{
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+			assert(a_codec == compression_codec::normal);
+			return this->compress_into_zlib(a_out);
+		case 104:
+			return a_codec == compression_codec::xmem ?
+                       this->compress_into_xmem(a_out) :
+                       this->compress_into_zlib(a_out);
+		case 105:
+			assert(a_codec == compression_codec::normal);
+			return this->compress_into_lz4(a_out);
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	void file::decompress(
+		version a_version,
+		compression_codec a_codec)
+	{
+		std::vector<std::byte> out;
+		out.resize(this->decompressed_size());
+		this->decompress_into(a_version, { out.data(), out.size() }, a_codec);
+		this->set_data(std::move(out));
+
+		assert(!this->compressed());
+	}
+
+	void file::decompress_into(
+		version a_version,
+		std::span<std::byte> a_out,
+		compression_codec a_codec) const
+	{
+		switch (detail::to_underlying(a_version)) {
+		case 103:
+			assert(a_codec == compression_codec::normal);
+			this->decompress_into_zlib(a_out);
+			break;
+		case 104:
+			if (a_codec == compression_codec::xmem) {
+				this->decompress_into_xmem(a_out);
+			} else {
+				this->decompress_into_zlib(a_out);
+			}
+			break;
+		case 105:
+			assert(a_codec == compression_codec::normal);
+			this->decompress_into_lz4(a_out);
+			break;
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	void file::read(
+		std::filesystem::path a_path,
+		version a_version,
+		compression_codec a_codec,
+		compression_type a_compression)
+	{
+		detail::istream_t in{ std::move(a_path) };
+		this->do_read(in, a_version, a_codec, a_compression);
+	}
+
+	void file::read(
+		std::span<const std::byte> a_src,
+		version a_version,
+		compression_codec a_codec,
+		compression_type a_compression,
+		copy_type a_copy)
+	{
+		detail::istream_t in{ a_src, a_copy };
+		this->do_read(in, a_version, a_codec, a_compression);
+	}
+
+	void file::write(
+		std::filesystem::path a_path,
+		version a_version,
+		compression_codec a_codec) const
+	{
+		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
+		this->do_write(out, a_version, a_codec);
+	}
+
+	void file::write(
+		binary_io::any_ostream& a_dst,
+		version a_version,
+		compression_codec a_codec) const
+	{
+		this->do_write(a_dst, a_version, a_codec);
+	}
+
+	auto file::compress_bound_xmem() const
+		-> std::size_t
+	{
+#ifdef BSA_SUPPORT_XMEM
+		try {
+			auto& proxy = get_xmem_proxy();
+			detail::process_out os{ proxy };
+			os << xmem::request_header{ xmem::request_type::compress_bound }
+			   << xmem::compress_bound_request{ this->as_bytes() };
+
+			detail::process_in is{ proxy };
+			xmem::response_header header;
+			is >> header;
+			if (header.error != xmem::error_code::ok) {
+				throw bsa::compression_error(header.error);
+			}
+
+			xmem::compress_bound_response response;
+			is >> response;
+			return response.bound;
+		} catch (const binary_io::exception&) {
+			throw bsa::compression_error(detail::error_code::xmem_communication_failure);
+		}
+#else
+		throw bsa::compression_error(detail::error_code::xmem_unavailable);
+#endif
+	}
+
 	auto file::compress_into_lz4(std::span<std::byte> a_out) const
 		-> std::size_t
 	{
@@ -718,168 +880,6 @@ namespace bsa::tes4
 		if (outsz != this->decompressed_size()) {
 			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 		}
-	}
-
-	auto file::compress_bound_xmem() const
-		-> std::size_t
-	{
-#ifdef BSA_SUPPORT_XMEM
-		try {
-			auto& proxy = get_xmem_proxy();
-			detail::process_out os{ proxy };
-			os << xmem::request_header{ xmem::request_type::compress_bound }
-			   << xmem::compress_bound_request{ this->as_bytes() };
-
-			detail::process_in is{ proxy };
-			xmem::response_header header;
-			is >> header;
-			if (header.error != xmem::error_code::ok) {
-				throw bsa::compression_error(header.error);
-			}
-
-			xmem::compress_bound_response response;
-			is >> response;
-			return response.bound;
-		} catch (const binary_io::exception&) {
-			throw bsa::compression_error(detail::error_code::xmem_communication_failure);
-		}
-#else
-		throw bsa::compression_error(detail::error_code::xmem_unavailable);
-#endif
-	}
-
-	void file::compress(
-		version a_version,
-		compression_codec a_codec)
-	{
-		std::vector<std::byte> out;
-		out.resize(this->compress_bound(a_version, a_codec));
-
-		const auto outsz = this->compress_into(a_version, { out.data(), out.size() }, a_codec);
-		out.resize(outsz);
-		out.shrink_to_fit();
-		this->set_data(std::move(out), this->size());
-
-		assert(this->compressed());
-	}
-
-	auto file::compress_bound(
-		version a_version,
-		compression_codec a_codec) const
-		-> std::size_t
-	{
-		switch (detail::to_underlying(a_version)) {
-		case 103:
-			assert(a_codec == compression_codec::normal);
-			return ::compressBound(static_cast<::uLong>(this->size()));
-		case 104:
-			return a_codec == compression_codec::xmem ?
-                       this->compress_bound_xmem() :
-                       ::compressBound(static_cast<::uLong>(this->size()));
-		case 105:
-			assert(a_codec == compression_codec::normal);
-			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	auto file::compress_into(
-		version a_version,
-		std::span<std::byte> a_out,
-		compression_codec a_codec) const
-		-> std::size_t
-	{
-		switch (detail::to_underlying(a_version)) {
-		case 103:
-			assert(a_codec == compression_codec::normal);
-			return this->compress_into_zlib(a_out);
-		case 104:
-			return a_codec == compression_codec::xmem ?
-                       this->compress_into_xmem(a_out) :
-                       this->compress_into_zlib(a_out);
-		case 105:
-			assert(a_codec == compression_codec::normal);
-			return this->compress_into_lz4(a_out);
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	void file::decompress(
-		version a_version,
-		compression_codec a_codec)
-	{
-		std::vector<std::byte> out;
-		out.resize(this->decompressed_size());
-		this->decompress_into(a_version, { out.data(), out.size() }, a_codec);
-		this->set_data(std::move(out));
-
-		assert(!this->compressed());
-	}
-
-	void file::decompress_into(
-		version a_version,
-		std::span<std::byte> a_out,
-		compression_codec a_codec) const
-	{
-		switch (detail::to_underlying(a_version)) {
-		case 103:
-			assert(a_codec == compression_codec::normal);
-			this->decompress_into_zlib(a_out);
-			break;
-		case 104:
-			if (a_codec == compression_codec::xmem) {
-				this->decompress_into_xmem(a_out);
-			} else {
-				this->decompress_into_zlib(a_out);
-			}
-			break;
-		case 105:
-			assert(a_codec == compression_codec::normal);
-			this->decompress_into_lz4(a_out);
-			break;
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	void file::read(
-		std::filesystem::path a_path,
-		version a_version,
-		compression_codec a_codec,
-		compression_type a_compression)
-	{
-		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_version, a_codec, a_compression);
-	}
-
-	void file::read(
-		std::span<const std::byte> a_src,
-		version a_version,
-		compression_codec a_codec,
-		compression_type a_compression,
-		copy_type a_copy)
-	{
-		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_version, a_codec, a_compression);
-	}
-
-	void file::write(
-		std::filesystem::path a_path,
-		version a_version,
-		compression_codec a_codec) const
-	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out, a_version, a_codec);
-	}
-
-	void file::write(
-		binary_io::any_ostream& a_dst,
-		version a_version,
-		compression_codec a_codec) const
-	{
-		this->do_write(a_dst, a_version, a_codec);
 	}
 
 	void file::do_read(

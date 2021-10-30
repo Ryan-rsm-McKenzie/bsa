@@ -349,6 +349,9 @@ namespace bsa
 		public std::exception
 	{
 	public:
+		/// \name Constructors
+		/// @{
+
 		/// \brief	Constructs an exception with no message.
 		exception() noexcept = default;
 
@@ -357,8 +360,15 @@ namespace bsa
 			_what(a_what)
 		{}
 
+		/// @}
+
+		/// \name Observers
+		/// @{
+
 		/// \brief	Obtains the explanation for why the exception was thrown.
 		const char* what() const noexcept override { return _what; }
+
+		/// @}
 
 	private:
 		const char* _what{ "" };
@@ -403,11 +413,16 @@ namespace bsa
 		const char* what() const noexcept override { return _what.c_str(); }
 #endif
 
+		/// \name Observers
+		/// @{
+
 		/// \brief	Returns the library which was the origin of this error.
 		[[nodiscard]] library source_library() const noexcept
 		{
 			return _lib;
 		}
+
+		/// @}
 
 	private:
 		std::string _what;
@@ -436,12 +451,42 @@ namespace bsa::components
 	class basic_byte_container
 	{
 	public:
+		/// \name Assignment
+		/// @{
+
+		basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
+		basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
+
+		/// @}
+
+		/// \name Capacity
+		/// @{
+
+		/// \brief	Checks if the underlying byte container is empty.
+		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
+
+		/// \brief	Returns the size of the underlying byte container.
+		[[nodiscard]] std::size_t size() const noexcept { return as_bytes().size(); }
+
+		/// @}
+
+		/// \name Constructors
+		/// @{
 		basic_byte_container() noexcept = default;
 		basic_byte_container(const basic_byte_container&) noexcept = default;
 		basic_byte_container(basic_byte_container&&) noexcept = default;
+
+		/// @}
+
+		/// \name Destructor
+		/// @{
+
 		~basic_byte_container() noexcept = default;
-		basic_byte_container& operator=(const basic_byte_container&) noexcept = default;
-		basic_byte_container& operator=(basic_byte_container&&) noexcept = default;
+
+		/// @}
+
+		/// \name Element access
+		/// @{
 
 		/// \brief	Retrieves an immutable view into the underlying bytes.
 		std::span<const std::byte> as_bytes() const noexcept;
@@ -449,11 +494,7 @@ namespace bsa::components
 		/// \brief	Retrieves an immutable pointer to the underlying bytes.
 		[[nodiscard]] const std::byte* data() const noexcept { return as_bytes().data(); }
 
-		/// \brief	Checks if the underlying byte container is empty.
-		[[nodiscard]] bool empty() const noexcept { return size() == 0; }
-
-		/// \brief	Returns the size of the underlying byte container.
-		[[nodiscard]] std::size_t size() const noexcept { return as_bytes().size(); }
+		/// @}
 
 	private:
 		friend compressed_byte_container;
@@ -484,6 +525,9 @@ namespace bsa::components
 		public basic_byte_container
 	{
 	public:
+		/// \name Modifiers
+		/// @{
+
 		/// \brief	Assigns the underlying container to be a non-owning view into the given data.
 		///
 		/// \param	a_data	The data to store a view to.
@@ -499,6 +543,8 @@ namespace bsa::components
 		{
 			_data.emplace<data_owner>(std::move(a_data));
 		}
+
+		/// @}
 
 #ifndef DOXYGEN
 	protected:
@@ -526,8 +572,8 @@ namespace bsa::components
 		public basic_byte_container
 	{
 	public:
-		/// \brief	Checks if the underlying bytes are compressed.
-		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+		/// \name Decompression
+		/// @{
 
 		/// \brief	Retrieves the decompressed size of the compressed storage.
 		/// \details	Only valid if the container *is* compressed.
@@ -536,6 +582,11 @@ namespace bsa::components
 			assert(this->compressed());
 			return *_decompsz;
 		}
+
+		/// @}
+
+		/// \name Modifiers
+		/// @{
 
 		/// \copydoc bsa::components::byte_container::set_data(std::span<const std::byte>)
 		///
@@ -560,6 +611,16 @@ namespace bsa::components
 			_data.emplace<data_owner>(std::move(a_data));
 			_decompsz = a_decompressedSize;
 		}
+
+		/// @}
+
+		/// \name Observers
+		/// @{
+
+		/// \brief	Checks if the underlying bytes are compressed.
+		[[nodiscard]] bool compressed() const noexcept { return _decompsz.has_value(); }
+
+		/// @}
 
 #ifndef DOXYGEN
 	protected:
@@ -604,6 +665,9 @@ namespace bsa::components
 			std::map<typename T::key, T>;
 
 	public:
+		/// \name Member types
+		/// @{
+
 #ifdef DOXYGEN
 		using key_type = typename T::key;
 		using mapped_type = T;
@@ -617,18 +681,33 @@ namespace bsa::components
 		using iterator = typename container_type::iterator;
 		using const_iterator = typename container_type::const_iterator;
 
+		/// @}
+
 		/// \brief	A proxy value used to facilitate the usage/chaining of \ref hashmap::operator[]
 		///		in an intuitive manner.
 		template <class U>
 		class index_t final
 		{
 		public:
+			/// \name Member types
+			/// @{
+
 			using value_type = U;
 			using pointer = value_type*;
 			using reference = value_type&;
 
+			/// @}
+
+			/// \name Constructors
+			/// @{
+
 			/// \brief	Constructs an empty index.
 			index_t() noexcept = default;
+
+			/// @}
+
+			/// \name Lookup
+			/// @{
 
 			/// \brief	Indexes the stored index with the given key.
 			/// \remark	Indexing an empty index is valid, and will simply yield another empty index.
@@ -641,6 +720,11 @@ namespace bsa::components
                            (**this)[std::forward<K>(a_key)] :
                            result_t{};
 			}
+
+			/// @}
+
+			/// \name Observers
+			/// @{
 
 			/// \brief	Checks if the current index is valid.
 			[[nodiscard]] explicit operator bool() const noexcept { return _proxy != nullptr; }
@@ -657,6 +741,8 @@ namespace bsa::components
 			/// \remark	The current index does *not* need to be valid.
 			[[nodiscard]] pointer operator->() const noexcept { return _proxy; }
 
+			/// @}
+
 		private:
 			friend hashmap;
 
@@ -667,15 +753,70 @@ namespace bsa::components
 			value_type* _proxy{ nullptr };
 		};
 
+		/// \name Member types
+		/// @{
+
 		using index = index_t<mapped_type>;
 		using const_index = index_t<const mapped_type>;
+
+		/// @}
+
+		/// \name Assignment
+		/// @{
+
+		hashmap& operator=(const hashmap&) noexcept = default;
+		hashmap& operator=(hashmap&&) noexcept = default;
+
+		/// @}
+
+		/// \name Capacity
+		/// @{
+
+		/// \brief	Checks if the container is empty.
+		[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
+
+		/// \brief	Returns the number of elements in the container.
+		[[nodiscard]] std::size_t size() const noexcept { return _map.size(); }
+
+		/// @}
+
+		/// \name Constructors
+		/// @{
 
 		hashmap() noexcept = default;
 		hashmap(const hashmap&) noexcept = default;
 		hashmap(hashmap&&) noexcept = default;
+
+		/// @}
+
+		/// \name Destructor
+		/// @{
+
 		~hashmap() noexcept = default;
-		hashmap& operator=(const hashmap&) noexcept = default;
-		hashmap& operator=(hashmap&&) noexcept = default;
+
+		/// @}
+
+		/// \name Iterators
+		/// @{
+
+		/// \brief	Obtains an interator to the beginning of the container.
+		[[nodiscard]] iterator begin() noexcept { return _map.begin(); }
+		/// \copybrief begin()
+		[[nodiscard]] const_iterator begin() const noexcept { return _map.begin(); }
+		/// \copybrief begin()
+		[[nodiscard]] const_iterator cbegin() const noexcept { return _map.cbegin(); }
+
+		/// \brief	Obtains an iterator to the end of the container.
+		[[nodiscard]] iterator end() noexcept { return _map.end(); }
+		/// \copybrief end()
+		[[nodiscard]] const_iterator end() const noexcept { return _map.end(); }
+		/// \copybrief end()
+		[[nodiscard]] const_iterator cend() const noexcept { return _map.cend(); }
+
+		/// @}
+
+		/// \name Lookup
+		/// @{
 
 		/// \brief	Obtains a proxy to the underlying `mapped_type`. The validity of the
 		///		proxy depends on the presence of the key within the container.
@@ -692,22 +833,16 @@ namespace bsa::components
 			return it != _map.end() ? const_index{ it->second } : const_index{};
 		}
 
-		/// \brief	Obtains an interator to the beginning of the container.
-		[[nodiscard]] iterator begin() noexcept { return _map.begin(); }
-		/// \copybrief begin()
-		[[nodiscard]] const_iterator begin() const noexcept { return _map.begin(); }
-		/// \copybrief begin()
-		[[nodiscard]] const_iterator cbegin() const noexcept { return _map.cbegin(); }
+		/// \brief	Finds a `value_type` with the given key within the container.
+		[[nodiscard]] iterator find(const key_type& a_key) noexcept { return _map.find(a_key); }
 
-		/// \brief	Obtains an iterator to the end of the container.
-		[[nodiscard]] iterator end() noexcept { return _map.end(); }
-		/// \copybrief end()
-		[[nodiscard]] const_iterator end() const noexcept { return _map.end(); }
-		/// \copybrief end()
-		[[nodiscard]] const_iterator cend() const noexcept { return _map.cend(); }
+		/// \copybrief find()
+		[[nodiscard]] const_iterator find(const key_type& a_key) const noexcept { return _map.find(a_key); }
 
-		/// \brief	Checks if the container is empty.
-		[[nodiscard]] bool empty() const noexcept { return _map.empty(); }
+		/// @}
+
+		/// \name Modifiers
+		/// @{
 
 		/// \brief	Erases any element with the given key from the container.
 		///
@@ -723,12 +858,6 @@ namespace bsa::components
 			}
 		}
 
-		/// \brief	Finds a `value_type` with the given key within the container.
-		[[nodiscard]] iterator find(const key_type& a_key) noexcept { return _map.find(a_key); }
-
-		/// \copybrief find()
-		[[nodiscard]] const_iterator find(const key_type& a_key) const noexcept { return _map.find(a_key); }
-
 		/// \brief	Inserts `a_value` into the container with the given `a_key`.
 		///
 		/// \param	a_key	The key of the `value_type`.
@@ -742,8 +871,7 @@ namespace bsa::components
 			return _map.emplace(std::move(a_key), std::move(a_value));
 		}
 
-		/// \brief	Returns the number of elements in the container.
-		[[nodiscard]] std::size_t size() const noexcept { return _map.size(); }
+		/// @}
 
 #ifndef DOXYGEN
 	protected:
@@ -762,51 +890,24 @@ namespace bsa::components
 	class key final
 	{
 	public:
+		/// \name Member types
+		/// @{
+
 		/// \brief	The underlying hash type.
 		using hash_type = Hash;
 
-		key() = delete;
+		/// @}
 
-		/// \brief	Construct a key using a raw hash.
-		///
-		/// \param	a_hash	The raw hash that identifies the key.
-		key(hash_type a_hash) noexcept :
-			_hash(a_hash)
-		{}
+		/// \name Assignment
+		/// @{
 
-		/// \brief	Construct a key using a string-like object.
-		///
-		/// \param	a_string	The string-like object used to generate the underlying hash.
-		template <concepts::stringable String>
-		key(String&& a_string) noexcept
-		{
-			_name.emplace<name_owner>(std::forward<String>(a_string));
-			_hash = Hasher(*std::get_if<name_owner>(&_name));
-		}
-
-		key(const key&) noexcept = default;
-		key(key&&) noexcept = default;
-		~key() noexcept = default;
 		key& operator=(const key&) noexcept = default;
 		key& operator=(key&&) noexcept = default;
 
-		/// \brief	Retrieve a reference to the underlying hash.
-		[[nodiscard]] const hash_type& hash() const noexcept { return _hash; }
+		/// @}
 
-		/// \brief	Retrieve the name that generated the underlying hash.
-		[[nodiscard]] std::string_view name() const noexcept
-		{
-			switch (_name.index()) {
-			case name_view:
-				return *std::get_if<name_view>(&_name);
-			case name_owner:
-				return *std::get_if<name_owner>(&_name);
-			case name_proxied:
-				return std::get_if<name_proxied>(&_name)->d;
-			default:
-				detail::declare_unreachable();
-			}
-		}
+		/// \name Comparison
+		/// @{
 
 		[[nodiscard]] friend bool operator==(
 			const key& a_lhs,
@@ -835,6 +936,65 @@ namespace bsa::components
 		{
 			return a_lhs.hash() <=> a_rhs;
 		}
+
+		/// @}
+
+		/// \name Constructors
+		/// @{
+
+		key() = delete;
+
+		/// \brief	Construct a key using a raw hash.
+		///
+		/// \param	a_hash	The raw hash that identifies the key.
+		key(hash_type a_hash) noexcept :
+			_hash(a_hash)
+		{}
+
+		/// \brief	Construct a key using a string-like object.
+		///
+		/// \param	a_string	The string-like object used to generate the underlying hash.
+		template <concepts::stringable String>
+		key(String&& a_string) noexcept
+		{
+			_name.emplace<name_owner>(std::forward<String>(a_string));
+			_hash = Hasher(*std::get_if<name_owner>(&_name));
+		}
+
+		key(const key&) noexcept = default;
+		key(key&&) noexcept = default;
+
+		/// @}
+
+		/// \name Destructor
+		/// @{
+
+		~key() noexcept = default;
+
+		/// @}
+
+		/// \name Observers
+		/// @{
+
+		/// \brief	Retrieve a reference to the underlying hash.
+		[[nodiscard]] const hash_type& hash() const noexcept { return _hash; }
+
+		/// \brief	Retrieve the name that generated the underlying hash.
+		[[nodiscard]] std::string_view name() const noexcept
+		{
+			switch (_name.index()) {
+			case name_view:
+				return *std::get_if<name_view>(&_name);
+			case name_owner:
+				return *std::get_if<name_owner>(&_name);
+			case name_proxied:
+				return std::get_if<name_proxied>(&_name)->d;
+			default:
+				detail::declare_unreachable();
+			}
+		}
+
+		/// @}
 
 	private:
 #ifndef DOXYGEN

@@ -101,7 +101,7 @@ namespace bsa::tes4
 #endif
 
 	/// \brief	The archive version.
-	/// \remark	Each version has an impact on the abi of the TES:4 archive file format.
+	/// \remark	Each version has an impact on the abi of the TES4 archive file format.
 	enum class version : std::uint32_t
 	{
 		/// \brief	The Elder Scrolls IV: Oblivion
@@ -144,6 +144,9 @@ namespace bsa::tes4
 
 			std::uint32_t crc{ 0 };
 
+			/// \name Comparison
+			/// @{
+
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
 			[[nodiscard]] friend std::strong_ordering operator<=>(
@@ -152,6 +155,11 @@ namespace bsa::tes4
 			{
 				return a_lhs.numeric() <=> a_rhs.numeric();
 			}
+
+			/// @}
+
+			/// \name Observers
+			/// @{
 
 			/// \copybrief bsa::tes3::hashing::hash
 			[[nodiscard]] std::uint64_t numeric() const noexcept
@@ -164,6 +172,8 @@ namespace bsa::tes4
 					std::uint64_t{ crc } << 4u * 8u
 				};
 			}
+
+			/// @}
 
 		private:
 #ifndef DOXYGEN
@@ -203,7 +213,7 @@ namespace bsa::tes4
 		}
 	}
 
-	/// \brief	Represents a file within the TES:4 virtual filesystem.
+	/// \brief	Represents a file within the TES4 virtual filesystem.
 	class file final :
 		public components::compressed_byte_container
 	{
@@ -211,32 +221,17 @@ namespace bsa::tes4
 		friend archive;
 		using super = components::compressed_byte_container;
 
-		enum : std::uint32_t
-		{
-			icompression = 1u << 30u,
-			ichecked = 1u << 31u,
-
-			isecondary_archive = 1u << 31u
-		};
-
-		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) const -> std::size_t;
-		[[nodiscard]] auto compress_into_xmem(std::span<std::byte> a_out) const -> std::size_t;
-		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) const -> std::size_t;
-		void decompress_into_lz4(std::span<std::byte> a_out) const;
-		void decompress_into_xmem(std::span<std::byte> a_out) const;
-		void decompress_into_zlib(std::span<std::byte> a_out) const;
-		[[nodiscard]] auto compress_bound_xmem() const -> std::size_t;
-
 	public:
+		/// \name Member types
+		/// @{
+
 		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
 
-#ifdef DOXYGEN
-		/// \brief	Clears the contents of the file.
-		void clear() noexcept;
-#else
-		using super::clear;
-#endif
+		/// @}
+
+		/// \name Compression
+		/// @{
 
 		/// \copydoc bsa::fo4::chunk::compress
 		///
@@ -263,6 +258,11 @@ namespace bsa::tes4
 			std::span<std::byte> a_out,
 			compression_codec a_codec = compression_codec::normal) const;
 
+		/// @}
+
+		/// \name Decompression
+		/// @{
+
 		/// \copydoc bsa::fo4::chunk::decompress
 		///
 		/// \param	a_version	The version to decompress the file for.
@@ -279,6 +279,23 @@ namespace bsa::tes4
 			version a_version,
 			std::span<std::byte> a_out,
 			compression_codec a_codec = compression_codec::normal) const;
+
+		/// @}
+
+		/// \name Modifiers
+		/// @{
+
+#ifdef DOXYGEN
+		/// \brief	Clears the contents of the file.
+		void clear() noexcept;
+#else
+		using super::clear;
+#endif
+
+		/// @}
+
+		/// \name Reading
+		/// @{
 
 		/// \copydoc bsa::tes3::file::read(std::filesystem::path)
 		/// \copydoc bsa::tes4::file::doxygen_read
@@ -297,6 +314,11 @@ namespace bsa::tes4
 			compression_type a_compression = compression_type::decompressed,
 			copy_type a_copy = copy_type::deep);
 
+		/// @}
+
+		/// \name Writing
+		/// @{
+
 		/// \copydoc bsa::tes3::file::write(std::filesystem::path) const
 		/// \copydoc bsa::tes4::file::doxygen_write
 		void write(
@@ -311,8 +333,13 @@ namespace bsa::tes4
 			version a_version,
 			compression_codec a_codec = compression_codec::normal) const;
 
+		/// @}
+
 #ifdef DOXYGEN
 	protected:
+		/// \name Doxygen only
+		/// @{
+
 		/// \param	a_version	The version to compress the file for.
 		/// \param	a_codec	The codec to use.
 		/// \param	a_compression	The resulting compression of the file read.
@@ -326,9 +353,29 @@ namespace bsa::tes4
 		void doxygen_write(
 			version a_version,
 			compression_codec a_codec = compression_codec::normal) const;
+
+		/// @}
 #endif
 
 	private:
+		enum : std::uint32_t
+		{
+			icompression = 1u << 30u,
+			ichecked = 1u << 31u,
+
+			isecondary_archive = 1u << 31u
+		};
+
+		[[nodiscard]] auto compress_bound_xmem() const -> std::size_t;
+
+		[[nodiscard]] auto compress_into_lz4(std::span<std::byte> a_out) const -> std::size_t;
+		[[nodiscard]] auto compress_into_xmem(std::span<std::byte> a_out) const -> std::size_t;
+		[[nodiscard]] auto compress_into_zlib(std::span<std::byte> a_out) const -> std::size_t;
+
+		void decompress_into_lz4(std::span<std::byte> a_out) const;
+		void decompress_into_xmem(std::span<std::byte> a_out) const;
+		void decompress_into_zlib(std::span<std::byte> a_out) const;
+
 		void do_read(
 			detail::istream_t& a_in,
 			version a_version,
@@ -340,7 +387,7 @@ namespace bsa::tes4
 			compression_codec a_codec) const;
 	};
 
-	/// \brief	Represents a directory within the TES:4 virtual filesystem.
+	/// \brief	Represents a directory within the TES4 virtual filesystem.
 	class directory final :
 		public components::hashmap<file>
 	{
@@ -349,8 +396,16 @@ namespace bsa::tes4
 		using super = components::hashmap<file>;
 
 	public:
+		/// \name Member types
+		/// @{
+
 		/// \brief	The key used to indentify a directory.
 		using key = components::key<hashing::hash, hashing::hash_directory_in_place>;
+
+		/// @}
+
+		/// \name Modifiers
+		/// @{
 
 #ifdef DOXYGEN
 		/// \brief	Clears the contents of the directory.
@@ -358,9 +413,11 @@ namespace bsa::tes4
 #else
 		using super::clear;
 #endif
+
+		/// @}
 	};
 
-	/// \brief	Represents the TES:4 revision of the bsa format.
+	/// \brief	Represents the TES4 revision of the bsa format.
 	class archive final :
 		public components::hashmap<directory, true>
 	{
@@ -368,15 +425,13 @@ namespace bsa::tes4
 		using super = components::hashmap<directory, true>;
 
 	public:
+		/// \name Archive flags
+		/// @{
+
 		/// \brief	Retrieves the current archive flags.
 		[[nodiscard]] archive_flag archive_flags() const noexcept { return _flags; }
 		/// \brief	Sets the current archive flags.
 		void archive_flags(archive_flag a_flags) noexcept { _flags = a_flags; }
-
-		/// \brief	Retrieves the current archive types.
-		[[nodiscard]] archive_type archive_types() const noexcept { return _types; }
-		/// \brief	Sets the current archive types.
-		void archive_types(archive_type a_types) noexcept { _types = a_types; }
 
 		/// \brief	Checks if \ref archive_flag::compressed is set.
 		[[nodiscard]] bool compressed() const noexcept { return test_flag(archive_flag::compressed); }
@@ -399,6 +454,16 @@ namespace bsa::tes4
 		/// \brief	Checks if \ref archive_flag::xbox_compressed is set.
 		[[nodiscard]] bool xbox_compressed() const noexcept { return test_flag(archive_flag::xbox_compressed); }
 
+		/// @}
+
+		/// \name Archive types
+		/// @{
+
+		/// \brief	Retrieves the current archive types.
+		[[nodiscard]] archive_type archive_types() const noexcept { return _types; }
+		/// \brief	Sets the current archive types.
+		void archive_types(archive_type a_types) noexcept { _types = a_types; }
+
 		/// \brief	Checks if \ref archive_type::fonts is set.
 		[[nodiscard]] bool fonts() const noexcept { return test_type(archive_type::fonts); }
 		/// \brief	Checks if \ref archive_type::menus is set.
@@ -418,6 +483,11 @@ namespace bsa::tes4
 		/// \brief	Checks if \ref archive_type::voices is set.
 		[[nodiscard]] bool voices() const noexcept { return test_type(archive_type::voices); }
 
+		/// @}
+
+		/// \name Modifiers
+		/// @{
+
 		/// \brief	Clears the contents, flags, and file types of the archive.
 		void clear() noexcept
 		{
@@ -425,6 +495,11 @@ namespace bsa::tes4
 			_flags = archive_flag::none;
 			_types = archive_type::none;
 		}
+
+		/// @}
+
+		/// \name Reading
+		/// @{
 
 		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
 		/// \copydoc bsa::tes4::archive::doxygen_read
@@ -436,10 +511,20 @@ namespace bsa::tes4
 			std::span<const std::byte> a_src,
 			copy_type a_copy = copy_type::deep);
 
+		/// @}
+
+		/// \name Verification
+		/// @{
+
 		/// \copydoc bsa::tes3::archive::verify_offsets
 		///
 		/// \param	a_version	The version format to check for.
 		[[nodiscard]] bool verify_offsets(version a_version) const noexcept;
+
+		/// @}
+
+		/// \name Writing
+		/// @{
 
 		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
 		/// \copydoc bsa::tes4::archive::doxygen_write
@@ -449,13 +534,20 @@ namespace bsa::tes4
 		/// \copydoc bsa::tes4::archive::doxygen_write
 		void write(binary_io::any_ostream& a_dst, version a_version) const;
 
+		/// @}
+
 #ifdef DOXYGEN
 	protected:
+		/// \name Doxygen only
+		/// @{
+
 		/// \return	The version of the archive that was read.
 		version doxygen_read();
 
 		/// \param	a_version The version format to write the archive in.
 		void doxygen_write(version a_version) const;
+
+		/// @}
 #endif
 
 	private:

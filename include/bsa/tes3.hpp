@@ -30,6 +30,9 @@ namespace bsa::tes3
 			std::uint32_t lo{ 0 };
 			std::uint32_t hi{ 0 };
 
+			/// \name Comparison
+			/// @{
+
 			[[nodiscard]] friend bool operator==(const hash&, const hash&) noexcept = default;
 
 			[[nodiscard]] friend std::strong_ordering operator<=>(
@@ -39,6 +42,11 @@ namespace bsa::tes3
 				return a_lhs.numeric() <=> a_rhs.numeric();
 			}
 
+			/// @}
+
+			/// \name Observers
+			/// @{
+
 			/// \brief	Obtains the numeric value of the hash used for comparisons.
 			[[nodiscard]] std::uint64_t numeric() const noexcept
 			{
@@ -47,6 +55,8 @@ namespace bsa::tes3
 					std::uint64_t{ lo } << 4u * 8u
 				};
 			}
+
+			/// @}
 
 #ifndef DOXYGEN
 			friend auto operator>>(
@@ -76,7 +86,7 @@ namespace bsa::tes3
 		}
 	}
 
-	/// \brief	Represents a file within the TES:3 virtual filesystem.
+	/// \brief	Represents a file within the TES3 virtual filesystem.
 	class file final :
 		public components::byte_container
 	{
@@ -85,8 +95,16 @@ namespace bsa::tes3
 		using super = components::byte_container;
 
 	public:
+		/// \name Member types
+		/// @{
+
 		/// \brief	The key used to indentify a file.
 		using key = components::key<hashing::hash, hashing::hash_file_in_place>;
+
+		/// @}
+
+		/// \name Modifiers
+		/// @{
 
 #ifdef DOXYGEN
 		/// \brief	Clears the contents of the file.
@@ -94,6 +112,11 @@ namespace bsa::tes3
 #else
 		using super::clear;
 #endif
+
+		/// @}
+
+		/// \name Reading
+		/// @{
 
 		/// \copydoc bsa::tes3::file::doxygen_read
 		///
@@ -112,6 +135,11 @@ namespace bsa::tes3
 			std::span<const std::byte> a_src,
 			copy_type a_copy = copy_type::deep);
 
+		/// @}
+
+		/// \name Writing
+		/// @{
+
 		/// \copydoc bsa::tes3::file::doxygen_write
 		///
 		/// \param	a_path	The path to write the archive to on the native filesystem.
@@ -122,8 +150,13 @@ namespace bsa::tes3
 		/// \param	a_dst	The stream to write the archive to.
 		void write(binary_io::any_ostream& a_dst) const;
 
+		/// @}
+
 #ifdef DOXYGEN
 	protected:
+		/// \name Doxygen only
+		/// @{
+
 		/// \brief	Reads the contents of the file from the source.
 		///
 		/// \exception	binary_io::buffer_exhausted	Thrown when the input buffer is exhausted.
@@ -139,6 +172,8 @@ namespace bsa::tes3
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
 		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
 		void doxygen_write() const;
+
+		/// @}
 #endif
 
 	private:
@@ -146,7 +181,7 @@ namespace bsa::tes3
 		void do_write(detail::ostream_t& a_out) const;
 	};
 
-	/// \brief	Represents the TES:3 revision of the bsa format.
+	/// \brief	Represents the TES3 revision of the bsa format.
 	class archive final :
 		public components::hashmap<file>
 	{
@@ -154,12 +189,20 @@ namespace bsa::tes3
 		using super = components::hashmap<file>;
 
 	public:
+		/// \name Modifiers
+		/// @{
+
 #ifdef DOXYGEN
 		/// \brief	Clears the contents of the archive.
 		void clear() noexcept;
 #else
 		using super::clear;
 #endif
+
+		/// @}
+
+		/// \name Reading
+		/// @{
 
 		/// \copydoc bsa::tes3::archive::doxygen_read
 		///
@@ -178,10 +221,20 @@ namespace bsa::tes3
 			std::span<const std::byte> a_src,
 			copy_type a_copy = copy_type::deep);
 
+		/// @}
+
+		/// \name Validation
+		/// @{
+
 		/// \brief	Verifies that offsets within the archive will be valid when written to disk.
 		///
 		/// \return	Returns `true` is the archive passes validation, `false` otherwise.
 		[[nodiscard]] bool verify_offsets() const noexcept;
+
+		/// @}
+
+		/// \name Writing
+		/// @{
 
 		/// \copydoc bsa::tes3::archive::doxygen_write
 		///
@@ -193,8 +246,13 @@ namespace bsa::tes3
 		/// \param	a_dst	The stream to write the archive to.
 		void write(binary_io::any_ostream& a_dst) const;
 
+		/// @}
+
 #ifdef DOXYGEN
 	protected:
+		/// \name Doxygen only
+		/// @{
+
 		/// \brief	Reads the contents of the archive from the source.
 		///
 		/// \exception	binary_io::buffer_exhausted	Thrown when archive reads index out of bounds.
@@ -211,6 +269,8 @@ namespace bsa::tes3
 		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
 		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
 		void doxygen_write() const;
+
+		/// @}
 #endif
 
 	private:
