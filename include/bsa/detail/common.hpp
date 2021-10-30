@@ -196,6 +196,22 @@ namespace bsa
 		///		in an unspecified state.
 		static std::size_t compress_into(
 			std::span<std::byte> a_out);
+
+		/// \brief	Reads the contents of the source.
+		///
+		/// \exception	binary_io::buffer_exhausted	Thrown when reads index out of bounds.
+		///
+		///	\remark	If any exception is thrown, the object is left in an unspecified state.
+		///		Use clear to return it to a valid state.
+		/// \remark	If the function returns successfully, the contents of the object are
+		///		*replaced* with the contents of the input.
+		static void read();
+
+		/// \brief	Writes the contents of the object to the destination.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
+		static void write();
 	};
 #endif
 

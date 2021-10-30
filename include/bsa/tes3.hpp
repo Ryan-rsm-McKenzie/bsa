@@ -157,20 +157,10 @@ namespace bsa::tes3
 		/// \name Doxygen only
 		/// @{
 
-		/// \brief	Reads the contents of the file from the source.
-		///
-		/// \exception	binary_io::buffer_exhausted	Thrown when the input buffer is exhausted.
-		///
-		///	\remark	If any exception is thrown, the file is left in an unspecified state.
-		///		Use \ref clear to return it to a valid state.
-		/// \remark	If the function returns successfully, the contents of the file are *replaced*
-		///		with the contents of the input file.
+		/// \copydoc bsa::doxygen_detail::read
 		void doxygen_read();
 
-		/// \brief	Writes the contents of the file to the destination.
-		///
-		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
+		//// \copydoc bsa::doxygen_detail::write
 		void doxygen_write() const;
 
 		/// @}
@@ -253,21 +243,12 @@ namespace bsa::tes3
 		/// \name Doxygen only
 		/// @{
 
-		/// \brief	Reads the contents of the archive from the source.
+		/// \copydoc bsa::doxygen_detail::read
 		///
-		/// \exception	binary_io::buffer_exhausted	Thrown when archive reads index out of bounds.
 		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
-		///
-		///	\remark	If any exception is thrown, the archive is left in an unspecified state.
-		///		Use \ref clear to return it to a valid state.
-		/// \remark	If the function returns successfully, the contents of the current archived are
-		///		*replaced* with the contents of the input archive.
 		void doxygen_read();
 
-		/// \brief	Writes the contents of the archive to the destination.
-		///
-		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		/// \exception	binary_io::buffer_exhausted	Thrown when the output buffer is exhausted.
+		/// \copydoc bsa::doxygen_detail::write
 		void doxygen_write() const;
 
 		/// @}
