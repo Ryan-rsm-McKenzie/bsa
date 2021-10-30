@@ -111,12 +111,12 @@ namespace bsa
 	/// \brief	The copy method to use when reading from in-memory buffers.
 	enum class copy_type
 	{
-		/// Makes a deep copy of the given data (i.e. uses an allocating `std::vector` instead of
-		///		a lightweight `std::span`).
+		/// \brief Makes a deep copy of the given data (i.e. uses an allocating `std::vector`
+		///		instead of a lightweight `std::span`).
 		deep,
 
-		/// Make a shallow copy of the given data (i.e. uses a lightweight `std::span` instead of
-		///		an allocating `std::vector`).
+		/// \brief	Make a shallow copy of the given data (i.e. uses a lightweight `std::span`
+		///		instead of an allocating `std::vector`).
 		shallow
 	};
 
