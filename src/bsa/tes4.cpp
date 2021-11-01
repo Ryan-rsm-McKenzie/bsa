@@ -252,6 +252,146 @@ namespace bsa::tes4
 				return offsetof_file_strings(a_header) +
 				       a_header.file_names_length();
 			}
+
+#ifdef BSA_SUPPORT_XMEM
+			template <class CharT>
+			[[nodiscard]] auto string_split(
+				std::basic_string_view<CharT> a_string,
+				CharT a_separator) noexcept
+				-> std::vector<std::basic_string_view<CharT>>
+			{
+				std::vector<std::basic_string_view<CharT>> result;
+				if (a_string.empty()) {
+					return result;
+				}
+
+				std::size_t lpos = 0;
+				std::size_t rpos = static_cast<std::size_t>(-1);
+				do {
+					lpos = rpos + 1;
+					rpos = a_string.find_first_of(a_separator, lpos);
+					result.push_back(a_string.substr(lpos, rpos - lpos));
+				} while (rpos != std::basic_string_view<CharT>::npos);
+
+				return result;
+			}
+
+			[[nodiscard]] auto get_file_version(
+				std::filesystem::path a_file) noexcept
+				-> std::optional<std::array<std::uint16_t, 4>>
+			{
+				::DWORD dummy = 0;
+				std::vector<std::byte> buf(::GetFileVersionInfoSizeW(a_file.c_str(), &dummy));
+				if (buf.empty()) {
+					return std::nullopt;
+				}
+
+				if (::GetFileVersionInfoW(
+						a_file.c_str(),
+						0,
+						static_cast<::DWORD>(buf.size()),
+						buf.data()) == FALSE) {
+					return std::nullopt;
+				}
+
+				void* verBuf = nullptr;
+				::UINT verLen = 0;
+				if (!::VerQueryValueW(
+						buf.data(),
+						LR"(\StringFileInfo\040904B0\ProductVersion)",
+						&verBuf,
+						&verLen)) {
+					return std::nullopt;
+				}
+
+				std::array<std::uint16_t, 4> version;
+				const auto tokens = string_split({ static_cast<const wchar_t*>(verBuf), verLen }, L'.');
+				std::wstring token;
+				for (std::size_t i = 0; i < std::min<std::size_t>(tokens.size(), 4); ++i) {
+					token = tokens[i];
+					version[i] = static_cast<std::uint16_t>(std::stoul(token));
+				}
+
+				return version;
+			}
+
+			class xmem_proxy final
+			{
+			public:
+				xmem_proxy()
+				{
+					const auto cwd = xmem::current_executable_directory();
+					if (!cwd) {
+						throw bsa::compression_error(detail::error_code::current_executable_directory_failure);
+					}
+
+					const auto path = *cwd / u8"xmem.exe"sv;
+					const auto version = get_file_version(path);
+					if (!version ||
+						(*version)[0] != project_version::major ||
+						(*version)[1] != project_version::minor ||
+						(*version)[2] != project_version::patch ||
+						(*version)[3] != 0) {
+						throw bsa::compression_error(detail::error_code::xmem_version_mismatch);
+					}
+
+					const std::array argv{
+						path.u8string(),
+						u8"serve"s,
+					};
+
+					const auto o = []() noexcept {
+						reproc::options result;
+						result.redirect.in.type = reproc::redirect::pipe;
+						result.redirect.out.type = reproc::redirect::pipe;
+						return result;
+					}();
+
+					const auto err = _proxy.start({ argv }, o);
+					if (err) {
+						throw bsa::compression_error(detail::error_code::xmem_start_failure);
+					}
+				}
+
+				~xmem_proxy() noexcept
+				{
+					try {
+						detail::process_out os{ _proxy };
+						os << xmem::request_header{ xmem::request_type::exit };
+					} catch (const binary_io::exception&) {}
+
+					const auto actions = []() {
+						reproc::stop_actions result;
+						result.first.action = reproc::stop::wait;
+						result.first.timeout = 1000ms;
+						result.second.action = reproc::stop::terminate;
+						result.second.timeout = reproc::infinite;
+						return result;
+					}();
+
+					_proxy.stop(actions);
+				}
+
+				xmem_proxy(const volatile xmem_proxy&) = delete;
+				xmem_proxy& operator=(const volatile xmem_proxy&) = delete;
+
+				[[nodiscard]] auto get() noexcept
+					-> reproc::process&
+				{
+					return _proxy;
+				}
+
+			private:
+				reproc::process _proxy;
+			};
+
+			[[nodiscard]] auto get_xmem_proxy()
+				-> reproc::process&
+			{
+				thread_local xmem_proxy proxy;
+				return proxy.get();
+			}
+#endif
 		}
 	}
 
@@ -390,149 +530,6 @@ namespace bsa::tes4
 			}
 		}
 	}
-
-#ifdef BSA_SUPPORT_XMEM
-	namespace
-	{
-		template <class CharT>
-		[[nodiscard]] auto string_split(
-			std::basic_string_view<CharT> a_string,
-			CharT a_separator) noexcept
-			-> std::vector<std::basic_string_view<CharT>>
-		{
-			std::vector<std::basic_string_view<CharT>> result;
-			if (a_string.empty()) {
-				return result;
-			}
-
-			std::size_t lpos = 0;
-			std::size_t rpos = static_cast<std::size_t>(-1);
-			do {
-				lpos = rpos + 1;
-				rpos = a_string.find_first_of(a_separator, lpos);
-				result.push_back(a_string.substr(lpos, rpos - lpos));
-			} while (rpos != std::basic_string_view<CharT>::npos);
-
-			return result;
-		}
-
-		[[nodiscard]] auto get_file_version(
-			std::filesystem::path a_file) noexcept
-			-> std::optional<std::array<std::uint16_t, 4>>
-		{
-			::DWORD dummy = 0;
-			std::vector<std::byte> buf(::GetFileVersionInfoSizeW(a_file.c_str(), &dummy));
-			if (buf.empty()) {
-				return std::nullopt;
-			}
-
-			if (::GetFileVersionInfoW(
-					a_file.c_str(),
-					0,
-					static_cast<::DWORD>(buf.size()),
-					buf.data()) == FALSE) {
-				return std::nullopt;
-			}
-
-			void* verBuf = nullptr;
-			::UINT verLen = 0;
-			if (!::VerQueryValueW(
-					buf.data(),
-					LR"(\StringFileInfo\040904B0\ProductVersion)",
-					&verBuf,
-					&verLen)) {
-				return std::nullopt;
-			}
-
-			std::array<std::uint16_t, 4> version;
-			const auto tokens = string_split({ static_cast<const wchar_t*>(verBuf), verLen }, L'.');
-			std::wstring token;
-			for (std::size_t i = 0; i < std::min<std::size_t>(tokens.size(), 4); ++i) {
-				token = tokens[i];
-				version[i] = static_cast<std::uint16_t>(std::stoul(token));
-			}
-
-			return version;
-		}
-
-		class xmem_proxy final
-		{
-		public:
-			xmem_proxy()
-			{
-				const auto cwd = xmem::current_executable_directory();
-				if (!cwd) {
-					throw bsa::compression_error(detail::error_code::current_executable_directory_failure);
-				}
-
-				const auto path = *cwd / u8"xmem.exe"sv;
-				const auto version = get_file_version(path);
-				if (!version ||
-					(*version)[0] != project_version::major ||
-					(*version)[1] != project_version::minor ||
-					(*version)[2] != project_version::patch ||
-					(*version)[3] != 0) {
-					throw bsa::compression_error(detail::error_code::xmem_version_mismatch);
-				}
-
-				const std::array argv{
-					path.u8string(),
-					u8"serve"s,
-				};
-
-				const auto o = []() noexcept {
-					reproc::options result;
-					result.redirect.in.type = reproc::redirect::pipe;
-					result.redirect.out.type = reproc::redirect::pipe;
-					return result;
-				}();
-
-				const auto err = _proxy.start({ argv }, o);
-				if (err) {
-					throw bsa::compression_error(detail::error_code::xmem_start_failure);
-				}
-			}
-
-			~xmem_proxy() noexcept
-			{
-				try {
-					detail::process_out os{ _proxy };
-					os << xmem::request_header{ xmem::request_type::exit };
-				} catch (const binary_io::exception&) {}
-
-				const auto actions = []() {
-					reproc::stop_actions result;
-					result.first.action = reproc::stop::wait;
-					result.first.timeout = 1000ms;
-					result.second.action = reproc::stop::terminate;
-					result.second.timeout = reproc::infinite;
-					return result;
-				}();
-
-				_proxy.stop(actions);
-			}
-
-			xmem_proxy(const volatile xmem_proxy&) = delete;
-			xmem_proxy& operator=(const volatile xmem_proxy&) = delete;
-
-			[[nodiscard]] auto get() noexcept
-				-> reproc::process&
-			{
-				return _proxy;
-			}
-
-		private:
-			reproc::process _proxy;
-		};
-
-		[[nodiscard]] auto get_xmem_proxy()
-			-> reproc::process&
-		{
-			thread_local xmem_proxy proxy;
-			return proxy.get();
-		}
-	}
-#endif
 
 	void file::compress(
 		version a_version,
@@ -673,7 +670,7 @@ namespace bsa::tes4
 	{
 #ifdef BSA_SUPPORT_XMEM
 		try {
-			auto& proxy = get_xmem_proxy();
+			auto& proxy = detail::get_xmem_proxy();
 			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::compress_bound }
 			   << xmem::compress_bound_request{ this->as_bytes() };
@@ -726,7 +723,7 @@ namespace bsa::tes4
 		assert(a_out.size_bytes() >= this->compress_bound(version::tes5, compression_codec::xmem));
 
 		try {
-			auto& proxy = get_xmem_proxy();
+			auto& proxy = detail::get_xmem_proxy();
 			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::compress }
 			   << xmem::compress_request(
@@ -830,7 +827,7 @@ namespace bsa::tes4
 		assert(a_out.size_bytes() >= this->decompressed_size());
 
 		try {
-			auto& proxy = get_xmem_proxy();
+			auto& proxy = detail::get_xmem_proxy();
 			detail::process_out os{ proxy };
 			os << xmem::request_header{ xmem::request_type::decompress }
 			   << xmem::decompress_request(
