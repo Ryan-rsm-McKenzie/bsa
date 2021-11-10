@@ -648,7 +648,7 @@ namespace bsa::fo4
 		std::size_t required = 0;
 		if (const auto result = DirectX::_EncodeDDSHeader(
 				meta,
-				DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
+				DirectX::DDS_FLAGS::DDS_FLAGS_FORCE_DX10_EXT,
 				blob.GetBufferPointer(),
 				blob.GetBufferSize(),
 				required);
