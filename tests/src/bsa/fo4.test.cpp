@@ -534,5 +534,23 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			REQUIRE(std::memcmp(lhs + 1, rhs + 1, copy.size() - sizeof(dds_header_t)) == 0);
 		}
 	}
+
+	SECTION("we can read/write directx files")
+	{
+		const std::filesystem::path root{ "fo4_dds_test"sv };
+		const auto filename = "dx9.dds"sv;
+		bsa::fo4::file file;
+		file.read(root / filename, bsa::fo4::format::directx);
+		binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
+		file.write(buffer, bsa::fo4::format::directx);
+
+		const auto original = map_file(root / filename);
+		const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
+
+		constexpr auto dx10_header_size = 20;
+		constexpr auto full_header_size = 144;
+		REQUIRE(copy.size() == original.size() + dx10_header_size);
+		REQUIRE(std::memcmp(copy.data() + full_header_size, original.data() + full_header_size - dx10_header_size, copy.size() - full_header_size) == 0);
+	}
 #endif
 }
