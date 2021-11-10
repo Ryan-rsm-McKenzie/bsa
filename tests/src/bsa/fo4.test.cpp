@@ -96,13 +96,20 @@ namespace
 		}
 	};
 
-	struct dds_header_t
+	struct dds9_header_t
 	{
 		DWORD dwMagic;
 		DDS_HEADER header;
+
+		[[nodiscard]] friend bool operator==(dds9_header_t, dds9_header_t) noexcept = default;
+	};
+
+	struct dds10_header_t
+	{
+		dds9_header_t header9;
 		DDS_HEADER_DXT10 header10;
 
-		[[nodiscard]] friend bool operator==(dds_header_t, dds_header_t) noexcept = default;
+		[[nodiscard]] friend bool operator==(dds10_header_t, dds10_header_t) noexcept = default;
 	};
 
 #	undef COMPARE
@@ -528,10 +535,10 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
 
 			REQUIRE(copy.size() == original.size());
-			const auto lhs = reinterpret_cast<const dds_header_t*>(copy.data());
-			const auto rhs = reinterpret_cast<const dds_header_t*>(original.data());
+			const auto lhs = reinterpret_cast<const dds10_header_t*>(copy.data());
+			const auto rhs = reinterpret_cast<const dds10_header_t*>(original.data());
 			REQUIRE(*lhs == *rhs);
-			REQUIRE(std::memcmp(lhs + 1, rhs + 1, copy.size() - sizeof(dds_header_t)) == 0);
+			REQUIRE(std::memcmp(lhs + 1, rhs + 1, copy.size() - sizeof(dds10_header_t)) == 0);
 		}
 	}
 
@@ -547,10 +554,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const auto original = map_file(root / filename);
 		const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
 
-		constexpr auto dx10_header_size = 20;
-		constexpr auto full_header_size = 144;
-		REQUIRE(copy.size() == original.size() + dx10_header_size);
-		REQUIRE(std::memcmp(copy.data() + full_header_size, original.data() + full_header_size - dx10_header_size, copy.size() - full_header_size) == 0);
+		REQUIRE(copy.size() == original.size() + sizeof(DDS_HEADER_DXT10));
+		REQUIRE(std::memcmp(copy.data() + sizeof(dds10_header_t), original.data() + sizeof(dds9_header_t), copy.size() - sizeof(dds10_header_t)) == 0);
 	}
 #endif
 }
