@@ -67,6 +67,7 @@ acquire_test("tes3_write_test")
 
 acquire_test("tes4_compression_mismatch_test")
 acquire_test("tes4_compression_test")
+acquire_test("tes4_data_sharing_name_test")
 acquire_test("tes4_flags_test")
 acquire_test("tes4_invalid_test")
 acquire_test("tes4_xbox_read_test")

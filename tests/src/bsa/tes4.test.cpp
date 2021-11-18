@@ -607,4 +607,25 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 		}
 	}
 #endif
+
+	SECTION("we can correctly parse file names out of archives which use file sharing and name embedding")
+	{
+		const std::filesystem::path root{ "tes4_data_sharing_name_test"sv };
+		bsa::tes4::archive bsa;
+		REQUIRE(bsa.read(root / "share.bsa"sv) == bsa::tes4::version::tes5);
+		REQUIRE(bsa.embedded_file_names());
+
+		const auto find = [&](std::string_view a_directory, std::string_view a_file) {
+			const auto dit = bsa.find(a_directory);
+			REQUIRE(dit != bsa.end());
+			REQUIRE(dit->first.name() == a_directory);
+
+			const auto fit = dit->second.find(a_file);
+			REQUIRE(fit != dit->second.end());
+			REQUIRE(fit->first.name() == a_file);
+		};
+
+		find("misc1"sv, "example1.txt"sv);
+		find("misc2"sv, "example2.txt"sv);
+	}
 }

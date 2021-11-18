@@ -1079,7 +1079,19 @@ namespace bsa::tes4
 			const detail::restore_point _{ a_in };
 			a_in->seek_absolute(offset & ~file::isecondary_archive);
 
-			const auto fname = [&]() -> std::string_view {
+			const auto tableName = [&]() -> std::optional<std::string_view> {
+				if (a_header.file_strings()) {
+					const detail::restore_point r{ a_in };
+					a_in->seek_absolute(a_namesOffset);
+					const auto name = detail::read_zstring(a_in);
+					a_namesOffset = a_in->tell();
+					return name;
+				} else {
+					return std::nullopt;
+				}
+			}();
+
+			const auto embeddedName = [&]() -> std::optional<std::string_view> {
 				if (a_header.embedded_file_names()) {
 					auto name = detail::read_bstring(a_in);
 					size -= static_cast<std::uint32_t>(name.length() + 1u);
@@ -1092,16 +1104,16 @@ namespace bsa::tes4
 					}
 
 					return name;
-				} else if (a_header.file_strings()) {
-					const detail::restore_point r{ a_in };
-					a_in->seek_absolute(a_namesOffset);
-					const auto name = detail::read_zstring(a_in);
-					a_namesOffset = a_in->tell();
-					return name;
 				} else {
-					return {};
+					return std::nullopt;
 				}
 			}();
+
+			// prefer file string table name, see #7
+			const auto fname =
+				tableName    ? *tableName :
+				embeddedName ? *embeddedName :
+                               ""sv;
 
 			[[maybe_unused]] const auto [it, success] =
 				a_dir.insert(
@@ -1163,14 +1175,23 @@ namespace bsa::tes4
 		const detail::restore_point _{ a_in };
 		a_in->seek_absolute(a_filesOffset);
 
-		const auto name =
-			a_header.directory_strings() ? detail::read_bzstring(a_in) : ""sv;
+		const auto tableName =
+			a_header.directory_strings() ?
+                std::make_optional(detail::read_bzstring(a_in)) :
+                std::nullopt;
 
 		directory d;
-		const auto backup = this->read_file_entries(d, a_in, a_header, count, a_namesOffset);
+		const auto embeddedName = this->read_file_entries(d, a_in, a_header, count, a_namesOffset);
+
+		// prefer directory string table name, see #7
+		const auto dname =
+			tableName    ? *tableName :
+			embeddedName ? *embeddedName :
+                           ""sv;
+
 		[[maybe_unused]] const auto [it, success] =
 			this->insert(
-				key_type{ hash, backup.value_or(name), a_in },
+				key_type{ hash, dname, a_in },
 				std::move(d));
 		assert(success);
 
