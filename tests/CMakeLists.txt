@@ -57,6 +57,7 @@ acquire_test("common_guess_test")
 
 acquire_test("fo4_compression_test")
 acquire_test("fo4_dds_test")
+acquire_test("fo4_dx9_test")
 acquire_test("fo4_invalid_test")
 acquire_test("fo4_missing_string_table_test")
 acquire_test("fo4_write_test")

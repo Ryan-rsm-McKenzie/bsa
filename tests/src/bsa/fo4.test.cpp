@@ -544,7 +544,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 	SECTION("we can read/write directx files")
 	{
-		const std::filesystem::path root{ "fo4_dds_test"sv };
+		const std::filesystem::path root{ "fo4_dx9_test"sv };
 		const auto filename = "dx9.dds"sv;
 		bsa::fo4::file file;
 		file.read(root / filename, bsa::fo4::format::directx);
