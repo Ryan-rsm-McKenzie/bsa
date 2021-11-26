@@ -28,8 +28,6 @@ namespace DirectX
 		void* a_destination,
 		::size_t a_maxsize,
 		::size_t& a_required) noexcept;
-	[[nodiscard]] ::size_t __cdecl BitsPerPixel(
-		::DXGI_FORMAT a_fmt) noexcept;
 }
 #endif
 
@@ -94,6 +92,27 @@ namespace bsa::fo4
 				}
 
 				return result;
+			}
+
+			[[nodiscard]] auto directx_mip_chunk_maximum(
+				::DXGI_FORMAT a_fmt,
+				std::size_t a_width,
+				std::size_t a_height)
+				-> std::size_t
+			{
+				std::size_t pitch = 0;
+				std::size_t slice = 0;
+				if (const auto result = DirectX::ComputePitch(
+						a_fmt,
+						a_width,
+						a_height,
+						pitch,
+						slice);
+					FAILED(result)) {
+					throw bsa::exception("failed to compute dds pitch");
+				}
+
+				return slice;
 			}
 		}
 #endif
@@ -483,24 +502,26 @@ namespace bsa::fo4
 	void file::read(
 		std::filesystem::path a_path,
 		format a_format,
-		std::size_t a_mipChunkMax,
+		std::size_t a_mipChunkWidth,
+		std::size_t a_mipChunkHeight,
 		compression_level a_level,
 		compression_type a_compression)
 	{
 		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_format, a_mipChunkMax, a_level, a_compression);
+		this->do_read(in, a_format, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
 	}
 
 	void file::read(
 		std::span<const std::byte> a_src,
 		format a_format,
-		std::size_t a_mipChunkMax,
+		std::size_t a_mipChunkWidth,
+		std::size_t a_mipChunkHeight,
 		compression_level a_level,
 		compression_type a_compression,
 		copy_type a_copy)
 	{
 		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_format, a_mipChunkMax, a_level, a_compression);
+		this->do_read(in, a_format, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
 	}
 
 	void file::write(
@@ -521,7 +542,8 @@ namespace bsa::fo4
 	void file::do_read(
 		detail::istream_t& a_in,
 		format a_format,
-		std::size_t a_mipChunkMax,
+		std::size_t a_mipChunkWidth,
+		std::size_t a_mipChunkHeight,
 		compression_level a_level,
 		compression_type a_compression)
 	{
@@ -530,7 +552,7 @@ namespace bsa::fo4
 			this->read_general(a_in, a_level, a_compression);
 			break;
 		case format::directx:
-			this->read_directx(a_in, a_mipChunkMax, a_level, a_compression);
+			this->read_directx(a_in, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -555,7 +577,8 @@ namespace bsa::fo4
 
 	void file::read_directx(
 		[[maybe_unused]] detail::istream_t& a_in,
-		[[maybe_unused]] std::size_t a_mipChunkMax,
+		[[maybe_unused]] std::size_t a_mipChunkWidth,
+		[[maybe_unused]] std::size_t a_mipChunkHeight,
 		[[maybe_unused]] compression_level a_level,
 		[[maybe_unused]] compression_type a_compression)
 	{
@@ -580,12 +603,12 @@ namespace bsa::fo4
 		this->header.width = static_cast<std::uint16_t>(meta.width);
 		this->header.mip_count = static_cast<std::uint8_t>(meta.mipLevels);
 		this->header.format = static_cast<std::uint8_t>(meta.format);
-		this->header.flags = static_cast<std::uint8_t>(meta.miscFlags);
-		this->header.tile_mode = static_cast<std::uint8_t>(DirectX::BitsPerPixel(meta.format));
+		this->header.flags = meta.IsCubemap() ? 1u : 0u;
+		this->header.tile_mode = 8u;
 
 		const auto splices = detail::chunk<4>(
 			std::span{ scratch.GetImages(), scratch.GetImageCount() },
-			a_mipChunkMax);
+			detail::directx_mip_chunk_maximum(meta.format, a_mipChunkWidth, a_mipChunkHeight));
 		for (const auto& splice : splices) {
 			assert(!splice.empty());
 
@@ -634,7 +657,7 @@ namespace bsa::fo4
 			.depth = 1,
 			.arraySize = 1,
 			.mipLevels = this->header.mip_count,
-			.miscFlags = this->header.flags,
+			.miscFlags = this->header.flags != 0 ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
 			.format = static_cast<::DXGI_FORMAT>(this->header.format),
 			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
 		};

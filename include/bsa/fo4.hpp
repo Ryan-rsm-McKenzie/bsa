@@ -381,7 +381,8 @@ namespace bsa::fo4
 		void read(
 			std::filesystem::path a_path,
 			format a_format,
-			std::size_t a_mipChunkMax = 512u * 512u,
+			std::size_t a_mipChunkWidth = 512u,
+			std::size_t a_mipChunkHeight = 512u,
 			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed);
 
@@ -390,7 +391,8 @@ namespace bsa::fo4
 		void read(
 			std::span<const std::byte> a_src,
 			format a_format,
-			std::size_t a_mipChunkMax = 512u * 512u,
+			std::size_t a_mipChunkWidth = 512u,
+			std::size_t a_mipChunkHeight = 512u,
 			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed,
 			copy_type a_copy = copy_type::deep);
@@ -420,12 +422,14 @@ namespace bsa::fo4
 		/// @{
 
 		/// \param	a_format	The format to read the file as.
-		/// \param	a_mipChunkMax	The maxiumum size to restrict a single mip chunk to.
+		/// \param	a_mipChunkWidth	The maxiumum width to restrict a single mip chunk to.
+		/// \param	a_mipChunkHeight	The maxiumum height to restrict a single mip chunk to.
 		/// \param	a_level	The level to compress the data at.
 		/// \param	a_compression	The resulting compression of the file read.
 		void doxygen_read(
 			format a_format,
-			std::size_t a_mipChunkMax = 512u * 512u,
+			std::size_t a_mipChunkWidth = 512u,
+			std::size_t a_mipChunkHeight = 512u,
 			compression_level a_level = compression_level::normal,
 			compression_type a_compression = compression_type::decompressed);
 
@@ -439,7 +443,8 @@ namespace bsa::fo4
 		void do_read(
 			detail::istream_t& a_in,
 			format a_format,
-			std::size_t a_mipChunkMax,
+			std::size_t a_mipChunkWidth,
+			std::size_t a_mipChunkHeight,
 			compression_level a_level,
 			compression_type a_compression);
 		void do_write(
@@ -448,7 +453,8 @@ namespace bsa::fo4
 
 		void read_directx(
 			detail::istream_t& a_in,
-			std::size_t a_mipChunkMax,
+			std::size_t a_mipChunkWidth,
+			std::size_t a_mipChunkHeight,
 			compression_level a_level,
 			compression_type a_compression);
 		void read_general(

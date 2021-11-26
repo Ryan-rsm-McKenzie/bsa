@@ -68,7 +68,8 @@ namespace
 				f.read(
 					a_path,
 					bsa::fo4::format::general,
-					512u * 512u,
+					512u,
+					512u,
 					bsa::fo4::compression_level::normal,
 					bsa::compression_type::compressed);
 
