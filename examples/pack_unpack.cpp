@@ -118,7 +118,11 @@ namespace
 			a_input,
 			[&](const std::filesystem::path& a_path) {
 				bsa::tes4::file f;
-				f.read(a_path, version, bsa::tes4::compression_codec::normal, bsa::compression_type::compressed);
+				f.read(
+					a_path,
+					version,
+					bsa::tes4::compression_codec::normal,
+					bsa::compression_type::compressed);
 
 				const auto d = [&]() {
 					const auto key =
