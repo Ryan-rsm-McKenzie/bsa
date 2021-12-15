@@ -662,16 +662,18 @@ namespace bsa::fo4
 			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
 		};
 
-		DirectX::Blob blob;
-		blob.Initialize(
-			4u +    // dwMagic
-			124u +  // header
-			20u);   // header10
-
 		std::size_t required = 0;
+		if (const auto result = DirectX::_EncodeDDSHeader(meta, DirectX::DDS_FLAGS_NONE, nullptr, 0, required);
+			FAILED(result)) {
+			throw bsa::exception("failed to encode dds header");
+		}
+
+		DirectX::Blob blob;
+		blob.Initialize(required);
+
 		if (const auto result = DirectX::_EncodeDDSHeader(
 				meta,
-				DirectX::DDS_FLAGS::DDS_FLAGS_FORCE_DX10_EXT,
+				DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
 				blob.GetBufferPointer(),
 				blob.GetBufferSize(),
 				required);
