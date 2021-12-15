@@ -545,17 +545,19 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 	SECTION("we can read/write directx files")
 	{
 		const std::filesystem::path root{ "fo4_dx9_test"sv };
-		const auto filename = "dx9.dds"sv;
-		bsa::fo4::file file;
-		file.read(root / filename, bsa::fo4::format::directx);
-		binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
-		file.write(buffer, bsa::fo4::format::directx);
+		const auto files = { "dx9.dds"sv, "blacksky_e.dds"sv, "bleakfallscube_e.dds"sv };
+		for (const auto& filename : files) {
+			bsa::fo4::file file;
+			file.read(root / filename, bsa::fo4::format::directx);
+			binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
+			file.write(buffer, bsa::fo4::format::directx);
 
-		const auto original = map_file(root / filename);
-		const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
+			const auto original = map_file(root / filename);
+			const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
 
-		REQUIRE(copy.size() == original.size() + sizeof(DDS_HEADER_DXT10));
-		REQUIRE(std::memcmp(copy.data() + sizeof(dds10_header_t), original.data() + sizeof(dds9_header_t), copy.size() - sizeof(dds10_header_t)) == 0);
+			REQUIRE(copy.size() == original.size());
+			REQUIRE(std::memcmp(copy.data(), original.data(), copy.size()) == 0);
+		}
 	}
 #endif
 }
