@@ -497,6 +497,37 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			});
 	}
 
+	SECTION("we can create texture archives using cubemaps")
+	{
+		const std::filesystem::path root{ "fo4_cubemap_test"sv };
+		const auto filename = "blacksky_e.dds"sv;
+
+		bsa::fo4::file f;
+		f.read(
+			root / filename,
+			bsa::fo4::format::directx,
+			512u,
+			512u,
+			bsa::fo4::compression_level::normal,
+			bsa::compression_type::compressed);
+		REQUIRE(f.header.mip_count == 10);
+		REQUIRE(f.header.flags == 1);
+		REQUIRE(f.header.tile_mode == 8);
+		REQUIRE(f.size() == 1);
+		REQUIRE(f[0].mips.first == 0);
+		REQUIRE(f[0].mips.last == 9);
+		REQUIRE(f[0].decompressed_size() == 0x20'00A0);
+
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.insert(filename, std::move(f)).second);
+		ba2.write(root / "out.ba2"sv, bsa::fo4::format::directx);
+
+		const auto in = map_file(root / "in.ba2"sv);
+		const auto out = map_file(root / "out.ba2"sv);
+		REQUIRE(in.size() == out.size());
+		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+	}
+
 #if BSA_OS_WINDOWS
 	SECTION("we can pack/unpack archives written in the directx format")
 	{
