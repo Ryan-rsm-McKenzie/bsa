@@ -606,27 +606,41 @@ namespace bsa::fo4
 		this->header.flags = meta.IsCubemap() ? 1u : 0u;
 		this->header.tile_mode = 8u;
 
-		const auto splices = detail::chunk<4>(
-			std::span{ scratch.GetImages(), scratch.GetImageCount() },
-			detail::directx_mip_chunk_maximum(meta.format, a_mipChunkWidth, a_mipChunkHeight));
-		for (const auto& splice : splices) {
-			assert(!splice.empty());
+		const std::span images{ scratch.GetImages(), scratch.GetImageCount() };
+		const auto addChunk = [&](std::span<const DirectX::Image> a_splice) {
+			assert(!a_splice.empty());
 
 			std::vector<std::byte> bytes;
-			for (const auto& image : splice) {
+			for (const auto& image : a_splice) {
 				// dxtex always allocates internally, so we're forced to allocate,
 				//	even for mmapped files
 				const auto pixels = reinterpret_cast<std::byte*>(image.pixels);
 				bytes.insert(bytes.end(), pixels, pixels + image.slicePitch);
 			}
 
+			const auto mipIdx = [&](const DirectX::Image& a_image) noexcept {
+				return static_cast<std::uint16_t>(
+					(std::min<std::size_t>)(  //
+						&a_image - scratch.GetImages(),
+						this->header.mip_count - 1u));
+			};
+
 			auto& chunk = this->emplace_back();
-			chunk.mips.first = static_cast<std::uint16_t>(&splice.front() - scratch.GetImages());
-			chunk.mips.last = static_cast<std::uint16_t>(&splice.back() - scratch.GetImages());
+			chunk.mips.first = mipIdx(a_splice.front());
+			chunk.mips.last = mipIdx(a_splice.back());
 			chunk.set_data(std::move(bytes));
 			if (a_compression == compression_type::compressed) {
 				chunk.compress(a_level);
 			}
+		};
+
+		if ((this->header.flags & 1u) != 0) {  // don't chunk cubemaps
+			addChunk(images);
+		} else {
+			const auto splices = detail::chunk<4>(
+				images,
+				detail::directx_mip_chunk_maximum(meta.format, a_mipChunkWidth, a_mipChunkHeight));
+			std::for_each(splices.begin(), splices.end(), addChunk);
 		}
 #else
 		throw bsa::exception("dds file support is only available on windows");
