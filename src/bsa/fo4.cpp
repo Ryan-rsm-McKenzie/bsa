@@ -596,7 +596,7 @@ namespace bsa::fo4
 		}
 
 		this->clear();
-		this->reserve(4);
+		this->reserve(4u);
 
 		auto& meta = scratch.GetMetadata();
 		this->header.height = static_cast<std::uint16_t>(meta.height);
