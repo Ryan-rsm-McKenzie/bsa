@@ -497,6 +497,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			});
 	}
 
+#if BSA_OS_WINDOWS
 	SECTION("we can create texture archives using cubemaps")
 	{
 		const std::filesystem::path root{ "fo4_cubemap_test"sv };
@@ -528,7 +529,6 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
 	}
 
-#if BSA_OS_WINDOWS
 	SECTION("we can pack/unpack archives written in the directx format")
 	{
 		const std::filesystem::path root{ "fo4_dds_test"sv };
