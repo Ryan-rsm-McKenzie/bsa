@@ -114,6 +114,14 @@ inline auto make_substr_matcher(std::string_view a_str) noexcept
 	};
 }
 
+inline void assert_byte_equality(
+	std::span<const std::byte> a_lhs,
+	std::span<const std::byte> a_rhs)
+{
+	REQUIRE(a_lhs.size() == a_rhs.size());
+	REQUIRE(std::memcmp(a_lhs.data(), a_rhs.data(), a_lhs.size()) == 0);
+}
+
 template <class Archive>
 void test_in_memory_buffer(
 	std::string_view a_archiveName,
@@ -161,7 +169,22 @@ void test_in_memory_buffer(
 		if (!disk.is_open()) {
 			disk = map_disk();
 		}
-		REQUIRE(disk.size() == memory.size());
-		REQUIRE(std::memcmp(disk.data(), memory.data(), disk.size()) == 0);
+
+		assert_byte_equality(std::span{ disk.data(), disk.size() }, memory);
 	}
+}
+
+inline void compare_to_master_copy(
+	std::filesystem::path a_masterFile,
+	std::function<void(binary_io::any_ostream&)> a_writeCopy,
+	std::function<void(std::span<const std::byte>, std::span<const std::byte>)> a_compare = assert_byte_equality)
+{
+	binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
+	a_writeCopy(os);
+	const std::span copy = os.get<binary_io::memory_ostream>().rdbuf();
+
+	const auto mmapped = map_file(a_masterFile);
+	const std::span master{ mmapped.data(), mmapped.size() };
+
+	a_compare(copy, master);
 }

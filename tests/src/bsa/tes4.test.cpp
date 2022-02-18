@@ -237,13 +237,11 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
 				original.compress(version);
 
-				REQUIRE(read->size() == original.size());
 				REQUIRE(read->decompressed_size() == original.decompressed_size());
-				REQUIRE(std::memcmp(read->data(), original.data(), original.size()) == 0);
+				assert_byte_equality(read->as_bytes(), original.as_bytes());
 
 				read->decompress(version);
-				REQUIRE(read->size() == origsrc.size());
-				REQUIRE(std::memcmp(read->data(), origsrc.data(), origsrc.size()) == 0);
+				assert_byte_equality(read->as_bytes(), std::span{ origsrc.data(), origsrc.size() });
 			}
 		};
 
@@ -289,11 +287,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				REQUIRE(fnorm.first.name() == fxbox->first.name());
 				REQUIRE(!fnorm.second.compressed());
 				REQUIRE(!fxbox->second.compressed());
-				REQUIRE(fnorm.second.size() == fxbox->second.size());
-				REQUIRE(std::memcmp(
-							fnorm.second.data(),
-							fxbox->second.data(),
-							fnorm.second.size()) == 0);
+				assert_byte_equality(fnorm.second.as_bytes(), fxbox->second.as_bytes());
 			}
 		}
 	}
@@ -302,21 +296,17 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 	{
 		const std::filesystem::path root{ "tes4_xbox_write_test"sv };
 		const auto inPath = root / "in.bsa"sv;
-		const auto outPath = root / "out.bsa"sv;
 
-		{
-			bsa::tes4::archive bsa;
-			const auto format = bsa.read(inPath);
-			REQUIRE(bsa.xbox_archive());
-			REQUIRE(!bsa.xbox_compressed());
+		bsa::tes4::archive bsa;
+		const auto format = bsa.read(inPath);
+		REQUIRE(bsa.xbox_archive());
+		REQUIRE(!bsa.xbox_compressed());
 
-			bsa.write(outPath, format);
-		}
-
-		const auto in = map_file(inPath);
-		const auto out = map_file(outPath);
-		REQUIRE(in.size() == out.size());
-		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+		compare_to_master_copy(
+			inPath,
+			[&](binary_io::any_ostream& a_os) {
+				bsa.write(a_os, format);
+			});
 	}
 
 	SECTION("files can be compressed independently of the archive's compression")
@@ -391,7 +381,6 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 	SECTION("we can write archives with a variety of flags")
 	{
 		const std::filesystem::path root{ "tes4_flags_test"sv };
-		const std::filesystem::path outPath = root / "out.bsa"sv;
 
 		struct info_t
 		{
@@ -455,11 +444,12 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 
 		const auto test = [&](bsa::tes4::version a_version,
 							  bsa::tes4::archive_flag a_flags) {
+			binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
 			in.archive_flags(a_flags);
-			in.write(outPath, a_version);
+			in.write(os, a_version);
 
 			bsa::tes4::archive out;
-			REQUIRE(out.read(outPath) == a_version);
+			REQUIRE(out.read(os.get<binary_io::memory_ostream>().rdbuf()) == a_version);
 			REQUIRE(out.size() == index.size());
 			for (std::size_t idx = 0; idx < index.size(); ++idx) {
 				const auto& [dir, file] = index[idx];
@@ -486,8 +476,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				if (f->second.compressed()) {
 					f->second.decompress(a_version);
 				}
-				REQUIRE(f->second.size() == mapped.size());
-				REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+				assert_byte_equality(f->second.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
 		};
 
@@ -597,13 +586,11 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 			REQUIRE(memory->decompressed_size() == disk.size());
 			memory->decompress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
 			REQUIRE(!memory->compressed());
-			REQUIRE(memory->size() == disk.size());
-			REQUIRE(std::memcmp(memory->data(), disk.data(), disk.size()) == 0);
+			assert_byte_equality(memory->as_bytes(), std::span{ disk.data(), disk.size() });
 
 			memory->compress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
 			REQUIRE(memory->compressed());
-			REQUIRE(memory->size() == compressed.size());
-			REQUIRE(std::memcmp(memory->data(), compressed.data(), compressed.size()) == 0);
+			assert_byte_equality(memory->as_bytes(), compressed);
 		}
 	}
 #endif

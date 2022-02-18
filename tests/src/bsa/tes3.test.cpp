@@ -113,17 +113,14 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 			REQUIRE(archived->size() == std::filesystem::file_size(p));
 
 			const auto disk = map_file(p);
-			REQUIRE(disk.is_open());
 
-			REQUIRE(archived->size() == disk.size());
-			REQUIRE(std::memcmp(archived->data(), disk.data(), archived->size()) == 0);
+			assert_byte_equality(archived->as_bytes(), std::span{ disk.data(), disk.size() });
 		}
 	}
 
 	SECTION("we can write archives")
 	{
 		const std::filesystem::path root{ "tes3_write_test"sv };
-		const std::filesystem::path outPath = root / "out.bsa"sv;
 
 		struct info_t
 		{
@@ -162,10 +159,11 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 			REQUIRE(in.insert(file.path, std::move(f)).second);
 		}
 
-		in.write(outPath);
+		binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
+		in.write(os);
 
 		bsa::tes3::archive out;
-		out.read(outPath);
+		out.read(os.get<binary_io::memory_ostream>().rdbuf());
 		REQUIRE(out.size() == index.size());
 		for (std::size_t idx = 0; idx < index.size(); ++idx) {
 			const auto& file = index[idx];
@@ -177,8 +175,7 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 			REQUIRE(f != out.end());
 			REQUIRE(f->first.hash() == file.hash);
 			REQUIRE(f->first.name() == simple_normalize(file.path));
-			REQUIRE(f->second.size() == mapped.size());
-			REQUIRE(std::memcmp(f->second.data(), mapped.data(), mapped.size()) == 0);
+			assert_byte_equality(f->second.as_bytes(), std::span{ mapped.data(), mapped.size() });
 		}
 	}
 

@@ -249,50 +249,43 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 	{
 		const std::filesystem::path root{ "fo4_dds_test"sv };
 		const std::filesystem::path inPath = root / "in.ba2"sv;
-		const std::filesystem::path outPath = root / "out.ba2"sv;
 
-		{
-			bsa::fo4::archive ba2;
-			REQUIRE(ba2.read(inPath) == bsa::fo4::format::directx);
-			REQUIRE(ba2.size() == 1);
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.read(inPath) == bsa::fo4::format::directx);
+		REQUIRE(ba2.size() == 1);
 
-			const auto file = ba2["Fence006_1K_Roughness.dds"sv];
-			REQUIRE(file);
-			REQUIRE(file->size() == 3);
-			REQUIRE(file->header.height == 1024);
-			REQUIRE(file->header.width == 1024);
-			REQUIRE(file->header.mip_count == 11);
-			REQUIRE(file->header.format == 98);
-			REQUIRE(file->header.flags == 0);
-			REQUIRE(file->header.tile_mode == 8);
+		const auto file = ba2["Fence006_1K_Roughness.dds"sv];
+		REQUIRE(file);
+		REQUIRE(file->size() == 3);
+		REQUIRE(file->header.height == 1024);
+		REQUIRE(file->header.width == 1024);
+		REQUIRE(file->header.mip_count == 11);
+		REQUIRE(file->header.format == 98);
+		REQUIRE(file->header.flags == 0);
+		REQUIRE(file->header.tile_mode == 8);
 
-			REQUIRE((*file)[0].size() == 0x100'000);
-			REQUIRE((*file)[0].mips.first == 0);
-			REQUIRE((*file)[0].mips.last == 0);
+		REQUIRE((*file)[0].size() == 0x100'000);
+		REQUIRE((*file)[0].mips.first == 0);
+		REQUIRE((*file)[0].mips.last == 0);
 
-			REQUIRE((*file)[1].size() == 0x40'000);
-			REQUIRE((*file)[1].mips.first == 1);
-			REQUIRE((*file)[1].mips.last == 1);
+		REQUIRE((*file)[1].size() == 0x40'000);
+		REQUIRE((*file)[1].mips.first == 1);
+		REQUIRE((*file)[1].mips.last == 1);
 
-			REQUIRE((*file)[2].size() == 0x15'570);
-			REQUIRE((*file)[2].mips.first == 2);
-			REQUIRE((*file)[2].mips.last == 10);
+		REQUIRE((*file)[2].size() == 0x15'570);
+		REQUIRE((*file)[2].mips.first == 2);
+		REQUIRE((*file)[2].mips.last == 10);
 
-			ba2.write(outPath, bsa::fo4::format::directx);
-		}
-
-		const auto in = map_file(inPath);
-		const auto out = map_file(outPath);
-		REQUIRE(in.is_open());
-		REQUIRE(out.is_open());
-		REQUIRE(in.size() == out.size());
-		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+		compare_to_master_copy(
+			inPath,
+			[&](binary_io::any_ostream& a_os) {
+				ba2.write(a_os, bsa::fo4::format::directx);
+			});
 	}
 
 	SECTION("we can write archives")
 	{
 		const std::filesystem::path root{ "fo4_write_test"sv };
-		const std::filesystem::path outPath = root / "out.ba2"sv;
 
 		struct info_t
 		{
@@ -336,10 +329,12 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		}
 
 		const auto test = [&](bool a_strings) {
-			in.write(outPath, bsa::fo4::format::general, a_strings);
+			binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
+
+			in.write(os, bsa::fo4::format::general, a_strings);
 
 			bsa::fo4::archive out;
-			REQUIRE(out.read(outPath) == bsa::fo4::format::general);
+			REQUIRE(out.read(os.get<binary_io::memory_ostream>().rdbuf()) == bsa::fo4::format::general);
 			REQUIRE(out.size() == index.size());
 			for (std::size_t idx = 0; idx < index.size(); ++idx) {
 				const auto& file = index[idx];
@@ -360,8 +355,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 					REQUIRE(c.decompressed_size() == mapped.size());
 					c.decompress();
 				}
-				REQUIRE(c.size() == mapped.size());
-				REQUIRE(std::memcmp(c.data(), mapped.data(), mapped.size()) == 0);
+				assert_byte_equality(c.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
 		};
 
@@ -407,30 +401,25 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 	{
 		const std::filesystem::path root{ "fo4_missing_string_table_test"sv };
 		const auto inPath = root / "in.ba2"sv;
-		const auto outPath = root / "out.ba2"sv;
 		const auto filename = "misc/example.txt"sv;
 
-		{
-			bsa::fo4::archive ba2;
-			REQUIRE(ba2.read(inPath) == bsa::fo4::format::general);
-			const auto f = ba2[filename];
-			REQUIRE(f);
-			REQUIRE(f->size() == 1);
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.read(inPath) == bsa::fo4::format::general);
+		const auto f = ba2[filename];
+		REQUIRE(f);
+		REQUIRE(f->size() == 1);
 
-			const auto mapped = map_file(root / "data"sv / filename);
-			const auto& c = f->front();
+		const auto mapped = map_file(root / "data"sv / filename);
+		const auto& c = f->front();
 
-			REQUIRE(!c.compressed());
-			REQUIRE(c.size() == mapped.size());
-			REQUIRE(std::memcmp(c.data(), mapped.data(), c.size()) == 0);
+		REQUIRE(!c.compressed());
+		assert_byte_equality(c.as_bytes(), std::span{ mapped.data(), mapped.size() });
 
-			ba2.write(outPath, bsa::fo4::format::general, false);
-		}
-
-		const auto in = map_file(inPath);
-		const auto out = map_file(outPath);
-		REQUIRE(in.size() == out.size());
-		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+		compare_to_master_copy(
+			inPath,
+			[&](binary_io::any_ostream& a_os) {
+				ba2.write(a_os, bsa::fo4::format::general, false);
+			});
 	}
 
 	SECTION("archives can contain compressed files")
@@ -460,13 +449,11 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 						reinterpret_cast<const std::byte*>(disk.data()),
 						disk.size() });
 					diskC.compress(compression);
-					REQUIRE(archC.size() == diskC.size());
-					REQUIRE(std::memcmp(archC.data(), diskC.data(), archC.size()) == 0);
+					assert_byte_equality(archC.as_bytes(), diskC.as_bytes());
 
 					archC.decompress();
 					REQUIRE(!archC.compressed());
-					REQUIRE(archC.size() == disk.size());
-					REQUIRE(std::memcmp(archC.data(), disk.data(), archC.size()) == 0);
+					assert_byte_equality(archC.as_bytes(), std::span{ disk.data(), disk.size() });
 				}
 			}
 		}
@@ -521,12 +508,12 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		bsa::fo4::archive ba2;
 		REQUIRE(ba2.insert(filename, std::move(f)).second);
-		ba2.write(root / "out.ba2"sv, bsa::fo4::format::directx);
 
-		const auto in = map_file(root / "in.ba2"sv);
-		const auto out = map_file(root / "out.ba2"sv);
-		REQUIRE(in.size() == out.size());
-		REQUIRE(std::memcmp(in.data(), out.data(), in.size()) == 0);
+		compare_to_master_copy(
+			root / "in.ba2"sv,
+			[&](binary_io::any_ostream& a_os) {
+				ba2.write(a_os, bsa::fo4::format::directx);
+			});
 	}
 
 	SECTION("we can pack/unpack archives written in the directx format")
@@ -553,24 +540,22 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				const auto& chunk1 = copy[i];
 				const auto& chunk2 = (*archived)[i];
 				REQUIRE(chunk1.mips == chunk2.mips);
-				REQUIRE(chunk1.size() == chunk2.size());
-				REQUIRE(std::memcmp(chunk1.data(), chunk2.data(), chunk1.size()) == 0);
+				assert_byte_equality(chunk1.as_bytes(), chunk2.as_bytes());
 			}
 		}
 
-		{
-			const auto original = map_file(root / filename);
-
-			binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
-			archived->write(buffer, bsa::fo4::format::directx);
-			const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
-
-			REQUIRE(copy.size() == original.size());
-			const auto lhs = reinterpret_cast<const dds10_header_t*>(copy.data());
-			const auto rhs = reinterpret_cast<const dds10_header_t*>(original.data());
-			REQUIRE(*lhs == *rhs);
-			REQUIRE(std::memcmp(lhs + 1, rhs + 1, copy.size() - sizeof(dds10_header_t)) == 0);
-		}
+		compare_to_master_copy(
+			root / filename,
+			[&](binary_io::any_ostream& a_os) {
+				archived->write(a_os, bsa::fo4::format::directx);
+			},
+			[](std::span<const std::byte> a_lhs, std::span<const std::byte> a_rhs) {
+				REQUIRE(a_lhs.size() == a_rhs.size());
+				const auto lhs = reinterpret_cast<const dds10_header_t*>(a_lhs.data());
+				const auto rhs = reinterpret_cast<const dds10_header_t*>(a_rhs.data());
+				REQUIRE(*lhs == *rhs);
+				REQUIRE(std::memcmp(lhs + 1, rhs + 1, a_lhs.size() - sizeof(dds10_header_t)) == 0);
+			});
 	}
 
 	SECTION("we can read/write directx files")
@@ -580,14 +565,11 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		for (const auto& filename : files) {
 			bsa::fo4::file file;
 			file.read(root / filename, bsa::fo4::format::directx);
-			binary_io::any_ostream buffer{ std::in_place_type<binary_io::memory_ostream> };
-			file.write(buffer, bsa::fo4::format::directx);
-
-			const auto original = map_file(root / filename);
-			const auto& copy = buffer.get<binary_io::memory_ostream>().rdbuf();
-
-			REQUIRE(copy.size() == original.size());
-			REQUIRE(std::memcmp(copy.data(), original.data(), copy.size()) == 0);
+			compare_to_master_copy(
+				root / filename,
+				[&](binary_io::any_ostream& a_os) {
+					file.write(a_os, bsa::fo4::format::directx);
+				});
 		}
 	}
 #endif
