@@ -106,9 +106,6 @@ target_link_libraries(
 )
 
 if(WIN32)
-	# WORKAROUND: directxtex has a misconfigured config file
-	find_package(directx-headers REQUIRED CONFIG)
-	find_package(directxmath REQUIRED CONFIG)
 	find_package(directxtex REQUIRED CONFIG)
 
 	target_link_libraries(
