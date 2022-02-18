@@ -1,7 +1,7 @@
 #pragma once
 
 #if defined(_WIN32)
-#	define NOGDI         // workaround for old windows kits + new preprocessor
+#	define NOGDI         // WORKAROUND: old windows kits + new preprocessor == compile error
 #	include <Windows.h>  // ensure windows.h compatibility
 #endif
 
