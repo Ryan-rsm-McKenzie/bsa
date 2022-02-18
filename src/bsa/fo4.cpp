@@ -671,7 +671,7 @@ namespace bsa::fo4
 			.depth = 1,
 			.arraySize = 1,
 			.mipLevels = this->header.mip_count,
-			.miscFlags = this->header.flags != 0 ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
+			.miscFlags = (this->header.flags & 1u) != 0 ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
 			.format = static_cast<::DXGI_FORMAT>(this->header.format),
 			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
 		};
