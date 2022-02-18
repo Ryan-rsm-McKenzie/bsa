@@ -27,23 +27,27 @@ static_assert(assert_nothrowable<bsa::tes4::archive>());
 
 TEST_CASE("bsa::tes4::hashing", "[src][tes4][hashing]")
 {
-	SECTION("validate hash values")
+	SECTION("validate directory hashes")
 	{
-		const auto dhash = [](std::string_view a_path) {
+		const auto h = [](std::string_view a_path) {
 			return bsa::tes4::hashing::hash_directory(a_path).numeric();
 		};
-		const auto fhash = [](std::string_view a_path) {
+
+		REQUIRE(h("textures/armor/amuletsandrings/elder council"sv) == 0x04BC422C742C696C);
+		REQUIRE(h("sound/voice/skyrim.esm/maleuniquedbguardian"sv) == 0x594085AC732B616E);
+		REQUIRE(h("textures/architecture/windhelm"sv) == 0xC1D97EBE741E6C6D);
+	}
+
+	SECTION("validate file hashes")
+	{
+		const auto h = [](std::string_view a_path) {
 			return bsa::tes4::hashing::hash_file(a_path).numeric();
 		};
 
-		REQUIRE(dhash("textures/armor/amuletsandrings/elder council"sv) == 0x04BC422C742C696C);
-		REQUIRE(dhash("sound/voice/skyrim.esm/maleuniquedbguardian"sv) == 0x594085AC732B616E);
-		REQUIRE(dhash("textures/architecture/windhelm"sv) == 0xC1D97EBE741E6C6D);
-
-		REQUIRE(fhash("darkbrotherhood__0007469a_1.fuz"sv) == 0x011F11B0641B5F31);
-		REQUIRE(fhash("elder_council_amulet_n.dds"sv) == 0xDC531E2F6516DFEE);
-		REQUIRE(fhash("testtoddquest_testtoddhappy_00027fa2_1.mp3"sv) == 0xDE0301EE74265F31);
-		REQUIRE(fhash("María_F.fuz"sv) == 0x6434BBA36D085F66);
+		REQUIRE(h("darkbrotherhood__0007469a_1.fuz"sv) == 0x011F11B0641B5F31);
+		REQUIRE(h("elder_council_amulet_n.dds"sv) == 0xDC531E2F6516DFEE);
+		REQUIRE(h("testtoddquest_testtoddhappy_00027fa2_1.mp3"sv) == 0xDE0301EE74265F31);
+		REQUIRE(h("María_F.fuz"sv) == 0x6434BBA36D085F66);
 	}
 
 	SECTION("the empty path \"\" is equivalent to the current path \".\"")

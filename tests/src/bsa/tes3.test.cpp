@@ -34,20 +34,20 @@ TEST_CASE("bsa::tes3::hashing", "[src][tes3][hashing]")
 
 	SECTION("validate hash values")
 	{
-		const auto hash = [](std::string_view a_path) noexcept {
+		const auto h = [](std::string_view a_path) noexcept {
 			return bsa::tes3::hashing::hash_file(a_path).numeric();
 		};
 
-		REQUIRE(hash("meshes/c/artifact_bloodring_01.nif"sv) == 0x1C3C1149920D5F0C);
-		REQUIRE(hash("meshes/x/ex_stronghold_pylon00.nif"sv) == 0x20250749ACCCD202);
-		REQUIRE(hash("meshes/r/xsteam_centurions.kf"sv) == 0x6E5C0F3125072EA6);
-		REQUIRE(hash("textures/tx_rock_cave_mu_01.dds"sv) == 0x58060C2FA3D8F759);
-		REQUIRE(hash("meshes/f/furn_ashl_chime_02.nif"sv) == 0x7C3B2F3ABFFC8611);
-		REQUIRE(hash("textures/tx_rope_woven.dds"sv) == 0x5865632F0C052C64);
-		REQUIRE(hash("icons/a/tx_templar_skirt.dds"sv) == 0x46512A0B60EDA673);
-		REQUIRE(hash("icons/m/misc_prongs00.dds"sv) == 0x51715677BBA837D3);
-		REQUIRE(hash("meshes/i/in_c_stair_plain_tall_02.nif"sv) == 0x2A324956BF89B1C9);
-		REQUIRE(hash("meshes/r/xkwama worker.nif"sv) == 0x6D446E352C3F5A1E);
+		REQUIRE(h("meshes/c/artifact_bloodring_01.nif"sv) == 0x1C3C1149920D5F0C);
+		REQUIRE(h("meshes/x/ex_stronghold_pylon00.nif"sv) == 0x20250749ACCCD202);
+		REQUIRE(h("meshes/r/xsteam_centurions.kf"sv) == 0x6E5C0F3125072EA6);
+		REQUIRE(h("textures/tx_rock_cave_mu_01.dds"sv) == 0x58060C2FA3D8F759);
+		REQUIRE(h("meshes/f/furn_ashl_chime_02.nif"sv) == 0x7C3B2F3ABFFC8611);
+		REQUIRE(h("textures/tx_rope_woven.dds"sv) == 0x5865632F0C052C64);
+		REQUIRE(h("icons/a/tx_templar_skirt.dds"sv) == 0x46512A0B60EDA673);
+		REQUIRE(h("icons/m/misc_prongs00.dds"sv) == 0x51715677BBA837D3);
+		REQUIRE(h("meshes/i/in_c_stair_plain_tall_02.nif"sv) == 0x2A324956BF89B1C9);
+		REQUIRE(h("meshes/r/xkwama worker.nif"sv) == 0x6D446E352C3F5A1E);
 	}
 
 	SECTION("forward slashes '/' are treated the same as backwards slashes '\\'")
