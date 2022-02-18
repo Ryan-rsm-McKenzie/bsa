@@ -55,6 +55,7 @@ endmacro()
 
 acquire_test("common_guess_test")
 
+acquire_test("fo4_chunk_test")
 acquire_test("fo4_compression_test")
 acquire_test("fo4_cubemap_test")
 acquire_test("fo4_dds_test")

@@ -484,6 +484,46 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			});
 	}
 
+	SECTION("we can apply the correct chunking strategy for texture files")
+	{
+		const std::filesystem::path root{ "fo4_chunk_test"sv };
+		const auto filename = "test.dds"sv;
+
+		bsa::fo4::file f;
+		f.read(
+			root / filename,
+			bsa::fo4::format::directx,
+			512u,
+			512u,
+			bsa::fo4::compression_level::normal,
+			bsa::compression_type::compressed);
+
+		REQUIRE(f.header.mip_count == 11);
+		REQUIRE(f.header.format == 71);  // DXGI_FORMAT_BC1_UNORM
+		REQUIRE(f.size() == 3);
+
+		REQUIRE(f[0].mips.first == 0);
+		REQUIRE(f[0].mips.last == 0);
+		REQUIRE(f[0].decompressed_size() == 0x8'0000);
+
+		REQUIRE(f[1].mips.first == 1);
+		REQUIRE(f[1].mips.last == 1);
+		REQUIRE(f[1].decompressed_size() == 0x2'0000);
+
+		REQUIRE(f[2].mips.first == 2);
+		REQUIRE(f[2].mips.last == 10);
+		REQUIRE(f[2].decompressed_size() == 0xAAB8);
+
+		bsa::fo4::archive ba2;
+		REQUIRE(ba2.insert(filename, std::move(f)).second);
+
+		compare_to_master_copy(
+			root / "in.ba2"sv,
+			[&](binary_io::any_ostream& a_os) {
+				ba2.write(a_os, bsa::fo4::format::directx);
+			});
+	}
+
 #if BSA_OS_WINDOWS
 	SECTION("we can create texture archives using cubemaps")
 	{
