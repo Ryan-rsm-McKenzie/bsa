@@ -18,17 +18,6 @@
 
 #if BSA_OS_WINDOWS
 #	include <DirectXTex.h>
-
-namespace DirectX
-{
-	// dxtex hides these as implementation details, but we need to use them
-	::HRESULT __cdecl _EncodeDDSHeader(
-		const DirectX::TexMetadata& a_metadata,
-		DirectX::DDS_FLAGS a_flags,
-		void* a_destination,
-		::size_t a_maxsize,
-		::size_t& a_required) noexcept;
-}
 #endif
 
 namespace bsa::fo4
@@ -677,7 +666,7 @@ namespace bsa::fo4
 		};
 
 		std::size_t required = 0;
-		if (const auto result = DirectX::_EncodeDDSHeader(meta, DirectX::DDS_FLAGS_NONE, nullptr, 0, required);
+		if (const auto result = DirectX::EncodeDDSHeader(meta, DirectX::DDS_FLAGS_NONE, nullptr, 0, required);
 			FAILED(result)) {
 			throw bsa::exception("failed to encode dds header");
 		}
@@ -685,7 +674,7 @@ namespace bsa::fo4
 		DirectX::Blob blob;
 		blob.Initialize(required);
 
-		if (const auto result = DirectX::_EncodeDDSHeader(
+		if (const auto result = DirectX::EncodeDDSHeader(
 				meta,
 				DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
 				blob.GetBufferPointer(),
