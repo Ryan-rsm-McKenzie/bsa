@@ -55,8 +55,8 @@ namespace bsa::detail
 			_proc(a_proc)
 		{}
 
-		void seek_absolute(binary_io::streamoff) noexcept {}
-		void seek_relative(binary_io::streamoff) noexcept {}
+		void seek_absolute(binary_io::streamoff) noexcept { return; }
+		void seek_relative(binary_io::streamoff) noexcept { return; }
 		binary_io::streamoff tell() const noexcept { return -1; }
 
 		void write_bytes(std::span<const std::byte> a_src)
