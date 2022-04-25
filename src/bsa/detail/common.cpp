@@ -133,11 +133,13 @@ namespace bsa::detail
 	auto read_zstring(detail::istream_t& a_in)
 		-> std::string_view
 	{
-		const std::string_view result{
-			reinterpret_cast<const char*>(a_in->read_bytes(1u).data())
-		};
-		a_in->seek_relative(result.length());  // include null terminator
-		return result;
+		const auto first = reinterpret_cast<const char*>(a_in->read_bytes(1u).data());
+		auto last = first;
+		do {
+			++last;
+		} while (std::get<0>(a_in->read<char>()) != '\0');
+
+		return { first, last };
 	}
 
 	void write_bzstring(detail::ostream_t& a_out, std::string_view a_string) noexcept
