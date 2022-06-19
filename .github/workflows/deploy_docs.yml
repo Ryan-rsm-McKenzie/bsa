@@ -2,7 +2,7 @@ name: Deploy Docs
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
       - '.github/workflows/deploy_docs.yml'
       - 'docs/**'
@@ -13,30 +13,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    - name: Install Doxygen
-      run: |
-        sudo apt install libclang-cpp9 libclang-9-dev -y
+      - name: Install Doxygen
+        run: |
+          sudo apt install libclang-cpp9 libclang-9-dev -y
 
-        wget https://www.doxygen.nl/files/doxygen-1.9.2.linux.bin.tar.gz
-        tar -xzf doxygen-1.9.2.linux.bin.tar.gz
-        sudo mv doxygen-1.9.2/bin/doxygen /usr/local/bin
+          wget https://www.doxygen.nl/files/doxygen-1.9.2.linux.bin.tar.gz
+          tar -xzf doxygen-1.9.2.linux.bin.tar.gz
+          sudo mv doxygen-1.9.2/bin/doxygen /usr/local/bin
 
-    - name: Install Poxy
-      run: sudo pip install poxy
+      - name: Install Poxy
+        run: sudo pip install poxy
 
-    - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBSA_BUILD_DOCS=ON -DBSA_BUILD_SRC=OFF -DBUILD_TESTING=OFF
+      - name: Configure CMake
+        run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBSA_BUILD_DOCS=ON -DBSA_BUILD_SRC=OFF -DBUILD_TESTING=OFF
 
-    - name: Build
-      run: cmake --build ${{ github.workspace }}/build --target docs
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build --target docs
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        force_orphan: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{ github.workspace }}/build/docs/html/
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          force_orphan: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ github.workspace }}/build/docs/html/

@@ -2,7 +2,7 @@ name: Main CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
       - '**/*.cpp'
       - '**/*.hpp'
@@ -13,7 +13,7 @@ on:
       - '.github/workflows/main_ci.yml'
       - 'codecov.yml'
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 env:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        config: [ gcc ]
+        config: [gcc]
         include:
           - config: gcc
             version: '10'
