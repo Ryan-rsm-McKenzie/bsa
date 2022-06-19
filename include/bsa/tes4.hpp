@@ -110,6 +110,9 @@ namespace bsa::tes4
 		/// \brief	Fallout 3
 		fo3 = 104,
 
+		/// \brief	Fallout: New Vegas
+		fnv = 104,
+
 		/// \brief	The Elder Scrolls V: Skyrim
 		tes5 = 104,
 
