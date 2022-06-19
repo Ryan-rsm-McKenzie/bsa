@@ -21,12 +21,12 @@ jobs:
         run: |
           sudo apt install libclang-cpp9 libclang-9-dev -y
 
-          wget https://www.doxygen.nl/files/doxygen-1.9.2.linux.bin.tar.gz
-          tar -xzf doxygen-1.9.2.linux.bin.tar.gz
-          sudo mv doxygen-1.9.2/bin/doxygen /usr/local/bin
+          wget https://www.doxygen.nl/files/doxygen-1.9.4.linux.bin.tar.gz
+          tar -xzf doxygen-1.9.4.linux.bin.tar.gz
+          sudo mv doxygen-1.9.4/bin/doxygen /usr/local/bin
 
       - name: Install Poxy
-        run: sudo pip install poxy
+        run: sudo pip install poxy>=0.5.7
 
       - name: Configure CMake
         run: cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} -DBSA_BUILD_DOCS=ON -DBSA_BUILD_SRC=OFF -DBUILD_TESTING=OFF
