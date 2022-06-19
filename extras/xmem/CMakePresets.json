@@ -51,10 +51,6 @@
     {
       "name": "msvc",
       "hidden": true,
-      "architecture": {
-        "value": "Win32",
-        "strategy": "set"
-      },
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": {
           "type": "string",
