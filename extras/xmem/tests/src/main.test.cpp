@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 #include <mmio/mmio.hpp>
 
 #include "bsa/xmem/xmem.hpp"

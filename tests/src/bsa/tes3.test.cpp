@@ -12,7 +12,7 @@
 #include <string_view>
 #include <utility>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 #include <mmio/mmio.hpp>
 
 #include "bsa/tes3.hpp"

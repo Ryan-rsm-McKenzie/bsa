@@ -3,7 +3,7 @@
 #include <span>
 #include <string_view>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 
 using namespace std::literals;
 

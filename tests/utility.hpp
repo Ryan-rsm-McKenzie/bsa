@@ -19,10 +19,10 @@
 #include <utility>
 #include <vector>
 
+#include "catch2.hpp"
 #include <binary_io/any_stream.hpp>
 #include <binary_io/common.hpp>
 #include <binary_io/memory_stream.hpp>
-#include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
 
 #include <bsa/detail/common.hpp>

@@ -1,25 +1,28 @@
 {
+  "version": 4,
   "configurePresets": [
     {
+      "name": "cmake-dev",
+      "hidden": true,
       "binaryDir": "${sourceDir}/build",
+      "installDir": "${sourceDir}/../../installed",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
           "type": "STRING",
           "value": "Debug"
         }
       },
-      "errors": {
-        "deprecated": true
-      },
-      "hidden": true,
-      "installDir": "${sourceDir}/../../installed",
-      "name": "cmake-dev",
       "warnings": {
         "deprecated": true,
         "dev": true
+      },
+      "errors": {
+        "deprecated": true
       }
     },
     {
+      "name": "vcpkg",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "STRING",
@@ -28,58 +31,61 @@
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
           "value": "tests"
+        },
+        "VCPKG_OVERLAY_PORTS": {
+          "type": "STRING",
+          "value": "${sourceDir}/../../cmake/ports"
         }
-      },
-      "hidden": true,
-      "name": "vcpkg"
+      }
     },
     {
+      "name": "windows",
+      "hidden": true,
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x86-windows-static"
+        }
+      }
+    },
+    {
+      "name": "msvc",
+      "hidden": true,
+      "architecture": {
+        "value": "Win32",
+        "strategy": "set"
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": {
+          "type": "string",
+          "value": "/EHsc /MP /W4 /WX /external:anglebrackets /external:W0"
+        },
         "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
           "type": "STRING",
           "value": "/DEBUG:FASTLINK"
         },
         "CMAKE_MSVC_RUNTIME_LIBRARY": {
           "type": "STRING",
-          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-        },
-        "VCPKG_TARGET_TRIPLET": {
-          "type": "STRING",
-          "value": "x86-windows-static-md"
+          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         }
-      },
-      "hidden": true,
-      "name": "windows"
+      }
     },
     {
-      "architecture": {
-        "strategy": "set",
-        "value": "Win32"
-      },
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX"
-      },
-      "generator": "Visual Studio 17 2022",
+      "name": "windows-msvc-vcpkg",
       "inherits": [
         "cmake-dev",
+        "msvc",
         "vcpkg",
         "windows"
-      ],
-      "name": "vs2022-windows",
-      "toolset": "v143"
+      ]
     },
     {
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX /external:anglebrackets /external:W0"
-      },
-      "generator": "Ninja",
+      "name": "windows-msvc",
       "inherits": [
         "cmake-dev",
-        "vcpkg",
+        "msvc",
         "windows"
-      ],
-      "name": "ninja-windows"
+      ]
     }
-  ],
-  "version": 3
+  ]
 }

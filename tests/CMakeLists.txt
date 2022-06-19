@@ -6,7 +6,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/fo4.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes3.test.cpp"
 	"${SOURCE_DIR}/src/bsa/tes4.test.cpp"
-	"${SOURCE_DIR}/main.cpp"
+	"${SOURCE_DIR}/catch2.hpp"
 	"${SOURCE_DIR}/utility.hpp"
 )
 
@@ -43,7 +43,7 @@ target_link_libraries(
 	tests
 	PRIVATE
 		"${PROJECT_NAME}::${PROJECT_NAME}"
-		Catch2::Catch2
+		Catch2::Catch2WithMain
 )
 
 macro(acquire_test NAME)

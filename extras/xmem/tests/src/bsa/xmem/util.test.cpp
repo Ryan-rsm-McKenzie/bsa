@@ -1,6 +1,6 @@
 #include "bsa/xmem/util.hpp"
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 
 namespace util = bsa::xmem::util;
 

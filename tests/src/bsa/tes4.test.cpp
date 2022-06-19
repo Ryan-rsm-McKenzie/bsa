@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 #include <mmio/mmio.hpp>
 
 #include "bsa/tes4.hpp"

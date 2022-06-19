@@ -6,8 +6,8 @@
 #include <span>
 #include <string_view>
 
+#include "catch2.hpp"
 #include <binary_io/binary_io.hpp>
-#include <catch2/catch.hpp>
 
 using namespace std::literals;
 

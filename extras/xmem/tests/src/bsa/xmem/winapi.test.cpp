@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 
 namespace winapi = bsa::xmem::winapi;
 

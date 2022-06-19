@@ -5,7 +5,7 @@
 #include <system_error>
 #include <utility>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 
 #include "bsa/detail/common.hpp"
 

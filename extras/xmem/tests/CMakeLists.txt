@@ -9,7 +9,7 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/src/bsa/xmem/winapi.test.cpp"
 	"${SOURCE_DIR}/src/bsa/xmem/xmem.test.cpp"
 	"${SOURCE_DIR}/src/main.test.cpp"
-	"${SOURCE_DIR}/main.cpp"
+	"${SOURCE_DIR}/catch2.hpp"
 )
 
 source_group(TREE "${SOURCE_DIR}" PREFIX "src" FILES ${SOURCE_FILES})
@@ -37,7 +37,7 @@ target_link_libraries(
 	tests
 	PRIVATE
 		"${PROJECT_NAME}_common::${PROJECT_NAME}_common"
-		Catch2::Catch2
+		Catch2::Catch2WithMain
 )
 
 target_link_libraries(

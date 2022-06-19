@@ -1,6 +1,9 @@
 {
+  "version": 4,
   "configurePresets": [
     {
+      "name": "cmake-dev",
+      "hidden": true,
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "BSA_BUILD_DOCS": {
@@ -16,43 +19,35 @@
           "value": "Debug"
         }
       },
-      "errors": {
-        "deprecated": true
-      },
-      "hidden": true,
-      "name": "cmake-dev",
       "warnings": {
         "deprecated": true,
         "dev": true
+      },
+      "errors": {
+        "deprecated": true
       }
     },
     {
+      "name": "vcpkg",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "STRING",
           "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
         },
-        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": {
-          "type": "BOOL",
-          "value": "ON"
+        "VCPKG_OVERLAY_PORTS": {
+          "type": "STRING",
+          "value": "${sourceDir}/cmake/ports"
         }
-      },
-      "hidden": true,
-      "name": "vcpkg"
+      }
     },
     {
+      "name": "windows",
+      "hidden": true,
       "cacheVariables": {
         "BSA_SUPPORT_XMEM": {
           "type": "BOOL",
           "value": "ON"
-        },
-        "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
-          "type": "STRING",
-          "value": "/DEBUG:FASTLINK"
-        },
-        "CMAKE_MSVC_RUNTIME_LIBRARY": {
-          "type": "STRING",
-          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
@@ -60,13 +55,27 @@
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
-          "value": "x64-windows-static-md"
+          "value": "x64-windows-static"
         }
-      },
-      "hidden": true,
-      "name": "windows"
+      }
     },
     {
+      "name": "linux",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "tests"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux"
+        }
+      }
+    },
+    {
+      "name": "gcc",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": {
           "type": "STRING",
@@ -79,57 +88,60 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": {
           "type": "BOOL",
           "value": "ON"
-        },
-        "VCPKG_MANIFEST_FEATURES": {
-          "type": "STRING",
-          "value": "tests"
-        },
-        "VCPKG_TARGET_TRIPLET": {
-          "type": "STRING",
-          "value": "x64-linux"
         }
-      },
+      }
+    },
+    {
+      "name": "msvc",
       "hidden": true,
-      "name": "linux"
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": {
+          "type": "string",
+          "value": "/EHsc /MP /W4 /WX /external:anglebrackets /external:W0"
+        },
+        "CMAKE_EXE_LINKER_FLAGS_RELEASE": {
+          "type": "STRING",
+          "value": "/DEBUG:FASTLINK"
+        },
+        "CMAKE_MSVC_RUNTIME_LIBRARY": {
+          "type": "STRING",
+          "value": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+        }
+      }
     },
     {
-      "architecture": {
-        "strategy": "set",
-        "value": "x64"
-      },
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX"
-      },
-      "generator": "Visual Studio 17 2022",
+      "name": "windows-msvc",
       "inherits": [
         "cmake-dev",
+        "msvc",
+        "windows"
+      ]
+    },
+    {
+      "name": "windows-msvc-vcpkg",
+      "inherits": [
+        "cmake-dev",
+        "msvc",
         "vcpkg",
         "windows"
-      ],
-      "name": "vs2022-windows",
-      "toolset": "v143"
+      ]
     },
     {
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX /external:anglebrackets /external:W0"
-      },
-      "generator": "Ninja",
+      "name": "linux-gcc",
       "inherits": [
         "cmake-dev",
-        "vcpkg",
-        "windows"
-      ],
-      "name": "ninja-windows"
+        "gcc",
+        "linux"
+      ]
     },
     {
-      "generator": "Ninja",
+      "name": "linux-gcc-vcpkg",
       "inherits": [
         "cmake-dev",
+        "gcc",
         "linux",
         "vcpkg"
-      ],
-      "name": "ninja-linux"
+      ]
     }
-  ],
-  "version": 3
+  ]
 }

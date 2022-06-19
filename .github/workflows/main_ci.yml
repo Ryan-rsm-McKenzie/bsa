@@ -49,18 +49,17 @@ jobs:
 
       - name: Cache vcpkg
         uses: actions/cache@v2
-        id: vcpkg-cache
         env:
           cache-name: vcpkg-cache
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/**/vcpkg.json', 'vcpkg-version.txt') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('bsa/vcpkg.json', 'vcpkg-version.txt') }}
 
       - name: Setup Environment
         run: |
           echo "GCOV=gcov-${{ matrix.version }}" >> $GITHUB_ENV
 
-          wget https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
+          wget https://github.com/ninja-build/ninja/releases/download/v1.11.0/ninja-linux.zip
           unzip ninja-linux.zip
           sudo mv ninja /usr/local/bin
 
@@ -70,7 +69,7 @@ jobs:
       - name: Configure & Build
         working-directory: ${{ github.workspace }}/bsa
         run: |
-          cmake --preset ninja-linux -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
+          cmake --preset linux-gcc-vcpkg -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
           cmake --build build
 
       - name: Test
@@ -118,7 +117,6 @@ jobs:
 
       - name: Cache vcpkg
         uses: actions/cache@v2
-        id: vcpkg-cache
         env:
           cache-name: vcpkg-cache
         with:
@@ -133,8 +131,8 @@ jobs:
       - name: (xmem) Configure & Build
         working-directory: ${{ github.workspace }}/bsa/extras/xmem
         run: |
-          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-          cmake --build build
+          cmake --preset windows-msvc-vcpkg -G Ninja
+          cmake --build build --config ${{ env.BUILD_TYPE }}
 
       - name: (xmem) Test
         working-directory: ${{ github.workspace }}/bsa/extras/xmem/build
@@ -160,8 +158,8 @@ jobs:
       - name: (main) Configure & Build
         working-directory: ${{ github.workspace }}/bsa
         run: |
-          cmake --preset ninja-windows -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBSA_BUILD_DOCS=OFF
-          cmake --build build
+          cmake --preset windows-msvc-vcpkg -G Ninja -DBSA_BUILD_DOCS=OFF
+          cmake --build build --config ${{ env.BUILD_TYPE }}
 
       - name: (main) Test
         working-directory: ${{ github.workspace }}/bsa/build

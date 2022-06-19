@@ -15,9 +15,9 @@
 #	include <d3d10.h>
 #endif
 
+#include "catch2.hpp"
 #include <binary_io/any_stream.hpp>
 #include <binary_io/memory_stream.hpp>
-#include <catch2/catch.hpp>
 #include <mmio/mmio.hpp>
 
 #include "bsa/fo4.hpp"

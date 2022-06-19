@@ -3,7 +3,7 @@
 #include <cstring>
 #include <string>
 
-#include <catch2/catch.hpp>
+#include "catch2.hpp"
 
 namespace unicode = bsa::xmem::unicode;
 
