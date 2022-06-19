@@ -23,11 +23,8 @@
     {
       "name": "vcpkg",
       "hidden": true,
+      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "STRING",
-          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
           "value": "tests"
