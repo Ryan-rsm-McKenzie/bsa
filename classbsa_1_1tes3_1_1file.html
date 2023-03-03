@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>bsa::tes3::file class | bsa bethesda archives meet c++</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" rel="stylesheet"/>
+  <link href="m-dark+documentation.compiled.css" rel="stylesheet"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <meta content="bsa" name="twitter:title"/>
+  <meta content="bsa" property="og:title"/>
+  <meta content="bsa" itemprop="name"/>
+  <meta content="Ryan McKenzie" name="author"/>
+  <meta content="Ryan McKenzie" property="article:author"/>
+  <meta content="bethesda archives meet c++" name="description"/>
+  <meta content="bethesda archives meet c++" name="twitter:description"/>
+  <meta content="bethesda archives meet c++" property="og:description"/>
+  <meta content="bethesda archives meet c++" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.5.7" name="generator"/>
+  <meta content="no-referrer-when-downgrade" name="referrer"/>
+  <link href="poxy-0.5.7.css" rel="stylesheet"/>
+  <link href="poxy-0.5.7-dark.css" rel="stylesheet"/>
+  <script src="poxy-0.5.7.js"></script>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bsa <span class="m-thin">bethesda archives meet c++</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a class="github poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebsa.html">bsa</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespacebsa_1_1tes3.html">tes3</a>::<wbr/></span>file <span class="m-thin">class</span> <span class="m-label m-flat m-warning">final</span>
+          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tes3_8hpp.html">&lt;bsa/tes3.hpp&gt;</a></div>
+        </h1>
+        <p>Represents a file within the TES3 virtual filesystem.</p>
+        <nav class="m-block m-default poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#base-classes">Base classes</a></li>
+                <li><a href="#capacity">Capacity</a></li>
+                <li><a href="#doxygen-only">Doxygen only</a></li>
+                <li><a href="#element-access">Element access</a></li>
+                <li><a href="#member-types">Member types</a></li>
+                <li><a href="#modifiers">Modifiers</a></li>
+                <li><a href="#reading">Reading</a></li>
+                <li><a href="#writing">Writing</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="base-classes">
+          <h2><a href="#base-classes">Base classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a class="m-doc" href="classbsa_1_1components_1_1byte__container.html">bsa::components::byte_container</a>
+            </dt>
+            <dd>A byte storage container without compression support.</dd>
+          </dl>
+        </section>
+        <section id="capacity">
+          <h2><a href="#capacity">Capacity</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#a096ea2d7371c338bf5238b1572c454a7">empty</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if the underlying byte container is empty.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#af0a9c873e76e769eae53d6273595663d">size</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Returns the size of the underlying byte container.</dd>
+          </dl>
+        </section>
+        <section id="doxygen-only">
+          <h2><a href="#doxygen-only">Doxygen only</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a158e789e0952689cc277d817572dd377">doxygen_read</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">protected</span></span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+            <dt id="a9abf8aa966619e8fedfec74caeb35688">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a9abf8aa966619e8fedfec74caeb35688">doxygen_write</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-flat m-warning">protected</span></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="element-access">
+          <h2><a href="#element-access">Element access</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#a5432c026029905920e29cb441f816557">as_bytes</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves an immutable view into the underlying bytes.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#afdf82c0d56de7bd18beeb6e69bb8a27e">data</a>(</span><span class="m-doc-wrap">) const -&gt; const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves an immutable pointer to the underlying bytes.</dd>
+          </dl>
+        </section>
+        <section id="member-types">
+          <h2><a href="#member-types">Member types</a></h2>
+          <dl class="m-doc">
+            <dt id="ace7210a0ac30ecfcd6affc582f6004a7">
+              using <a class="m-doc-self" href="#ace7210a0ac30ecfcd6affc582f6004a7">key</a> = <a class="m-doc" href="classbsa_1_1components_1_1key.html">components::<wbr/>key</a>&lt;<a class="m-doc" href="structbsa_1_1tes3_1_1hashing_1_1hash.html">hashing::<wbr/>hash</a>, <a class="m-doc" href="namespacebsa_1_1tes3_1_1hashing.html#a2c7df3602d6ea9ee9c30dc65e496ab63">hashing::<wbr/>hash_file_in_place</a>&gt;
+            </dt>
+            <dd>The key used to indentify a file.</dd>
+          </dl>
+        </section>
+        <section id="modifiers">
+          <h2><a href="#modifiers">Modifiers</a></h2>
+          <dl class="m-doc">
+            <dt id="a3788e091ff3dffbc5824f4b406314a32">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a3788e091ff3dffbc5824f4b406314a32">clear</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Clears the contents of the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="classbsa_1_1components_1_1byte__container.html#a6fc8f1af4e747c6c0fd78e158625445e">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Assigns the underlying container to be a non-owning view into the given data.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="classbsa_1_1components_1_1byte__container.html#a7f4a21f08096638f61ac065b0bab5bad">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Assigns the underlying container to be an owning view into the given data.</dd>
+          </dl>
+        </section>
+        <section id="reading">
+          <h2><a href="#reading">Reading</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a26e8632cdb934c99cd4f76dcccb9e139">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path)</span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a73af3c663e75c8defdd49d63890a1878">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_src,
+              <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66c">copy_<wbr/>type</a> a_copy = <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66ca6627415e807ee33c7302917216e7da68">copy_type::<wbr/>deep</a>)</span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+          </dl>
+        </section>
+        <section id="writing">
+          <h2><a href="#writing">Writing</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a31e8832ccda9bdf22f5ef1a8e91d8f69">write</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path) const</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a84e618cc91551687c130cb80ecb2c9f9">write</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::any_ostream</a>&amp; a_dst) const</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a096ea2d7371c338bf5238b1572c454a7"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a096ea2d7371c338bf5238b1572c454a7">empty</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Checks if the underlying byte container is empty.</p>
+          </div></section>
+          <section class="m-doc-details" id="af0a9c873e76e769eae53d6273595663d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af0a9c873e76e769eae53d6273595663d">size</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Returns the size of the underlying byte container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a158e789e0952689cc277d817572dd377"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a158e789e0952689cc277d817572dd377">doxygen_read</a>(</span><span class="m-doc-wrap">) <span class="m-label m-warning">protected</span></span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%"><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a5432c026029905920e29cb441f816557"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a5432c026029905920e29cb441f816557">as_bytes</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Retrieves an immutable view into the underlying bytes.</p>
+          </div></section>
+          <section class="m-doc-details" id="afdf82c0d56de7bd18beeb6e69bb8a27e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>* bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#afdf82c0d56de7bd18beeb6e69bb8a27e">data</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Retrieves an immutable pointer to the underlying bytes.</p>
+          </div></section>
+          <section class="m-doc-details" id="a6fc8f1af4e747c6c0fd78e158625445e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a6fc8f1af4e747c6c0fd78e158625445e">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Assigns the underlying container to be a non-owning view into the given data.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_data</td>
+                  <td>The data to store a view to.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a7f4a21f08096638f61ac065b0bab5bad"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a7f4a21f08096638f61ac065b0bab5bad">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Assigns the underlying container to be an owning view into the given data.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_data</td>
+                  <td>The data to take ownership of.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a26e8632cdb934c99cd4f76dcccb9e139"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a26e8632cdb934c99cd4f76dcccb9e139">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path)</span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_path</td>
+                  <td>The path to the given archive on the native filesystem.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+                <tr>
+                  <td><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/error/system_error.html" target="_blank">std::<wbr/>system_error</a></td>
+                  <td>Thrown when filesystem errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If <code><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/error/system_error.html" target="_blank">std::<wbr/>system_error</a></code> is thrown, the file is left unmodified.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a73af3c663e75c8defdd49d63890a1878"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a73af3c663e75c8defdd49d63890a1878">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_src,
+              <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66c">copy_<wbr/>type</a> a_copy = <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66ca6627415e807ee33c7302917216e7da68">copy_type::<wbr/>deep</a>)</span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_src</td>
+                  <td>The source to read from.</td>
+                </tr>
+                <tr>
+                  <td>a_copy</td>
+                  <td>The method to use when copying data from <code>a_src</code>.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a31e8832ccda9bdf22f5ef1a8e91d8f69"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a31e8832ccda9bdf22f5ef1a8e91d8f69">write</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path) const</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_path</td>
+                  <td>The path to write the archive to on the native filesystem.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a84e618cc91551687c130cb80ecb2c9f9"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes3::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a84e618cc91551687c130cb80ecb2c9f9">write</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::any_ostream</a>&amp; a_dst) const</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_dst</td>
+                  <td>The stream to write the archive to.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+    <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/issues" target="_blank">Report an issue</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank">License</a>
+     • <a download="" href="bsa.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+    <br/><br/>
+    Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>

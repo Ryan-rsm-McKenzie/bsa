@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>bsa::tes4::file class | bsa bethesda archives meet c++</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" rel="stylesheet"/>
+  <link href="m-dark+documentation.compiled.css" rel="stylesheet"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <meta content="bsa" name="twitter:title"/>
+  <meta content="bsa" property="og:title"/>
+  <meta content="bsa" itemprop="name"/>
+  <meta content="Ryan McKenzie" name="author"/>
+  <meta content="Ryan McKenzie" property="article:author"/>
+  <meta content="bethesda archives meet c++" name="description"/>
+  <meta content="bethesda archives meet c++" name="twitter:description"/>
+  <meta content="bethesda archives meet c++" property="og:description"/>
+  <meta content="bethesda archives meet c++" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.5.7" name="generator"/>
+  <meta content="no-referrer-when-downgrade" name="referrer"/>
+  <link href="poxy-0.5.7.css" rel="stylesheet"/>
+  <link href="poxy-0.5.7-dark.css" rel="stylesheet"/>
+  <script src="poxy-0.5.7.js"></script>
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bsa <span class="m-thin">bethesda archives meet c++</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a class="github poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebsa.html">bsa</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespacebsa_1_1tes4.html">tes4</a>::<wbr/></span>file <span class="m-thin">class</span> <span class="m-label m-flat m-warning">final</span>
+          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tes4_8hpp.html">&lt;bsa/tes4.hpp&gt;</a></div>
+        </h1>
+        <p>Represents a file within the TES4 virtual filesystem.</p>
+        <nav class="m-block m-default poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#base-classes">Base classes</a></li>
+                <li><a href="#capacity">Capacity</a></li>
+                <li><a href="#compression">Compression</a></li>
+                <li><a href="#decompression">Decompression</a></li>
+                <li><a href="#doxygen-only">Doxygen only</a></li>
+                <li><a href="#element-access">Element access</a></li>
+                <li><a href="#member-types">Member types</a></li>
+                <li><a href="#modifiers">Modifiers</a></li>
+                <li><a href="#observers">Observers</a></li>
+                <li><a href="#reading">Reading</a></li>
+                <li><a href="#writing">Writing</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="base-classes">
+          <h2><a href="#base-classes">Base classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html">bsa::components::compressed_byte_container</a>
+            </dt>
+            <dd>A byte storage container with compression support.</dd>
+          </dl>
+        </section>
+        <section id="capacity">
+          <h2><a href="#capacity">Capacity</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#a096ea2d7371c338bf5238b1572c454a7">empty</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if the underlying byte container is empty.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#af0a9c873e76e769eae53d6273595663d">size</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Returns the size of the underlying byte container.</dd>
+          </dl>
+        </section>
+        <section id="compression">
+          <h2><a href="#compression">Compression</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a56525f541e2e6ebbf29da29668283268">compress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>)</span>
+            </dt>
+            <dd>Compresses the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#aa8d81b72c3209180d15afc9fb8dc7373">compress_bound</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a></span>
+            </dt>
+            <dd>Returns an upper bound on the storage size required to compress the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#ac9a48c1aa69feb51252b1278840dca0e">compress_into</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_out,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a></span>
+            </dt>
+            <dd>Compresses the file into the given buffer.</dd>
+          </dl>
+        </section>
+        <section id="decompression">
+          <h2><a href="#decompression">Decompression</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#ac35acef7fbc73a049c93c7e7344af289">decompress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>)</span>
+            </dt>
+            <dd>Decompresses the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#abe76babb01756e299e0f69ba33519450">decompress_into</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_out,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span>
+            </dt>
+            <dd>Decompresses the file into the given buffer.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html#af27650d5b908666b1d6cf9a3517cfa0d">decompressed_size</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves the decompressed size of the compressed storage.</dd>
+          </dl>
+        </section>
+        <section id="doxygen-only">
+          <h2><a href="#doxygen-only">Doxygen only</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#af6e560c08d6ff7d346bdd9a4e39d73a3">doxygen_read</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>) <span class="m-label m-flat m-warning">protected</span></span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a0480c2bf93163083910c2b83355cd78b">doxygen_write</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const <span class="m-label m-flat m-warning">protected</span></span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="element-access">
+          <h2><a href="#element-access">Element access</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#a5432c026029905920e29cb441f816557">as_bytes</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves an immutable view into the underlying bytes.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1basic__byte__container.html#afdf82c0d56de7bd18beeb6e69bb8a27e">data</a>(</span><span class="m-doc-wrap">) const -&gt; const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>* <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves an immutable pointer to the underlying bytes.</dd>
+          </dl>
+        </section>
+        <section id="member-types">
+          <h2><a href="#member-types">Member types</a></h2>
+          <dl class="m-doc">
+            <dt id="a7c58900ac3938dc739b7cee5d96d1bb1">
+              using <a class="m-doc-self" href="#a7c58900ac3938dc739b7cee5d96d1bb1">key</a> = <a class="m-doc" href="classbsa_1_1components_1_1key.html">components::<wbr/>key</a>&lt;<a class="m-doc" href="structbsa_1_1tes4_1_1hashing_1_1hash.html">hashing::<wbr/>hash</a>, <a class="m-doc" href="namespacebsa_1_1tes4_1_1hashing.html#ab6991373262d3fb67cc09a211cd73545">hashing::<wbr/>hash_file_in_place</a>&gt;
+            </dt>
+            <dd>The key used to indentify a file.</dd>
+          </dl>
+        </section>
+        <section id="modifiers">
+          <h2><a href="#modifiers">Modifiers</a></h2>
+          <dl class="m-doc">
+            <dt id="a675181544541f5832709666aec9ca4c3">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a675181544541f5832709666aec9ca4c3">clear</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Clears the contents of the file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html#a06b6911070fbf5ad2c219dc3c0747647">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a>&gt; a_decompressedSize = std::nullopt) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Assigns the underlying container to be a non-owning view into the given data.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html#a81718a49fd319431da6d4c89424dd1e3">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a>&gt; a_decompressedSize = std::nullopt) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Assigns the underlying container to be an owning view into the given data.</dd>
+          </dl>
+        </section>
+        <section id="observers">
+          <h2><a href="#observers">Observers</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html#aaa95fbcc92f30c30af345eee6045e145">compressed</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if the underlying bytes are compressed.</dd>
+          </dl>
+        </section>
+        <section id="reading">
+          <h2><a href="#reading">Reading</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a2c722f9fb46391f82f3e38176f36eadc">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>)</span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a89242a15e1df9badf77aec779d1a48ec">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_src,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>,
+              <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66c">copy_<wbr/>type</a> a_copy = <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66ca6627415e807ee33c7302917216e7da68">copy_type::<wbr/>deep</a>)</span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+          </dl>
+        </section>
+        <section id="writing">
+          <h2><a href="#writing">Writing</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a6ce50a8816be86b7e6ebcc34728e1557">write</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#a50c0c9bf904d5019a77b045cbe570a0d">write</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::any_ostream</a>&amp; a_dst,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a096ea2d7371c338bf5238b1572c454a7"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a096ea2d7371c338bf5238b1572c454a7">empty</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Checks if the underlying byte container is empty.</p>
+          </div></section>
+          <section class="m-doc-details" id="af0a9c873e76e769eae53d6273595663d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af0a9c873e76e769eae53d6273595663d">size</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Returns the size of the underlying byte container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a56525f541e2e6ebbf29da29668283268"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a56525f541e2e6ebbf29da29668283268">compress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>)</span></span>
+            </h3>
+            <p>Compresses the file.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to compress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1compression__error.html">bsa::<wbr/>compression_error</a></td>
+                  <td>Thrown when any backend compression library errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file must <em>not</em> be compressed.</p></aside><aside class="m-note m-success"><h4>Postcondition</h4><p>The file will be compressed.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If a compression error is thrown, then the contents are left unchanged.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="aa8d81b72c3209180d15afc9fb8dc7373"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa8d81b72c3209180d15afc9fb8dc7373">compress_bound</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span></span>
+            </h3>
+            <p>Returns an upper bound on the storage size required to compress the file.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version the file would be compressed for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr>
+                  <th>Returns</th>
+                  <td>Returns the size required to successfully compress the file.</td>
+                </tr>
+              </thead>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1compression__error.html">bsa::<wbr/>compression_error</a></td>
+                  <td>Thrown when any backend compression library errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file must <em>not</em> be compressed.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ac9a48c1aa69feb51252b1278840dca0e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ac9a48c1aa69feb51252b1278840dca0e">compress_into</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_out,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span></span>
+            </h3>
+            <p>Compresses the file into the given buffer.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to compress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_out</td>
+                  <td>The buffer to compress the file into.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr>
+                  <th>Returns</th>
+                  <td>The final size of the compressed buffer.</td>
+                </tr>
+              </thead>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1compression__error.html">bsa::<wbr/>compression_error</a></td>
+                  <td>Thrown when any backend compression library errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file must <em>not</em> be compressed.</p><p><code>a_out</code> must be <a class="m-doc" href="classbsa_1_1tes4_1_1file.html#aa8d81b72c3209180d15afc9fb8dc7373">large enough</a> to compress the file into.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If a compression error is thrown, then the contents of <code>a_out</code> are left in an unspecified state.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="ac35acef7fbc73a049c93c7e7344af289"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ac35acef7fbc73a049c93c7e7344af289">decompress</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>)</span></span>
+            </h3>
+            <p>Decompresses the file.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to decompress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1compression__error.html">bsa::<wbr/>compression_error</a></td>
+                  <td>Thrown when any backend compression library errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file <em>must</em> be <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">compressed</a>.</p></aside><aside class="m-note m-success"><h4>Postcondition</h4><p>The file will be <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">decompressed</a>.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If a compression error is thrown, then the contents are left unchanged.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="abe76babb01756e299e0f69ba33519450"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#abe76babb01756e299e0f69ba33519450">decompress_into</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_out,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span></span>
+            </h3>
+            <p>Decompresses the file into the given buffer.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to decompress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_out</td>
+                  <td>The buffer to decompress the file into.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1compression__error.html">bsa::<wbr/>compression_error</a></td>
+                  <td>Thrown when any backend compression library errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-success"><h4>Precondition</h4><p>The file <em>must</em> be <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">compressed</a>.</p><p><code>a_out</code> must be <a class="m-doc" href="classbsa_1_1components_1_1compressed__byte__container.html#af27650d5b908666b1d6cf9a3517cfa0d">large enough</a> to decompress the file into.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If a compression error is thrown, then the contents of <code>a_out</code> are left in an unspecified state.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="af27650d5b908666b1d6cf9a3517cfa0d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af27650d5b908666b1d6cf9a3517cfa0d">decompressed_size</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Retrieves the decompressed size of the compressed storage.</p>
+<p>Only valid if the container <em>is</em> compressed.</p>
+          </div></section>
+          <section class="m-doc-details" id="af6e560c08d6ff7d346bdd9a4e39d73a3"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af6e560c08d6ff7d346bdd9a4e39d73a3">doxygen_read</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>) <span class="m-label m-warning">protected</span></span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to compress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+                <tr>
+                  <td>a_compression</td>
+                  <td>The resulting compression of the file read.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a0480c2bf93163083910c2b83355cd78b"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a0480c2bf93163083910c2b83355cd78b">doxygen_write</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const <span class="m-label m-warning">protected</span></span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version to decompress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a5432c026029905920e29cb441f816557"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a5432c026029905920e29cb441f816557">as_bytes</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Retrieves an immutable view into the underlying bytes.</p>
+          </div></section>
+          <section class="m-doc-details" id="afdf82c0d56de7bd18beeb6e69bb8a27e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>* bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#afdf82c0d56de7bd18beeb6e69bb8a27e">data</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Retrieves an immutable pointer to the underlying bytes.</p>
+          </div></section>
+          <section class="m-doc-details" id="a06b6911070fbf5ad2c219dc3c0747647"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a06b6911070fbf5ad2c219dc3c0747647">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a>&gt; a_decompressedSize = std::nullopt) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Assigns the underlying container to be a non-owning view into the given data.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_data</td>
+                  <td>The data to store a view to.</td>
+                </tr>
+                <tr>
+                  <td>a_decompressedSize</td>
+                  <td>The decompressed size of the data, if the given data is compressed.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a81718a49fd319431da6d4c89424dd1e3"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a81718a49fd319431da6d4c89424dd1e3">set_data</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/vector.html" target="_blank">std::<wbr/>vector</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_data,
+              <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/utility/optional.html" target="_blank">std::<wbr/>optional</a>&lt;<a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a>&gt; a_decompressedSize = std::nullopt) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Assigns the underlying container to be an owning view into the given data.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_data</td>
+                  <td>The data to take ownership of.</td>
+                </tr>
+                <tr>
+                  <td>a_decompressedSize</td>
+                  <td>The decompressed size of the data, if the given data is compressed.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="aaa95fbcc92f30c30af345eee6045e145"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aaa95fbcc92f30c30af345eee6045e145">compressed</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Checks if the underlying bytes are compressed.</p>
+          </div></section>
+          <section class="m-doc-details" id="a2c722f9fb46391f82f3e38176f36eadc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a2c722f9fb46391f82f3e38176f36eadc">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>)</span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_path</td>
+                  <td>The path to the given archive on the native filesystem.</td>
+                </tr>
+                <tr>
+                  <td>a_version</td>
+                  <td>The version to compress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+                <tr>
+                  <td>a_compression</td>
+                  <td>The resulting compression of the file read.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+                <tr>
+                  <td><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/error/system_error.html" target="_blank">std::<wbr/>system_error</a></td>
+                  <td>Thrown when filesystem errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside><aside class="m-note m-default"><h4>Remark</h4><p>If <code><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/error/system_error.html" target="_blank">std::<wbr/>system_error</a></code> is thrown, the file is left unmodified.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a89242a15e1df9badf77aec779d1a48ec"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a89242a15e1df9badf77aec779d1a48ec">read</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/container/span.html" target="_blank">std::<wbr/>span</a>&lt;const <a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/types/byte.html" target="_blank">std::<wbr/>byte</a>&gt; a_src,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>,
+              <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709">compression_<wbr/>type</a> a_compression = <a class="m-doc" href="namespacebsa.html#aa43a2c59eaf218c9243f381be13d6709ae61e8c6b8f8cc953006a03a056b97384">compression_type::<wbr/>decompressed</a>,
+              <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66c">copy_<wbr/>type</a> a_copy = <a class="m-doc" href="namespacebsa.html#a7cd057d5499ea55cf49aac251d29a66ca6627415e807ee33c7302917216e7da68">copy_type::<wbr/>deep</a>)</span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_src</td>
+                  <td>The source to read from.</td>
+                </tr>
+                <tr>
+                  <td>a_version</td>
+                  <td>The version to compress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+                <tr>
+                  <td>a_compression</td>
+                  <td>The resulting compression of the file read.</td>
+                </tr>
+                <tr>
+                  <td>a_copy</td>
+                  <td>The method to use when copying data from <code>a_src</code>.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a6ce50a8816be86b7e6ebcc34728e1557"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a6ce50a8816be86b7e6ebcc34728e1557">write</a>(</span><span class="m-doc-wrap"><a class="m-doc-external poxy-external" href="http://en.cppreference.com/w/cpp/filesystem/path.html" target="_blank">std::<wbr/>filesystem::<wbr/>path</a> a_path,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_path</td>
+                  <td>The path to write the archive to on the native filesystem.</td>
+                </tr>
+                <tr>
+                  <td>a_version</td>
+                  <td>The version to decompress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a50c0c9bf904d5019a77b045cbe570a0d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void bsa::<wbr/>tes4::<wbr/>file::<wbr/></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a50c0c9bf904d5019a77b045cbe570a0d">write</a>(</span><span class="m-doc-wrap"><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::any_ostream</a>&amp; a_dst,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124">compression_<wbr/>codec</a> a_codec = <a class="m-doc" href="namespacebsa_1_1tes4.html#a63a2eb1a179e7b8da6cf20270da5b124afea087517c26fadd409bd4b9dc642555">compression_codec::<wbr/>normal</a>) const</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_dst</td>
+                  <td>The stream to write the archive to.</td>
+                </tr>
+                <tr>
+                  <td>a_version</td>
+                  <td>The version to decompress the file for.</td>
+                </tr>
+                <tr>
+                  <td>a_codec</td>
+                  <td>The codec to use.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+    <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/" target="_blank">Github</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/issues" target="_blank">Report an issue</a>
+     • <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank">License</a>
+     • <a download="" href="bsa.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+    <br/><br/>
+    Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>
