@@ -24,7 +24,7 @@ navbar = [ 'classes', 'namespaces' ]
 	'#'
 ]
 'build' = [
-	'https://img.shields.io/github/workflow/status/Ryan-rsm-McKenzie/bsa/Main%20CI?logo=github&style=flat-square',
+	'https://img.shields.io/github/actions/workflow/status/Ryan-rsm-McKenzie/bsa/main_ci.yml?branch=master&logo=github&style=flat-square',
 	'https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml'
 ]
 'codecov' = [
