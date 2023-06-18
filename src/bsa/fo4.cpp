@@ -16,9 +16,7 @@
 #include <binary_io/file_stream.hpp>
 #include <zlib.h>
 
-#if BSA_OS_WINDOWS
-#	include <DirectXTex.h>
-#endif
+#include <DirectXTex.h>
 
 namespace bsa::fo4
 {
@@ -42,7 +40,6 @@ namespace bsa::fo4
 			}
 		}
 
-#if BSA_OS_WINDOWS
 		namespace
 		{
 			template <std::size_t MAX_COUNT>
@@ -104,7 +101,6 @@ namespace bsa::fo4
 				return slice;
 			}
 		}
-#endif
 
 		class header_t final
 		{
@@ -190,8 +186,8 @@ namespace bsa::fo4
 				const auto find = [&](char a_ch) noexcept {
 					const auto pos = a_path.find_last_of(a_ch);
 					return pos != std::string_view::npos ?
-                               std::optional{ pos } :
-                               std::nullopt;
+					           std::optional{ pos } :
+					           std::nullopt;
 				};
 
 				split_t result;
@@ -208,8 +204,8 @@ namespace bsa::fo4
 
 				const auto first = pstem ? *pstem + 1 : 0;
 				const auto last = pextension ?
-                                      *pextension - first :
-                                      pextension.value_or(std::string_view::npos);
+				                      *pextension - first :
+				                      pextension.value_or(std::string_view::npos);
 				result.stem = a_path.substr(first, last);
 
 				return result;
@@ -571,7 +567,6 @@ namespace bsa::fo4
 		[[maybe_unused]] compression_level a_level,
 		[[maybe_unused]] compression_type a_compression)
 	{
-#if BSA_OS_WINDOWS
 		DirectX::ScratchImage scratch;
 		const auto in = a_in->rdbuf();
 		if (const auto result = DirectX::LoadFromDDSMemory(
@@ -631,9 +626,6 @@ namespace bsa::fo4
 				detail::directx_mip_chunk_maximum(meta.format, a_mipChunkWidth, a_mipChunkHeight));
 			std::for_each(splices.begin(), splices.end(), addChunk);
 		}
-#else
-		throw bsa::exception("dds file support is only available on windows");
-#endif
 	}
 
 	void file::read_general(
@@ -653,7 +645,6 @@ namespace bsa::fo4
 	void file::write_directx(
 		[[maybe_unused]] detail::ostream_t& a_out) const
 	{
-#if BSA_OS_WINDOWS
 		const DirectX::TexMetadata meta{
 			.width = this->header.width,
 			.height = this->header.height,
@@ -661,6 +652,7 @@ namespace bsa::fo4
 			.arraySize = 1,
 			.mipLevels = this->header.mip_count,
 			.miscFlags = (this->header.flags & 1u) != 0 ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
+			.miscFlags2 = 0,
 			.format = static_cast<::DXGI_FORMAT>(this->header.format),
 			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
 		};
@@ -697,9 +689,6 @@ namespace bsa::fo4
 				a_out.write_bytes(chunk.as_bytes());
 			}
 		}
-#else
-		throw bsa::exception("dds file support is only available on windows");
-#endif
 	}
 
 	void file::write_general(detail::ostream_t& a_out) const

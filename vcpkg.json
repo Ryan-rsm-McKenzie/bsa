@@ -2,6 +2,7 @@
   "name": "bsa",
   "version-string": "1",
   "dependencies": [
+    "directxtex",
     "rsm-binary-io",
     "rsm-mmio"
   ],
@@ -14,12 +15,6 @@
       "dependencies": [
         "lz4",
         "zlib"
-      ]
-    },
-    "dds": {
-      "description": "Build support for dds files in ba2 archives",
-      "dependencies": [
-        "directxtex"
       ]
     },
     "tests": {

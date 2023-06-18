@@ -48,7 +48,7 @@
         },
         "VCPKG_MANIFEST_FEATURES": {
           "type": "STRING",
-          "value": "compression;dds;tests;xmem"
+          "value": "compression;tests;xmem"
         },
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",

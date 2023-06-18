@@ -29,7 +29,7 @@ endif()
 
 include(CTest)
 if("${BUILD_TESTING}")
-	find_package(Catch2 REQUIRED CONFIG)
+	find_package(Catch2 3 REQUIRED CONFIG)
 	include(Catch)
 	add_subdirectory(tests)
 endif()
