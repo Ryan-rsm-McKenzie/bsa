@@ -10,10 +10,7 @@
 #include <string_view>
 #include <utility>
 
-#if BSA_OS_WINDOWS
-#	include <dxgiformat.h>
-#	include <d3d10.h>
-#endif
+#include <DirectXTex.h>
 
 #include "catch2.hpp"
 #include <binary_io/any_stream.hpp>
@@ -22,10 +19,9 @@
 
 #include "bsa/fo4.hpp"
 
-#if BSA_OS_WINDOWS
 namespace
 {
-#	define COMPARE(a_field) a_lhs.a_field == a_rhs.a_field
+#define COMPARE(a_field) a_lhs.a_field == a_rhs.a_field
 
 	struct DDS_PIXELFORMAT
 	{
@@ -80,7 +76,7 @@ namespace
 	struct DDS_HEADER_DXT10
 	{
 		DXGI_FORMAT dxgiFormat;
-		D3D10_RESOURCE_DIMENSION resourceDimension;
+		UINT resourceDimension;
 		UINT miscFlag;
 		UINT arraySize;
 		UINT miscFlags2;  // formerly reserved
@@ -112,9 +108,8 @@ namespace
 		[[nodiscard]] friend bool operator==(dds10_header_t, dds10_header_t) noexcept = default;
 	};
 
-#	undef COMPARE
+#undef COMPARE
 }
-#endif
 
 static_assert(assert_nothrowable<bsa::fo4::hashing::hash>());
 static_assert(assert_nothrowable<bsa::fo4::chunk>());
@@ -484,7 +479,6 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			});
 	}
 
-#if BSA_OS_WINDOWS
 	SECTION("we can apply the correct chunking strategy for texture files")
 	{
 		const std::filesystem::path root{ "fo4_chunk_test"sv };
@@ -612,5 +606,4 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				});
 		}
 	}
-#endif
 }

@@ -94,26 +94,18 @@ find_package(binary_io REQUIRED CONFIG)
 find_package(LZ4 MODULE REQUIRED)
 find_package(mmio REQUIRED CONFIG)
 find_package(ZLIB MODULE REQUIRED)
+find_package(directxtex REQUIRED CONFIG)
 
 target_link_libraries(
 	"${PROJECT_NAME}"
 	PUBLIC
 		binary_io::binary_io
 		mmio::mmio
+		Microsoft::DirectXTex
 	PRIVATE
 		LZ4::LZ4
 		ZLIB::ZLIB
 )
-
-if(WIN32)
-	find_package(directxtex REQUIRED CONFIG)
-
-	target_link_libraries(
-		"${PROJECT_NAME}"
-		PRIVATE
-			Microsoft::DirectXTex
-	)
-endif()
 
 option(BSA_SUPPORT_XMEM "build support for the xmem codec proxy" OFF)
 if("${BSA_SUPPORT_XMEM}")
