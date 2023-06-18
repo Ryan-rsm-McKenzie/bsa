@@ -186,8 +186,8 @@ namespace bsa::fo4
 				const auto find = [&](char a_ch) noexcept {
 					const auto pos = a_path.find_last_of(a_ch);
 					return pos != std::string_view::npos ?
-					           std::optional{ pos } :
-					           std::nullopt;
+                               std::optional{ pos } :
+                               std::nullopt;
 				};
 
 				split_t result;
@@ -204,8 +204,8 @@ namespace bsa::fo4
 
 				const auto first = pstem ? *pstem + 1 : 0;
 				const auto last = pextension ?
-				                      *pextension - first :
-				                      pextension.value_or(std::string_view::npos);
+                                      *pextension - first :
+                                      pextension.value_or(std::string_view::npos);
 				result.stem = a_path.substr(first, last);
 
 				return result;
