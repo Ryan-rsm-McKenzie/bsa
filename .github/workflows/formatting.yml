@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run clang-format
-        run: find -type f \( -name *.hpp -o -name *.cpp \) | xargs clang-format-12 -style=file -i
+        run: find -type f \( -name *.hpp -o -name *.cpp \) | xargs clang-format-14 -style=file -i
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
