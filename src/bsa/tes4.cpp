@@ -188,8 +188,8 @@ namespace bsa::tes4
 			{
 				_endian =
 					this->xbox_archive() ?
-                        std::endian::big :
-                        std::endian::little;
+						std::endian::big :
+						std::endian::little;
 			}
 
 			std::uint32_t _version{ 0 };
@@ -236,9 +236,9 @@ namespace bsa::tes4
 			{
 				const auto dirStrSz =
 					a_header.directory_strings() ?
-                        // include prefixed byte length
-                        a_header.directory_names_length() + a_header.directory_count() :
-                        0;
+						// include prefixed byte length
+						a_header.directory_names_length() + a_header.directory_count() :
+						0;
 
 				return offsetof_file_entries(a_header) +
 				       dirStrSz +
@@ -557,8 +557,8 @@ namespace bsa::tes4
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
 			return a_codec == compression_codec::xmem ?
-                       this->compress_bound_xmem() :
-                       ::compressBound(static_cast<::uLong>(this->size()));
+			           this->compress_bound_xmem() :
+			           ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
 			assert(a_codec == compression_codec::normal);
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
@@ -579,8 +579,8 @@ namespace bsa::tes4
 			return this->compress_into_zlib(a_out);
 		case 104:
 			return a_codec == compression_codec::xmem ?
-                       this->compress_into_xmem(a_out) :
-                       this->compress_into_zlib(a_out);
+			           this->compress_into_xmem(a_out) :
+			           this->compress_into_zlib(a_out);
 		case 105:
 			assert(a_codec == compression_codec::normal);
 			return this->compress_into_lz4(a_out);
@@ -1113,7 +1113,7 @@ namespace bsa::tes4
 			const auto fname =
 				tableName    ? *tableName :
 				embeddedName ? *embeddedName :
-                               ""sv;
+							   ""sv;
 
 			[[maybe_unused]] const auto [it, success] =
 				a_dir.insert(
@@ -1136,8 +1136,8 @@ namespace bsa::tes4
 		std::optional<std::size_t> decompsz;
 		const bool compressed =
 			a_size & file::icompression ?
-                !a_header.compressed() :
-                a_header.compressed();
+				!a_header.compressed() :
+				a_header.compressed();
 		if (compressed) {
 			std::tie(decompsz) = a_in->read<std::uint32_t>();
 			a_size -= 4;
@@ -1177,8 +1177,8 @@ namespace bsa::tes4
 
 		const auto tableName =
 			a_header.directory_strings() ?
-                std::make_optional(detail::read_bzstring(a_in)) :
-                std::nullopt;
+				std::make_optional(detail::read_bzstring(a_in)) :
+				std::nullopt;
 
 		directory d;
 		const auto embeddedName = this->read_file_entries(d, a_in, a_header, count, a_namesOffset);
@@ -1187,7 +1187,7 @@ namespace bsa::tes4
 		const auto dname =
 			tableName    ? *tableName :
 			embeddedName ? *embeddedName :
-                           ""sv;
+						   ""sv;
 
 		[[maybe_unused]] const auto [it, success] =
 			this->insert(
