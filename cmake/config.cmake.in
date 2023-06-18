@@ -3,8 +3,8 @@ include(CMakeFindDependencyMacro)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-find_dependency(directxtex)
 find_dependency(binary_io CONFIG)
+find_dependency(directxtex)
 find_dependency(LZ4 MODULE)
 find_dependency(mmio CONFIG)
 find_dependency(ZLIB MODULE)
