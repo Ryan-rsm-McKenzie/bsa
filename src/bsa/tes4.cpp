@@ -551,6 +551,7 @@ namespace bsa::tes4
 		compression_codec a_codec) const
 		-> std::size_t
 	{
+		assert(!this->compressed());
 		switch (detail::to_underlying(a_version)) {
 		case 103:
 			assert(a_codec == compression_codec::normal);
