@@ -561,11 +561,11 @@ namespace bsa::fo4
 	}
 
 	void file::read_directx(
-		[[maybe_unused]] detail::istream_t& a_in,
-		[[maybe_unused]] std::size_t a_mipChunkWidth,
-		[[maybe_unused]] std::size_t a_mipChunkHeight,
-		[[maybe_unused]] compression_level a_level,
-		[[maybe_unused]] compression_type a_compression)
+		detail::istream_t& a_in,
+		std::size_t a_mipChunkWidth,
+		std::size_t a_mipChunkHeight,
+		compression_level a_level,
+		compression_type a_compression)
 	{
 		DirectX::ScratchImage scratch;
 		const auto in = a_in->rdbuf();
