@@ -160,10 +160,10 @@ namespace bsa
 		static std::optional<file_format> guess_file_format(
 			std::filesystem::path a_path);
 
-		/// \brief	Compresses the file.
+		/// \brief	Compresses the object.
 		///
-		/// \pre	The file must *not* be compressed.
-		/// \post	The file will be compressed.
+		/// \pre	The object must *not* be compressed.
+		/// \post	The object will be compressed.
 		///
 		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
 		///		are encountered.
@@ -171,31 +171,57 @@ namespace bsa
 		/// \remark	If a compression error is thrown, then the contents are left unchanged.
 		static void compress();
 
-		/// \brief	Returns an upper bound on the storage size required to compress the file.
+		/// \brief	Returns an upper bound on the storage size required to compress the object.
 		///
-		/// \pre	The file must *not* be compressed.
+		/// \pre	The object must *not* be compressed.
 		///
 		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
 		///		are encountered.
 		///
-		/// \return	Returns the size required to successfully compress the file.
+		/// \return	Returns the size required to successfully compress the object.
 		static std::size_t compress_bound();
 
-		/// \brief	Compresses the file into the given buffer.
+		/// \brief	Compresses the object into the given buffer.
 		///
-		/// \pre	The file must *not* be compressed.
+		/// \pre	The object must *not* be compressed.
 		/// \pre	`a_out` must be \ref compress_bound() "large enough" to compress the
-		/// 	file into.
+		/// 	object into.
 		///
 		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
 		///		are encountered.
 		///
-		/// \param	a_out	The buffer to compress the file into.
+		/// \param	a_out	The buffer to compress the object into.
 		/// \return	The final size of the compressed buffer.
 		///
 		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
 		///		in an unspecified state.
 		static std::size_t compress_into(
+			std::span<std::byte> a_out);
+
+		/// \brief	Decompresses the object.
+		///
+		/// \pre	The object *must* be compressed.
+		/// \post	The object will be decompressed.
+		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \remark	If a compression error is thrown, then the contents are left unchanged.
+		static void decompress();
+
+		/// \brief	Decompresses the object into the given buffer.
+		///
+		/// \pre	The object *must* be compressed.
+		/// \pre	`a_out` must be large enough to decompress the object into.
+		///
+		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
+		///		are encountered.
+		///
+		/// \param	a_out	The buffer to decompress the object into.
+		///
+		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
+		///		in an unspecified state.
+		static void decompress_into(
 			std::span<std::byte> a_out);
 
 		/// \brief	Reads the contents of the source.
@@ -496,21 +522,25 @@ namespace bsa
 		{}
 
 		/// \param	a_src	The source to read from.
+		///
+		/// \remarks	Defaults to a \ref copy_type::deep "deep" copy.
 		read_source(std::span<const std::byte> a_src) noexcept :
 			read_source(a_src, copy_type::deep)
 		{}
 
-		/// \copydoc bsa::read_source::read_source(std::span<const std::byte>)
+		/// \param	a_src	The source to read from.
 		/// \param	a_copy	The method to use when copying data from `a_src`.
 		read_source(std::span<const std::byte> a_src, copy_type a_copy) noexcept :
 			_value(a_src, a_copy)
 		{}
 
 	private:
+#ifndef DOXYGEN
 		friend tes3::archive;
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
+#endif
 
 		using value_type = detail::istream_t;
 
@@ -536,10 +566,12 @@ namespace bsa
 		{}
 
 	private:
+#ifndef DOXYGEN
 		friend tes3::archive;
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
+#endif
 
 		using value_type = binary_io::any_ostream;
 
@@ -574,15 +606,10 @@ namespace bsa
 
 namespace bsa::concepts
 {
-#ifdef DOXYGEN
 	/// \brief	Defines a type that can be used to construct `std::string`
-	struct stringable
-	{};
-#else
 	template <class T>
 	concept stringable =
 		std::constructible_from<std::string, T>;
-#endif
 }
 
 namespace bsa::components
