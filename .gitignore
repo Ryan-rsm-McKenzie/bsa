@@ -1,4 +1,5 @@
 /.cache
+/.venv
 /.vscode
 /build
 /extras/xmem/CMakeUserPresets.json
