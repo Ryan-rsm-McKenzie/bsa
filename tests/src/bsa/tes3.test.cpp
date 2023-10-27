@@ -163,7 +163,7 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 		in.write(os);
 
 		bsa::tes3::archive out;
-		out.read(os.get<binary_io::memory_ostream>().rdbuf());
+		out.read({ os.get<binary_io::memory_ostream>().rdbuf() });
 		REQUIRE(out.size() == index.size());
 		for (std::size_t idx = 0; idx < index.size(); ++idx) {
 			const auto& file = index[idx];
@@ -258,7 +258,7 @@ TEST_CASE("bsa::tes3::archive", "[src][tes3][archive]")
 				a_archive.write(a_dst);
 			},
 			[](bsa::tes3::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
-				a_archive.read(a_src, a_type);
+				a_archive.read({ a_src, a_type });
 			});
 	}
 }

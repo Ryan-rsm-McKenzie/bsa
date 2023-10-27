@@ -118,57 +118,22 @@ namespace bsa::tes3
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::file::doxygen_read
+		/// \copydoc bsa::doxygen_detail::read
 		///
-		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
-		///
-		/// \remark	If `std::system_error` is thrown, the file is left unmodified.
-		///
-		/// \param	a_path	The path to the given archive on the native filesystem.
-		void read(std::filesystem::path a_path);
-
-		/// \copydoc bsa::tes3::file::doxygen_read
-		///
-		/// \param	a_src	The source to read from.
-		/// \param	a_copy	The method to use when copying data from `a_src`.
-		void read(
-			std::span<const std::byte> a_src,
-			copy_type a_copy = copy_type::deep);
+		/// \param	a_source	Where/how to read the given file.
+		void read(read_source a_source);
 
 		/// @}
 
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::file::doxygen_write
+		/// \copydoc bsa::doxygen_detail::write
 		///
-		/// \param	a_path	The path to write the archive to on the native filesystem.
-		void write(std::filesystem::path a_path) const;
-
-		/// \copydoc bsa::tes3::file::doxygen_write
-		///
-		/// \param	a_dst	The stream to write the archive to.
-		void write(binary_io::any_ostream& a_dst) const;
+		/// \param	a_sink	Where/how to write the given file.
+		void write(write_sink a_sink) const;
 
 		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \copydoc bsa::doxygen_detail::read
-		void doxygen_read();
-
-		//// \copydoc bsa::doxygen_detail::write
-		void doxygen_write() const;
-
-		/// @}
-#endif
-
-	private:
-		void do_read(detail::istream_t& a_in);
-		void do_write(detail::ostream_t& a_out) const;
 	};
 
 	/// \brief	Represents the TES3 revision of the bsa format.
@@ -194,22 +159,12 @@ namespace bsa::tes3
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::doxygen_read
+		/// \copydoc bsa::doxygen_detail::read
 		///
-		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
 		///
-		/// \remark	If `std::system_error` is thrown, the archive is left unmodified.
-		///
-		/// \param	a_path	The path to the given archive on the native filesystem.
-		void read(std::filesystem::path a_path);
-
-		/// \copydoc bsa::tes3::archive::doxygen_read
-		///
-		/// \param	a_src	The source to read from.
-		/// \param	a_copy	The method to use when copying data from `a_src`.
-		void read(
-			std::span<const std::byte> a_src,
-			copy_type a_copy = copy_type::deep);
+		/// \param	a_source	Where/how to read the given archive.
+		void read(read_source a_source);
 
 		/// @}
 
@@ -226,39 +181,15 @@ namespace bsa::tes3
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::doxygen_write
-		///
-		/// \param	a_path	The path to write the archive to on the native filesystem.
-		void write(std::filesystem::path a_path) const;
-
-		/// \copydoc bsa::tes3::archive::doxygen_write
-		///
-		/// \param	a_dst	The stream to write the archive to.
-		void write(binary_io::any_ostream& a_dst) const;
-
-		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \copydoc bsa::doxygen_detail::read
-		///
-		/// \exception	bsa::exception	Thrown when archive parsing errors are encountered.
-		void doxygen_read();
-
 		/// \copydoc bsa::doxygen_detail::write
-		void doxygen_write() const;
+		///
+		/// \param	a_sink	Where/how to write the given archive.
+		void write(write_sink a_sink) const;
 
 		/// @}
-#endif
 
 	private:
 		struct offsets_t;
-
-		void do_read(detail::istream_t& a_in);
-		void do_write(detail::ostream_t& a_out) const;
 
 		[[nodiscard]] auto make_header() const noexcept -> detail::header_t;
 

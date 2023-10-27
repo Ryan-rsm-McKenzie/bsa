@@ -169,7 +169,7 @@ TEST_CASE("pack_unpack", "[examples]")
 			"bsa"sv,
 			[&](std::string_view a_outfile) {
 				bsa::tes3::archive bsa;
-				bsa.read(a_outfile);
+				bsa.read({ a_outfile });
 
 				const auto files = get_files_from_directory(datadir);
 				REQUIRE(bsa.size() == files.size());
@@ -186,7 +186,7 @@ TEST_CASE("pack_unpack", "[examples]")
 			"bsa"sv,
 			[&](std::string_view a_outfile) {
 				bsa::tes4::archive bsa;
-				bsa.read(a_outfile);
+				bsa.read({ a_outfile });
 
 				const auto files = get_files_from_directory(datadir);
 				const auto filecount = [&]() {
