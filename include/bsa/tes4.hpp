@@ -294,12 +294,12 @@ namespace bsa::tes4
 		/// \name Decompression
 		/// @{
 
-		/// \copydoc bsa::fo4::chunk::decompress
+		/// \copydoc bsa::doxygen_detail::decompress
 		///
 		/// \param	a_params	Extra configuration options.
 		void decompress(compression_params a_params);
 
-		/// \copydoc bsa::fo4::chunk::decompress_into
+		/// \copydoc bsa::doxygen_detail::decompress_into
 		///
 		/// \param	a_params	Extra configuration options.
 		void decompress_into(
@@ -325,7 +325,7 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::tes3::file::read
 		///
-		/// \brief	a_params	Extra configuration options.
+		/// \param	a_params	Extra configuration options.
 		void read(
 			read_source a_source,
 			read_params a_params);
@@ -337,7 +337,7 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::tes3::file::write
 		///
-		/// \brief	a_params	Extra configuration options.
+		/// \param	a_params	Extra configuration options.
 		void write(
 			write_sink a_sink,
 			write_params a_params) const;
