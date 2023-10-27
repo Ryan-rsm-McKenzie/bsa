@@ -295,7 +295,7 @@ namespace bsa::fo4
 		}
 	}
 
-	std::size_t chunk::compress_into_default(std::span<std::byte> a_out) const
+	std::size_t chunk::compress_into_zlib(std::span<std::byte> a_out) const
 	{
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >= this->compress_bound());
@@ -368,71 +368,7 @@ namespace bsa::fo4
 		return finalsz;
 	}
 
-	auto operator>>(
-		detail::istream_t& a_in,
-		chunk::mips_t& a_mips)
-		-> detail::istream_t&
-	{
-		a_in->read(a_mips.first, a_mips.last);
-		return a_in;
-	}
-
-	auto operator<<(
-		detail::ostream_t& a_out,
-		const chunk::mips_t& a_mips) noexcept
-		-> detail::ostream_t&
-	{
-		a_out.write(a_mips.first, a_mips.last);
-		return a_out;
-	}
-
-	void chunk::compress(
-		compression_level a_level)
-	{
-		std::vector<std::byte> out;
-		out.resize(this->compress_bound());
-
-		const auto outsz = this->compress_into({ out.data(), out.size() }, a_level);
-		out.resize(outsz);
-		out.shrink_to_fit();
-		this->set_data(std::move(out), this->size());
-
-		assert(this->compressed());
-	}
-
-	auto chunk::compress_bound() const
-		-> std::size_t
-	{
-		assert(!this->compressed());
-		return ::compressBound(static_cast<::uLong>(this->size()));
-	}
-
-	auto chunk::compress_into(
-		std::span<std::byte> a_out,
-		compression_level a_level) const
-		-> std::size_t
-	{
-		switch (a_level) {
-		case compression_level::normal:
-			return this->compress_into_default(a_out);
-		case compression_level::xbox:
-			return this->compress_into_xbox(a_out);
-		default:
-			detail::declare_unreachable();
-		}
-	}
-
-	void chunk::decompress()
-	{
-		std::vector<std::byte> out;
-		out.resize(this->decompressed_size());
-		this->decompress_into({ out.data(), out.size() });
-		this->set_data(std::move(out));
-
-		assert(!this->compressed());
-	}
-
-	void chunk::decompress_into(std::span<std::byte> a_out) const
+	void chunk::decompress_into_zlib(std::span<std::byte> a_out) const
 	{
 		assert(this->compressed());
 		assert(a_out.size_bytes() >= this->decompressed_size());
@@ -452,6 +388,74 @@ namespace bsa::fo4
 		if (outsz != this->decompressed_size()) {
 			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
 		}
+	}
+
+	auto operator>>(
+		detail::istream_t& a_in,
+		chunk::mips_t& a_mips)
+		-> detail::istream_t&
+	{
+		a_in->read(a_mips.first, a_mips.last);
+		return a_in;
+	}
+
+	auto operator<<(
+		detail::ostream_t& a_out,
+		const chunk::mips_t& a_mips) noexcept
+		-> detail::ostream_t&
+	{
+		a_out.write(a_mips.first, a_mips.last);
+		return a_out;
+	}
+
+	void chunk::compress(compression_params a_params)
+	{
+		std::vector<std::byte> out;
+		out.resize(this->compress_bound());
+
+		const auto outsz = this->compress_into({ out.data(), out.size() }, a_params);
+		out.resize(outsz);
+		out.shrink_to_fit();
+		this->set_data(std::move(out), this->size());
+
+		assert(this->compressed());
+	}
+
+	auto chunk::compress_bound() const
+		-> std::size_t
+	{
+		assert(!this->compressed());
+		return ::compressBound(static_cast<::uLong>(this->size()));
+	}
+
+	auto chunk::compress_into(
+		std::span<std::byte> a_out,
+		compression_params a_params) const
+		-> std::size_t
+	{
+		switch (a_params.compression_level) {
+		case compression_level::normal:
+			return this->compress_into_zlib(a_out);
+		case compression_level::xbox:
+			return this->compress_into_xbox(a_out);
+		default:
+			detail::declare_unreachable();
+		}
+	}
+
+	void chunk::decompress()
+	{
+		std::vector<std::byte> out;
+		out.resize(this->decompressed_size());
+		this->decompress_into({ out.data(), out.size() });
+		this->set_data(std::move(out));
+
+		assert(!this->compressed());
+	}
+
+	void chunk::decompress_into(std::span<std::byte> a_out) const
+	{
+		this->decompress_into_zlib(a_out);
 	}
 
 	auto operator>>(
@@ -485,75 +489,41 @@ namespace bsa::fo4
 	}
 
 	void file::read(
-		std::filesystem::path a_path,
-		format a_format,
-		std::size_t a_mipChunkWidth,
-		std::size_t a_mipChunkHeight,
-		compression_level a_level,
-		compression_type a_compression)
+		read_source a_source,
+		read_params a_params)
 	{
-		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_format, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
-	}
-
-	void file::read(
-		std::span<const std::byte> a_src,
-		format a_format,
-		std::size_t a_mipChunkWidth,
-		std::size_t a_mipChunkHeight,
-		compression_level a_level,
-		compression_type a_compression,
-		copy_type a_copy)
-	{
-		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_format, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
-	}
-
-	void file::write(
-		std::filesystem::path a_path,
-		format a_format) const
-	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out, a_format);
-	}
-
-	void file::write(
-		binary_io::any_ostream& a_dst,
-		format a_format) const
-	{
-		this->do_write(a_dst, a_format);
-	}
-
-	void file::do_read(
-		detail::istream_t& a_in,
-		format a_format,
-		std::size_t a_mipChunkWidth,
-		std::size_t a_mipChunkHeight,
-		compression_level a_level,
-		compression_type a_compression)
-	{
-		switch (a_format) {
+		auto& in = a_source.stream();
+		switch (a_params.format) {
 		case format::general:
-			this->read_general(a_in, a_level, a_compression);
+			this->read_general(
+				in,
+				a_params.compression_level,
+				a_params.compression_type);
 			break;
 		case format::directx:
-			this->read_directx(a_in, a_mipChunkWidth, a_mipChunkHeight, a_level, a_compression);
+			this->read_directx(
+				in,
+				a_params.mip_chunk_width,
+				a_params.mip_chunk_height,
+				a_params.compression_level,
+				a_params.compression_type);
 			break;
 		default:
 			detail::declare_unreachable();
 		}
 	}
 
-	void file::do_write(
-		detail::ostream_t& a_out,
-		format a_format) const
+	void file::write(
+		write_sink a_sink,
+		write_params a_params) const
 	{
-		switch (a_format) {
+		auto& out = a_sink.stream();
+		switch (a_params.format) {
 		case format::general:
-			this->write_general(a_out);
+			this->write_general(out);
 			break;
 		case format::directx:
-			this->write_directx(a_out);
+			this->write_directx(out);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -565,7 +535,7 @@ namespace bsa::fo4
 		std::size_t a_mipChunkWidth,
 		std::size_t a_mipChunkHeight,
 		compression_level a_level,
-		compression_type a_compression)
+		compression_type a_type)
 	{
 		DirectX::ScratchImage scratch;
 		const auto in = a_in->rdbuf();
@@ -613,8 +583,8 @@ namespace bsa::fo4
 			chunk.mips.first = mipIdx(a_splice.front());
 			chunk.mips.last = mipIdx(a_splice.back());
 			chunk.set_data(std::move(bytes));
-			if (a_compression == compression_type::compressed) {
-				chunk.compress(a_level);
+			if (a_type == compression_type::compressed) {
+				chunk.compress({ .compression_level = a_level });
 			}
 		};
 
@@ -631,14 +601,14 @@ namespace bsa::fo4
 	void file::read_general(
 		detail::istream_t& a_in,
 		compression_level a_level,
-		compression_type a_compression)
+		compression_type a_type)
 	{
 		this->clear();
 
 		auto& chunk = this->emplace_back();
 		chunk.set_data(a_in->rdbuf(), a_in);
-		if (a_compression == compression_type::compressed) {
-			chunk.compress(a_level);
+		if (a_type == compression_type::compressed) {
+			chunk.compress({ .compression_level = a_level });
 		}
 	}
 
@@ -705,45 +675,14 @@ namespace bsa::fo4
 		}
 	}
 
-	auto archive::read(std::filesystem::path a_path)
+	auto archive::read(read_source a_source)
 		-> format
 	{
-		detail::istream_t in{ std::move(a_path) };
-		return this->do_read(in);
-	}
+		auto& in = a_source.stream();
 
-	auto archive::read(
-		std::span<const std::byte> a_src,
-		copy_type a_copy)
-		-> format
-	{
-		detail::istream_t in{ a_src, a_copy };
-		return this->do_read(in);
-	}
-
-	void archive::write(
-		std::filesystem::path a_path,
-		format a_format,
-		bool a_strings) const
-	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out, a_format, a_strings);
-	}
-
-	void archive::write(
-		binary_io::any_ostream& a_dst,
-		format a_format,
-		bool a_strings) const
-	{
-		this->do_write(a_dst, a_format, a_strings);
-	}
-
-	auto archive::do_read(detail::istream_t& a_in)
-		-> format
-	{
 		const auto header = [&]() {
 			detail::header_t result;
-			a_in >> result;
+			in >> result;
 			return result;
 		}();
 
@@ -754,14 +693,14 @@ namespace bsa::fo4
 			 i < header.file_count();
 			 ++i) {
 			hashing::hash hash;
-			a_in >> hash;
+			in >> hash;
 
 			const auto name = [&]() {
 				if (strpos != 0) {
-					const detail::restore_point _{ a_in };
-					a_in->seek_absolute(strpos);
-					const auto name = detail::read_wstring(a_in);
-					strpos = a_in->tell();
+					const detail::restore_point _{ in };
+					in->seek_absolute(strpos);
+					const auto name = detail::read_wstring(in);
+					strpos = in->tell();
 					return name;
 				} else {
 					return ""sv;
@@ -770,38 +709,39 @@ namespace bsa::fo4
 
 			[[maybe_unused]] const auto [it, success] =
 				this->insert(
-					key_type{ hash, name, a_in },
+					key_type{ hash, name, in },
 					mapped_type{});
 			assert(success);
 
-			this->read_file(it->second, a_in, fmt);
+			this->read_file(it->second, in, fmt);
 		}
 
 		return fmt;
 	}
 
-	void archive::do_write(
-		detail::ostream_t& a_out,
-		format a_format,
-		bool a_strings) const
+	void archive::write(
+		write_sink a_sink,
+		write_params a_params) const
 	{
-		auto [header, dataOffset] = make_header(a_format, a_strings);
-		a_out << header;
+		auto& out = a_sink.stream();
+
+		auto [header, dataOffset] = make_header(a_params.format, a_params.strings);
+		out << header;
 
 		for (const auto& [key, file] : *this) {
-			a_out << key.hash();
-			this->write_file(file, a_out, a_format, dataOffset);
+			out << key.hash();
+			this->write_file(file, out, a_params.format, dataOffset);
 		}
 
 		for (const auto& file : *this) {
 			for (const auto& chunk : file.second) {
-				a_out.write_bytes(chunk.as_bytes());
+				out.write_bytes(chunk.as_bytes());
 			}
 		}
 
-		if (a_strings) {
+		if (a_params.strings) {
 			for ([[maybe_unused]] const auto& [key, file] : *this) {
-				detail::write_wstring(a_out, key.name());
+				detail::write_wstring(out, key.name());
 			}
 		}
 	}

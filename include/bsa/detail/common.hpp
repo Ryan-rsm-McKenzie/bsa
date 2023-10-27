@@ -540,6 +540,8 @@ namespace bsa
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
+		friend fo4::archive;
+		friend fo4::file;
 #endif
 
 		using value_type = detail::istream_t;
@@ -571,6 +573,8 @@ namespace bsa
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
+		friend fo4::archive;
+		friend fo4::file;
 #endif
 
 		using value_type = binary_io::any_ostream;

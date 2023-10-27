@@ -67,11 +67,10 @@ namespace
 				bsa::fo4::file f;
 				f.read(
 					a_path,
-					bsa::fo4::format::general,
-					512u,
-					512u,
-					bsa::fo4::compression_level::normal,
-					bsa::compression_type::compressed);
+					{
+						.format = bsa::fo4::format::general,
+						.compression_type = bsa::compression_type::compressed,
+					});
 
 				ba2.insert(
 					a_path
@@ -80,7 +79,7 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		ba2.write(a_output, bsa::fo4::format::general);
+		ba2.write(a_output, { .format = bsa::fo4::format::general });
 	}
 
 	void pack_tes3(
@@ -157,7 +156,7 @@ namespace
 
 		for (auto& [key, file] : ba2) {
 			auto out = open_virtual_path(a_output, key);
-			file.write(out, format);
+			file.write(out, { .format = format });
 		}
 	}
 
