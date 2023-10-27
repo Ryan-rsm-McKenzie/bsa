@@ -22,9 +22,9 @@ jobs:
 
       - name: Install Doxygen
         run: |
-          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_6/doxygen-1.9.6.linux.bin.tar.gz
-          tar -xzf doxygen-1.9.6.linux.bin.tar.gz
-          sudo mv doxygen-1.9.6/bin/doxygen /usr/local/bin
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+          tar -xzf doxygen-1.9.8.linux.bin.tar.gz
+          sudo mv doxygen-1.9.8/bin/doxygen /usr/local/bin
 
       - name: Install Poxy
         run: sudo pip install poxy==0.5.7
