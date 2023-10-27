@@ -224,7 +224,7 @@ TEST_CASE("pack_unpack", "[examples]")
 			"ba2"sv,
 			[&](std::string_view a_outfile) {
 				bsa::fo4::archive ba2;
-				ba2.read(a_outfile);
+				ba2.read({ a_outfile });
 
 				const auto files = get_files_from_directory(datadir);
 				REQUIRE(ba2.size() == files.size());
@@ -241,7 +241,7 @@ TEST_CASE("pack_unpack", "[examples]")
 
 		const auto texture = (root / "fo4_texture.ba2"sv).string();
 		bsa::fo4::archive ba2;
-		ba2.write(texture, bsa::fo4::format::directx);
+		ba2.write({ texture }, { .format = bsa::fo4::format::directx });
 
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack"),

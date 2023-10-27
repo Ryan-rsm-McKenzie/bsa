@@ -105,10 +105,20 @@ namespace bsa::fo4
 		friend file;
 		using super = components::compressed_byte_container;
 
-		[[nodiscard]] std::size_t compress_into_default(std::span<std::byte> a_out) const;
+		[[nodiscard]] std::size_t compress_into_zlib(std::span<std::byte> a_out) const;
 		[[nodiscard]] std::size_t compress_into_xbox(std::span<std::byte> a_out) const;
 
+		void decompress_into_zlib(std::span<std::byte> a_out) const;
+
 	public:
+		/// \brief	Common parameters to configure how chunks are compressed.
+		struct compression_params final
+		{
+		public:
+			/// \brief	The level to compress the data at.
+			compression_level compression_level{ compression_level::normal };
+		};
+
 		/// \brief	Unique to \ref format::directx.
 		struct mips_t final
 		{
@@ -140,49 +150,28 @@ namespace bsa::fo4
 
 		/// \copydoc bsa::doxygen_detail::compress
 		///
-		/// \param	a_level	The level to compress the data at.
-		void compress(
-			compression_level a_level = compression_level::normal);
+		/// \param	a_params	Extra configuration options.
+		void compress(compression_params a_params);
 
 		/// \copydoc bsa::doxygen_detail::compress_bound
 		[[nodiscard]] std::size_t compress_bound() const;
 
 		/// \copydoc bsa::doxygen_detail::compress_into
 		///
-		/// \param	a_level	The level to compress the data at.
+		/// \param	a_params	Extra configuration options.
 		[[nodiscard]] std::size_t compress_into(
 			std::span<std::byte> a_out,
-			compression_level a_level = compression_level::normal) const;
+			compression_params a_params) const;
 
 		/// @}
 
 		/// \name Decompression
 		/// @{
 
-		/// \brief	Decompresses the file.
-		///
-		/// \pre	The file *must* be \ref compressed() "compressed".
-		/// \post	The file will be \ref compressed() "decompressed".
-		///
-		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
-		///		are encountered.
-		///
-		/// \remark	If a compression error is thrown, then the contents are left unchanged.
+		/// \copydoc bsa::doxygen_detail::decompress
 		void decompress();
 
-		/// \brief	Decompresses the file into the given buffer.
-		///
-		/// \pre	The file *must* be \ref compressed() "compressed".
-		/// \pre	`a_out` must be \ref decompressed_size() "large enough" to
-		/// 	decompress the file into.
-		///
-		/// \exception	bsa::compression_error	Thrown when any backend compression library errors
-		///		are encountered.
-		///
-		/// \param	a_out	The buffer to decompress the file into.
-		///
-		/// \remark	If a compression error is thrown, then the contents of `a_out` are left
-		///		in an unspecified state.
+		/// \copydoc bsa::doxygen_detail::decompress_into
 		void decompress_into(std::span<std::byte> a_out) const;
 
 		/// @}
@@ -207,6 +196,36 @@ namespace bsa::fo4
 		using container_type = std::vector<chunk>;
 
 	public:
+		/// \brief	Common parameters to configure how files are read.
+		struct read_params final
+		{
+			/// \brief	The format to read the file as.
+			format format;
+
+			/// \brief	The maxiumum width to restrict a single mip chunk to.
+			std::size_t mip_chunk_width{ 512u };
+
+			/// \brief	The maxiumum height to restrict a single mip chunk to.
+			std::size_t mip_chunk_height{ 512u };
+
+			/// \brief	The level to compress the data at.
+			compression_level compression_level{ compression_level::normal };
+
+			/// \brief	The resulting compression of the file read.
+			compression_type compression_type{ compression_type::decompressed };
+		};
+
+		/// \brief	Common parameters to configure how files are written.
+		struct write_params final
+		{
+		public:
+			/// \brief	The format to write the file as.
+			format format;
+
+			/// \brief	TODO
+			compression_format compression_format{ compression_format::zip };
+		};
+
 		/// \brief	Unique to \ref format::directx.
 		struct header_t final
 		{
@@ -376,91 +395,38 @@ namespace bsa::fo4
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::file::read(std::filesystem::path)
-		/// \copydoc bsa::fo4::file::doxygen_read
+		/// \copydoc bsa::tes3::file::read
+		///
+		/// \param	a_params	Extra configuration options.
 		void read(
-			std::filesystem::path a_path,
-			format a_format,
-			std::size_t a_mipChunkWidth = 512u,
-			std::size_t a_mipChunkHeight = 512u,
-			compression_level a_level = compression_level::normal,
-			compression_type a_compression = compression_type::decompressed);
-
-		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
-		/// \copydoc bsa::fo4::file::doxygen_read
-		void read(
-			std::span<const std::byte> a_src,
-			format a_format,
-			std::size_t a_mipChunkWidth = 512u,
-			std::size_t a_mipChunkHeight = 512u,
-			compression_level a_level = compression_level::normal,
-			compression_type a_compression = compression_type::decompressed,
-			copy_type a_copy = copy_type::deep);
+			read_source a_source,
+			read_params a_params);
 
 		/// @}
 
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::file::write(std::filesystem::path) const
-		/// \copydoc bsa::fo4::file::doxygen_write
+		/// \copydoc bsa::tes3::file::write
+		///
+		/// \param	a_params	Extra configuration options.
 		void write(
-			std::filesystem::path a_path,
-			format a_format) const;
-
-		/// \copydoc bsa::tes3::file::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::fo4::file::doxygen_write
-		void write(
-			binary_io::any_ostream& a_dst,
-			format a_format) const;
+			write_sink a_sink,
+			write_params a_params) const;
 
 		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \param	a_format	The format to read the file as.
-		/// \param	a_mipChunkWidth	The maxiumum width to restrict a single mip chunk to.
-		/// \param	a_mipChunkHeight	The maxiumum height to restrict a single mip chunk to.
-		/// \param	a_level	The level to compress the data at.
-		/// \param	a_compression	The resulting compression of the file read.
-		void doxygen_read(
-			format a_format,
-			std::size_t a_mipChunkWidth = 512u,
-			std::size_t a_mipChunkHeight = 512u,
-			compression_level a_level = compression_level::normal,
-			compression_type a_compression = compression_type::decompressed);
-
-		/// \param	a_format	The format to write the file as.
-		void doxygen_write(format a_format) const;
-
-		/// @}
-#endif
 
 	private:
-		void do_read(
-			detail::istream_t& a_in,
-			format a_format,
-			std::size_t a_mipChunkWidth,
-			std::size_t a_mipChunkHeight,
-			compression_level a_level,
-			compression_type a_compression);
-		void do_write(
-			detail::ostream_t& a_out,
-			format a_format) const;
-
 		void read_directx(
 			detail::istream_t& a_in,
 			std::size_t a_mipChunkWidth,
 			std::size_t a_mipChunkHeight,
 			compression_level a_level,
-			compression_type a_compression);
+			compression_type a_type);
 		void read_general(
 			detail::istream_t& a_in,
 			compression_level a_level,
-			compression_type a_compression);
+			compression_type a_type);
 
 		void write_directx(detail::ostream_t& a_out) const;
 		void write_general(detail::ostream_t& a_out) const;
@@ -476,6 +442,17 @@ namespace bsa::fo4
 		using super = components::hashmap<file>;
 
 	public:
+		/// \brief	Common parameters to configure how archives are written.
+		struct write_params final
+		{
+		public:
+			/// \brief	The format to write the archive in.
+			format format;
+
+			/// \brief	Controls whether the string table is written or not.
+			bool strings{ true };
+		};
+
 		/// \name Modifiers
 		/// @{
 
@@ -491,60 +468,26 @@ namespace bsa::fo4
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
-		/// \copydoc bsa::fo4::archive::doxygen_read
-		format read(std::filesystem::path a_path);
-
-		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
-		/// \copydoc bsa::fo4::archive::doxygen_read
-		format read(
-			std::span<const std::byte> a_src,
-			copy_type a_copy = copy_type::deep);
+		/// \copydoc bsa::tes3::archive::read
+		///
+		/// \return	The format of the archive that was read.
+		format read(read_source a_source);
 
 		/// @}
 
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		/// \copydoc bsa::fo4::archive::doxygen_write
+		/// \copydoc bsa::tes3::archive::write
+		///
+		/// \param	a_params	Extra configuration options.
 		void write(
-			std::filesystem::path a_path,
-			format a_format,
-			bool a_strings = true) const;
-
-		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::fo4::archive::doxygen_write
-		void write(
-			binary_io::any_ostream& a_dst,
-			format a_format,
-			bool a_strings = true) const;
+			write_sink a_sink,
+			write_params a_params) const;
 
 		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \return	The format of the archive that was read.
-		format doxygen_read();
-
-		/// \param	a_format	The format to write the archive in.
-		/// \param	a_strings	Controls whether the string table is written or not.
-		void doxygen_write(format a_format, bool a_strings) const;
-
-		/// @}
-#endif
 
 	private:
-		[[nodiscard]] auto do_read(detail::istream_t& a_in) -> format;
-
-		void do_write(
-			detail::ostream_t& a_out,
-			format a_format,
-			bool a_strings) const;
-
 		[[nodiscard]] auto make_header(
 			format a_format,
 			bool a_strings) const noexcept
