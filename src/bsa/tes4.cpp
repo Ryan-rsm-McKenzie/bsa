@@ -531,14 +531,12 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::compress(
-		version a_version,
-		compression_codec a_codec)
+	void file::compress(compression_params a_params)
 	{
 		std::vector<std::byte> out;
-		out.resize(this->compress_bound(a_version, a_codec));
+		out.resize(this->compress_bound(a_params));
 
-		const auto outsz = this->compress_into(a_version, { out.data(), out.size() }, a_codec);
+		const auto outsz = this->compress_into({ out.data(), out.size() }, a_params);
 		out.resize(outsz);
 		out.shrink_to_fit();
 		this->set_data(std::move(out), this->size());
@@ -546,22 +544,20 @@ namespace bsa::tes4
 		assert(this->compressed());
 	}
 
-	auto file::compress_bound(
-		version a_version,
-		compression_codec a_codec) const
+	auto file::compress_bound(compression_params a_params) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		switch (detail::to_underlying(a_version)) {
+		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
-			return a_codec == compression_codec::xmem ?
+			return a_params.codec == compression_codec::xmem ?
 			           this->compress_bound_xmem() :
 			           ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
 			detail::declare_unreachable();
@@ -569,58 +565,54 @@ namespace bsa::tes4
 	}
 
 	auto file::compress_into(
-		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec) const
+		compression_params a_params) const
 		-> std::size_t
 	{
-		switch (detail::to_underlying(a_version)) {
+		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			return this->compress_into_zlib(a_out);
 		case 104:
-			return a_codec == compression_codec::xmem ?
+			return a_params.codec == compression_codec::xmem ?
 			           this->compress_into_xmem(a_out) :
 			           this->compress_into_zlib(a_out);
 		case 105:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			return this->compress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
 		}
 	}
 
-	void file::decompress(
-		version a_version,
-		compression_codec a_codec)
+	void file::decompress(compression_params a_params)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
-		this->decompress_into(a_version, { out.data(), out.size() }, a_codec);
+		this->decompress_into({ out.data(), out.size() }, a_params);
 		this->set_data(std::move(out));
 
 		assert(!this->compressed());
 	}
 
 	void file::decompress_into(
-		version a_version,
 		std::span<std::byte> a_out,
-		compression_codec a_codec) const
+		compression_params a_params) const
 	{
-		switch (detail::to_underlying(a_version)) {
+		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			this->decompress_into_zlib(a_out);
 			break;
 		case 104:
-			if (a_codec == compression_codec::xmem) {
+			if (a_params.codec == compression_codec::xmem) {
 				this->decompress_into_xmem(a_out);
 			} else {
 				this->decompress_into_zlib(a_out);
 			}
 			break;
 		case 105:
-			assert(a_codec == compression_codec::normal);
+			assert(a_params.codec == compression_codec::normal);
 			this->decompress_into_lz4(a_out);
 			break;
 		default:
@@ -628,42 +620,27 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::read(
-		std::filesystem::path a_path,
-		version a_version,
-		compression_codec a_codec,
-		compression_type a_compression)
+	void file::read(read_source a_source, read_params a_params)
 	{
-		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in, a_version, a_codec, a_compression);
+		auto& in = a_source.stream();
+		this->clear();
+		this->set_data(in->rdbuf(), in);
+		if (a_params.compression == compression_type::compressed) {
+			this->compress({ .version = a_params.version, .codec = a_params.codec });
+		}
 	}
 
-	void file::read(
-		std::span<const std::byte> a_src,
-		version a_version,
-		compression_codec a_codec,
-		compression_type a_compression,
-		copy_type a_copy)
+	void file::write(write_sink a_sink, write_params a_params) const
 	{
-		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in, a_version, a_codec, a_compression);
-	}
-
-	void file::write(
-		std::filesystem::path a_path,
-		version a_version,
-		compression_codec a_codec) const
-	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out, a_version, a_codec);
-	}
-
-	void file::write(
-		binary_io::any_ostream& a_dst,
-		version a_version,
-		compression_codec a_codec) const
-	{
-		this->do_write(a_dst, a_version, a_codec);
+		auto& out = a_sink.stream();
+		if (this->compressed()) {
+			std::vector<std::byte> buffer;
+			buffer.resize(this->decompressed_size());
+			this->decompress_into(buffer, { .version = a_params.version, .codec = a_params.codec });
+			out.write_bytes(buffer);
+		} else {
+			out.write_bytes(this->as_bytes());
+		}
 	}
 
 	auto file::compress_bound_xmem() const
@@ -698,7 +675,7 @@ namespace bsa::tes4
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound(version::sse));
+		assert(a_out.size_bytes() >= this->compress_bound({ .version = version::sse }));
 
 		const auto in = this->as_bytes();
 
@@ -756,7 +733,7 @@ namespace bsa::tes4
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound(version::tes4));
+		assert(a_out.size_bytes() >= this->compress_bound({ .version = version::tes4 }));
 
 		const auto in = this->as_bytes();
 		auto outsz = static_cast<::uLong>(a_out.size_bytes());
@@ -880,48 +857,30 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::do_read(
-		detail::istream_t& a_in,
-		version a_version,
-		compression_codec a_codec,
-		compression_type a_compression)
+	auto archive::read(read_source a_source)
+		-> version
 	{
+		auto& in = a_source.stream();
+
+		const auto header = [&]() {
+			detail::header_t result;
+			in >> result;
+			return result;
+		}();
+
 		this->clear();
-		this->set_data(a_in->rdbuf(), a_in);
-		if (a_compression == compression_type::compressed) {
-			this->compress(a_version, a_codec);
+
+		_flags = header.archive_flags();
+		_types = header.archive_types();
+
+		std::size_t namesOffset = detail::offsetof_file_strings(header);
+		std::size_t filesOffset = detail::offsetof_file_entries(header);
+		in->seek_absolute(header.directories_offset());
+		for (std::size_t i = 0; i < header.directory_count(); ++i) {
+			this->read_directory(in, header, filesOffset, namesOffset);
 		}
-	}
 
-	void file::do_write(
-		detail::ostream_t& a_out,
-		version a_version,
-		compression_codec a_codec) const
-	{
-		if (this->compressed()) {
-			std::vector<std::byte> buffer;
-			buffer.resize(this->decompressed_size());
-			this->decompress_into(a_version, buffer, a_codec);
-			a_out.write_bytes(buffer);
-		} else {
-			a_out.write_bytes(this->as_bytes());
-		}
-	}
-
-	auto archive::read(std::filesystem::path a_path)
-		-> version
-	{
-		detail::istream_t in{ std::move(a_path) };
-		return this->do_read(in);
-	}
-
-	auto archive::read(
-		std::span<const std::byte> a_src,
-		copy_type a_copy)
-		-> version
-	{
-		detail::istream_t in{ a_src, a_copy };
-		return this->do_read(in);
+		return static_cast<version>(header.archive_version());
 	}
 
 	bool archive::verify_offsets(version a_version) const noexcept
@@ -946,15 +905,21 @@ namespace bsa::tes4
 		return offset <= (std::numeric_limits<std::int32_t>::max)();
 	}
 
-	void archive::write(std::filesystem::path a_path, version a_version) const
+	void archive::write(write_sink a_sink, write_params a_params) const
 	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out, a_version);
-	}
+		auto& out = a_sink.stream();
 
-	void archive::write(binary_io::any_ostream& a_dst, version a_version) const
-	{
-		this->do_write(a_dst, a_version);
+		const auto header = this->make_header(a_params.version);
+		out << header;
+
+		const auto intermediate = sort_for_write(header.xbox_archive());
+
+		this->write_directory_entries(intermediate, out, header);
+		this->write_file_entries(intermediate, out, header);
+		if (header.file_strings()) {
+			this->write_file_names(intermediate, out);
+		}
+		this->write_file_data(intermediate, out, header);
 	}
 
 	struct archive::xbox_sort_t final
@@ -986,45 +951,6 @@ namespace bsa::tes4
 				a_value->first.hash().numeric());
 		}
 	};
-
-	auto archive::do_read(detail::istream_t& a_in)
-		-> version
-	{
-		const auto header = [&]() {
-			detail::header_t result;
-			a_in >> result;
-			return result;
-		}();
-
-		this->clear();
-
-		_flags = header.archive_flags();
-		_types = header.archive_types();
-
-		std::size_t namesOffset = detail::offsetof_file_strings(header);
-		std::size_t filesOffset = detail::offsetof_file_entries(header);
-		a_in->seek_absolute(header.directories_offset());
-		for (std::size_t i = 0; i < header.directory_count(); ++i) {
-			this->read_directory(a_in, header, filesOffset, namesOffset);
-		}
-
-		return static_cast<version>(header.archive_version());
-	}
-
-	void archive::do_write(detail::ostream_t& a_out, version a_version) const
-	{
-		const auto header = this->make_header(a_version);
-		a_out << header;
-
-		const auto intermediate = sort_for_write(header.xbox_archive());
-
-		this->write_directory_entries(intermediate, a_out, header);
-		this->write_file_entries(intermediate, a_out, header);
-		if (header.file_strings()) {
-			this->write_file_names(intermediate, a_out);
-		}
-		this->write_file_data(intermediate, a_out, header);
-	}
 
 	auto archive::make_header(version a_version) const noexcept
 		-> detail::header_t

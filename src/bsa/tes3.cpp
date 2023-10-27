@@ -154,40 +154,17 @@ namespace bsa::tes3
 		}
 	}
 
-	void file::read(std::filesystem::path a_path)
+	void file::read(read_source a_source)
 	{
-		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in);
-	}
-
-	void file::read(
-		std::span<const std::byte> a_src,
-		copy_type a_copy)
-	{
-		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in);
-	}
-
-	void file::write(std::filesystem::path a_path) const
-	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out);
-	}
-
-	void file::write(binary_io::any_ostream& a_dst) const
-	{
-		this->do_write(a_dst);
-	}
-
-	void file::do_read(detail::istream_t& a_in)
-	{
+		auto& in = a_source.stream();
 		this->clear();
-		this->set_data(a_in->rdbuf(), a_in);
+		this->set_data(in->rdbuf(), in);
 	}
 
-	void file::do_write(detail::ostream_t& a_out) const
+	void file::write(write_sink a_sink) const
 	{
-		a_out.write_bytes(this->as_bytes());
+		auto& out = a_sink.stream();
+		out.write_bytes(this->as_bytes());
 	}
 
 	struct archive::offsets_t final
@@ -220,18 +197,28 @@ namespace bsa::tes3
 		}
 	};
 
-	void archive::read(std::filesystem::path a_path)
+	void archive::read(read_source a_source)
 	{
-		detail::istream_t in{ std::move(a_path) };
-		this->do_read(in);
-	}
+		auto& in = a_source.stream();
 
-	void archive::read(
-		std::span<const std::byte> a_src,
-		copy_type a_copy)
-	{
-		detail::istream_t in{ a_src, a_copy };
-		this->do_read(in);
+		const auto header = [&]() {
+			detail::header_t result;
+			in >> result;
+			return result;
+		}();
+
+		this->clear();
+
+		const offsets_t offsets{
+			detail::offsetof_hashes(header),
+			detail::offsetof_name_offsets(header),
+			detail::offsetof_names(header),
+			detail::offsetof_file_data(header)
+		};
+
+		for (std::size_t i = 0; i < header.file_count(); ++i) {
+			this->read_file(in, offsets, i);
+		}
 	}
 
 	bool archive::verify_offsets() const noexcept
@@ -266,48 +253,17 @@ namespace bsa::tes3
 		return true;
 	}
 
-	void archive::write(std::filesystem::path a_path) const
+	void archive::write(write_sink a_sink) const
 	{
-		binary_io::any_ostream out{ std::in_place_type<binary_io::file_ostream>, std::move(a_path) };
-		this->do_write(out);
-	}
+		auto& out = a_sink.stream();
 
-	void archive::write(binary_io::any_ostream& a_dst) const
-	{
-		this->do_write(a_dst);
-	}
+		out << this->make_header();
 
-	void archive::do_read(detail::istream_t& a_in)
-	{
-		const auto header = [&]() {
-			detail::header_t result;
-			a_in >> result;
-			return result;
-		}();
-
-		this->clear();
-
-		const offsets_t offsets{
-			detail::offsetof_hashes(header),
-			detail::offsetof_name_offsets(header),
-			detail::offsetof_names(header),
-			detail::offsetof_file_data(header)
-		};
-
-		for (std::size_t i = 0; i < header.file_count(); ++i) {
-			this->read_file(a_in, offsets, i);
-		}
-	}
-
-	void archive::do_write(detail::ostream_t& a_out) const
-	{
-		a_out << this->make_header();
-
-		this->write_file_entries(a_out);
-		this->write_file_name_offsets(a_out);
-		this->write_file_names(a_out);
-		this->write_file_hashes(a_out);
-		this->write_file_data(a_out);
+		this->write_file_entries(out);
+		this->write_file_name_offsets(out);
+		this->write_file_names(out);
+		this->write_file_hashes(out);
+		this->write_file_data(out);
 	}
 
 	auto archive::make_header() const noexcept

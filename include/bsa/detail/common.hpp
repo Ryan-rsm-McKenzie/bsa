@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <binary_io/any_stream.hpp>
+#include <binary_io/file_stream.hpp>
 #include <binary_io/span_stream.hpp>
 #include <mmio/mmio.hpp>
 
@@ -481,6 +482,93 @@ namespace bsa
 	private:
 		std::string _what;
 		library _lib{ library::internal };
+	};
+
+	/// \brief	An abstraction over the specific source that will be read from.
+	class read_source final
+	{
+	public:
+		/// \param	a_path	The path to read from on the native filesystem.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		read_source(std::filesystem::path a_path) :
+			_value(std::move(a_path))
+		{}
+
+		/// \param	a_src	The source to read from.
+		read_source(std::span<const std::byte> a_src) noexcept :
+			read_source(a_src, copy_type::deep)
+		{}
+
+		/// \copydoc bsa::read_source::read_source(std::span<const std::byte>)
+		/// \param	a_copy	The method to use when copying data from `a_src`.
+		read_source(std::span<const std::byte> a_src, copy_type a_copy) noexcept :
+			_value(a_src, a_copy)
+		{}
+
+	private:
+		friend tes3::archive;
+		friend tes3::file;
+		friend tes4::archive;
+		friend tes4::file;
+
+		using value_type = detail::istream_t;
+
+		[[nodiscard]] auto stream() noexcept -> value_type& { return _value; }
+
+		value_type _value;
+	};
+
+	/// \brief	An abstraction over the specific sink that will be written to.
+	class write_sink final
+	{
+	public:
+		/// \param a_path The path to write to on the native filesystem.
+		///
+		/// \exception	std::system_error	Thrown when filesystem errors are encountered.
+		write_sink(std::filesystem::path a_path) :
+			_value(std::in_place_index<stream_value>, std::in_place_type<binary_io::file_ostream>, std::move(a_path))
+		{}
+
+		/// \param	a_dst	The stream to write the archive to.
+		write_sink(binary_io::any_ostream& a_dst) noexcept :
+			_value(std::in_place_index<stream_reference>, a_dst)
+		{}
+
+	private:
+		friend tes3::archive;
+		friend tes3::file;
+		friend tes4::archive;
+		friend tes4::file;
+
+		using value_type = binary_io::any_ostream;
+
+		enum : std::size_t
+		{
+			stream_value,
+			stream_reference,
+
+			stream_count
+		};
+
+		[[nodiscard]] auto stream() noexcept -> value_type&
+		{
+			switch (_value.index()) {
+			case stream_value:
+				return *std::get_if<stream_value>(&_value);
+			case stream_reference:
+				return *std::get_if<stream_reference>(&_value);
+			default:
+				detail::declare_unreachable();
+			}
+		}
+
+		std::variant<
+			value_type,
+			std::reference_wrapper<value_type>>
+			_value;
+
+		static_assert(stream_count == std::variant_size_v<decltype(_value)>);
 	};
 }
 

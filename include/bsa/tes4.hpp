@@ -225,6 +225,42 @@ namespace bsa::tes4
 		using super = components::compressed_byte_container;
 
 	public:
+		/// \brief	Common parameters to configure how files are compressed/decompressed.
+		struct compression_params final
+		{
+		public:
+			/// \brief	The version to compress/decompress the file for.
+			version version;
+
+			/// \brief	The codec to use.
+			compression_codec codec{ compression_codec::normal };
+		};
+
+		/// \brief	Common parameters to configure how files are read.
+		struct read_params final
+		{
+		public:
+			/// \brief	The version to compress the file for.
+			version version;
+
+			/// \brief	The codec to use.
+			compression_codec codec{ compression_codec::normal };
+
+			/// \brief	The resulting compression of the file read.
+			compression_type compression{ compression_type::decompressed };
+		};
+
+		/// \brief	Common parameters to configure how files are written.
+		struct write_params final
+		{
+		public:
+			/// \brief	The version to decompress the file for.
+			version version;
+
+			/// \brief	The codec to use.
+			compression_codec codec{ compression_codec::normal };
+		};
+
 		/// \name Member types
 		/// @{
 
@@ -238,28 +274,20 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::doxygen_detail::compress
 		///
-		/// \param	a_version	The version to compress the file for.
-		/// \param	a_codec	The codec to use.
-		void compress(
-			version a_version,
-			compression_codec a_codec = compression_codec::normal);
+		/// \param	a_params	Extra configuration options.
+		void compress(compression_params a_params);
 
 		/// \copydoc bsa::doxygen_detail::compress_bound
 		///
-		/// \param	a_version	The version the file would be compressed for.
-		/// \param	a_codec	The codec to use.
-		[[nodiscard]] std::size_t compress_bound(
-			version a_version,
-			compression_codec a_codec = compression_codec::normal) const;
+		/// \param	a_params	Extra configuration options.
+		[[nodiscard]] std::size_t compress_bound(compression_params a_params) const;
 
 		/// \copydoc bsa::doxygen_detail::compress_into
 		///
-		/// \param	a_version	The version to compress the file for.
-		/// \param	a_codec	The codec to use.
+		/// \param	a_params	Extra configuration options.
 		[[nodiscard]] std::size_t compress_into(
-			version a_version,
 			std::span<std::byte> a_out,
-			compression_codec a_codec = compression_codec::normal) const;
+			compression_params a_params) const;
 
 		/// @}
 
@@ -268,20 +296,15 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::fo4::chunk::decompress
 		///
-		/// \param	a_version	The version to decompress the file for.
-		/// \param	a_codec	The codec to use.
-		void decompress(
-			version a_version,
-			compression_codec a_codec = compression_codec::normal);
+		/// \param	a_params	Extra configuration options.
+		void decompress(compression_params a_params);
 
 		/// \copydoc bsa::fo4::chunk::decompress_into
 		///
-		/// \param	a_version	The version to decompress the file for.
-		/// \param	a_codec	The codec to use.
+		/// \param	a_params	Extra configuration options.
 		void decompress_into(
-			version a_version,
 			std::span<std::byte> a_out,
-			compression_codec a_codec = compression_codec::normal) const;
+			compression_params a_params) const;
 
 		/// @}
 
@@ -300,65 +323,26 @@ namespace bsa::tes4
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::file::read(std::filesystem::path)
-		/// \copydoc bsa::tes4::file::doxygen_read
+		/// \copydoc bsa::tes3::file::read
+		///
+		/// \brief	a_params	Extra configuration options.
 		void read(
-			std::filesystem::path a_path,
-			version a_version,
-			compression_codec a_codec = compression_codec::normal,
-			compression_type a_compression = compression_type::decompressed);
-
-		/// \copydoc bsa::tes3::file::read(std::span<const std::byte>, copy_type)
-		/// \copydoc bsa::tes4::file::doxygen_read
-		void read(
-			std::span<const std::byte> a_src,
-			version a_version,
-			compression_codec a_codec = compression_codec::normal,
-			compression_type a_compression = compression_type::decompressed,
-			copy_type a_copy = copy_type::deep);
+			read_source a_source,
+			read_params a_params);
 
 		/// @}
 
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::file::write(std::filesystem::path) const
-		/// \copydoc bsa::tes4::file::doxygen_write
+		/// \copydoc bsa::tes3::file::write
+		///
+		/// \brief	a_params	Extra configuration options.
 		void write(
-			std::filesystem::path a_path,
-			version a_version,
-			compression_codec a_codec = compression_codec::normal) const;
-
-		/// \copydoc bsa::tes3::file::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::tes4::file::doxygen_write
-		void write(
-			binary_io::any_ostream& a_dst,
-			version a_version,
-			compression_codec a_codec = compression_codec::normal) const;
+			write_sink a_sink,
+			write_params a_params) const;
 
 		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \param	a_version	The version to compress the file for.
-		/// \param	a_codec	The codec to use.
-		/// \param	a_compression	The resulting compression of the file read.
-		void doxygen_read(
-			version a_version,
-			compression_codec a_codec = compression_codec::normal,
-			compression_type a_compression = compression_type::decompressed);
-
-		/// \param	a_version	The version to decompress the file for.
-		/// \param	a_codec	The codec to use.
-		void doxygen_write(
-			version a_version,
-			compression_codec a_codec = compression_codec::normal) const;
-
-		/// @}
-#endif
 
 	private:
 		enum : std::uint32_t
@@ -378,16 +362,6 @@ namespace bsa::tes4
 		void decompress_into_lz4(std::span<std::byte> a_out) const;
 		void decompress_into_xmem(std::span<std::byte> a_out) const;
 		void decompress_into_zlib(std::span<std::byte> a_out) const;
-
-		void do_read(
-			detail::istream_t& a_in,
-			version a_version,
-			compression_codec a_codec,
-			compression_type a_compression);
-		void do_write(
-			detail::ostream_t& a_out,
-			version a_version,
-			compression_codec a_codec) const;
 	};
 
 	/// \brief	Represents a directory within the TES4 virtual filesystem.
@@ -428,6 +402,14 @@ namespace bsa::tes4
 		using super = components::hashmap<directory, true>;
 
 	public:
+		/// \brief	Common parameters to configure how archives are written.
+		struct write_params final
+		{
+		public:
+			/// \brief	The version format to write the archive in.
+			version version;
+		};
+
 		/// \name Archive flags
 		/// @{
 
@@ -504,15 +486,10 @@ namespace bsa::tes4
 		/// \name Reading
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::read(std::filesystem::path)
-		/// \copydoc bsa::tes4::archive::doxygen_read
-		version read(std::filesystem::path a_path);
-
-		/// \copydoc bsa::tes3::archive::read(std::span<const std::byte>, copy_type)
-		/// \copydoc bsa::tes4::archive::doxygen_read
-		version read(
-			std::span<const std::byte> a_src,
-			copy_type a_copy = copy_type::deep);
+		/// \copydoc bsa::tes3::archive::read
+		///
+		/// \return	The version of the archive that was read.
+		version read(read_source a_source);
 
 		/// @}
 
@@ -529,29 +506,12 @@ namespace bsa::tes4
 		/// \name Writing
 		/// @{
 
-		/// \copydoc bsa::tes3::archive::write(std::filesystem::path) const
-		/// \copydoc bsa::tes4::archive::doxygen_write
-		void write(std::filesystem::path a_path, version a_version) const;
-
-		/// \copydoc bsa::tes3::archive::write(binary_io::any_ostream&) const
-		/// \copydoc bsa::tes4::archive::doxygen_write
-		void write(binary_io::any_ostream& a_dst, version a_version) const;
+		/// \copydoc bsa::tes3::archive::write
+		///
+		/// \param	a_params	Extra configuration options.
+		void write(write_sink a_sink, write_params a_params) const;
 
 		/// @}
-
-#ifdef DOXYGEN
-	protected:
-		/// \name Doxygen only
-		/// @{
-
-		/// \return	The version of the archive that was read.
-		version doxygen_read();
-
-		/// \param	a_version The version format to write the archive in.
-		void doxygen_write(version a_version) const;
-
-		/// @}
-#endif
 
 	private:
 		using intermediate_t =
@@ -561,10 +521,6 @@ namespace bsa::tes4
 					std::vector<const mapped_type::value_type*>>>;
 
 		struct xbox_sort_t;
-
-		[[nodiscard]] auto do_read(detail::istream_t& a_in) -> version;
-
-		void do_write(detail::ostream_t& a_out, version a_version) const;
 
 		[[nodiscard]] auto make_header(version a_version) const noexcept -> detail::header_t;
 

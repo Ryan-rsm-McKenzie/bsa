@@ -205,13 +205,13 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 	SECTION("attempting to read an invalid file will fail")
 	{
 		bsa::tes4::archive bsa;
-		REQUIRE_THROWS_AS(bsa.read("."sv), std::system_error);
+		REQUIRE_THROWS_AS(bsa.read({ "."sv }), std::system_error);
 	}
 
 	SECTION("attempting to write to an invalid location will fail")
 	{
 		bsa::tes4::archive bsa;
-		REQUIRE_THROWS_AS(bsa.write("."sv, bsa::tes4::version::tes5), std::system_error);
+		REQUIRE_THROWS_AS(bsa.write({ "."sv }, { .version = bsa::tes4::version::tes5 }), std::system_error);
 	}
 
 	{
@@ -239,12 +239,12 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				bsa::tes4::file original;
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
-				original.compress(version);
+				original.compress({ .version = version });
 
 				REQUIRE(read->decompressed_size() == original.decompressed_size());
 				assert_byte_equality(read->as_bytes(), original.as_bytes());
 
-				read->decompress(version);
+				read->decompress({ .version = version });
 				assert_byte_equality(read->as_bytes(), std::span{ origsrc.data(), origsrc.size() });
 			}
 		};
@@ -309,7 +309,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 		compare_to_master_copy(
 			inPath,
 			[&](binary_io::any_ostream& a_os) {
-				bsa.write(a_os, format);
+				bsa.write(a_os, { .version = format });
 			});
 	}
 
@@ -450,10 +450,10 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 							  bsa::tes4::archive_flag a_flags) {
 			binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
 			in.archive_flags(a_flags);
-			in.write(os, a_version);
+			in.write(os, { .version = a_version });
 
 			bsa::tes4::archive out;
-			REQUIRE(out.read(os.get<binary_io::memory_ostream>().rdbuf()) == a_version);
+			REQUIRE(out.read({ os.get<binary_io::memory_ostream>().rdbuf() }) == a_version);
 			REQUIRE(out.size() == index.size());
 			for (std::size_t idx = 0; idx < index.size(); ++idx) {
 				const auto& [dir, file] = index[idx];
@@ -478,7 +478,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 					REQUIRE(f->first.name() == simple_normalize(file.name));
 				}
 				if (f->second.compressed()) {
-					f->second.decompress(a_version);
+					f->second.decompress({ .version = a_version });
 				}
 				assert_byte_equality(f->second.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
@@ -551,13 +551,13 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				}
 			},
 			[](bsa::tes4::archive& a_archive, std::filesystem::path a_dst) {
-				a_archive.write(a_dst, bsa::tes4::version::tes4);
+				a_archive.write(a_dst, { .version = bsa::tes4::version::tes4 });
 			},
 			[](bsa::tes4::archive& a_archive, binary_io::any_ostream& a_dst) {
-				a_archive.write(a_dst, bsa::tes4::version::tes4);
+				a_archive.write(a_dst, { .version = bsa::tes4::version::tes4 });
 			},
 			[](bsa::tes4::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
-				REQUIRE(a_archive.read(a_src, a_type) == bsa::tes4::version::tes4);
+				REQUIRE(a_archive.read({ a_src, a_type }) == bsa::tes4::version::tes4);
 			});
 	}
 

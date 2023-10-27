@@ -120,9 +120,10 @@ namespace
 				bsa::tes4::file f;
 				f.read(
 					a_path,
-					version,
-					bsa::tes4::compression_codec::normal,
-					bsa::compression_type::compressed);
+					{
+						.version = version,
+						.compression = bsa::compression_type::compressed,
+					});
 
 				const auto d = [&]() {
 					const auto key =
@@ -144,7 +145,7 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		bsa.write(a_output, version);
+		bsa.write(a_output, { .version = version });
 	}
 
 	void unpack_fo4(
@@ -183,7 +184,7 @@ namespace
 		for (auto& dir : bsa) {
 			for (auto& file : dir.second) {
 				auto out = open_virtual_path(a_output, dir.first, file.first);
-				file.second.write(out, format);
+				file.second.write(out, { .version = format });
 			}
 		}
 	}
