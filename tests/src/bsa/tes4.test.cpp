@@ -588,11 +588,17 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 			}();
 
 			REQUIRE(memory->decompressed_size() == disk.size());
-			memory->decompress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
+			memory->decompress({
+				.version = bsa::tes4::version::tes5,
+				.codec = bsa::tes4::compression_codec::xmem,
+			});
 			REQUIRE(!memory->compressed());
 			assert_byte_equality(memory->as_bytes(), std::span{ disk.data(), disk.size() });
 
-			memory->compress(bsa::tes4::version::tes5, bsa::tes4::compression_codec::xmem);
+			memory->compress({
+				.version = bsa::tes4::version::tes5,
+				.codec = bsa::tes4::compression_codec::xmem,
+			});
 			REQUIRE(memory->compressed());
 			assert_byte_equality(memory->as_bytes(), compressed);
 		}

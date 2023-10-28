@@ -702,7 +702,11 @@ namespace bsa::tes4
 	{
 #ifdef BSA_SUPPORT_XMEM
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound(version::tes5, compression_codec::xmem));
+		assert(a_out.size_bytes() >=
+			   this->compress_bound({
+				   .version = version::tes5,
+				   .codec = compression_codec::xmem,
+			   }));
 
 		try {
 			auto& proxy = detail::get_xmem_proxy();
