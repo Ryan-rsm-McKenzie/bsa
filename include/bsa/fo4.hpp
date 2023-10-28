@@ -188,7 +188,7 @@ namespace bsa::fo4
 		/// \copydoc bsa::doxygen_detail::compress
 		///
 		/// \param	a_params	Extra configuration options.
-		void compress(compression_params a_params);
+		void compress(const compression_params& a_params);
 
 		/// \copydoc bsa::doxygen_detail::compress_bound
 		///
@@ -200,7 +200,7 @@ namespace bsa::fo4
 		/// \param	a_params	Extra configuration options.
 		[[nodiscard]] std::size_t compress_into(
 			std::span<std::byte> a_out,
-			compression_params a_params) const;
+			const compression_params& a_params) const;
 
 		/// @}
 
@@ -448,7 +448,7 @@ namespace bsa::fo4
 		/// \param	a_params	Extra configuration options.
 		void read(
 			read_source a_source,
-			read_params a_params);
+			const read_params& a_params);
 
 		/// @}
 
@@ -460,7 +460,7 @@ namespace bsa::fo4
 		/// \param	a_params	Extra configuration options.
 		void write(
 			write_sink a_sink,
-			write_params a_params) const;
+			const write_params& a_params) const;
 
 		/// @}
 

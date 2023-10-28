@@ -509,7 +509,7 @@ namespace bsa::fo4
 		return a_out;
 	}
 
-	void chunk::compress(compression_params a_params)
+	void chunk::compress(const compression_params& a_params)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->compress_bound(a_params.compression_format));
@@ -538,7 +538,7 @@ namespace bsa::fo4
 
 	auto chunk::compress_into(
 		std::span<std::byte> a_out,
-		compression_params a_params) const
+		const compression_params& a_params) const
 		-> std::size_t
 	{
 		switch (a_params.compression_format) {
@@ -618,7 +618,7 @@ namespace bsa::fo4
 
 	void file::read(
 		read_source a_source,
-		read_params a_params)
+		const read_params& a_params)
 	{
 		auto& in = a_source.stream();
 		switch (a_params.format) {
@@ -645,7 +645,7 @@ namespace bsa::fo4
 
 	void file::write(
 		write_sink a_sink,
-		write_params a_params) const
+		const write_params& a_params) const
 	{
 		auto& out = a_sink.stream();
 		switch (a_params.format) {
