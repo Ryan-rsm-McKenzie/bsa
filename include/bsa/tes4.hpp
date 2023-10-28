@@ -233,7 +233,7 @@ namespace bsa::tes4
 			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec codec{ compression_codec::normal };
+			compression_codec compression_codec{ compression_codec::normal };
 		};
 
 		/// \brief	Common parameters to configure how files are read.
@@ -244,10 +244,10 @@ namespace bsa::tes4
 			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec codec{ compression_codec::normal };
+			compression_codec compression_codec{ compression_codec::normal };
 
 			/// \brief	The resulting compression of the file read.
-			compression_type compression{ compression_type::decompressed };
+			compression_type compression_type{ compression_type::decompressed };
 		};
 
 		/// \brief	Common parameters to configure how files are written.
@@ -258,7 +258,7 @@ namespace bsa::tes4
 			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec codec{ compression_codec::normal };
+			compression_codec compression_codec{ compression_codec::normal };
 		};
 
 		/// \name Member types
