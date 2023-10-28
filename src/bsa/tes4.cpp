@@ -531,7 +531,7 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::compress(compression_params a_params)
+	void file::compress(const compression_params& a_params)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->compress_bound(a_params));
@@ -544,7 +544,7 @@ namespace bsa::tes4
 		assert(this->compressed());
 	}
 
-	auto file::compress_bound(compression_params a_params) const
+	auto file::compress_bound(const compression_params& a_params) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
@@ -566,7 +566,7 @@ namespace bsa::tes4
 
 	auto file::compress_into(
 		std::span<std::byte> a_out,
-		compression_params a_params) const
+		const compression_params& a_params) const
 		-> std::size_t
 	{
 		switch (detail::to_underlying(a_params.version)) {
@@ -585,7 +585,7 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::decompress(compression_params a_params)
+	void file::decompress(const compression_params& a_params)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
@@ -597,7 +597,7 @@ namespace bsa::tes4
 
 	void file::decompress_into(
 		std::span<std::byte> a_out,
-		compression_params a_params) const
+		const compression_params& a_params) const
 	{
 		switch (detail::to_underlying(a_params.version)) {
 		case 103:
@@ -620,7 +620,9 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::read(read_source a_source, read_params a_params)
+	void file::read(
+		read_source a_source,
+		const read_params& a_params)
 	{
 		auto& in = a_source.stream();
 		this->clear();
@@ -630,7 +632,9 @@ namespace bsa::tes4
 		}
 	}
 
-	void file::write(write_sink a_sink, write_params a_params) const
+	void file::write(
+		write_sink a_sink,
+		const write_params& a_params) const
 	{
 		auto& out = a_sink.stream();
 		if (this->compressed()) {
@@ -905,7 +909,9 @@ namespace bsa::tes4
 		return offset <= (std::numeric_limits<std::int32_t>::max)();
 	}
 
-	void archive::write(write_sink a_sink, write_params a_params) const
+	void archive::write(
+		write_sink a_sink,
+		const write_params& a_params) const
 	{
 		auto& out = a_sink.stream();
 
