@@ -915,11 +915,11 @@ namespace bsa::tes4
 
 	void archive::write(
 		write_sink a_sink,
-		const write_params& a_params) const
+		version a_version) const
 	{
 		auto& out = a_sink.stream();
 
-		const auto header = this->make_header(a_params.version);
+		const auto header = this->make_header(a_version);
 		out << header;
 
 		const auto intermediate = sort_for_write(header.xbox_archive());
