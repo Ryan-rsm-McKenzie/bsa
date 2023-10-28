@@ -14,6 +14,8 @@
 
 #include <binary_io/any_stream.hpp>
 #include <binary_io/file_stream.hpp>
+#include <lz4.h>
+#include <lz4hc.h>
 #include <zlib.h>
 
 #include <DirectXTex.h>
@@ -28,8 +30,6 @@ namespace bsa::fo4
 			{
 				constexpr auto btdx = make_four_cc("BTDX"sv);
 
-				constexpr std::size_t header_size = 0x18;
-
 				constexpr std::size_t chunk_header_size_gnrl = 0x10;
 				constexpr std::size_t chunk_header_size_dx10 = 0x18;
 
@@ -37,6 +37,8 @@ namespace bsa::fo4
 				constexpr std::size_t chunk_size_dx10 = 0x18;
 
 				constexpr std::size_t chunk_sentinel = 0xBAADF00D;
+
+				constexpr std::uint32_t compression_lz4 = 3;
 			}
 		}
 
@@ -100,6 +102,28 @@ namespace bsa::fo4
 
 				return slice;
 			}
+
+			[[nodiscard]] auto sizeof_header(version a_version) noexcept
+				-> std::size_t
+			{
+				std::size_t size = 0;
+
+				switch (a_version) {
+				case version::v3:
+					size += sizeof(std::uint32_t);
+					[[fallthrough]];
+				case version::v2:
+					size += sizeof(std::uint64_t);
+					[[fallthrough]];
+				case version::v1:
+					size += 0x18;
+					break;
+				default:
+					detail::declare_unreachable();
+				}
+
+				return size;
+			}
 		}
 
 		class header_t final
@@ -108,13 +132,19 @@ namespace bsa::fo4
 			header_t() noexcept = default;
 
 			header_t(
-				format a_format,
+				const archive::meta_info& a_meta,
 				std::size_t a_fileCount,
-				std::uint64_t a_stringTableOffset) noexcept :
-				_format(to_underlying(a_format)),
+				std::uint64_t a_stringTableOffset) :
+				_version(to_underlying(a_meta.version)),
+				_format(to_underlying(a_meta.format)),
 				_fileCount(static_cast<std::uint32_t>(a_fileCount)),
-				_stringTableOffset(a_stringTableOffset)
-			{}
+				_stringTableOffset(a_stringTableOffset),
+				_compression_format(a_meta.compression_format)
+			{
+				if (a_meta.compression_format == compression_format::lz4 && a_meta.version < version::v3) {
+					throw exception("compression format is not valid for the given version");
+				}
+			}
 
 			friend auto operator>>(
 				istream_t& a_in,
@@ -122,22 +152,39 @@ namespace bsa::fo4
 				-> istream_t&
 			{
 				std::uint32_t magic = 0;
-				std::uint32_t version = 0;
 
 				a_in->read(
 					magic,
-					version,
+					a_header._version,
 					a_header._format,
 					a_header._fileCount,
 					a_header._stringTableOffset);
 
 				if (magic != constants::btdx) {
 					throw exception("invalid magic");
-				} else if (version != 1) {
-					throw exception("invalid version");
 				} else if (a_header._format != constants::gnrl &&
 						   a_header._format != constants::dx10) {
 					throw exception("invalid format");
+				} else {
+					switch (a_header._version) {
+					case 1:
+					case 2:
+					case 3:
+						break;
+					default:
+						throw exception("invalid version");
+					}
+				}
+
+				if (a_header._version >= 2) {
+					(void)a_in->read<std::uint64_t>();
+				}
+
+				if (a_header._version >= 3) {
+					const auto [compression] = a_in->read<std::uint32_t>();
+					if (compression == constants::compression_lz4) {
+						a_header._compression_format = fo4::compression_format::lz4;
+					}
 				}
 
 				return a_in;
@@ -150,22 +197,51 @@ namespace bsa::fo4
 			{
 				a_out.write(
 					constants::btdx,
-					std::uint32_t{ 1 },
+					a_header._version,
 					a_header._format,
 					a_header._fileCount,
 					a_header._stringTableOffset);
+
+				if (a_header._version >= 2) {
+					a_out.write(std::uint64_t{ 1 });
+				}
+
+				if (a_header._version >= 3) {
+					std::uint32_t format =
+						a_header._compression_format == fo4::compression_format::lz4 ?
+							constants::compression_lz4 :
+							0;
+					a_out.write(format);
+				}
+
 				return a_out;
 			}
 
-			[[nodiscard]] auto archive_format() const noexcept -> std::size_t { return _format; }
+			[[nodiscard]] auto archive_format() const noexcept -> format { return static_cast<format>(_format); }
+			[[nodiscard]] auto archive_version() const noexcept -> version { return static_cast<version>(_version); }
+			[[nodiscard]] auto compression_format() const noexcept -> fo4::compression_format { return _compression_format; }
 			[[nodiscard]] auto file_count() const noexcept -> std::size_t { return _fileCount; }
+
+			[[nodiscard]] auto make_meta() const noexcept
+				-> archive::meta_info
+			{
+				return archive::meta_info{
+					.format = this->archive_format(),
+					.version = this->archive_version(),
+					.compression_format = this->compression_format(),
+					.strings = this->string_table_offset() != 0,
+				};
+			}
+
 			[[nodiscard]] auto string_table_offset() const noexcept
 				-> std::uint64_t { return _stringTableOffset; }
 
 		private:
+			std::uint32_t _version{ 0 };
 			std::uint32_t _format{ 0 };
 			std::uint32_t _fileCount{ 0 };
 			std::uint64_t _stringTableOffset{ 0 };
+			fo4::compression_format _compression_format{ fo4::compression_format::zip };
 		};
 	}
 
@@ -295,38 +371,41 @@ namespace bsa::fo4
 		}
 	}
 
-	std::size_t chunk::compress_into_zlib(std::span<std::byte> a_out) const
+	std::size_t chunk::compress_into_lz4(std::span<std::byte> a_out) const
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound());
+		assert(a_out.size_bytes() >= this->compress_bound(compression_format::lz4));
 
 		const auto in = this->as_bytes();
-		auto outsz = static_cast<::uLong>(a_out.size());
-
-		const auto result = ::compress(
-			reinterpret_cast<::Byte*>(a_out.data()),
-			&outsz,
-			reinterpret_cast<const ::Byte*>(in.data()),
-			static_cast<::uLong>(in.size_bytes()));
-		if (result != Z_OK) {
-			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
+		const auto result = ::LZ4_compress_HC(
+			reinterpret_cast<const char*>(in.data()),
+			reinterpret_cast<char*>(a_out.data()),
+			static_cast<int>(in.size_bytes()),
+			static_cast<int>(a_out.size_bytes()),
+			12);
+		if (result == 0) {
+			throw bsa::compression_error(bsa::compression_error::library::lz4, result);
 		}
 
-		return static_cast<std::size_t>(outsz);
+		return static_cast<std::size_t>(result);
 	}
 
-	std::size_t chunk::compress_into_xbox(std::span<std::byte> a_out) const
+	std::size_t chunk::compress_into_zlib(
+		std::span<std::byte> a_out,
+		int a_level,
+		int a_windowBits,
+		int a_memLevel) const
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound());
+		assert(a_out.size_bytes() >= this->compress_bound(compression_format::zip));
 
 		::z_stream stream = {};
 		if (const auto result = deflateInit2(
 				&stream,
-				Z_BEST_COMPRESSION,
+				a_level,
 				Z_DEFLATED,
-				12,
-				8,
+				a_windowBits,
+				a_memLevel,
 				Z_DEFAULT_STRATEGY);
 			result != Z_OK) {
 			throw bsa::compression_error(bsa::compression_error::library::zlib, result);
@@ -366,6 +445,28 @@ namespace bsa::fo4
 		}
 
 		return finalsz;
+	}
+
+	void chunk::decompress_into_lz4(std::span<std::byte> a_out) const
+	{
+		assert(this->compressed());
+		assert(a_out.size_bytes() >= this->decompressed_size());
+
+		const auto in = this->as_bytes();
+		const auto result = ::LZ4_decompress_safe(
+			reinterpret_cast<const char*>(in.data()),
+			reinterpret_cast<char*>(a_out.data()),
+			static_cast<int>(in.size_bytes()),
+			static_cast<int>(a_out.size_bytes()));
+
+		if (result < 0) {
+			throw bsa::compression_error(bsa::compression_error::library::lz4, result);
+		}
+
+		const auto outsz = static_cast<std::size_t>(result);
+		if (outsz != this->decompressed_size()) {
+			throw bsa::compression_error(detail::error_code::decompress_size_mismatch);
+		}
 	}
 
 	void chunk::decompress_into_zlib(std::span<std::byte> a_out) const
@@ -411,7 +512,7 @@ namespace bsa::fo4
 	void chunk::compress(compression_params a_params)
 	{
 		std::vector<std::byte> out;
-		out.resize(this->compress_bound());
+		out.resize(this->compress_bound(a_params.compression_format));
 
 		const auto outsz = this->compress_into({ out.data(), out.size() }, a_params);
 		out.resize(outsz);
@@ -421,11 +522,18 @@ namespace bsa::fo4
 		assert(this->compressed());
 	}
 
-	auto chunk::compress_bound() const
+	auto chunk::compress_bound(compression_format a_format) const
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		return ::compressBound(static_cast<::uLong>(this->size()));
+		switch (a_format) {
+		case compression_format::zip:
+			return ::compressBound(static_cast<::uLong>(this->size()));
+		case compression_format::lz4:
+			return ::LZ4_compressBound(static_cast<int>(this->size()));
+		default:
+			detail::declare_unreachable();
+		}
 	}
 
 	auto chunk::compress_into(
@@ -433,29 +541,49 @@ namespace bsa::fo4
 		compression_params a_params) const
 		-> std::size_t
 	{
-		switch (a_params.compression_level) {
-		case compression_level::normal:
-			return this->compress_into_zlib(a_out);
-		case compression_level::xbox:
-			return this->compress_into_xbox(a_out);
+		switch (a_params.compression_format) {
+		case compression_format::zip:
+			switch (a_params.compression_level) {
+			case compression_level::fo4:
+				return this->compress_into_zlib(a_out, Z_DEFAULT_COMPRESSION, MAX_WBITS, 8);
+			case compression_level::fo4_xbox:
+				return this->compress_into_zlib(a_out, Z_BEST_COMPRESSION, 12, 8);
+			case compression_level::starfield:
+				return this->compress_into_zlib(a_out, Z_BEST_COMPRESSION, MAX_WBITS, MAX_MEM_LEVEL);
+			default:
+				detail::declare_unreachable();
+			}
+		case compression_format::lz4:
+			return this->compress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
 		}
 	}
 
-	void chunk::decompress()
+	void chunk::decompress(compression_format a_format)
 	{
 		std::vector<std::byte> out;
 		out.resize(this->decompressed_size());
-		this->decompress_into({ out.data(), out.size() });
+		this->decompress_into({ out.data(), out.size() }, a_format);
 		this->set_data(std::move(out));
 
 		assert(!this->compressed());
 	}
 
-	void chunk::decompress_into(std::span<std::byte> a_out) const
+	void chunk::decompress_into(
+		std::span<std::byte> a_out,
+		compression_format a_format) const
 	{
-		this->decompress_into_zlib(a_out);
+		switch (a_format) {
+		case compression_format::zip:
+			this->decompress_into_zlib(a_out);
+			break;
+		case compression_format::lz4:
+			this->decompress_into_lz4(a_out);
+			break;
+		default:
+			detail::declare_unreachable();
+		}
 	}
 
 	auto operator>>(
@@ -497,6 +625,7 @@ namespace bsa::fo4
 		case format::general:
 			this->read_general(
 				in,
+				a_params.compression_format,
 				a_params.compression_level,
 				a_params.compression_type);
 			break;
@@ -505,6 +634,7 @@ namespace bsa::fo4
 				in,
 				a_params.mip_chunk_width,
 				a_params.mip_chunk_height,
+				a_params.compression_format,
 				a_params.compression_level,
 				a_params.compression_type);
 			break;
@@ -520,10 +650,10 @@ namespace bsa::fo4
 		auto& out = a_sink.stream();
 		switch (a_params.format) {
 		case format::general:
-			this->write_general(out);
+			this->write_general(out, a_params.compression_format);
 			break;
 		case format::directx:
-			this->write_directx(out);
+			this->write_directx(out, a_params.compression_format);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -534,6 +664,7 @@ namespace bsa::fo4
 		detail::istream_t& a_in,
 		std::size_t a_mipChunkWidth,
 		std::size_t a_mipChunkHeight,
+		compression_format a_format,
 		compression_level a_level,
 		compression_type a_type)
 	{
@@ -584,7 +715,7 @@ namespace bsa::fo4
 			chunk.mips.last = mipIdx(a_splice.back());
 			chunk.set_data(std::move(bytes));
 			if (a_type == compression_type::compressed) {
-				chunk.compress({ .compression_level = a_level });
+				chunk.compress({ .compression_format = a_format, .compression_level = a_level });
 			}
 		};
 
@@ -600,6 +731,7 @@ namespace bsa::fo4
 
 	void file::read_general(
 		detail::istream_t& a_in,
+		compression_format a_format,
 		compression_level a_level,
 		compression_type a_type)
 	{
@@ -608,12 +740,13 @@ namespace bsa::fo4
 		auto& chunk = this->emplace_back();
 		chunk.set_data(a_in->rdbuf(), a_in);
 		if (a_type == compression_type::compressed) {
-			chunk.compress({ .compression_level = a_level });
+			chunk.compress({ .compression_format = a_format, .compression_level = a_level });
 		}
 	}
 
 	void file::write_directx(
-		[[maybe_unused]] detail::ostream_t& a_out) const
+		detail::ostream_t& a_out,
+		compression_format a_format) const
 	{
 		const DirectX::TexMetadata meta{
 			.width = this->header.width,
@@ -653,7 +786,7 @@ namespace bsa::fo4
 		for (const auto& chunk : *this) {
 			if (chunk.compressed()) {
 				buffer.resize(chunk.decompressed_size());
-				chunk.decompress_into(buffer);
+				chunk.decompress_into(buffer, a_format);
 				a_out.write_bytes(buffer);
 			} else {
 				a_out.write_bytes(chunk.as_bytes());
@@ -661,13 +794,15 @@ namespace bsa::fo4
 		}
 	}
 
-	void file::write_general(detail::ostream_t& a_out) const
+	void file::write_general(
+		detail::ostream_t& a_out,
+		compression_format a_format) const
 	{
 		std::vector<std::byte> buffer;
 		for (const auto& chunk : *this) {
 			if (chunk.compressed()) {
 				buffer.resize(chunk.decompressed_size());
-				chunk.decompress_into(buffer);
+				chunk.decompress_into(buffer, a_format);
 				a_out.write_bytes(buffer);
 			} else {
 				a_out.write_bytes(chunk.as_bytes());
@@ -676,10 +811,9 @@ namespace bsa::fo4
 	}
 
 	auto archive::read(read_source a_source)
-		-> format
+		-> meta_info
 	{
 		auto& in = a_source.stream();
-
 		const auto header = [&]() {
 			detail::header_t result;
 			in >> result;
@@ -687,8 +821,6 @@ namespace bsa::fo4
 		}();
 
 		this->clear();
-		const auto fmt = static_cast<format>(header.archive_format());
-
 		for (std::size_t i = 0, strpos = header.string_table_offset();
 			 i < header.file_count();
 			 ++i) {
@@ -713,24 +845,24 @@ namespace bsa::fo4
 					mapped_type{});
 			assert(success);
 
-			this->read_file(it->second, in, fmt);
+			this->read_file(it->second, in, header.archive_format());
 		}
 
-		return fmt;
+		return header.make_meta();
 	}
 
 	void archive::write(
 		write_sink a_sink,
-		write_params a_params) const
+		const meta_info& a_meta) const
 	{
 		auto& out = a_sink.stream();
 
-		auto [header, dataOffset] = make_header(a_params.format, a_params.strings);
+		auto [header, dataOffset] = make_header(a_meta);
 		out << header;
 
 		for (const auto& [key, file] : *this) {
 			out << key.hash();
-			this->write_file(file, out, a_params.format, dataOffset);
+			this->write_file(file, out, a_meta.format, dataOffset);
 		}
 
 		for (const auto& file : *this) {
@@ -739,20 +871,18 @@ namespace bsa::fo4
 			}
 		}
 
-		if (a_params.strings) {
+		if (a_meta.strings) {
 			for ([[maybe_unused]] const auto& [key, file] : *this) {
 				detail::write_wstring(out, key.name());
 			}
 		}
 	}
 
-	auto archive::make_header(
-		format a_format,
-		bool a_strings) const noexcept
+	auto archive::make_header(const meta_info& a_meta) const
 		-> std::pair<detail::header_t, std::uint64_t>
 	{
 		const auto inspect = [&](auto a_gnrl, auto a_dx10) noexcept {
-			switch (a_format) {
+			switch (a_meta.format) {
 			case format::general:
 				return a_gnrl();
 			case format::directx:
@@ -763,7 +893,7 @@ namespace bsa::fo4
 		};
 
 		std::uint64_t dataOffset =
-			detail::constants::header_size +
+			detail::sizeof_header(a_meta.version) +
 			inspect(
 				[]() noexcept { return detail::constants::chunk_header_size_gnrl; },
 				[]() noexcept { return detail::constants::chunk_header_size_dx10; }) *
@@ -782,9 +912,9 @@ namespace bsa::fo4
 
 		return {
 			detail::header_t{
-				a_format,
+				a_meta,
 				this->size(),
-				a_strings ? dataOffset + dataSize : 0u },
+				a_meta.strings ? dataOffset + dataSize : 0u },
 			dataOffset
 		};
 	}

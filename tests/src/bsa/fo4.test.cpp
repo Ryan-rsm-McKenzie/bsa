@@ -246,7 +246,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const std::filesystem::path inPath = root / "in.ba2"sv;
 
 		bsa::fo4::archive ba2;
-		REQUIRE(ba2.read(inPath) == bsa::fo4::format::directx);
+		const auto meta = ba2.read(inPath);
+		REQUIRE(meta.format == bsa::fo4::format::directx);
+		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 		REQUIRE(ba2.size() == 1);
 
 		const auto file = ba2["Fence006_1K_Roughness.dds"sv];
@@ -329,7 +331,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 			in.write(os, { .format = bsa::fo4::format::general, .strings = a_strings });
 
 			bsa::fo4::archive out;
-			REQUIRE(out.read({ os.get<binary_io::memory_ostream>().rdbuf() }) == bsa::fo4::format::general);
+			const auto meta = out.read({ os.get<binary_io::memory_ostream>().rdbuf() });
+			REQUIRE(meta.format == bsa::fo4::format::general);
+			REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 			REQUIRE(out.size() == index.size());
 			for (std::size_t idx = 0; idx < index.size(); ++idx) {
 				const auto& file = index[idx];
@@ -348,7 +352,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				auto& c = f->second.front();
 				if (c.compressed()) {
 					REQUIRE(c.decompressed_size() == mapped.size());
-					c.decompress();
+					c.decompress(meta.compression_format);
 				}
 				assert_byte_equality(c.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
@@ -399,7 +403,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const auto filename = "misc/example.txt"sv;
 
 		bsa::fo4::archive ba2;
-		REQUIRE(ba2.read(inPath) == bsa::fo4::format::general);
+		const auto meta = ba2.read(inPath);
+		REQUIRE(meta.format == bsa::fo4::format::general);
+		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 		const auto f = ba2[filename];
 		REQUIRE(f);
 		REQUIRE(f->size() == 1);
@@ -421,13 +427,15 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 	{
 		const std::filesystem::path root{ "fo4_compression_test"sv };
 		const std::array archives{
-			std::make_pair("normal.ba2"sv, bsa::fo4::compression_level::normal),
-			std::make_pair("xbox.ba2"sv, bsa::fo4::compression_level::xbox),
+			std::make_pair("normal.ba2"sv, bsa::fo4::compression_level::fo4),
+			std::make_pair("xbox.ba2"sv, bsa::fo4::compression_level::fo4_xbox),
 		};
 
 		for (const auto& [archive, compression] : archives) {
 			bsa::fo4::archive ba2;
-			REQUIRE(ba2.read(root / archive) == bsa::fo4::format::general);
+			const auto meta = ba2.read(root / archive);
+			REQUIRE(meta.format == bsa::fo4::format::general);
+			REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 			for (const auto& entry : std::filesystem::recursive_directory_iterator(root / "data"sv)) {
 				if (entry.is_regular_file()) {
 					const auto p = std::filesystem::relative(entry.path(), root / "data"sv);
@@ -446,7 +454,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 					diskC.compress({ .compression_level = compression });
 					assert_byte_equality(archC.as_bytes(), diskC.as_bytes());
 
-					archC.decompress();
+					archC.decompress(meta.compression_format);
 					REQUIRE(!archC.compressed());
 					assert_byte_equality(archC.as_bytes(), std::span{ disk.data(), disk.size() });
 				}
@@ -475,7 +483,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				a_archive.write(a_dst, { .format = bsa::fo4::format::general });
 			},
 			[](bsa::fo4::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
-				REQUIRE(a_archive.read({ a_src, a_type }) == bsa::fo4::format::general);
+				const auto meta = a_archive.read({ a_src, a_type });
+				REQUIRE(meta.format == bsa::fo4::format::general);
+				REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 			});
 	}
 
@@ -554,7 +564,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const auto filename = "Fence006_1K_Roughness.dds"sv;
 
 		bsa::fo4::archive ba2;
-		REQUIRE(ba2.read(root / "in.ba2"sv) == bsa::fo4::format::directx);
+		const auto meta = ba2.read(root / "in.ba2"sv);
+		REQUIRE(meta.format == bsa::fo4::format::directx);
+		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
 
 		const auto archived = ba2[filename];
 		REQUIRE(archived);
