@@ -149,7 +149,7 @@ namespace bsa::fo4
 		{
 		public:
 			/// \brief	The format to compress the data with.
-			compression_format compression_format;
+			compression_format compression_format{ compression_format::zip };
 
 			/// \brief	The level to compress the data at.
 			/// \brief	Only valid for \ref compression_format::zip.
@@ -245,7 +245,7 @@ namespace bsa::fo4
 		struct read_params final
 		{
 			/// \brief	The format to read the file as.
-			format format;
+			format format{ format::general };
 
 			/// \brief	The maxiumum width to restrict a single mip chunk to.
 			std::size_t mip_chunk_width{ 512u };
@@ -254,7 +254,7 @@ namespace bsa::fo4
 			std::size_t mip_chunk_height{ 512u };
 
 			/// \brief	The format the file should be compressed in.
-			compression_format compression_format;
+			compression_format compression_format{ compression_format::zip };
 
 			/// \brief	The level to compress the file at.
 			compression_level compression_level{ compression_level::fo4 };
@@ -268,10 +268,10 @@ namespace bsa::fo4
 		{
 		public:
 			/// \brief	The format to write the file as.
-			format format;
+			format format{ format::general };
 
 			/// \brief	The format the file is currently compressed in.
-			compression_format compression_format;
+			compression_format compression_format{ compression_format::zip };
 		};
 
 		/// \brief	Unique to \ref format::directx.
