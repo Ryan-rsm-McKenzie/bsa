@@ -38,15 +38,43 @@ namespace bsa::fo4
 		directx = detail::constants::dx10,
 	};
 
+	/// \brief	Indicates the version of an archive.
+	enum class version : std::uint32_t
+	{
+		/// \brief	Initial format introduced in Fallout 4.
+		v1 = 1,
+
+		/// \brief	Intoduced in Starfield.
+		v2,
+
+		/// \brief	Intoduced in Starfield.
+		v3,
+	};
+
 	/// \brief	Specifies the compression level to use when compressing data.
 	enum class compression_level
 	{
 		/// \brief	The default compression level.
-		normal,
+		fo4,
 
 		/// \brief	Uses a smaller windows size, but higher a compression level
 		///		to yield a higher compression ratio.
-		xbox
+		fo4_xbox,
+
+		/// \brief	Uses a custom DEFLATE algorithm with zlib wrapper to obtain
+		///		a good compression ratio.
+		starfield,
+	};
+
+	/// \brief	A list of all compression methods supported by the ba2 format.
+	enum class compression_format
+	{
+		/// \brief	The default compression format, compatible with all games that utilize the ba2 format.
+		zip,
+
+		/// \brief	A more specialized format leveraging lz4's fast decompression to improve streaming time.
+		/// \brief	Only compatible with Starfield or later.
+		lz4,
 	};
 
 	namespace hashing
@@ -105,9 +133,14 @@ namespace bsa::fo4
 		friend file;
 		using super = components::compressed_byte_container;
 
-		[[nodiscard]] std::size_t compress_into_zlib(std::span<std::byte> a_out) const;
-		[[nodiscard]] std::size_t compress_into_xbox(std::span<std::byte> a_out) const;
+		[[nodiscard]] std::size_t compress_into_lz4(std::span<std::byte> a_out) const;
+		[[nodiscard]] std::size_t compress_into_zlib(
+			std::span<std::byte> a_out,
+			int a_level,
+			int a_windowBits,
+			int a_memLevel) const;
 
+		void decompress_into_lz4(std::span<std::byte> a_out) const;
 		void decompress_into_zlib(std::span<std::byte> a_out) const;
 
 	public:
@@ -115,8 +148,12 @@ namespace bsa::fo4
 		struct compression_params final
 		{
 		public:
+			/// \brief	The format to compress the data with.
+			compression_format compression_format;
+
 			/// \brief	The level to compress the data at.
-			compression_level compression_level{ compression_level::normal };
+			/// \brief	Only valid for \ref compression_format::zip.
+			compression_level compression_level{ compression_level::fo4 };
 		};
 
 		/// \brief	Unique to \ref format::directx.
@@ -154,7 +191,9 @@ namespace bsa::fo4
 		void compress(compression_params a_params);
 
 		/// \copydoc bsa::doxygen_detail::compress_bound
-		[[nodiscard]] std::size_t compress_bound() const;
+		///
+		/// \param	a_format	The format the data will be compressed with.
+		[[nodiscard]] std::size_t compress_bound(compression_format a_format) const;
 
 		/// \copydoc bsa::doxygen_detail::compress_into
 		///
@@ -169,10 +208,16 @@ namespace bsa::fo4
 		/// @{
 
 		/// \copydoc bsa::doxygen_detail::decompress
-		void decompress();
+		///
+		/// \param	a_format	The format the data is currently compressed in.
+		void decompress(compression_format a_format);
 
 		/// \copydoc bsa::doxygen_detail::decompress_into
-		void decompress_into(std::span<std::byte> a_out) const;
+		///
+		/// \param	a_format	The format the data is currently compressed in.
+		void decompress_into(
+			std::span<std::byte> a_out,
+			compression_format a_format) const;
 
 		/// @}
 
@@ -208,8 +253,11 @@ namespace bsa::fo4
 			/// \brief	The maxiumum height to restrict a single mip chunk to.
 			std::size_t mip_chunk_height{ 512u };
 
-			/// \brief	The level to compress the data at.
-			compression_level compression_level{ compression_level::normal };
+			/// \brief	The format the file should be compressed in.
+			compression_format compression_format;
+
+			/// \brief	The level to compress the file at.
+			compression_level compression_level{ compression_level::fo4 };
 
 			/// \brief	The resulting compression of the file read.
 			compression_type compression_type{ compression_type::decompressed };
@@ -222,8 +270,8 @@ namespace bsa::fo4
 			/// \brief	The format to write the file as.
 			format format;
 
-			/// \brief	TODO
-			compression_format compression_format{ compression_format::zip };
+			/// \brief	The format the file is currently compressed in.
+			compression_format compression_format;
 		};
 
 		/// \brief	Unique to \ref format::directx.
@@ -421,15 +469,21 @@ namespace bsa::fo4
 			detail::istream_t& a_in,
 			std::size_t a_mipChunkWidth,
 			std::size_t a_mipChunkHeight,
+			compression_format a_format,
 			compression_level a_level,
 			compression_type a_type);
 		void read_general(
 			detail::istream_t& a_in,
+			compression_format a_format,
 			compression_level a_level,
 			compression_type a_type);
 
-		void write_directx(detail::ostream_t& a_out) const;
-		void write_general(detail::ostream_t& a_out) const;
+		void write_directx(
+			detail::ostream_t& a_out,
+			compression_format a_format) const;
+		void write_general(
+			detail::ostream_t& a_out,
+			compression_format a_format) const;
 
 		container_type _chunks;
 	};
@@ -442,14 +496,22 @@ namespace bsa::fo4
 		using super = components::hashmap<file>;
 
 	public:
-		/// \brief	Common parameters to configure how archives are written.
-		struct write_params final
+		/// \brief	Archive info about the contents of the given archive.
+		struct meta_info final
 		{
 		public:
-			/// \brief	The format to write the archive in.
-			format format;
+			/// \brief	The format of the archive itself.
+			format format{ format::general };
 
-			/// \brief	Controls whether the string table is written or not.
+			/// \brief	The version of the archive itself.
+			version version{ version::v1 };
+
+			/// \brief	The format all chunks are compressed in.
+			/// \brief	All chunks in the archive *must* use the compression format
+			///		described here (if they are compressed).
+			compression_format compression_format{ compression_format::zip };
+
+			/// \brief	Controls whether the string table is present or not.
 			bool strings{ true };
 		};
 
@@ -470,8 +532,8 @@ namespace bsa::fo4
 
 		/// \copydoc bsa::tes3::archive::read
 		///
-		/// \return	The format of the archive that was read.
-		format read(read_source a_source);
+		/// \return	Meta info read from the archive.
+		meta_info read(read_source a_source);
 
 		/// @}
 
@@ -480,17 +542,15 @@ namespace bsa::fo4
 
 		/// \copydoc bsa::tes3::archive::write
 		///
-		/// \param	a_params	Extra configuration options.
+		/// \param	a_meta	Configuration options for how the archive is written.
 		void write(
 			write_sink a_sink,
-			write_params a_params) const;
+			const meta_info& a_meta) const;
 
 		/// @}
 
 	private:
-		[[nodiscard]] auto make_header(
-			format a_format,
-			bool a_strings) const noexcept
+		[[nodiscard]] auto make_header(const meta_info& a_meta) const
 			-> std::pair<detail::header_t, std::uint64_t>;
 
 		void read_chunk(

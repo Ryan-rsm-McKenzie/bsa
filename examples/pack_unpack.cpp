@@ -152,11 +152,11 @@ namespace
 		const std::filesystem::path& a_output)
 	{
 		bsa::fo4::archive ba2;
-		const auto format = ba2.read(a_input);
+		const auto meta = ba2.read(a_input);
 
 		for (auto& [key, file] : ba2) {
 			auto out = open_virtual_path(a_output, key);
-			file.write(out, { .format = format });
+			file.write(out, { .format = meta.format, .compression_format = meta.compression_format });
 		}
 	}
 
