@@ -230,7 +230,7 @@ namespace bsa::tes4
 		{
 		public:
 			/// \brief	The version to compress/decompress the file for.
-			version version;
+			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
 			compression_codec codec{ compression_codec::normal };
@@ -241,7 +241,7 @@ namespace bsa::tes4
 		{
 		public:
 			/// \brief	The version to compress the file for.
-			version version;
+			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
 			compression_codec codec{ compression_codec::normal };
@@ -255,7 +255,7 @@ namespace bsa::tes4
 		{
 		public:
 			/// \brief	The version to decompress the file for.
-			version version;
+			version version{ version::tes4 };
 
 			/// \brief	The codec to use.
 			compression_codec codec{ compression_codec::normal };
@@ -407,7 +407,7 @@ namespace bsa::tes4
 		{
 		public:
 			/// \brief	The version format to write the archive in.
-			version version;
+			version version{ version::tes4 };
 		};
 
 		/// \name Archive flags
