@@ -467,16 +467,10 @@ namespace bsa::fo4
 	private:
 		void read_directx(
 			detail::istream_t& a_in,
-			std::size_t a_mipChunkWidth,
-			std::size_t a_mipChunkHeight,
-			compression_format a_format,
-			compression_level a_level,
-			compression_type a_type);
+			const read_params& a_params);
 		void read_general(
 			detail::istream_t& a_in,
-			compression_format a_format,
-			compression_level a_level,
-			compression_type a_type);
+			const read_params& a_params);
 
 		void write_directx(
 			detail::ostream_t& a_out,

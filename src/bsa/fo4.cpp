@@ -623,20 +623,10 @@ namespace bsa::fo4
 		auto& in = a_source.stream();
 		switch (a_params.format) {
 		case format::general:
-			this->read_general(
-				in,
-				a_params.compression_format,
-				a_params.compression_level,
-				a_params.compression_type);
+			this->read_general(in, a_params);
 			break;
 		case format::directx:
-			this->read_directx(
-				in,
-				a_params.mip_chunk_width,
-				a_params.mip_chunk_height,
-				a_params.compression_format,
-				a_params.compression_level,
-				a_params.compression_type);
+			this->read_directx(in, a_params);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -662,11 +652,7 @@ namespace bsa::fo4
 
 	void file::read_directx(
 		detail::istream_t& a_in,
-		std::size_t a_mipChunkWidth,
-		std::size_t a_mipChunkHeight,
-		compression_format a_format,
-		compression_level a_level,
-		compression_type a_type)
+		const read_params& a_params)
 	{
 		DirectX::ScratchImage scratch;
 		const auto in = a_in->rdbuf();
@@ -714,8 +700,11 @@ namespace bsa::fo4
 			chunk.mips.first = mipIdx(a_splice.front());
 			chunk.mips.last = mipIdx(a_splice.back());
 			chunk.set_data(std::move(bytes));
-			if (a_type == compression_type::compressed) {
-				chunk.compress({ .compression_format = a_format, .compression_level = a_level });
+			if (a_params.compression_type == compression_type::compressed) {
+				chunk.compress({
+					.compression_format = a_params.compression_format,
+					.compression_level = a_params.compression_level,
+				});
 			}
 		};
 
@@ -724,23 +713,27 @@ namespace bsa::fo4
 		} else {
 			const auto splices = detail::chunk<4>(
 				images,
-				detail::directx_mip_chunk_maximum(meta.format, a_mipChunkWidth, a_mipChunkHeight));
+				detail::directx_mip_chunk_maximum(
+					meta.format,
+					a_params.mip_chunk_width,
+					a_params.mip_chunk_height));
 			std::for_each(splices.begin(), splices.end(), addChunk);
 		}
 	}
 
 	void file::read_general(
 		detail::istream_t& a_in,
-		compression_format a_format,
-		compression_level a_level,
-		compression_type a_type)
+		const read_params& a_params)
 	{
 		this->clear();
 
 		auto& chunk = this->emplace_back();
 		chunk.set_data(a_in->rdbuf(), a_in);
-		if (a_type == compression_type::compressed) {
-			chunk.compress({ .compression_format = a_format, .compression_level = a_level });
+		if (a_params.compression_type == compression_type::compressed) {
+			chunk.compress({
+				.compression_format = a_params.compression_format,
+				.compression_level = a_params.compression_level,
+			});
 		}
 	}
 
