@@ -63,7 +63,7 @@ namespace bsa::fo4
 
 		/// \brief	Uses a custom DEFLATE algorithm with zlib wrapper to obtain
 		///		a good compression ratio.
-		starfield,
+		sf,
 	};
 
 	/// \brief	A list of all compression methods supported by the ba2 format.
