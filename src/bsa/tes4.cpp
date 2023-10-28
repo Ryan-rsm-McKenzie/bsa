@@ -550,14 +550,14 @@ namespace bsa::tes4
 		assert(!this->compressed());
 		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
-			return a_params.codec == compression_codec::xmem ?
+			return a_params.compression_codec == compression_codec::xmem ?
 			           this->compress_bound_xmem() :
 			           ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
 			detail::declare_unreachable();
@@ -571,14 +571,14 @@ namespace bsa::tes4
 	{
 		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			return this->compress_into_zlib(a_out);
 		case 104:
-			return a_params.codec == compression_codec::xmem ?
+			return a_params.compression_codec == compression_codec::xmem ?
 			           this->compress_into_xmem(a_out) :
 			           this->compress_into_zlib(a_out);
 		case 105:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			return this->compress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
@@ -601,18 +601,18 @@ namespace bsa::tes4
 	{
 		switch (detail::to_underlying(a_params.version)) {
 		case 103:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			this->decompress_into_zlib(a_out);
 			break;
 		case 104:
-			if (a_params.codec == compression_codec::xmem) {
+			if (a_params.compression_codec == compression_codec::xmem) {
 				this->decompress_into_xmem(a_out);
 			} else {
 				this->decompress_into_zlib(a_out);
 			}
 			break;
 		case 105:
-			assert(a_params.codec == compression_codec::normal);
+			assert(a_params.compression_codec == compression_codec::normal);
 			this->decompress_into_lz4(a_out);
 			break;
 		default:
@@ -627,8 +627,11 @@ namespace bsa::tes4
 		auto& in = a_source.stream();
 		this->clear();
 		this->set_data(in->rdbuf(), in);
-		if (a_params.compression == compression_type::compressed) {
-			this->compress({ .version = a_params.version, .codec = a_params.codec });
+		if (a_params.compression_type == compression_type::compressed) {
+			this->compress({
+				.version = a_params.version,
+				.compression_codec = a_params.compression_codec,
+			});
 		}
 	}
 
@@ -640,7 +643,12 @@ namespace bsa::tes4
 		if (this->compressed()) {
 			std::vector<std::byte> buffer;
 			buffer.resize(this->decompressed_size());
-			this->decompress_into(buffer, { .version = a_params.version, .codec = a_params.codec });
+			this->decompress_into(
+				buffer,
+				{
+					.version = a_params.version,
+					.compression_codec = a_params.compression_codec,
+				});
 			out.write_bytes(buffer);
 		} else {
 			out.write_bytes(this->as_bytes());
@@ -705,7 +713,7 @@ namespace bsa::tes4
 		assert(a_out.size_bytes() >=
 			   this->compress_bound({
 				   .version = version::tes5,
-				   .codec = compression_codec::xmem,
+				   .compression_codec = compression_codec::xmem,
 			   }));
 
 		try {

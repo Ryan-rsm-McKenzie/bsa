@@ -121,7 +121,7 @@ namespace
 					a_path,
 					{
 						.version = version,
-						.compression = bsa::compression_type::compressed,
+						.compression_type = bsa::compression_type::compressed,
 					});
 
 				const auto d = [&]() {
