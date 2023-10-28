@@ -548,7 +548,7 @@ namespace bsa::fo4
 				return this->compress_into_zlib(a_out, Z_DEFAULT_COMPRESSION, MAX_WBITS, 8);
 			case compression_level::fo4_xbox:
 				return this->compress_into_zlib(a_out, Z_BEST_COMPRESSION, 12, 8);
-			case compression_level::starfield:
+			case compression_level::sf:
 				return this->compress_into_zlib(a_out, Z_BEST_COMPRESSION, MAX_WBITS, MAX_MEM_LEVEL);
 			default:
 				detail::declare_unreachable();
