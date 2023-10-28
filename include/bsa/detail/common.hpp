@@ -534,21 +534,21 @@ namespace bsa
 			_value(a_src, a_copy)
 		{}
 
-	private:
 #ifndef DOXYGEN
+	private:
 		friend tes3::archive;
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
 		friend fo4::archive;
 		friend fo4::file;
-#endif
 
 		using value_type = detail::istream_t;
 
 		[[nodiscard]] auto stream() noexcept -> value_type& { return _value; }
 
 		value_type _value;
+#endif
 	};
 
 	/// \brief	An abstraction over the specific sink that will be written to.
@@ -567,15 +567,14 @@ namespace bsa
 			_value(std::in_place_index<stream_reference>, a_dst)
 		{}
 
-	private:
 #ifndef DOXYGEN
+	private:
 		friend tes3::archive;
 		friend tes3::file;
 		friend tes4::archive;
 		friend tes4::file;
 		friend fo4::archive;
 		friend fo4::file;
-#endif
 
 		using value_type = binary_io::any_ostream;
 
@@ -605,6 +604,7 @@ namespace bsa
 			_value;
 
 		static_assert(stream_count == std::variant_size_v<decltype(_value)>);
+#endif
 	};
 }
 
