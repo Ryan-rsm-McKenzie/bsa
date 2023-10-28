@@ -402,14 +402,6 @@ namespace bsa::tes4
 		using super = components::hashmap<directory, true>;
 
 	public:
-		/// \brief	Common parameters to configure how archives are written.
-		struct write_params final
-		{
-		public:
-			/// \brief	The version format to write the archive in.
-			version version{ version::tes4 };
-		};
-
 		/// \name Archive flags
 		/// @{
 
@@ -508,10 +500,10 @@ namespace bsa::tes4
 
 		/// \copydoc bsa::tes3::archive::write
 		///
-		/// \param	a_params	Extra configuration options.
+		/// \param	a_version	The version format to write the archive in.
 		void write(
 			write_sink a_sink,
-			const write_params& a_params) const;
+			version a_version) const;
 
 		/// @}
 

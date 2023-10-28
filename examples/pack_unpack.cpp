@@ -144,7 +144,7 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		bsa.write(a_output, { .version = version });
+		bsa.write(a_output, version);
 	}
 
 	void unpack_fo4(
