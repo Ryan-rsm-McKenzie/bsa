@@ -226,6 +226,29 @@ namespace bsa::tes4
 
 	public:
 		/// \brief	Common parameters to configure how files are compressed/decompressed.
+		///
+		/// \code{.cpp}
+		/// // Configure for TES:IV
+		/// bsa::tes4::file::compression_params{
+		///		.version = bsa::tes4::version::tes4,
+		/// };
+		///
+		/// // Configure for F3/FNV/TES:V
+		/// bsa::tes4::file::compression_params{
+		///		.version = bsa::tes4::version::fo3,
+		/// };
+		///
+		/// // Configure for TES:V on the xbox
+		/// bsa::tes4::file::compression_params{
+		///		.version = bsa::tes4::version::tes5,
+		///		.compression_codec = bsa::tes4::compression_codec::xmem,
+		/// };
+		///
+		/// // Configure for SSE
+		/// bsa::tes4::file::compression_params{
+		///		.version = bsa::tes4::version::sse,
+		/// };
+		/// \endcode
 		struct compression_params final
 		{
 		public:
@@ -237,6 +260,33 @@ namespace bsa::tes4
 		};
 
 		/// \brief	Common parameters to configure how files are read.
+		///
+		/// \code{.cpp}
+		/// // Read and compress a file for TES:IV
+		/// bsa::tes4::file::read_params{
+		///		.version = bsa::tes4::version::tes4,
+		///		.compression_type = bsa::compression_type::compressed,
+		/// };
+		///
+		/// // Read and compress a file for F3/FNV/TES:V
+		/// bsa::tes4::file::read_params{
+		///		.version = bsa::tes4::version::fo3,
+		///		.compression_type = bsa::compression_type::compressed,
+		/// };
+		///
+		/// // Read and compress a file for TES:V on the xbox
+		/// bsa::tes4::file::read_params{
+		///		.version = bsa::tes4::version::tes5,
+		///		.compression_codec = bsa::tes4::compression_codec::xmem,
+		///		.compression_type = bsa::compression_type::compressed,
+		/// };
+		///
+		/// // Read and compress a file for SSE
+		/// bsa::tes4::file::read_params{
+		///		.version = bsa::tes4::version::sse,
+		///		.compression_type = bsa::compression_type::compressed,
+		/// };
+		/// \endcode
 		struct read_params final
 		{
 		public:
@@ -251,6 +301,29 @@ namespace bsa::tes4
 		};
 
 		/// \brief	Common parameters to configure how files are written.
+		///
+		/// \code{.cpp}
+		/// // Write a file for TES:IV
+		/// bsa::tes4::file::write_params{
+		///		.version = bsa::tes4::version::tes4,
+		/// };
+		///
+		/// // Write a file for F3/FNV/TES:V
+		/// bsa::tes4::file::write_params{
+		///		.version = bsa::tes4::version::fo3,
+		/// };
+		///
+		/// // Write a file for TES:V on the xbox
+		/// bsa::tes4::file::write_params{
+		///		.version = bsa::tes4::version::tes5,
+		///		.compression_codec = bsa::tes4::compression_codec::xmem,
+		/// };
+		///
+		/// // Write a file for SSE
+		/// bsa::tes4::file::write_params{
+		///		.version = bsa::tes4::version::sse,
+		/// };
+		/// \endcode
 		struct write_params final
 		{
 		public:
