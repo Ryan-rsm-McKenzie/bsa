@@ -204,7 +204,7 @@ TEST_CASE("bsa::fo4::hashing", "[src][fo4][hashing]")
 
 TEST_CASE("bsa::fo4::chunk", "[src][fo4][vfs]")
 {
-	SECTION("files start empty")
+	SECTION("chunks start empty")
 	{
 		const bsa::fo4::chunk chunk;
 		REQUIRE(chunk.empty());
