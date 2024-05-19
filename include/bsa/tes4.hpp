@@ -230,33 +230,33 @@ namespace bsa::tes4
 		/// \code{.cpp}
 		/// // Configure for TES:IV
 		/// bsa::tes4::file::compression_params{
-		///		.version = bsa::tes4::version::tes4,
+		///		.version_ = bsa::tes4::version::tes4,
 		/// };
 		///
 		/// // Configure for F3/FNV/TES:V
 		/// bsa::tes4::file::compression_params{
-		///		.version = bsa::tes4::version::fo3,
+		///		.version_ = bsa::tes4::version::fo3,
 		/// };
 		///
 		/// // Configure for TES:V on the xbox
 		/// bsa::tes4::file::compression_params{
-		///		.version = bsa::tes4::version::tes5,
-		///		.compression_codec = bsa::tes4::compression_codec::xmem,
+		///		.version_ = bsa::tes4::version::tes5,
+		///		.compression_codec_ = bsa::tes4::compression_codec::xmem,
 		/// };
 		///
 		/// // Configure for SSE
 		/// bsa::tes4::file::compression_params{
-		///		.version = bsa::tes4::version::sse,
+		///		.version_ = bsa::tes4::version::sse,
 		/// };
 		/// \endcode
 		struct compression_params final
 		{
 		public:
 			/// \brief	The version to compress/decompress the file for.
-			version version{ version::tes4 };
+			version version_{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec compression_codec{ compression_codec::normal };
+			compression_codec compression_codec_{ compression_codec::normal };
 		};
 
 		/// \brief	Common parameters to configure how files are read.
@@ -264,40 +264,40 @@ namespace bsa::tes4
 		/// \code{.cpp}
 		/// // Read and compress a file for TES:IV
 		/// bsa::tes4::file::read_params{
-		///		.version = bsa::tes4::version::tes4,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.version_ = bsa::tes4::version::tes4,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for F3/FNV/TES:V
 		/// bsa::tes4::file::read_params{
-		///		.version = bsa::tes4::version::fo3,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.version_ = bsa::tes4::version::fo3,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for TES:V on the xbox
 		/// bsa::tes4::file::read_params{
-		///		.version = bsa::tes4::version::tes5,
-		///		.compression_codec = bsa::tes4::compression_codec::xmem,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.version_ = bsa::tes4::version::tes5,
+		///		.compression_codec_ = bsa::tes4::compression_codec::xmem,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for SSE
 		/// bsa::tes4::file::read_params{
-		///		.version = bsa::tes4::version::sse,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.version_ = bsa::tes4::version::sse,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		/// \endcode
 		struct read_params final
 		{
 		public:
 			/// \brief	The version to compress the file for.
-			version version{ version::tes4 };
+			version version_{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec compression_codec{ compression_codec::normal };
+			compression_codec compression_codec_{ compression_codec::normal };
 
 			/// \brief	The resulting compression of the file read.
-			compression_type compression_type{ compression_type::decompressed };
+			compression_type compression_type_{ compression_type::decompressed };
 		};
 
 		/// \brief	Common parameters to configure how files are written.
@@ -305,33 +305,33 @@ namespace bsa::tes4
 		/// \code{.cpp}
 		/// // Write a file for TES:IV
 		/// bsa::tes4::file::write_params{
-		///		.version = bsa::tes4::version::tes4,
+		///		.version_ = bsa::tes4::version::tes4,
 		/// };
 		///
 		/// // Write a file for F3/FNV/TES:V
 		/// bsa::tes4::file::write_params{
-		///		.version = bsa::tes4::version::fo3,
+		///		.version_ = bsa::tes4::version::fo3,
 		/// };
 		///
 		/// // Write a file for TES:V on the xbox
 		/// bsa::tes4::file::write_params{
-		///		.version = bsa::tes4::version::tes5,
-		///		.compression_codec = bsa::tes4::compression_codec::xmem,
+		///		.version_ = bsa::tes4::version::tes5,
+		///		.compression_codec_ = bsa::tes4::compression_codec::xmem,
 		/// };
 		///
 		/// // Write a file for SSE
 		/// bsa::tes4::file::write_params{
-		///		.version = bsa::tes4::version::sse,
+		///		.version_ = bsa::tes4::version::sse,
 		/// };
 		/// \endcode
 		struct write_params final
 		{
 		public:
 			/// \brief	The version to decompress the file for.
-			version version{ version::tes4 };
+			version version_{ version::tes4 };
 
 			/// \brief	The codec to use.
-			compression_codec compression_codec{ compression_codec::normal };
+			compression_codec compression_codec_{ compression_codec::normal };
 		};
 
 		/// \name Member types

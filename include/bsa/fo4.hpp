@@ -158,35 +158,35 @@ namespace bsa::fo4
 		/// \code{.cpp}
 		/// // Configure for FO4/FO76
 		/// bsa::fo4::chunk::compression_params{
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4,
 		/// };
 		///
 		/// // Configure for FO4 on the xbox
 		/// bsa::fo4::chunk::compression_params{
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4_xbox,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4_xbox,
 		/// };
 		///
 		/// // Configure for SF, general format
 		/// bsa::fo4::chunk::compression_params{
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::sf,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::sf,
 		/// };
 		///
 		/// // Configure for SF, directx format
 		/// bsa::fo4::chunk::compression_params{
-		///		.compression_format = bsa::fo4::compression_format::lz4,
+		///		.compression_format_ = bsa::fo4::compression_format::lz4,
 		/// };
 		/// \endcode
 		struct compression_params final
 		{
 		public:
 			/// \brief	The format to compress the data with.
-			compression_format compression_format{ compression_format::zip };
+			compression_format compression_format_{ compression_format::zip };
 
 			/// \brief	The level to compress the data at.
-			compression_level compression_level{ compression_level::fo4 };
+			compression_level compression_level_{ compression_level::fo4 };
 		};
 
 		/// \brief	Unique to \ref format::directx.
@@ -279,55 +279,55 @@ namespace bsa::fo4
 		/// \code{.cpp}
 		/// // Read and compress a file for FO4/FO76, general format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::general,
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::general,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for FO4/FO76, directx format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::directx,
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for FO4 on the xbox, general format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::general,
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4_xbox,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::general,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4_xbox,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for FO4 on the xbox, directx format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::directx,
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::fo4_xbox,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::fo4_xbox,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for SF, general format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::general,
-		///		.compression_format = bsa::fo4::compression_format::zip,
-		///		.compression_level = bsa::fo4::compression_level::sf,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::general,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
+		///		.compression_level_ = bsa::fo4::compression_level::sf,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		///
 		/// // Read and compress a file for SF, directx format
 		/// bsa::fo4::file::read_params{
-		///		.format = bsa::fo4::format::directx,
-		///		.compression_format = bsa::fo4::compression_format::lz4,
-		///		.compression_type = bsa::compression_type::compressed,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.compression_format_ = bsa::fo4::compression_format::lz4,
+		///		.compression_type_ = bsa::compression_type::compressed,
 		/// };
 		/// \endcode
 		struct read_params final
 		{
 			/// \brief	The format to read the file as.
-			format format{ format::general };
+			format format_{ format::general };
 
 			/// \brief	The maxiumum width to restrict a single mip chunk to.
 			std::size_t mip_chunk_width{ 512u };
@@ -336,13 +336,13 @@ namespace bsa::fo4
 			std::size_t mip_chunk_height{ 512u };
 
 			/// \brief	The format the file should be compressed in.
-			compression_format compression_format{ compression_format::zip };
+			compression_format compression_format_{ compression_format::zip };
 
 			/// \brief	The level to compress the file at.
-			compression_level compression_level{ compression_level::fo4 };
+			compression_level compression_level_{ compression_level::fo4 };
 
 			/// \brief	The resulting compression of the file read.
-			compression_type compression_type{ compression_type::decompressed };
+			compression_type compression_type_{ compression_type::decompressed };
 		};
 
 		/// \brief	Common parameters to configure how files are written.
@@ -350,36 +350,36 @@ namespace bsa::fo4
 		/// \code{.cpp}
 		/// // Write a file for FO4/FO76, general format
 		/// bsa::fo4::file::write_params{
-		///		.format = bsa::fo4::format::general,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::general,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write a file for FO4/FO76, directx format
 		/// bsa::fo4::file::write_params{
-		///		.format = bsa::fo4::format::directx,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write a file for SF, general format
 		/// bsa::fo4::file::write_params{
-		///		.format = bsa::fo4::format::general,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::general,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write a file for SF, directx format
 		/// bsa::fo4::file::write_params{
-		///		.format = bsa::fo4::format::directx,
-		///		.compression_format = bsa::fo4::compression_format::lz4,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.compression_format_ = bsa::fo4::compression_format::lz4,
 		/// };
 		/// \endcode
 		struct write_params final
 		{
 		public:
 			/// \brief	The format to write the file as.
-			format format{ format::general };
+			format format_{ format::general };
 
 			/// \brief	The format the file is currently compressed in.
-			compression_format compression_format{ compression_format::zip };
+			compression_format compression_format_{ compression_format::zip };
 		};
 
 		/// \brief	Unique to \ref format::directx.
@@ -603,45 +603,45 @@ namespace bsa::fo4
 		/// \code{.cpp}
 		/// // Write an archive for FO4/FO76, general format
 		/// bsa::fo4::archive::meta_info{
-		///		.format = bsa::fo4::format::general,
-		///		.version = bsa::fo4::version::v1,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::general,
+		///		.version_ = bsa::fo4::version::v1,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write an archive for FO4/FO76, directx format
 		/// bsa::fo4::archive::meta_info{
-		///		.format = bsa::fo4::format::directx,
-		///		.version = bsa::fo4::version::v1,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.version_ = bsa::fo4::version::v1,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write an archive for SF, general format
 		/// bsa::fo4::archive::meta_info{
-		///		.format = bsa::fo4::format::general,
-		///		.version = bsa::fo4::version::v2,
-		///		.compression_format = bsa::fo4::compression_format::zip,
+		///		.format_ = bsa::fo4::format::general,
+		///		.version_ = bsa::fo4::version::v2,
+		///		.compression_format_ = bsa::fo4::compression_format::zip,
 		/// };
 		///
 		/// // Write an archive for SF, directx format
 		/// bsa::fo4::archive::meta_info{
-		///		.format = bsa::fo4::format::directx,
-		///		.version = bsa::fo4::version::v3,
-		///		.compression_format = bsa::fo4::compression_format::lz4,
+		///		.format_ = bsa::fo4::format::directx,
+		///		.version_ = bsa::fo4::version::v3,
+		///		.compression_format_ = bsa::fo4::compression_format::lz4,
 		/// };
 		/// \endcode
 		struct meta_info final
 		{
 		public:
 			/// \brief	The format of the archive itself.
-			format format{ format::general };
+			format format_{ format::general };
 
 			/// \brief	The version of the archive itself.
-			version version{ version::v1 };
+			version version_{ version::v1 };
 
 			/// \brief	The format all chunks are compressed in.
 			/// \remark	All chunks in the archive *must* use the compression format
 			///		described here (if they are compressed).
-			compression_format compression_format{ compression_format::zip };
+			compression_format compression_format_{ compression_format::zip };
 
 			/// \brief	Controls whether the string table is present or not.
 			bool strings{ true };

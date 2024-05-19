@@ -135,13 +135,13 @@ namespace bsa::fo4
 				const archive::meta_info& a_meta,
 				std::size_t a_fileCount,
 				std::uint64_t a_stringTableOffset) :
-				_version(to_underlying(a_meta.version)),
-				_format(to_underlying(a_meta.format)),
+				_version(to_underlying(a_meta.version_)),
+				_format(to_underlying(a_meta.format_)),
 				_fileCount(static_cast<std::uint32_t>(a_fileCount)),
 				_stringTableOffset(a_stringTableOffset),
-				_compression_format(a_meta.compression_format)
+				_compression_format(a_meta.compression_format_)
 			{
-				if (a_meta.compression_format == compression_format::lz4 && a_meta.version < version::v3) {
+				if (a_meta.compression_format_ == compression_format::lz4 && a_meta.version_ < version::v3) {
 					throw exception("compression format is not valid for the given version");
 				}
 			}
@@ -226,9 +226,9 @@ namespace bsa::fo4
 				-> archive::meta_info
 			{
 				return archive::meta_info{
-					.format = this->archive_format(),
-					.version = this->archive_version(),
-					.compression_format = this->compression_format(),
+					.format_ = this->archive_format(),
+					.version_ = this->archive_version(),
+					.compression_format_ = this->compression_format(),
 					.strings = this->string_table_offset() != 0,
 				};
 			}
@@ -512,7 +512,7 @@ namespace bsa::fo4
 	void chunk::compress(const compression_params& a_params)
 	{
 		std::vector<std::byte> out;
-		out.resize(this->compress_bound(a_params.compression_format));
+		out.resize(this->compress_bound(a_params.compression_format_));
 
 		const auto outsz = this->compress_into({ out.data(), out.size() }, a_params);
 		out.resize(outsz);
@@ -541,9 +541,9 @@ namespace bsa::fo4
 		const compression_params& a_params) const
 		-> std::size_t
 	{
-		switch (a_params.compression_format) {
+		switch (a_params.compression_format_) {
 		case compression_format::zip:
-			switch (a_params.compression_level) {
+			switch (a_params.compression_level_) {
 			case compression_level::fo4:
 				return this->compress_into_zlib(a_out, Z_DEFAULT_COMPRESSION, MAX_WBITS, 8);
 			case compression_level::fo4_xbox:
@@ -621,7 +621,7 @@ namespace bsa::fo4
 		const read_params& a_params)
 	{
 		auto& in = a_source.stream();
-		switch (a_params.format) {
+		switch (a_params.format_) {
 		case format::general:
 			this->read_general(in, a_params);
 			break;
@@ -638,12 +638,12 @@ namespace bsa::fo4
 		const write_params& a_params) const
 	{
 		auto& out = a_sink.stream();
-		switch (a_params.format) {
+		switch (a_params.format_) {
 		case format::general:
-			this->write_general(out, a_params.compression_format);
+			this->write_general(out, a_params.compression_format_);
 			break;
 		case format::directx:
-			this->write_directx(out, a_params.compression_format);
+			this->write_directx(out, a_params.compression_format_);
 			break;
 		default:
 			detail::declare_unreachable();
@@ -700,10 +700,10 @@ namespace bsa::fo4
 			chunk.mips.first = mipIdx(a_splice.front());
 			chunk.mips.last = mipIdx(a_splice.back());
 			chunk.set_data(std::move(bytes));
-			if (a_params.compression_type == compression_type::compressed) {
+			if (a_params.compression_type_ == compression_type::compressed) {
 				chunk.compress({
-					.compression_format = a_params.compression_format,
-					.compression_level = a_params.compression_level,
+					.compression_format_ = a_params.compression_format_,
+					.compression_level_ = a_params.compression_level_,
 				});
 			}
 		};
@@ -729,10 +729,10 @@ namespace bsa::fo4
 
 		auto& chunk = this->emplace_back();
 		chunk.set_data(a_in->rdbuf(), a_in);
-		if (a_params.compression_type == compression_type::compressed) {
+		if (a_params.compression_type_ == compression_type::compressed) {
 			chunk.compress({
-				.compression_format = a_params.compression_format,
-				.compression_level = a_params.compression_level,
+				.compression_format_ = a_params.compression_format_,
+				.compression_level_ = a_params.compression_level_,
 			});
 		}
 	}
@@ -855,7 +855,7 @@ namespace bsa::fo4
 
 		for (const auto& [key, file] : *this) {
 			out << key.hash();
-			this->write_file(file, out, a_meta.format, dataOffset);
+			this->write_file(file, out, a_meta.format_, dataOffset);
 		}
 
 		for (const auto& file : *this) {
@@ -875,7 +875,7 @@ namespace bsa::fo4
 		-> std::pair<detail::header_t, std::uint64_t>
 	{
 		const auto inspect = [&](auto a_gnrl, auto a_dx10) noexcept {
-			switch (a_meta.format) {
+			switch (a_meta.format_) {
 			case format::general:
 				return a_gnrl();
 			case format::directx:
@@ -886,7 +886,7 @@ namespace bsa::fo4
 		};
 
 		std::uint64_t dataOffset =
-			detail::sizeof_header(a_meta.version) +
+			detail::sizeof_header(a_meta.version_) +
 			inspect(
 				[]() noexcept { return detail::constants::chunk_header_size_gnrl; },
 				[]() noexcept { return detail::constants::chunk_header_size_dx10; }) *

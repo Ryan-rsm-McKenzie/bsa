@@ -68,8 +68,8 @@ namespace
 				f.read(
 					a_path,
 					{
-						.format = bsa::fo4::format::general,
-						.compression_type = bsa::compression_type::compressed,
+						.format_ = bsa::fo4::format::general,
+						.compression_type_ = bsa::compression_type::compressed,
 					});
 
 				ba2.insert(
@@ -79,7 +79,7 @@ namespace
 						.generic_string(),
 					std::move(f));
 			});
-		ba2.write(a_output, { .format = bsa::fo4::format::general });
+		ba2.write(a_output, { .format_ = bsa::fo4::format::general });
 	}
 
 	void pack_tes3(
@@ -120,8 +120,8 @@ namespace
 				f.read(
 					a_path,
 					{
-						.version = version,
-						.compression_type = bsa::compression_type::compressed,
+						.version_ = version,
+						.compression_type_ = bsa::compression_type::compressed,
 					});
 
 				const auto d = [&]() {
@@ -156,7 +156,7 @@ namespace
 
 		for (auto& [key, file] : ba2) {
 			auto out = open_virtual_path(a_output, key);
-			file.write(out, { .format = meta.format, .compression_format = meta.compression_format });
+			file.write(out, { .format_ = meta.format_, .compression_format_ = meta.compression_format_ });
 		}
 	}
 
@@ -183,7 +183,7 @@ namespace
 		for (auto& dir : bsa) {
 			for (auto& file : dir.second) {
 				auto out = open_virtual_path(a_output, dir.first, file.first);
-				file.second.write(out, { .version = format });
+				file.second.write(out, { .version_ = format });
 			}
 		}
 	}

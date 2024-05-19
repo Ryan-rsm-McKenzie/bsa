@@ -241,12 +241,12 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 				bsa::tes4::file original;
 				const auto origsrc = map_file(p);
 				original.set_data({ reinterpret_cast<const std::byte*>(origsrc.data()), origsrc.size() });
-				original.compress({ .version = version });
+				original.compress({ .version_ = version });
 
 				REQUIRE(read->decompressed_size() == original.decompressed_size());
 				assert_byte_equality(read->as_bytes(), original.as_bytes());
 
-				read->decompress({ .version = version });
+				read->decompress({ .version_ = version });
 				assert_byte_equality(read->as_bytes(), std::span{ origsrc.data(), origsrc.size() });
 			}
 		};
@@ -480,7 +480,7 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 					REQUIRE(f->first.name() == simple_normalize(file.name));
 				}
 				if (f->second.compressed()) {
-					f->second.decompress({ .version = a_version });
+					f->second.decompress({ .version_ = a_version });
 				}
 				assert_byte_equality(f->second.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
@@ -591,15 +591,15 @@ TEST_CASE("bsa::tes4::archive", "[src][tes4][archive]")
 
 			REQUIRE(memory->decompressed_size() == disk.size());
 			memory->decompress({
-				.version = bsa::tes4::version::tes5,
-				.compression_codec = bsa::tes4::compression_codec::xmem,
+				.version_ = bsa::tes4::version::tes5,
+				.compression_codec_ = bsa::tes4::compression_codec::xmem,
 			});
 			REQUIRE(!memory->compressed());
 			assert_byte_equality(memory->as_bytes(), std::span{ disk.data(), disk.size() });
 
 			memory->compress({
-				.version = bsa::tes4::version::tes5,
-				.compression_codec = bsa::tes4::compression_codec::xmem,
+				.version_ = bsa::tes4::version::tes5,
+				.compression_codec_ = bsa::tes4::compression_codec::xmem,
 			});
 			REQUIRE(memory->compressed());
 			assert_byte_equality(memory->as_bytes(), compressed);

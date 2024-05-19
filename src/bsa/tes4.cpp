@@ -548,16 +548,16 @@ namespace bsa::tes4
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		switch (detail::to_underlying(a_params.version)) {
+		switch (detail::to_underlying(a_params.version_)) {
 		case 103:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			return ::compressBound(static_cast<::uLong>(this->size()));
 		case 104:
-			return a_params.compression_codec == compression_codec::xmem ?
+			return a_params.compression_codec_ == compression_codec::xmem ?
 			           this->compress_bound_xmem() :
 			           ::compressBound(static_cast<::uLong>(this->size()));
 		case 105:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			return ::LZ4F_compressFrameBound(this->size(), &detail::lz4f_preferences);
 		default:
 			detail::declare_unreachable();
@@ -569,16 +569,16 @@ namespace bsa::tes4
 		const compression_params& a_params) const
 		-> std::size_t
 	{
-		switch (detail::to_underlying(a_params.version)) {
+		switch (detail::to_underlying(a_params.version_)) {
 		case 103:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			return this->compress_into_zlib(a_out);
 		case 104:
-			return a_params.compression_codec == compression_codec::xmem ?
+			return a_params.compression_codec_ == compression_codec::xmem ?
 			           this->compress_into_xmem(a_out) :
 			           this->compress_into_zlib(a_out);
 		case 105:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			return this->compress_into_lz4(a_out);
 		default:
 			detail::declare_unreachable();
@@ -599,20 +599,20 @@ namespace bsa::tes4
 		std::span<std::byte> a_out,
 		const compression_params& a_params) const
 	{
-		switch (detail::to_underlying(a_params.version)) {
+		switch (detail::to_underlying(a_params.version_)) {
 		case 103:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			this->decompress_into_zlib(a_out);
 			break;
 		case 104:
-			if (a_params.compression_codec == compression_codec::xmem) {
+			if (a_params.compression_codec_ == compression_codec::xmem) {
 				this->decompress_into_xmem(a_out);
 			} else {
 				this->decompress_into_zlib(a_out);
 			}
 			break;
 		case 105:
-			assert(a_params.compression_codec == compression_codec::normal);
+			assert(a_params.compression_codec_ == compression_codec::normal);
 			this->decompress_into_lz4(a_out);
 			break;
 		default:
@@ -627,10 +627,10 @@ namespace bsa::tes4
 		auto& in = a_source.stream();
 		this->clear();
 		this->set_data(in->rdbuf(), in);
-		if (a_params.compression_type == compression_type::compressed) {
+		if (a_params.compression_type_ == compression_type::compressed) {
 			this->compress({
-				.version = a_params.version,
-				.compression_codec = a_params.compression_codec,
+				.version_ = a_params.version_,
+				.compression_codec_ = a_params.compression_codec_,
 			});
 		}
 	}
@@ -646,8 +646,8 @@ namespace bsa::tes4
 			this->decompress_into(
 				buffer,
 				{
-					.version = a_params.version,
-					.compression_codec = a_params.compression_codec,
+					.version_ = a_params.version_,
+					.compression_codec_ = a_params.compression_codec_,
 				});
 			out.write_bytes(buffer);
 		} else {
@@ -687,7 +687,7 @@ namespace bsa::tes4
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound({ .version = version::sse }));
+		assert(a_out.size_bytes() >= this->compress_bound({ .version_ = version::sse }));
 
 		const auto in = this->as_bytes();
 
@@ -712,8 +712,8 @@ namespace bsa::tes4
 		assert(!this->compressed());
 		assert(a_out.size_bytes() >=
 			   this->compress_bound({
-				   .version = version::tes5,
-				   .compression_codec = compression_codec::xmem,
+				   .version_ = version::tes5,
+				   .compression_codec_ = compression_codec::xmem,
 			   }));
 
 		try {
@@ -749,7 +749,7 @@ namespace bsa::tes4
 		-> std::size_t
 	{
 		assert(!this->compressed());
-		assert(a_out.size_bytes() >= this->compress_bound({ .version = version::tes4 }));
+		assert(a_out.size_bytes() >= this->compress_bound({ .version_ = version::tes4 }));
 
 		const auto in = this->as_bytes();
 		auto outsz = static_cast<::uLong>(a_out.size_bytes());
