@@ -30,13 +30,7 @@
     {
       "name": "vcpkg",
       "hidden": true,
-      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "cacheVariables": {
-        "VCPKG_OVERLAY_PORTS": {
-          "type": "STRING",
-          "value": "${sourceDir}/cmake/ports"
-        }
-      }
+      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
     },
     {
       "name": "windows",

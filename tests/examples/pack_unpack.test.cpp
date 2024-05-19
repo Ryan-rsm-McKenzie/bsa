@@ -241,7 +241,7 @@ TEST_CASE("pack_unpack", "[examples]")
 
 		const auto texture = (root / "fo4_texture.ba2"sv).string();
 		bsa::fo4::archive ba2;
-		ba2.write({ texture }, { .format = bsa::fo4::format::directx });
+		ba2.write({ texture }, { .format_ = bsa::fo4::format::directx });
 
 		REQUIRE_THROWS_WITH(
 			invokeMain("pack"),
