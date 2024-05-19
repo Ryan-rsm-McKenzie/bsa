@@ -16,6 +16,10 @@ vcpkg_cmake_configure(
 
 vcpkg_cmake_install()
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/Catch2)
+
+file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/lib/pkgconfig")
+file(RENAME "${CURRENT_PACKAGES_DIR}/share/pkgconfig/catch2-with-main.pc" "${CURRENT_PACKAGES_DIR}/lib/pkgconfig/catch2-with-main.pc")
+file(RENAME "${CURRENT_PACKAGES_DIR}/share/pkgconfig/catch2.pc" "${CURRENT_PACKAGES_DIR}/lib/pkgconfig/catch2.pc")
 vcpkg_fixup_pkgconfig()
 
 file(REMOVE_RECURSE
