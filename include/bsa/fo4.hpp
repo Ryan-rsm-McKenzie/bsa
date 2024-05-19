@@ -52,6 +52,12 @@ namespace bsa::fo4
 
 		/// \brief	Intoduced in Starfield.
 		v3,
+
+		/// \brief	Intoduced in the Fallout 4 next-gen update.
+		v7 = 7,
+
+		/// \brief	Intoduced in the Fallout 4 next-gen update.
+		v8,
 	};
 
 	/// \brief	Specifies the compression level to use when compressing data.

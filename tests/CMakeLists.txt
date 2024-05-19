@@ -62,6 +62,7 @@ acquire_test("fo4_dds_test")
 acquire_test("fo4_dx9_test")
 acquire_test("fo4_invalid_test")
 acquire_test("fo4_missing_string_table_test")
+acquire_test("fo4_next_gen_test")
 acquire_test("fo4_write_test")
 
 acquire_test("tes3_invalid_test")

@@ -618,4 +618,51 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				});
 		}
 	}
+
+	SECTION("we can archives from the fallout 4 next-gen update")
+	{
+		const std::filesystem::path root{ "fo4_next_gen_test"sv };
+		const std::array formats = {
+			std::make_pair(bsa::fo4::format::directx, "dx10"sv),
+			std::make_pair(bsa::fo4::format::general, "gnrl"sv),
+		};
+		const std::array versions = { bsa::fo4::version::v7, bsa::fo4::version::v8 };
+
+		for (const auto [format, format_str] : formats) {
+			for (const auto version : versions) {
+				std::span<const std::string_view> files;
+				switch (format) {
+				case bsa::fo4::format::general:
+					{
+						constexpr std::array a = { "License.txt"sv, "SampleA.png"sv };
+						files = std::span(a);
+					}
+					break;
+				case bsa::fo4::format::directx:
+					{
+						constexpr std::array a = { "Fence006_1K_Roughness.dds"sv };
+						files = std::span(a);
+					}
+					break;
+				default:
+					REQUIRE(false);
+				}
+
+				bsa::fo4::archive ba2;
+				const auto path = root / std::format("{}_v{}.ba2", format_str, static_cast<std::uint32_t>(version));
+				const auto meta = ba2.read(path);
+				REQUIRE(meta.version_ == version);
+				REQUIRE(meta.format_ == format);
+
+				REQUIRE(ba2.size() == files.size());
+				for (const auto filename : files) {
+					const auto file = ba2[filename];
+					REQUIRE(static_cast<bool>(file));
+				}
+
+				auto os = binary_io::any_ostream(std::in_place_type<binary_io::memory_ostream>);
+				ba2.write({ os }, meta);
+			}
+		}
+	}
 }
