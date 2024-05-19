@@ -106,23 +106,18 @@ namespace bsa::fo4
 			[[nodiscard]] auto sizeof_header(version a_version) noexcept
 				-> std::size_t
 			{
-				std::size_t size = 0;
-
 				switch (a_version) {
-				case version::v3:
-					size += sizeof(std::uint32_t);
-					[[fallthrough]];
-				case version::v2:
-					size += sizeof(std::uint64_t);
-					[[fallthrough]];
 				case version::v1:
-					size += 0x18;
-					break;
+				case version::v7:
+				case version::v8:
+					return 0x18;
+				case version::v2:
+					return 0x20;
+				case version::v3:
+					return 0x24;
 				default:
 					detail::declare_unreachable();
 				}
-
-				return size;
 			}
 		}
 
@@ -141,7 +136,7 @@ namespace bsa::fo4
 				_stringTableOffset(a_stringTableOffset),
 				_compression_format(a_meta.compression_format_)
 			{
-				if (a_meta.compression_format_ == compression_format::lz4 && a_meta.version_ < version::v3) {
+				if (a_meta.compression_format_ == compression_format::lz4 && a_meta.version_ != version::v3) {
 					throw exception("compression format is not valid for the given version");
 				}
 			}
@@ -170,17 +165,19 @@ namespace bsa::fo4
 					case 1:
 					case 2:
 					case 3:
+					case 7:
+					case 8:
 						break;
 					default:
 						throw exception("invalid version");
 					}
 				}
 
-				if (a_header._version >= 2) {
+				if (a_header._version == 2 || a_header._version == 3) {
 					(void)a_in->read<std::uint64_t>();
 				}
 
-				if (a_header._version >= 3) {
+				if (a_header._version == 3) {
 					const auto [compression] = a_in->read<std::uint32_t>();
 					if (compression == constants::compression_lz4) {
 						a_header._compression_format = fo4::compression_format::lz4;
@@ -202,11 +199,11 @@ namespace bsa::fo4
 					a_header._fileCount,
 					a_header._stringTableOffset);
 
-				if (a_header._version >= 2) {
+				if (a_header._version == 2 || a_header._version == 3) {
 					a_out.write(std::uint64_t{ 1 });
 				}
 
-				if (a_header._version >= 3) {
+				if (a_header._version == 3) {
 					std::uint32_t format =
 						a_header._compression_format == fo4::compression_format::lz4 ?
 							constants::compression_lz4 :
