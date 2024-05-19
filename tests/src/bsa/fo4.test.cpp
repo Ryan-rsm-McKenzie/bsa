@@ -249,8 +249,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		bsa::fo4::archive ba2;
 		const auto meta = ba2.read(inPath);
-		REQUIRE(meta.format == bsa::fo4::format::directx);
-		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+		REQUIRE(meta.format_ == bsa::fo4::format::directx);
+		REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 		REQUIRE(ba2.size() == 1);
 
 		const auto file = ba2["Fence006_1K_Roughness.dds"sv];
@@ -278,7 +278,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		compare_to_master_copy(
 			inPath,
 			[&](binary_io::any_ostream& a_os) {
-				ba2.write(a_os, { .format = bsa::fo4::format::directx });
+				ba2.write(a_os, { .format_ = bsa::fo4::format::directx });
 			});
 	}
 
@@ -330,12 +330,12 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const auto test = [&](bool a_strings) {
 			binary_io::any_ostream os{ std::in_place_type<binary_io::memory_ostream> };
 
-			in.write(os, { .format = bsa::fo4::format::general, .strings = a_strings });
+			in.write(os, { .format_ = bsa::fo4::format::general, .strings = a_strings });
 
 			bsa::fo4::archive out;
 			const auto meta = out.read({ os.get<binary_io::memory_ostream>().rdbuf() });
-			REQUIRE(meta.format == bsa::fo4::format::general);
-			REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+			REQUIRE(meta.format_ == bsa::fo4::format::general);
+			REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 			REQUIRE(out.size() == index.size());
 			for (std::size_t idx = 0; idx < index.size(); ++idx) {
 				const auto& file = index[idx];
@@ -354,7 +354,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				auto& c = f->second.front();
 				if (c.compressed()) {
 					REQUIRE(c.decompressed_size() == mapped.size());
-					c.decompress(meta.compression_format);
+					c.decompress(meta.compression_format_);
 				}
 				assert_byte_equality(c.as_bytes(), std::span{ mapped.data(), mapped.size() });
 			}
@@ -406,8 +406,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		bsa::fo4::archive ba2;
 		const auto meta = ba2.read(inPath);
-		REQUIRE(meta.format == bsa::fo4::format::general);
-		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+		REQUIRE(meta.format_ == bsa::fo4::format::general);
+		REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 		const auto f = ba2[filename];
 		REQUIRE(f);
 		REQUIRE(f->size() == 1);
@@ -421,7 +421,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		compare_to_master_copy(
 			inPath,
 			[&](binary_io::any_ostream& a_os) {
-				ba2.write(a_os, { .format = bsa::fo4::format::general, .strings = false });
+				ba2.write(a_os, { .format_ = bsa::fo4::format::general, .strings = false });
 			});
 	}
 
@@ -436,8 +436,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		for (const auto& [archive, compression] : archives) {
 			bsa::fo4::archive ba2;
 			const auto meta = ba2.read(root / archive);
-			REQUIRE(meta.format == bsa::fo4::format::general);
-			REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+			REQUIRE(meta.format_ == bsa::fo4::format::general);
+			REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 			for (const auto& entry : std::filesystem::recursive_directory_iterator(root / "data"sv)) {
 				if (entry.is_regular_file()) {
 					const auto p = std::filesystem::relative(entry.path(), root / "data"sv);
@@ -453,10 +453,10 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 					diskC.set_data({ //
 						reinterpret_cast<const std::byte*>(disk.data()),
 						disk.size() });
-					diskC.compress({ .compression_level = compression });
+					diskC.compress({ .compression_level_ = compression });
 					assert_byte_equality(archC.as_bytes(), diskC.as_bytes());
 
-					archC.decompress(meta.compression_format);
+					archC.decompress(meta.compression_format_);
 					REQUIRE(!archC.compressed());
 					assert_byte_equality(archC.as_bytes(), std::span{ disk.data(), disk.size() });
 				}
@@ -479,15 +479,15 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				}
 			},
 			[](bsa::fo4::archive& a_archive, std::filesystem::path a_dst) {
-				a_archive.write(a_dst, { .format = bsa::fo4::format::general });
+				a_archive.write(a_dst, { .format_ = bsa::fo4::format::general });
 			},
 			[](bsa::fo4::archive& a_archive, binary_io::any_ostream& a_dst) {
-				a_archive.write(a_dst, { .format = bsa::fo4::format::general });
+				a_archive.write(a_dst, { .format_ = bsa::fo4::format::general });
 			},
 			[](bsa::fo4::archive& a_archive, std::span<const std::byte> a_src, bsa::copy_type a_type) {
 				const auto meta = a_archive.read({ a_src, a_type });
-				REQUIRE(meta.format == bsa::fo4::format::general);
-				REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+				REQUIRE(meta.format_ == bsa::fo4::format::general);
+				REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 			});
 	}
 
@@ -500,8 +500,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		f.read(
 			root / filename,
 			{
-				.format = bsa::fo4::format::directx,
-				.compression_type = bsa::compression_type::compressed,
+				.format_ = bsa::fo4::format::directx,
+				.compression_type_ = bsa::compression_type::compressed,
 			});
 
 		REQUIRE(f.header.mip_count == 11);
@@ -526,7 +526,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		compare_to_master_copy(
 			root / "in.ba2"sv,
 			[&](binary_io::any_ostream& a_os) {
-				ba2.write(a_os, { .format = bsa::fo4::format::directx });
+				ba2.write(a_os, { .format_ = bsa::fo4::format::directx });
 			});
 	}
 
@@ -539,8 +539,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		f.read(
 			root / filename,
 			{
-				.format = bsa::fo4::format::directx,
-				.compression_type = bsa::compression_type::compressed,
+				.format_ = bsa::fo4::format::directx,
+				.compression_type_ = bsa::compression_type::compressed,
 			});
 		REQUIRE(f.header.mip_count == 10);
 		REQUIRE(f.header.flags == 1);
@@ -556,7 +556,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		compare_to_master_copy(
 			root / "in.ba2"sv,
 			[&](binary_io::any_ostream& a_os) {
-				ba2.write(a_os, { .format = bsa::fo4::format::directx });
+				ba2.write(a_os, { .format_ = bsa::fo4::format::directx });
 			});
 	}
 
@@ -567,8 +567,8 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		bsa::fo4::archive ba2;
 		const auto meta = ba2.read(root / "in.ba2"sv);
-		REQUIRE(meta.format == bsa::fo4::format::directx);
-		REQUIRE(meta.compression_format == bsa::fo4::compression_format::zip);
+		REQUIRE(meta.format_ == bsa::fo4::format::directx);
+		REQUIRE(meta.compression_format_ == bsa::fo4::compression_format::zip);
 
 		const auto archived = ba2[filename];
 		REQUIRE(archived);
@@ -579,7 +579,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		{
 			bsa::fo4::file copy;
-			copy.read(root / filename, { .format = bsa::fo4::format::directx });
+			copy.read(root / filename, { .format_ = bsa::fo4::format::directx });
 			REQUIRE(copy.header == archived->header);
 			REQUIRE(copy.size() == archived->size());
 			for (std::size_t i = 0; i < copy.size(); ++i) {
@@ -593,7 +593,7 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		compare_to_master_copy(
 			root / filename,
 			[&](binary_io::any_ostream& a_os) {
-				archived->write(a_os, { .format = bsa::fo4::format::directx });
+				archived->write(a_os, { .format_ = bsa::fo4::format::directx });
 			},
 			[](std::span<const std::byte> a_lhs, std::span<const std::byte> a_rhs) {
 				REQUIRE(a_lhs.size() == a_rhs.size());
@@ -610,11 +610,11 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 		const auto files = { "dx9.dds"sv, "blacksky_e.dds"sv, "bleakfallscube_e.dds"sv };
 		for (const auto& filename : files) {
 			bsa::fo4::file file;
-			file.read(root / filename, { .format = bsa::fo4::format::directx });
+			file.read(root / filename, { .format_ = bsa::fo4::format::directx });
 			compare_to_master_copy(
 				root / filename,
 				[&](binary_io::any_ostream& a_os) {
-					file.write(a_os, { .format = bsa::fo4::format::directx });
+					file.write(a_os, { .format_ = bsa::fo4::format::directx });
 				});
 		}
 	}
