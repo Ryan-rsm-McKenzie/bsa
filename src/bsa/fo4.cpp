@@ -677,7 +677,7 @@ namespace bsa::fo4
 		}
 
 		a_out.write_bytes({ //
-			static_cast<const std::byte*>(blob.GetBufferPointer()),
+			reinterpret_cast<const std::byte*>(blob.GetBufferPointer()),
 			blob.GetBufferSize() });
 		std::vector<std::byte> buffer;
 		for (const auto& chunk : *this) {
