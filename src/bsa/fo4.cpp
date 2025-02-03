@@ -738,13 +738,14 @@ namespace bsa::fo4
 		detail::ostream_t& a_out,
 		compression_format a_format) const
 	{
+		const bool isCubemap = (this->header.flags & 1u) != 0;
 		const DirectX::TexMetadata meta{
 			.width = this->header.width,
 			.height = this->header.height,
 			.depth = 1,
-			.arraySize = 1,
+			.arraySize = isCubemap ? 6 : 1,
 			.mipLevels = this->header.mip_count,
-			.miscFlags = (this->header.flags & 1u) != 0 ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
+			.miscFlags = isCubemap ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
 			.miscFlags2 = 0,
 			.format = static_cast<::DXGI_FORMAT>(this->header.format),
 			.dimension = DirectX::TEX_DIMENSION_TEXTURE2D,
