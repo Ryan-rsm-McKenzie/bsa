@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>bsa bethesda archives meet c++</title>
+  <link href="favicon-dark.png" rel="icon" type="image/png"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <link href="poxy/poxy.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+  <script src="poxy/poxy.js"></script>
+  <script>initialize_theme("dark");</script>
+  <meta content="bsa" name="twitter:title"/>
+  <meta content="bsa" property="og:title"/>
+  <meta content="bsa" itemprop="name"/>
+  <meta content="Ryan McKenzie" name="author"/>
+  <meta content="Ryan McKenzie" property="article:author"/>
+  <meta content="bethesda archives meet c++" name="description"/>
+  <meta content="bethesda archives meet c++" name="twitter:description"/>
+  <meta content="bethesda archives meet c++" property="og:description"/>
+  <meta content="bethesda archives meet c++" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.13.9" name="generator"/>
+  <meta content="strict-origin-when-cross-origin" name="referrer"/>
+</head>
+<body class="poxy-has-toc poxy-has-main-banner poxy-has-badges">
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bsa <span class="m-thin">bethesda archives meet c++</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a class="poxy-icon repo github poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa" target="_blank" title="View on GitHub"><svg id="poxy-icon-repo" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25,1.23a24.37,24.37,0,0,0-7.7,47.5C18.51,49,19,48.2,19,47.56s0-2.12,0-4.15c-6.78,1.47-8.21-3.27-8.21-3.27C9.61,37.33,8,36.58,8,36.58c-2.21-1.51.17-1.48.17-1.48a5.12,5.12,0,0,1,3.73,2.51c2.17,3.72,5.7,2.65,7.09,2a5.25,5.25,0,0,1,1.55-3.26c-5.41-.61-11.1-2.7-11.1-12A9.41,9.41,0,0,1,12,17.79a8.75,8.75,0,0,1,.24-6.45s2-.66,6.7,2.49a23.1,23.1,0,0,1,12.2,0c4.66-3.15,6.7-2.49,6.7-2.49A8.75,8.75,0,0,1,38,17.79a9.41,9.41,0,0,1,2.51,6.54c0,9.36-5.7,11.42-11.13,12a5.83,5.83,0,0,1,1.65,4.51c0,3.26,0,5.89,0,6.69,0,.65.44,1.41,1.68,1.17A24.38,24.38,0,0,0,25,1.23Z" fill="currentColor"></path></svg></a></li>
+            <li><a class="poxy-icon theme" href="javascript:void(null);" id="poxy-theme-switch" onclick="toggle_theme(); return false;" role="button" title="Toggle dark and light themes"><svg id="poxy-theme-switch-img" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="185.6708" cy="183.8122" fill="currentColor" r="65.625"></circle><path d="M185.6708,87.5622a13.1256,13.1256,0,0,0,13.125-13.125V52.5622a13.125,13.125,0,1,0-26.25,0v21.875A13.1257,13.1257,0,0,0,185.6708,87.5622Z" fill="currentColor"></path><path d="M99.051,115.7519a13.1236,13.1236,0,1,0,18.56-18.56L102.1442,81.726a13.1236,13.1236,0,0,0-18.5595,18.56Z" fill="currentColor"></path><path d="M89.4208,183.8122a13.1257,13.1257,0,0,0-13.125-13.125H54.4208a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,89.4208,183.8122Z" fill="currentColor"></path><path d="M99.051,251.8725,83.5847,267.3431a13.1236,13.1236,0,1,0,18.56,18.56l15.4663-15.4706a13.1236,13.1236,0,1,0-18.5595-18.56Z" fill="currentColor"></path><path d="M185.6708,280.0622a13.1258,13.1258,0,0,0-13.125,13.125v21.875a13.125,13.125,0,0,0,26.25,0v-21.875A13.1257,13.1257,0,0,0,185.6708,280.0622Z" fill="currentColor"></path><path d="M272.2907,251.8725a13.1236,13.1236,0,1,0-18.56,18.56l15.4663,15.4706a13.1236,13.1236,0,1,0,18.56-18.56Z" fill="currentColor"></path><path d="M330.0458,183.8122a13.1257,13.1257,0,0,0-13.125-13.125h-21.875a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,330.0458,183.8122Z" fill="currentColor"></path><path d="M263.0109,119.5971a13.0824,13.0824,0,0,0,9.28-3.8452l15.4663-15.4663a13.1236,13.1236,0,1,0-18.56-18.56L253.7312,97.1923a13.125,13.125,0,0,0,9.28,22.4048Z" fill="currentColor"></path><path d="M456.9379,401.6714a63.97,63.97,0,0,1-14.9963,7.2055c-19.6448,6.5283-41.8787,2.9566-58.1439-9.8523a68.9311,68.9311,0,0,1-10.835-10.8339c-12.8088-16.2663-16.3806-38.5-9.8523-58.1471a63.8444,63.8444,0,0,1,7.2077-14.9931,8.8036,8.8036,0,0,0-10.1172-13.3034,87.5188,87.5188,0,1,0,110.0372,110.04A8.8,8.8,0,0,0,456.9379,401.6714Z" fill="currentColor"></path></svg></a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <img alt="Image" class="m-image" id="poxy-main-banner" src="banner_small.png" style="width: 1280px;"/><div id="poxy-badges"><span><a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank"><svg class="poxy-injected-svg" height="20" id="poxy-injected-svg-0" version="1.1" width="78" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g shape-rendering="crispEdges"><path d="M0 0h47v20H0z" fill="#555"></path><path d="M47 0h31v20H47z" fill="purple"></path></g><g fill="#fff" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110" text-anchor="middle"><text textLength="370" transform="scale(.1)" x="245" y="140">license</text><text textLength="210" transform="scale(.1)" x="615" y="140">MIT</text></g></svg></a><a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/releases" target="_blank"><img alt="Releases" src="https://img.shields.io/github/v/release/Ryan-rsm-McKenzie/bsa?style=flat-square"/></a></span><span><a class="poxy-cppreference poxy-external" href="https://en.cppreference.com/w/cpp/compiler_support" target="_blank"><svg class="poxy-injected-svg" height="20" id="poxy-injected-svg-1" version="1.1" width="125" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g shape-rendering="crispEdges"><path d="M0 0h76v20H0z" fill="#555"></path><path d="M76 0h49v20H76z" fill="#007ec6"></path></g><g fill="#fff" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110" text-anchor="middle"><image height="14" width="14" x="5" xlink:href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSJ3aGl0ZXNtb2tlIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QysrIGljb248L3RpdGxlPjxwYXRoIGQ9Ik0yMi4zOTMgNmMtLjE2Ny0uMjktLjM5OC0uNTQzLS42NTItLjY5TDEyLjkyNS4yMmMtLjUwOC0uMjkzLTEuMzM5LS4yOTMtMS44NDcgMEwyLjI2IDUuMzFjLS41MDguMjkzLS45MjMgMS4wMTMtLjkyMyAxLjZ2MTAuMThjMCAuMjk0LjEwNC42Mi4yNzEuOTEuMTY3LjI5LjM5OC41NDMuNjUyLjY4OWw4LjgxNiA1LjA5MWMuNTA4LjI5MyAxLjMzOS4yOTMgMS44NDcgMGw4LjgxNi01LjA5MWMuMjU0LS4xNDYuNDg1LS4zOTkuNjUyLS42ODlzLjI3MS0uNjE2LjI3MS0uOTFWNi45MWMuMDAyLS4yOTQtLjEwMi0uNjItLjI2OS0uOTF6TTEyIDE5LjEwOWMtMy45MiAwLTcuMTA5LTMuMTg5LTcuMTA5LTcuMTA5UzguMDggNC44OTEgMTIgNC44OTFhNy4xMzMgNy4xMzMgMCAwIDEgNi4xNTYgMy41NTJsLTMuMDc2IDEuNzgxQTMuNTY3IDMuNTY3IDAgMCAwIDEyIDguNDQ1Yy0xLjk2IDAtMy41NTQgMS41OTUtMy41NTQgMy41NTVTMTAuMDQgMTUuNTU1IDEyIDE1LjU1NWEzLjU3IDMuNTcgMCAwIDAgMy4wOC0xLjc3OGwzLjA3NyAxLjc4QTcuMTM1IDcuMTM1IDAgMCAxIDEyIDE5LjEwOXptNy4xMDktNi43MTRoLS43OXYuNzloLS43OXYtLjc5aC0uNzl2LS43OWguNzl2LS43OWguNzl2Ljc5aC43OXYuNzl6bTIuOTYyIDBoLS43OXYuNzloLS43OXYtLjc5aC0uNzg5di0uNzloLjc4OXYtLjc5aC43OXYuNzloLjc5di43OXoiLz48L3N2Zz4=" y="3"/><text textLength="490" transform="scale(.1)" x="475" y="140">standard</text><text textLength="390" transform="scale(.1)" x="995" y="140">C++20</text></g></svg></a><a href="#" target="_blank"><img alt="a-architecture" src="https://img.shields.io/static/v1?label=architecture&amp;message=x64&amp;color=dimgray&amp;style=flat-square"/></a></span><span><a href="#" target="_blank"><img alt="a-platform" src="https://img.shields.io/static/v1?label=platform&amp;message=windows%20|%20linux&amp;color=dimgray&amp;style=flat-square"/></a><a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/actions/workflows/main_ci.yml" target="_blank"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/Ryan-rsm-McKenzie/bsa/main_ci.yml?branch=master&amp;logo=github&amp;style=flat-square"/></a></span><span><a class="poxy-external" href="https://app.codecov.io/gh/Ryan-rsm-McKenzie/bsa" target="_blank"><img alt="codecov" src="https://img.shields.io/codecov/c/github/Ryan-rsm-McKenzie/bsa?logo=codecov&amp;logoColor=white&amp;style=flat-square"/></a></span></div>
+        <nav class="m-block m-default poxy-toc" id="poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              <a href="#overview">Overview</a>
+              <ul>
+                <li><a href="#what">What is a BSA?</a></li>
+                <li>
+                  <a href="#why">Why bsa?</a>
+                  <ul>
+                    <li><a href="#why-cxx">It's written in contemporary C++</a></li>
+                    <li><a href="#why-testing">It's actively tested</a></li>
+                    <li><a href="#why-low-overhead">It's low overhead</a></li>
+                    <li><a href="#why-low-level">It's low level</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#examples">Examples</a>
+              <ul>
+                <li><a href="#examples-reading">Reading</a></li>
+                <li><a href="#examples-writing">Writing</a></li>
+              </ul>
+            </li>
+            <li><a href="#cmake-options">CMake Options</a></li>
+            <li><a href="#integration">Integration</a></li>
+            <li><a href="#xmem-codec">XMem Codec</a></li>
+            <li><a href="#important-notes">Important Notes</a></li>
+            <li>
+              <a href="#dependencies">Dependencies</a>
+              <ul>
+                <li><a href="#dependencies-consumption">Consumption</a></li>
+                <li><a href="#dependencies-xmem">XMem Codec Support</a></li>
+                <li><a href="#dependencies-development">Development</a></li>
+              </ul>
+            </li>
+            <li><a href="#alternatives">Alternatives</a></li>
+          </ul>
+        </nav>
+<section id="overview"><h2><a href="#overview">Overview</a></h2><section id="what"><h3><a href="#what">What is a BSA?</a></h3><p>The Bethesda archive file is a proprietary format used to store game files for the <a class="poxy-external" href="https://en.wikipedia.org/wiki/The_Elder_Scrolls" target="_blank">The Elder Scrolls</a> and <a class="poxy-external" href="https://en.wikipedia.org/wiki/Fallout_(series)" target="_blank">Fallout</a> series of games beginning with the <a class="poxy-external" href="https://en.wikipedia.org/wiki/The_Elder_Scrolls_III:_Morrowind" target="_blank">The Elder Scrolls III</a>. This format is essentially a zip file which stores some extra meta information to be used with their internal virtual filesystem. There are many tools that can be used to work with these files, but most are written as user facing applications, without the intention to be used as a <em>library</em>. <code>bsa</code> intends to provide a low-ish level interface for C++ programmers to work with the format.</p></section><section id="why"><h3><a href="#why">Why bsa?</a></h3><section id="why-cxx"><h4><a href="#why-cxx">It's written in contemporary C++</a></h4><p>Nope, it's not written in C#, Pascal, or Python. It's all native, with contemporary C++ features in mind. <code>bsa</code> provides interfaces that <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html">model standard containers</a>, so that programmers intuitively understand how to work with its interface without needing to dive into the documentation.</p></section><section id="why-testing"><h4><a href="#why-testing">It's actively tested</a></h4><p>The <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/tree/master/tests" target="_blank">testsuite</a> covers a wide range of features, ensuring that <code>bsa</code> handles archives accurately, and that bugs never regress.</p></section><section id="why-low-overhead"><h4><a href="#why-low-overhead">It's low overhead</a></h4><p><code>bsa</code> primarily stores no-copy views into file data/strings so that objects are cheap to copy and the resulting memory overhead is low. However, <code>bsa</code> can also take ownership of data, as a convenience.</p></section><section id="why-low-level"><h4><a href="#why-low-level">It's low level</a></h4><p><code>bsa</code> provides <a class="m-doc" href="classbsa_1_1tes4_1_1file.html#a75bf256a4f4715d459e2b197cf864b53">low level interfaces</a> into the underlying data, so that programmers who feel they can "do it better" don't feel burdened by arbitrary restrictions. This does not mean that there aren't high level interfaces, it simply means that <code>bsa</code> will step out of your way when appropriate.</p></section></section></section><section id="examples"><h2><a href="#examples">Examples</a></h2><section id="examples-reading"><h3><a href="#examples-reading">Reading</a></h3><pre class="m-code"><span class="cp">#include</span> <span class="cpf">&lt;bsa/tes4.hpp&gt;</span>
+<span class="cp">#include</span> <span class="cpf">&lt;cstdio&gt;</span>
+<span class="cp">#include</span> <span class="cpf">&lt;filesystem&gt;</span>
+
+<span class="k">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nn">std::filesystem</span><span class="o">::</span><span class="nc">path</span> <span class="n">oblivion</span><span class="p">{</span> <span class="s">"path/to/oblivion"</span> <span class="p">};</span>
+    <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">archive</span> <span class="nn">bsa</span><span class="p">;</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">version</span> <span class="o">=</span> <span class="nn">bsa</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">oblivion</span> <span class="o">/</span> <span class="s">"Data/Oblivion - Voices2.bsa"</span><span class="p">);</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">file</span> <span class="o">=</span> <span class="nn">bsa</span><span class="p">[</span><span class="s">"sound/voice/oblivion.esm/imperial/m"</span><span class="p">][</span><span class="s">"testtoddquest_testtoddhappy_00027fa2_1.mp3"</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">file</span><span class="o">-&gt;</span><span class="nf">write</span><span class="p">(</span><span class="nn">std::filesystem</span><span class="o">::</span><span class="nc">path</span><span class="p">{</span> <span class="s">"happy.mp3"</span> <span class="p">},</span> <span class="n">version</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span></pre></section><section id="examples-writing"><h3><a href="#examples-writing">Writing</a></h3><pre class="m-code"><span class="cp">#include</span> <span class="cpf">&lt;bsa/tes4.hpp&gt;</span>
+<span class="cp">#include</span> <span class="cpf">&lt;cstddef&gt;</span>
+<span class="cp">#include</span> <span class="cpf">&lt;utility&gt;</span>
+
+<span class="k">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="k">char</span> <span class="n">payload</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">"Hello world!</span><span class="se">\n</span><span class="s">"</span> <span class="p">};</span>
+    <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">file</span> <span class="n">f</span><span class="p">;</span>
+    <span class="n">f</span><span class="p">.</span><span class="nf">set_data</span><span class="p">({</span> <span class="k"><a class="m-doc poxy-injected poxy-external poxy-cppreference" href="https://en.cppreference.com/w/cpp/language/reinterpret_cast" target="_blank">reinterpret_cast</a></span><span class="o">&lt;</span><span class="k">const</span> <span class="nn">std</span><span class="o">::</span><span class="nc">byte</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">payload</span><span class="p">),</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">});</span>
+
+    <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">directory</span> <span class="n">d</span><span class="p">;</span>
+    <span class="n">d</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s">"hello.txt"</span><span class="p">,</span> <span class="nn">std</span><span class="o">::</span><span class="nf">move</span><span class="p">(f</span><span class="p">));</span>
+
+    <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">archive</span> <span class="n">archive</span><span class="p">;</span>
+    <span class="n">archive</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="s">"misc"</span><span class="p">,</span> <span class="nn">std</span><span class="o">::</span><span class="nf">move</span><span class="p">(d</span><span class="p">));</span>
+    <span class="n">archive</span><span class="p">.</span><span class="nf">archive_flags</span><span class="p">(</span><span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">archive_flag</span><span class="o">::</span><span class="mi">file_strings</span> <span class="o">|</span> <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">archive_flag</span><span class="o">::</span><span class="mi">directory_strings</span><span class="p">);</span>
+    <span class="n">archive</span><span class="p">.</span><span class="nf">archive_types</span><span class="p">(</span><span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">archive_type</span><span class="o">::</span><span class="mi">misc</span><span class="p">);</span>
+
+    <span class="n">archive</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s">"example.bsa"</span><span class="p">,</span> <span class="nn">bsa::tes4</span><span class="o">::</span><span class="nc">version</span><span class="o">::</span><span class="mi">sse</span><span class="p">);</span>
+<span class="p">}</span></pre></section></section><section id="cmake-options"><h2><a href="#cmake-options">CMake Options</a></h2><table class="m-table"><thead><tr><th>Option</th><th>Default Value</th><th>Description</th></tr></thead><tbody><tr><td><code>BSA_BUILD_DOCS</code></td><td><code>OFF</code> ❌</td><td>Set to <code>ON</code> to build the documentation.</td></tr><tr><td><code>BSA_BUILD_EXAMPLES</code></td><td><code>OFF</code> ❌</td><td>Set to <code>ON</code> to build the examples.</td></tr><tr><td><code>BSA_BUILD_SRC</code></td><td><code>ON</code> ✔️</td><td>Set to <code>ON</code> to build the main library.</td></tr><tr><td><code>BSA_SUPPORT_XMEM</code></td><td><code>OFF</code> ❌</td><td>Set to <code>ON</code> to build support for the xmem codec proxy.</td></tr><tr><td><code>BUILD_TESTING</code></td><td><code>ON</code> ✔️</td><td>Set to <code>ON</code> to build the tests. See also the CMake <a class="poxy-external" href="https://cmake.org/cmake/help/latest/module/CTest.html" target="_blank">documentation</a> for this option.</td></tr></tbody></table></section><section id="integration"><h2><a href="#integration">Integration</a></h2><p><code>bsa</code> uses <a class="poxy-external" href="https://cmake.org/" target="_blank">CMake</a> as its primary build system. Assuming that <code>bsa</code> and its dependencies have been installed to a place where CMake can find it, then using it in your project is as simple as:</p><pre>find_package(bsa REQUIRED CONFIG)
+target_link_libraries(${PROJECT_NAME} PUBLIC bsa::bsa)
+</pre></section><section id="xmem-codec"><h2><a href="#xmem-codec">XMem Codec</a></h2><p>The xmem codec is a compression format available as part of the xbox development kit (XDK). This compression format is utilized only in TESV. <code>archive.exe</code> for TESV:SSE has this compression flag available, however it is unimplemented, and the game will simply use LZ4 instead. Support for this format is very difficult due to its proprietary nature, however there exists an implementation of the format as part of the XNA framework, which is freely available, albeit as a 32-bit binary. Thus, support for this format is only available on Windows, and requires users to opt into it via the <code>BSA_SUPPORT_XMEM</code> CMake option. Additionally, users must build the xmem support proxy separately, and bundle the resulting binary with their own.</p></section><section id="important-notes"><h2><a href="#important-notes">Important Notes</a></h2><ul><li>If the <code>hash</code> of one <code>file</code> compares equal to the <code>hash</code> of another <code>file</code>, then they <em>are</em> equal. It doesn't matter if they have different file names, or if they store different data blobs. The game engine uniquely identifies <code>file</code>'s based on their <code>hash</code> alone.</li><li>UTF-8 inputs are not well formed. The game engine has a crippling bug where extended ascii characters can index out-of-bounds, producing unreproducible hashes. It is the user's job to ensure they aren't attempting to store paths which contain such characters. The game engine will accept them, but it will never be able to reproducibly locate them.</li><li>The game engine normalizes paths to use the <code>\</code> character instead of the standard <code>/</code>. As such, users should be aware that file paths retrieved from the virtual file system may not constitute valid paths on their native file system.</li><li>Avoid writing file paths which are close to the limit of <code>MAX_PATH</code>. Bethesda uses fixed buffers everywhere with no input validation, so they will most likely crash the game.</li><li>Make sure to lexically normalize your paths before you pass them. Bethesda uses <em>really</em> basic path splitting methods, and <code>bsa</code> replicates them.</li><li>Files can not be split into more than 4 chunks inside a ba2. Bethesda uses a fixed buffer to store the chunks, and exceeding that limit will likely crash the game.</li></ul></section><section id="dependencies"><h2><a href="#dependencies">Dependencies</a></h2><section id="dependencies-consumption"><h3><a href="#dependencies-consumption">Consumption</a></h3><ul><li><a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_<wbr/>io</a></li><li><a class="poxy-external" href="https://github.com/microsoft/DirectXTex" target="_blank">DirectXTex</a> (windows only)</li><li><a class="poxy-external" href="https://github.com/lz4/lz4" target="_blank">LZ4</a></li><li><a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/mmio" target="_blank">mmio</a></li><li><a class="poxy-external" href="https://github.com/madler/zlib" target="_blank">zlib</a></li></ul></section><section id="dependencies-xmem"><h3><a href="#dependencies-xmem">XMem Codec Support</a></h3><ul><li><a class="poxy-external" href="https://github.com/Taywee/args" target="_blank">args</a></li><li><a class="poxy-external" href="https://github.com/martinmoene/expected-lite" target="_blank">expected lite</a></li><li><a class="poxy-external" href="https://github.com/DaanDeMeyer/reproc" target="_blank">reproc</a></li><li><a class="poxy-external" href="https://github.com/herumi/xbyak" target="_blank">Xbyak</a></li></ul></section><section id="dependencies-development"><h3><a href="#dependencies-development">Development</a></h3><ul><li><a class="poxy-external" href="https://github.com/catchorg/Catch2" target="_blank">Catch2</a></li><li><a class="poxy-external" href="https://github.com/marzer/poxy" target="_blank">poxy</a></li></ul></section></section><section id="alternatives"><h2><a href="#alternatives">Alternatives</a></h2><ul><li>C#<ul><li><a class="poxy-external" href="https://github.com/AlexxEG/BSA_Browser" target="_blank">BSA Browser</a></li><li><a class="poxy-external" href="https://www.nexusmods.com/oblivion/mods/2097" target="_blank">Oblivion Mod Manager</a></li><li><a class="poxy-external" href="https://github.com/wabbajack-tools/wabbajack" target="_blank">Wabbajack</a></li></ul></li><li>C++<ul><li><a class="poxy-external" href="https://www.nexusmods.com/skyrimspecialedition/mods/974" target="_blank">Bethesda Archive Extractor</a> (no source)</li><li><a class="poxy-external" href="https://github.com/Ethatron/bsaopt" target="_blank">BSAopt</a></li><li><a class="poxy-external" href="https://web.archive.org/web/20071010081047/http://www34.brinkster.com:80/ghostwheel/" target="_blank">BSAPACK</a></li><li><a class="poxy-external" href="https://gitlab.com/G_ka/Cathedral_Assets_Optimizer" target="_blank">Cathedral Assets Optimizer</a></li><li><a class="poxy-external" href="https://github.com/Ethatron/ddsopt" target="_blank">DDSopt</a></li><li><a class="poxy-external" href="https://f4se.silverlock.org/" target="_blank">Fallout 4 Tools</a></li><li><a class="poxy-external" href="https://github.com/Ortham/libbsa" target="_blank">Libbsa</a></li><li><a class="poxy-external" href="https://github.com/ModOrganizer2/modorganizer-bsatk" target="_blank">Mod Organizer 2</a></li></ul></li><li>Java<ul><li><a class="poxy-external" href="https://www.nexusmods.com/fallout3/mods/34" target="_blank">FO3 Archive Utility</a> (no source)</li></ul></li><li>Javascript<ul><li><a class="poxy-external" href="https://github.com/reklatsmasters/bsa" target="_blank">bsa</a></li></ul></li><li>Pascal<ul><li><a class="poxy-external" href="https://github.com/TES5Edit/TES5Edit" target="_blank">BSArch</a></li></ul></li><li>Python<ul><li><a class="poxy-external" href="https://github.com/stephen-bunn/bethesda-structs" target="_blank">Bethesda Structs</a></li><li><a class="poxy-external" href="https://github.com/wrye-bash/wrye-bash" target="_blank">Wrye Bash</a></li></ul></li><li>Unknown<ul><li><a class="poxy-external" href="https://www.nexusmods.com/oblivion/mods/3311" target="_blank">BSA Commander</a> (no source)</li><li><a class="poxy-external" href="https://www.nexusmods.com/skyrim/mods/4804/" target="_blank">BSA Unpacker</a> (no source)</li><li><a class="poxy-external" href="https://web.archive.org/web/20071010081047/http://www34.brinkster.com:80/ghostwheel/" target="_blank">TES4BSA</a> (no source)</li></ul></li></ul></section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script><script>install_mcss_search_shim();</script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+<a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa" target="_blank">GitHub</a>
+• <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/issues" target="_blank">Report an issue</a>
+• <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank">License</a>
+• <a download="" href="bsa.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+<br/><br/>
+Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>bsa::tes4::archive class | bsa bethesda archives meet c++</title>
+  <link href="favicon-dark.png" rel="icon" type="image/png"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#22272e" name="theme-color"/>
+  <link href="poxy/poxy.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+  <script src="poxy/poxy.js"></script>
+  <script>initialize_theme("dark");</script>
+  <meta content="bsa" name="twitter:title"/>
+  <meta content="bsa" property="og:title"/>
+  <meta content="bsa" itemprop="name"/>
+  <meta content="Ryan McKenzie" name="author"/>
+  <meta content="Ryan McKenzie" property="article:author"/>
+  <meta content="bethesda archives meet c++" name="description"/>
+  <meta content="bethesda archives meet c++" name="twitter:description"/>
+  <meta content="bethesda archives meet c++" property="og:description"/>
+  <meta content="bethesda archives meet c++" itemprop="description"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta content="Poxy v0.13.9" name="generator"/>
+  <meta content="strict-origin-when-cross-origin" name="referrer"/>
+</head>
+<body class="poxy-has-toc">
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a class="m-col-t-8 m-col-m-none m-left-m" href="index.html" id="m-navbar-brand">bsa <span class="m-thin">bethesda archives meet c++</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z" id="m-doc-search-icon-path"></path>
+        </svg></a>
+        <a href="#navigation" id="m-navbar-show" title="Show navigation"></a>
+        <a href="#" id="m-navbar-hide" title="Hide navigation"></a>
+      </div>
+      <div class="m-col-t-12 m-show-m m-col-m-none m-right-m" id="m-navbar-collapse">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="annotated.html">Classes</a></li>
+            <li><a href="namespaces.html">Namespaces</a></li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="3">
+            <li><a class="poxy-icon repo github poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa" target="_blank" title="View on GitHub"><svg id="poxy-icon-repo" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25,1.23a24.37,24.37,0,0,0-7.7,47.5C18.51,49,19,48.2,19,47.56s0-2.12,0-4.15c-6.78,1.47-8.21-3.27-8.21-3.27C9.61,37.33,8,36.58,8,36.58c-2.21-1.51.17-1.48.17-1.48a5.12,5.12,0,0,1,3.73,2.51c2.17,3.72,5.7,2.65,7.09,2a5.25,5.25,0,0,1,1.55-3.26c-5.41-.61-11.1-2.7-11.1-12A9.41,9.41,0,0,1,12,17.79a8.75,8.75,0,0,1,.24-6.45s2-.66,6.7,2.49a23.1,23.1,0,0,1,12.2,0c4.66-3.15,6.7-2.49,6.7-2.49A8.75,8.75,0,0,1,38,17.79a9.41,9.41,0,0,1,2.51,6.54c0,9.36-5.7,11.42-11.13,12a5.83,5.83,0,0,1,1.65,4.51c0,3.26,0,5.89,0,6.69,0,.65.44,1.41,1.68,1.17A24.38,24.38,0,0,0,25,1.23Z" fill="currentColor"></path></svg></a></li>
+            <li><a class="poxy-icon theme" href="javascript:void(null);" id="poxy-theme-switch" onclick="toggle_theme(); return false;" role="button" title="Toggle dark and light themes"><svg id="poxy-theme-switch-img" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="185.6708" cy="183.8122" fill="currentColor" r="65.625"></circle><path d="M185.6708,87.5622a13.1256,13.1256,0,0,0,13.125-13.125V52.5622a13.125,13.125,0,1,0-26.25,0v21.875A13.1257,13.1257,0,0,0,185.6708,87.5622Z" fill="currentColor"></path><path d="M99.051,115.7519a13.1236,13.1236,0,1,0,18.56-18.56L102.1442,81.726a13.1236,13.1236,0,0,0-18.5595,18.56Z" fill="currentColor"></path><path d="M89.4208,183.8122a13.1257,13.1257,0,0,0-13.125-13.125H54.4208a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,89.4208,183.8122Z" fill="currentColor"></path><path d="M99.051,251.8725,83.5847,267.3431a13.1236,13.1236,0,1,0,18.56,18.56l15.4663-15.4706a13.1236,13.1236,0,1,0-18.5595-18.56Z" fill="currentColor"></path><path d="M185.6708,280.0622a13.1258,13.1258,0,0,0-13.125,13.125v21.875a13.125,13.125,0,0,0,26.25,0v-21.875A13.1257,13.1257,0,0,0,185.6708,280.0622Z" fill="currentColor"></path><path d="M272.2907,251.8725a13.1236,13.1236,0,1,0-18.56,18.56l15.4663,15.4706a13.1236,13.1236,0,1,0,18.56-18.56Z" fill="currentColor"></path><path d="M330.0458,183.8122a13.1257,13.1257,0,0,0-13.125-13.125h-21.875a13.125,13.125,0,0,0,0,26.25h21.875A13.1256,13.1256,0,0,0,330.0458,183.8122Z" fill="currentColor"></path><path d="M263.0109,119.5971a13.0824,13.0824,0,0,0,9.28-3.8452l15.4663-15.4663a13.1236,13.1236,0,1,0-18.56-18.56L253.7312,97.1923a13.125,13.125,0,0,0,9.28,22.4048Z" fill="currentColor"></path><path d="M456.9379,401.6714a63.97,63.97,0,0,1-14.9963,7.2055c-19.6448,6.5283-41.8787,2.9566-58.1439-9.8523a68.9311,68.9311,0,0,1-10.835-10.8339c-12.8088-16.2663-16.3806-38.5-9.8523-58.1471a63.8444,63.8444,0,0,1,7.2077-14.9931,8.8036,8.8036,0,0,0-10.1172-13.3034,87.5188,87.5188,0,1,0,110.0372,110.04A8.8,8.8,0,0,0,456.9379,401.6714Z" fill="currentColor"></path></svg></a></li>
+            <li class="m-show-m"><a class="m-doc-search-icon" href="#search" onclick="return showSearch()" title="Search"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path"></use>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacebsa.html">bsa</a>::<wbr/></span><span class="m-breadcrumb"><a href="namespacebsa_1_1tes4.html">tes4</a>::<wbr/></span>archive <span class="m-thin">class</span> <span class="m-label m-flat m-warning">final</span>
+          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="tes4_8hpp.html">&lt;bsa/tes4.hpp&gt;</a></div>
+        </h1>
+        <p>Represents the TES4 revision of the bsa format.</p>
+        <nav class="m-block m-default poxy-toc" id="poxy-toc">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#base-classes">Base classes</a></li>
+                <li><a href="#archive-flags">Archive flags</a></li>
+                <li><a href="#archive-types">Archive types</a></li>
+                <li><a href="#capacity">Capacity</a></li>
+                <li><a href="#iterators">Iterators</a></li>
+                <li><a href="#lookup">Lookup</a></li>
+                <li><a href="#member-types">Member types</a></li>
+                <li><a href="#modifiers">Modifiers</a></li>
+                <li><a href="#reading">Reading</a></li>
+                <li><a href="#verification">Verification</a></li>
+                <li><a href="#writing">Writing</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <section id="base-classes">
+          <h2><a href="#base-classes">Base classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <div class="m-doc-template">template &lt;<span class="m-doc-template-params"><span class="m-doc-template-param">class T</span>, <span class="m-doc-template-param">bool RECURSE</span></span>&gt;</div>
+              class <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html">bsa::components::hashmap&lt;directory, true&gt;</a>
+            </dt>
+            <dd>Establishes a basic mapping between a <a class="m-doc" href="classbsa_1_1components_1_1key.html">key</a> and its associated files.</dd>
+          </dl>
+        </section>
+        <section id="archive-flags">
+          <h2><a href="#archive-flags">Archive flags</a></h2>
+          <dl class="m-doc">
+            <dt id="a141e80a817206e8a882acd304bd9cebf">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a141e80a817206e8a882acd304bd9cebf">archive_flags</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347b">archive_<wbr/>flag</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves the current archive flags.</dd>
+            <dt id="a3c48bfea645e9ad0d45dd0713428e8fb">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a3c48bfea645e9ad0d45dd0713428e8fb">archive_flags</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347b">archive_<wbr/>flag</a> a_flags) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Sets the current archive flags.</dd>
+            <dt id="a7e7de849d2b82320f412aeab0ff1c5af">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a7e7de849d2b82320f412aeab0ff1c5af">compressed</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba2b98a4ad988a18c42682f388901f2672">archive_flag::<wbr/>compressed</a> is set.</dd>
+            <dt id="aac7def1ba556696e7bb58a239a89dc46">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aac7def1ba556696e7bb58a239a89dc46">directory_strings</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347baa7dc9140432a962a83524e4206abf256">archive_flag::<wbr/>directory_strings</a> is set.</dd>
+            <dt id="a52285dcfc722119f8f59e11555de849d">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a52285dcfc722119f8f59e11555de849d">embedded_file_names</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347bafe3ff6f81e61f998602d0b1c66c7b944">archive_flag::<wbr/>embedded_file_names</a> is set.</dd>
+            <dt id="af9efebd70dc54fb1e2b77b326a1558d5">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#af9efebd70dc54fb1e2b77b326a1558d5">file_strings</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba481811567b0b34aee94c54a3473c6adc">archive_flag::<wbr/>file_strings</a> is set.</dd>
+            <dt id="aed26d8f8d45b455fff8170ac81b46c3e">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aed26d8f8d45b455fff8170ac81b46c3e">retain_directory_names</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347baa9a41705977069b26d7e30dc2501d8b9">archive_flag::<wbr/>retain_directory_names</a> is set.</dd>
+            <dt id="aac5c1f30ffe5c85a9b596764e92b2a48">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aac5c1f30ffe5c85a9b596764e92b2a48">retain_file_name_offsets</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba6d061ee081309ebce673951e4468775e">archive_flag::<wbr/>retain_file_name_offsets</a> is set.</dd>
+            <dt id="aa17bff448f955d8c1fa55a5fbc96716d">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aa17bff448f955d8c1fa55a5fbc96716d">retain_file_names</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347bad28bc7ccc5087c8c47d5d2c1f31403a7">archive_flag::<wbr/>retain_file_names</a> is set.</dd>
+            <dt id="a890c218e44f5ee66ee0e1cdb4477ac61">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a890c218e44f5ee66ee0e1cdb4477ac61">retain_strings_during_startup</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347bae82e4eb0d7802c56696a8d6689609793">archive_flag::<wbr/>retain_strings_during_startup</a> is set.</dd>
+            <dt id="a705d2a06c2d25a1f214cdb3594251ea2">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a705d2a06c2d25a1f214cdb3594251ea2">xbox_archive</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba349e12e1da168ba0f0651fcc8120d3b8">archive_flag::<wbr/>xbox_archive</a> is set.</dd>
+            <dt id="a668cafb52016f79dd811009092a9c54e">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a668cafb52016f79dd811009092a9c54e">xbox_compressed</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#a929dbf32826a657e850c6c563e47347ba08678295c8b2e35e4b32058998bd859e">archive_flag::<wbr/>xbox_compressed</a> is set.</dd>
+          </dl>
+        </section>
+        <section id="archive-types">
+          <h2><a href="#archive-types">Archive types</a></h2>
+          <dl class="m-doc">
+            <dt id="a7285c3a4f52c7dfd95c3dcbe8a001168">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a7285c3a4f52c7dfd95c3dcbe8a001168">archive_types</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39">archive_<wbr/>type</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Retrieves the current archive types.</dd>
+            <dt id="a82051152ff37e9e3aef4e1ad906d2907">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#a82051152ff37e9e3aef4e1ad906d2907">archive_types</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39">archive_<wbr/>type</a> a_types) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Sets the current archive types.</dd>
+            <dt id="a0e6eb84e9ad2e32bb64f19d5611b454d">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a0e6eb84e9ad2e32bb64f19d5611b454d">fonts</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39a980d14c0c85495b48b9a9134658e6121">archive_type::<wbr/>fonts</a> is set.</dd>
+            <dt id="af6697951d01b3b3b380625c7f864aeef">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#af6697951d01b3b3b380625c7f864aeef">menus</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39a81ca0b7c951be89184c130d2860a5b00">archive_type::<wbr/>menus</a> is set.</dd>
+            <dt id="adbc18f17ad352f330400a5a258014db9">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#adbc18f17ad352f330400a5a258014db9">meshes</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39a1541efdcede8c5a0c2ed7e32c89b361f">archive_type::<wbr/>meshes</a> is set.</dd>
+            <dt id="a13ff4831ecf3b38cb8a2c632d9603e09">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a13ff4831ecf3b38cb8a2c632d9603e09">misc</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39abc957e26ff41470c556ee5d09e96880b">archive_type::<wbr/>misc</a> is set.</dd>
+            <dt id="a7f7c1f7afe0b9979167051d39fb30163">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a7f7c1f7afe0b9979167051d39fb30163">shaders</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39a1aa355706e1767666124331a716c7890">archive_type::<wbr/>shaders</a> is set.</dd>
+            <dt id="a4887d88866f6c9f04dd69477db048b82">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a4887d88866f6c9f04dd69477db048b82">sounds</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39aad1588d76517dd34c49c3f901bce7fcf">archive_type::<wbr/>sounds</a> is set.</dd>
+            <dt id="abc9a402ddb6180c71385721fe335489c">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#abc9a402ddb6180c71385721fe335489c">textures</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39ac5e62798e528da9080811018cbb27cd3">archive_type::<wbr/>textures</a> is set.</dd>
+            <dt id="a522c9330e0909f43a39f05df9d388db4">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#a522c9330e0909f43a39f05df9d388db4">trees</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39a2d5563ed288ac5396add9b78fbca810b">archive_type::<wbr/>trees</a> is set.</dd>
+            <dt id="aa17417553a34ac4474567316ab03741a">
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc-self" href="#aa17417553a34ac4474567316ab03741a">voices</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if <a class="m-doc" href="namespacebsa_1_1tes4.html#ae0c17a039f112258e48dc29f4582ed39aac163f065d2b3ecd5fc2f8e6365b367e">archive_type::<wbr/>voices</a> is set.</dd>
+          </dl>
+        </section>
+        <section id="capacity">
+          <h2><a href="#capacity">Capacity</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a8323ce8a4363e9aa1900c702db23d824">empty</a>(</span><span class="m-doc-wrap">) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Checks if the container is empty.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a02e86261859aa54b60c8aab9249b745c">size</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Returns the number of elements in the container.</dd>
+          </dl>
+        </section>
+        <section id="iterators">
+          <h2><a href="#iterators">Iterators</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a2685315d484419a6c821a524e34c0221">begin</a>(</span><span class="m-doc-wrap">) -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an interator to the beginning of the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ae7605acca06cb7139d5be8b616ca571d">begin</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an interator to the beginning of the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#aa69f09325ec659912514d502458d01fc">cbegin</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an interator to the beginning of the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a385aa7c5914372f47c3530510470ef8e">cend</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an iterator to the end of the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a3e29ceff8e26f543f3883bb841904dae">end</a>(</span><span class="m-doc-wrap">) -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an iterator to the end of the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a8465be933e3ddbb0beff1000fbe12494">end</a>(</span><span class="m-doc-wrap">) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains an iterator to the end of the container.</dd>
+          </dl>
+        </section>
+        <section id="lookup">
+          <h2><a href="#lookup">Lookup</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#adf0b067b3bb96b2287cd9e6a5a7bdc06">find</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Finds a <code>value_type</code> with the given key within the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#add527d0ed7759ac82e7c3f507e14026d">find</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Finds a <code>value_type</code> with the given key within the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a8be04385cad568cb9bff1e8a33cd324c">operator[]</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a4c8b88df846bfa9be28bfcb4eb876fb3">index</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains a proxy to the underlying <code>mapped_type</code>. The validity of the proxy depends on the presence of the key within the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#af268fc2252a293e0d80e09e6541aeda5">operator[]</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) const -&gt; <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab11a383ffd618d3a9abc8e7acad6bb4b">const_<wbr/>index</a> <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Obtains a proxy to the underlying <code>mapped_type</code>. The validity of the proxy depends on the presence of the key within the container.</dd>
+          </dl>
+        </section>
+        <section id="member-types">
+          <h2><a href="#member-types">Member types</a></h2>
+          <dl class="m-doc">
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab11a383ffd618d3a9abc8e7acad6bb4b">const_index</a> = index_t&lt;const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_iterator</a> = typename container_type::const_iterator
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a4c8b88df846bfa9be28bfcb4eb876fb3">index</a> = index_t&lt;<a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> = typename container_type::iterator
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a82a1cbe1587f03b5c010e793a664ad78">key_compare</a> = typename container_type::key_compare
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_type</a> = typename T::key
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_type</a> = <a class="m-doc" href="classbsa_1_1tes4_1_1directory.html">directory</a>
+            </dt>
+            <dd></dd>
+            <dt>
+              using <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#afa94e8a401bc1a82150bb80856d0508b">value_type</a> = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/pair.html" target="_blank">std::<wbr/>pair</a>&lt;const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>, <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section id="modifiers">
+          <h2><a href="#modifiers">Modifiers</a></h2>
+          <dl class="m-doc">
+            <dt id="ae66d04dfca92cb6337956d4396ffbe1c">
+              <span class="m-doc-wrap-bumper">void <a class="m-doc-self" href="#ae66d04dfca92cb6337956d4396ffbe1c">clear</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Clears the contents, flags, and file types of the archive.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ada79189db0781a44d9c4e43bc73b5f9c">erase</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Erases any element with the given key from the container.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#af71f9a6ff9e884392cb5aea133f6d2ed">insert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a> a_key,
+              <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a> a_value) -&gt; <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/pair.html" target="_blank">std::<wbr/>pair</a>&lt;<a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a>, bool&gt; <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Inserts <code>a_value</code> into the container with the given <code>a_key</code>.</dd>
+          </dl>
+        </section>
+        <section id="reading">
+          <h2><a href="#reading">Reading</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a1b91a0576109b3d2e8989f2aef303115">read</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1read__source.html">read_<wbr/>source</a> a_source) -&gt; <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a></span>
+            </dt>
+            <dd>Reads the contents of the source.</dd>
+          </dl>
+        </section>
+        <section id="verification">
+          <h2><a href="#verification">Verification</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a class="m-doc" href="#a379d3902455021f27fc2d41fbaf8d4d7">verify_offsets</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version) const -&gt; bool <span class="m-label m-flat m-success">noexcept</span></span>
+            </dt>
+            <dd>Verifies that offsets within the archive will be valid when written to disk.</dd>
+          </dl>
+        </section>
+        <section id="writing">
+          <h2><a href="#writing">Writing</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a class="m-doc" href="#abcc63447f1a1fc06fe4c9d1fb0fbeb40">write</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1write__sink.html">write_<wbr/>sink</a> a_sink,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version) const</span>
+            </dt>
+            <dd>Writes the contents of the object to the destination.</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Typedef documentation</h2>
+          <section class="m-doc-details" id="ab11a383ffd618d3a9abc8e7acad6bb4b"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#ab11a383ffd618d3a9abc8e7acad6bb4b">const_index</a> = index_t&lt;const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ad7ba34f8859c8d0b2149eabc229f131c"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#ad7ba34f8859c8d0b2149eabc229f131c">const_iterator</a> = typename container_type::const_iterator
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a4c8b88df846bfa9be28bfcb4eb876fb3"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#a4c8b88df846bfa9be28bfcb4eb876fb3">index</a> = index_t&lt;<a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a6a17f1ff476ae31002e2eaa199246605"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#a6a17f1ff476ae31002e2eaa199246605">iterator</a> = typename container_type::iterator
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a82a1cbe1587f03b5c010e793a664ad78"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#a82a1cbe1587f03b5c010e793a664ad78">key_compare</a> = typename container_type::key_compare
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="ab5a2b045f3895f8e24d8fd60ce4b33be"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#ab5a2b045f3895f8e24d8fd60ce4b33be">key_type</a> = typename T::key
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="a175b6fb459551b1ffc5234f62351fea1"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#a175b6fb459551b1ffc5234f62351fea1">mapped_type</a> = <a class="m-doc" href="classbsa_1_1tes4_1_1directory.html">directory</a>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+          <section class="m-doc-details" id="afa94e8a401bc1a82150bb80856d0508b"><div>
+            <h3>
+              using <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span><a class="m-doc-self" href="#afa94e8a401bc1a82150bb80856d0508b">value_type</a> = <a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/pair.html" target="_blank">std::<wbr/>pair</a>&lt;const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>, <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a>&gt;
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p></p>
+          </div></section>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a8323ce8a4363e9aa1900c702db23d824"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a8323ce8a4363e9aa1900c702db23d824">empty</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Checks if the container is empty.</p>
+          </div></section>
+          <section class="m-doc-details" id="a02e86261859aa54b60c8aab9249b745c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/types/size_t.html" target="_blank">std::<wbr/>size_t</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a02e86261859aa54b60c8aab9249b745c">size</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Returns the number of elements in the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a2685315d484419a6c821a524e34c0221"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a2685315d484419a6c821a524e34c0221">begin</a>(</span><span class="m-doc-wrap">) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an interator to the beginning of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="ae7605acca06cb7139d5be8b616ca571d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ae7605acca06cb7139d5be8b616ca571d">begin</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an interator to the beginning of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="aa69f09325ec659912514d502458d01fc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#aa69f09325ec659912514d502458d01fc">cbegin</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an interator to the beginning of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a385aa7c5914372f47c3530510470ef8e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a385aa7c5914372f47c3530510470ef8e">cend</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an iterator to the end of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a3e29ceff8e26f543f3883bb841904dae"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a3e29ceff8e26f543f3883bb841904dae">end</a>(</span><span class="m-doc-wrap">) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an iterator to the end of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a8465be933e3ddbb0beff1000fbe12494"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a8465be933e3ddbb0beff1000fbe12494">end</a>(</span><span class="m-doc-wrap">) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains an iterator to the end of the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="adf0b067b3bb96b2287cd9e6a5a7bdc06"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#adf0b067b3bb96b2287cd9e6a5a7bdc06">find</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Finds a <code>value_type</code> with the given key within the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="add527d0ed7759ac82e7c3f507e14026d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ad7ba34f8859c8d0b2149eabc229f131c">const_<wbr/>iterator</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#add527d0ed7759ac82e7c3f507e14026d">find</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Finds a <code>value_type</code> with the given key within the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="a8be04385cad568cb9bff1e8a33cd324c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a4c8b88df846bfa9be28bfcb4eb876fb3">index</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a8be04385cad568cb9bff1e8a33cd324c">operator[]</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains a proxy to the underlying <code>mapped_type</code>. The validity of the proxy depends on the presence of the key within the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="af268fc2252a293e0d80e09e6541aeda5"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab11a383ffd618d3a9abc8e7acad6bb4b">const_<wbr/>index</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af268fc2252a293e0d80e09e6541aeda5">operator[]</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) const <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Obtains a proxy to the underlying <code>mapped_type</code>. The validity of the proxy depends on the presence of the key within the container.</p>
+          </div></section>
+          <section class="m-doc-details" id="ada79189db0781a44d9c4e43bc73b5f9c"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#ada79189db0781a44d9c4e43bc73b5f9c">erase</a>(</span><span class="m-doc-wrap">const <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a>&amp; a_key) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Erases any element with the given key from the container.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>Returns <code>true</code> if the element was successfully deleted, <code>false</code> otherwise.</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="af71f9a6ff9e884392cb5aea133f6d2ed"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/utility/pair.html" target="_blank">std::<wbr/>pair</a>&lt;<a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a6a17f1ff476ae31002e2eaa199246605">iterator</a>, bool&gt; <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#af71f9a6ff9e884392cb5aea133f6d2ed">insert</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#ab5a2b045f3895f8e24d8fd60ce4b33be">key_<wbr/>type</a> a_key,
+              <a class="m-doc" href="classbsa_1_1components_1_1hashmap.html#a175b6fb459551b1ffc5234f62351fea1">mapped_<wbr/>type</a> a_value) <span class="m-label m-success">noexcept</span></span></span>
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="common_8hpp.html">&lt;bsa/detail/common.hpp&gt;</a></div>
+            </h3>
+            <p>Inserts <code>a_value</code> into the container with the given <code>a_key</code>.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_key</td>
+                  <td>The key of the <code>value_type</code>.</td>
+                </tr>
+                <tr>
+                  <td>a_value</td>
+                  <td>The value of the <code>value_type</code>.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>Returns an <code>iterator</code> to the position at which the given <code>value_type</code> was inserted, and a <code>bool</code> to indicate if the insertion was successful.</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a1b91a0576109b3d2e8989f2aef303115"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a1b91a0576109b3d2e8989f2aef303115">read</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1read__source.html">read_<wbr/>source</a> a_source)</span></span>
+            </h3>
+            <p>Reads the contents of the source.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_source</td>
+                  <td>Where/how to read the given archive.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr>
+                  <th>Returns</th>
+                  <td>The version of the archive that was read.</td>
+                </tr>
+              </thead>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when reads index out of bounds.</td>
+                </tr>
+                <tr>
+                  <td><a class="m-doc" href="classbsa_1_1exception.html">bsa::<wbr/>exception</a></td>
+                  <td>Thrown when archive parsing errors are encountered.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-default"><h4>Remark</h4><p>If any exception is thrown, the object is left in an unspecified state. Use clear to return it to a valid state.</p><p>If the function returns successfully, the contents of the object are <em>replaced</em> with the contents of the input.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a379d3902455021f27fc2d41fbaf8d4d7"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">bool <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#a379d3902455021f27fc2d41fbaf8d4d7">verify_offsets</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version) const <span class="m-label m-success">noexcept</span></span></span>
+            </h3>
+            <p>Verifies that offsets within the archive will be valid when written to disk.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_version</td>
+                  <td>The version format to check for.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Returns</th>
+                  <td>Returns <code>true</code> is the archive passes validation, <code>false</code> otherwise.</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="abcc63447f1a1fc06fe4c9d1fb0fbeb40"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void <span class="m-doc-details-prefix">bsa::<wbr/>tes4::<wbr/>archive::<wbr/></span></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a class="m-doc-self" href="#abcc63447f1a1fc06fe4c9d1fb0fbeb40">write</a>(</span><span class="m-doc-wrap"><a class="m-doc" href="classbsa_1_1write__sink.html">write_<wbr/>sink</a> a_sink,
+              <a class="m-doc" href="namespacebsa_1_1tes4.html#a80407ad9bc5b93ad43225b2bb9f5100c">version</a> a_version) const</span></span>
+            </h3>
+            <p>Writes the contents of the object to the destination.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">a_sink</td>
+                  <td>Where/how to write the given archive.</td>
+                </tr>
+                <tr>
+                  <td>a_version</td>
+                  <td>The version format to write the archive in.</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="2">Exceptions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="m-doc-external poxy-cppreference poxy-external" href="http://en.cppreference.com/w/cpp/error/system_error.html" target="_blank">std::<wbr/>system_error</a></td>
+                  <td>Thrown when filesystem errors are encountered.</td>
+                </tr>
+                <tr>
+                  <td><a class="m-doc poxy-injected poxy-external" href="https://github.com/Ryan-rsm-McKenzie/binary_io" target="_blank">binary_io::buffer_exhausted</a></td>
+                  <td>Thrown when the output buffer is exhausted.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+        </section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">…</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input autocomplete="off" autofocus="autofocus" disabled="disabled" id="search-input" name="q" placeholder="Loading …" spellcheck="false" type="search"/>
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div class="m-text m-dim m-text-center" id="search-help">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">↓</span>
+            / <span class="m-label m-dim">↑</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+          </div>
+          <div class="m-text m-warning m-text-center" id="search-notfound">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v2.js"></script><script>install_mcss_search_shim();</script>
+<script async="async" src="searchdata-v2.js"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        
+<a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa" target="_blank">GitHub</a>
+• <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/issues" target="_blank">Report an issue</a>
+• <a class="poxy-external" href="https://github.com/Ryan-rsm-McKenzie/bsa/blob/master/LICENSE" target="_blank">License</a>
+• <a download="" href="bsa.tagfile.xml" target="_blank" type="text/xml">Doxygen tagfile</a>
+<br/><br/>
+Site generated using <a class="poxy-external" href="https://github.com/marzer/poxy/" target="_blank">Poxy</a>
+
+      </div>
+    </div>
+  </div>
+</nav></footer>
+
+
+</body></html>
