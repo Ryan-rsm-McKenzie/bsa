@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <format>
 #include <span>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -650,7 +650,9 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 				}
 
 				bsa::fo4::archive ba2;
-				const auto path = root / std::format("{}_v{}.ba2", format_str, static_cast<std::uint32_t>(version));
+				std::ostringstream strstr;
+				strstr << format_str << "_v" << static_cast<std::uint32_t>(version) << ".ba2";
+				const auto path = root / strstr.str();
 				const auto meta = ba2.read(path);
 				REQUIRE(meta.version_ == version);
 				REQUIRE(meta.format_ == format);
