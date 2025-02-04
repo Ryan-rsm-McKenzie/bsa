@@ -8,9 +8,9 @@
 
 namespace bsa::xmem::util
 {
-	template <class EF>                                    //
-	requires(std::invocable<std::remove_reference_t<EF>>)  //
-		class scope_exit
+	template <class EF>                                        //
+		requires(std::invocable<std::remove_reference_t<EF>>)  //
+	class scope_exit
 	{
 	public:
 		// 1)
