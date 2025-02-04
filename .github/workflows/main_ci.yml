@@ -108,6 +108,9 @@ jobs:
       - name: Install XNA Framework Redistributables
         run: choco install xna -y
 
+      - name: Install Ninja
+        run: choco install ninja -y
+
       - name: Setup vcpkg
         run: |
           mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
