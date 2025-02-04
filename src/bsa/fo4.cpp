@@ -743,7 +743,7 @@ namespace bsa::fo4
 			.width = this->header.width,
 			.height = this->header.height,
 			.depth = 1,
-			.arraySize = isCubemap ? 6 : 1,
+			.arraySize = isCubemap ? 6u : 1u,
 			.mipLevels = this->header.mip_count,
 			.miscFlags = isCubemap ? std::uint32_t{ DirectX::TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE } : 0u,
 			.miscFlags2 = 0,
