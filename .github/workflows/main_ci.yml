@@ -86,10 +86,11 @@ jobs:
           ${{ env.gcovr }} -f ".*/examples/.*" -o examples.json
 
       - name: Collect code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           files: bsa/build/examples.json,bsa/build/src.json
+          token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
   windows:
@@ -143,10 +144,11 @@ jobs:
           & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" --sources bsa\extras\xmem\src --sources bsa\extras\xmem\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V
 
       - name: (xmem) Collect code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           files: build/ctestCoverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ${{ github.workspace }}/bsa/extras/xmem/build
 
       - name: (xmem) Install
@@ -170,8 +172,9 @@ jobs:
           & "$($env:SystemDrive)/Program Files/OpenCppCoverage/OpenCppCoverage.exe" --sources bsa\examples --sources bsa\extras\xmem\src --sources bsa\src --sources bsa\tests --cover_children --export_type cobertura -- ctest -C ${{ env.BUILD_TYPE }} -V
 
       - name: (main) Collect code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           files: build/ctestCoverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           working-directory: ${{ github.workspace }}/bsa/build
