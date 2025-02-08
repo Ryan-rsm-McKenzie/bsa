@@ -631,19 +631,14 @@ TEST_CASE("bsa::fo4::archive", "[src][fo4][archive]")
 
 		for (const auto [format, format_str] : formats) {
 			for (const auto version : versions) {
-				std::span<const std::string_view> files;
+				std::vector<std::string_view> files;
 				switch (format) {
 				case bsa::fo4::format::general:
-					{
-						constexpr std::array a = { "License.txt"sv, "SampleA.png"sv };
-						files = std::span(a);
-					}
+					files.push_back("License.txt"sv);
+					files.push_back("SampleA.png"sv);
 					break;
 				case bsa::fo4::format::directx:
-					{
-						constexpr std::array a = { "Fence006_1K_Roughness.dds"sv };
-						files = std::span(a);
-					}
+					files.push_back("Fence006_1K_Roughness.dds"sv);
 					break;
 				default:
 					REQUIRE(false);
